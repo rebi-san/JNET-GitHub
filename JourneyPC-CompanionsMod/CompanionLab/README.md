@@ -2,7 +2,11 @@
 
 Current source version: **0.283**. The build produces `work/JNET-0.283.zip`, which extracts into `JNET/`. Release ZIPs are excluded from this source repository.
 
-Earlier release notes follow; their version numbers describe historical changes.
+0.283 allows a previously JNET-owned native companion slot to resume after a receiver reset when storage, ownership, chapter and gate checks pass. Vanilla connection guards remain enabled. Successful state publication clears stale result 124 when no ownership guard failure is present. Focused receiver and menu checks passed; live multiplayer recovery remains unverified.
+
+## Historical release notes
+
+The version numbers below describe earlier changes, not the current source version.
 
 0.276 replaces the 0.275 custom rider-position code with native Journey events: CreaB_WhaleRide for multi-segment playable creatures and ProtoClothMagnetize for Longtail's cloth mesh. These are the native riding and cloth-attraction mechanisms used in Level_Ruins. Only a local Wayfarer can ride an admitted, fresh remote creature; Rocket Deathmatch is excluded. Native attraction/pull multipliers are increased to 2; carrying strength and online behavior still require live validation. Native LinkEnable, Link and LinkGlitter emitters remain suppressed for creature avatars without changing recharge state. Original level assets and environmental event definitions are unchanged.
 

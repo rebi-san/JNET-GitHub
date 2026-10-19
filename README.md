@@ -2,12 +2,16 @@
 
 Private source repository for the Journey companion mod and its native-code research tools. This snapshot contains the 0.283 source. Package installation and offline tests do not establish live multiplayer correctness.
 
+## Current version: 0.283
+
+This version addresses receiver admission getting stuck after JNET has already owned a native companion slot. It can resume that retained slot after a receiver reset when storage, ownership, chapter and gate checks pass. Vanilla connection guards remain enabled. A stale result 124 is cleared only after successful state publication without an ownership guard failure. This does not establish that every reported visibility issue is fixed in live play.
+
 ## Contents
 
 - `JourneyPC-CompanionsMod/CompanionLab/diagnostic/`: Windows helper, injected DLL, native adapters, Lua payloads, build scripts, checks, and test fixtures.
 - `JourneyPC-CompanionsMod/CompanionLab/`: resource-generation and executable-analysis scripts, Python/Lua tests, and historical research notes.
 - `JourneyPC-CompanionsMod/CompanionLab/research/`: selected standalone experiments and the orchestration-fixture generator previously kept in the local work directory. These are historical research, not an assertion that every experiment passes against current source.
-- `source-inventory.json`: original workspace paths and hashes for the selected files.
+- `source-inventory.json`: original workspace paths and exported-file hashes. Entries edited for this export also retain their original source hash and an edit note.
 
 Only CompanionLab project files are included; the enclosing JourneyPC-CompanionsMod directory preserves paths used by the existing scripts. All other project folders are excluded. ObjectOutfits, extracted outfit references, game installations, game assets, downloaded toolchains, build products, release ZIPs, personal settings, installation receipts, saved games, and session logs are excluded. The optional prebuilt sound-fix payload and unrelated projects are also excluded.
 
