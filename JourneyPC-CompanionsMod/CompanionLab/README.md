@@ -1,6 +1,8 @@
 # JNET (Journet)
 
-Current release: **0.276**. Distribute `work/JNET-0.276.zip`; it extracts into `JNET/`.
+Current source version: **0.283**. The build produces `work/JNET-0.283.zip`, which extracts into `JNET/`. Release ZIPs are excluded from this source repository.
+
+Earlier release notes follow; their version numbers describe historical changes.
 
 0.276 replaces the 0.275 custom rider-position code with native Journey events: CreaB_WhaleRide for multi-segment playable creatures and ProtoClothMagnetize for Longtail's cloth mesh. These are the native riding and cloth-attraction mechanisms used in Level_Ruins. Only a local Wayfarer can ride an admitted, fresh remote creature; Rocket Deathmatch is excluded. Native attraction/pull multipliers are increased to 2; carrying strength and online behavior still require live validation. Native LinkEnable, Link and LinkGlitter emitters remain suppressed for creature avatars without changing recharge state. Original level assets and environmental event definitions are unchanged.
 

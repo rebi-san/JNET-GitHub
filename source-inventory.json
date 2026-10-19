@@ -4,7 +4,9 @@
     {
       "source": "JourneyPC-CompanionsMod/CompanionLab/README.md",
       "destination": "JourneyPC-CompanionsMod/CompanionLab/README.md",
-      "sha256": "694b3ced3b5ad908d8280eeb8add2a0fa7ae0f374ddd50a9b6f7ce6ba1f467c1"
+      "sha256": "55285fe5f42fa455931a8ba2fa6f54e598341db361d8d139bacce20477aeddb1",
+      "source_sha256": "694b3ced3b5ad908d8280eeb8add2a0fa7ae0f374ddd50a9b6f7ce6ba1f467c1",
+      "export_note": "Updated stale current-version heading to match build version 0.283; historical release notes retained."
     },
     {
       "source": "JourneyPC-CompanionsMod/CompanionLab/RESEARCH.md",
