@@ -1,0 +1,147 @@
+#include "jnet_menu_model.h"
+#include <assert.h>
+#include <stdio.h>
+
+int main(void) {
+    struct jnet_appearance_edit maximum={0};
+    maximum.draft.scarf_segments=29;
+    assert(!jnet_appearance_step(&maximum,JNET_SELECT_SCARF,1,JNET_SCARF_MAX) && maximum.draft.scarf_segments==30);
+    assert(!jnet_appearance_apply(&maximum,JNET_SCARF_MAX,0));
+    assert(!jnet_appearance_complete(&maximum,1) && maximum.applied.scarf_segments==30);
+    assert(!jnet_appearance_step(&maximum,JNET_SELECT_SCARF,1,JNET_SCARF_MAX) && maximum.draft.scarf_segments==0);
+    assert(!jnet_appearance_step(&maximum,JNET_SELECT_SCARF,-1,JNET_SCARF_MAX) && maximum.draft.scarf_segments==30);
+    struct jnet_appearance_edit loaded={.draft={.character=1},.applied={.character=1}};
+    jnet_appearance_observe(&loaded,5,12,0,1);
+    assert(loaded.applied.outfit==5 && loaded.draft.scarf_segments==12 && !loaded.draft.character && !loaded.applied.character);
+    loaded.draft.outfit=2;
+    loaded.applied.character=loaded.draft.character=1;
+    jnet_appearance_observe(&loaded,6,14,0,0);
+    assert(loaded.applied.outfit==6 && loaded.draft.outfit==2 && loaded.draft.scarf_segments==14 && loaded.applied.character);
+    assert(!jnet_appearance_apply(&loaded,29,1u<<JNET_CHARACTER_LONGTAIL));
+    jnet_appearance_observe(&loaded,1,1,0,0);
+    assert(loaded.applied.outfit==6 && loaded.pending.outfit==2);
+    assert(!jnet_appearance_complete(&loaded,1));
+    jnet_appearance_observe(&loaded,2,14,0,0);
+    assert(loaded.applied.outfit==2 && loaded.applied.character);
+    struct jnet_room_listing room={.id=7,.revision=1,.host=10,.level=2,.players=1,.capacity=3};
+    struct jnet_menu_session s={.level=2};
+    assert(jnet_listing_visible(&room,0));
+    assert(jnet_room_set_access(&room,11,JNET_PRIVATE)==JNET_MENU_INVALID);
+    assert(!jnet_room_set_access(&room,10,JNET_PRIVATE));
+    assert(room.revision==2 && room.players==1);
+    assert(!jnet_listing_visible(&room,0) && jnet_listing_visible(&room,7));
+    assert(!jnet_join_select(&s,&room,1,3));
+    assert(s.step==JNET_JOIN_CONFIRM && !s.room);
+    assert(jnet_join_confirm(&s,&room,0)==JNET_MENU_UNAVAILABLE);
+    assert(!jnet_join_confirm(&s,&room,1) && s.step==JNET_JOIN_CONNECT);
+    assert(jnet_join_connected(&s,8,2)==JNET_MENU_STALE);
+    assert(!jnet_join_connected(&s,7,2) && s.room==7 && s.step==JNET_JOIN_IDLE);
+    assert(!jnet_join_select(&s,&room,1,3) && s.step==JNET_JOIN_IDLE);
+
+    room.id=8;room.level=4;
+    assert(!jnet_join_select(&s,&room,1,3));
+    assert(!jnet_join_cancel(&s) && s.room==7);
+    assert(!jnet_join_select(&s,&room,1,3));
+    ++room.revision;
+    assert(jnet_join_confirm(&s,&room,1)==JNET_MENU_STALE && s.room==7);
+    assert(!jnet_join_cancel(&s));
+    assert(!jnet_join_select(&s,&room,1,3));
+    assert(!jnet_join_confirm(&s,&room,1) && s.step==JNET_JOIN_DEPART && s.room==7);
+    assert(jnet_join_loaded(&s,4,0)==JNET_MENU_INVALID);
+    assert(jnet_join_cancel(&s)==JNET_MENU_BUSY);
+    assert(!jnet_join_departed(&s) && !s.room && s.step==JNET_JOIN_LOAD);
+    assert(jnet_join_loaded(&s,2,0)==JNET_MENU_STALE);
+    assert(!jnet_join_loaded(&s,4,0));
+    assert(!jnet_join_connected(&s,8,room.revision) && s.room==8);
+
+    room.id=9;room.mode=JNET_ROCKET_DEATH_MATCH;
+    assert(jnet_join_select(&s,&room,1,3)==JNET_MENU_UNAVAILABLE);
+    assert(!jnet_join_select(&s,&room,3,3));
+    assert(!jnet_join_confirm(&s,&room,1));
+    assert(!jnet_join_departed(&s) && s.step==JNET_JOIN_LOAD);
+    assert(!jnet_join_loaded(&s,4,JNET_ROCKET_DEATH_MATCH));
+    assert(!jnet_join_connected(&s,9,room.revision));
+    room.id=10;room.players=3;
+    assert(jnet_join_select(&s,&room,3,3)==JNET_MENU_FULL);
+    room.players=1;room.capacity=4;
+    assert(jnet_join_select(&s,&room,3,3)==JNET_MENU_UNAVAILABLE);
+    room.level=12;assert(!jnet_listing_valid(&room));
+
+    struct jnet_menu_session view={0};
+    assert(!strcmp(jnet_lobby_labels(&view).action,"Join"));
+    room=(struct jnet_room_listing){.id=12,.revision=1,.host=10,.level=2,.players=2,.capacity=3,
+        .name="Evening journey",.level_name="Desert"};
+    view.level=2;
+    assert(!jnet_join_select(&view,&room,1,3));
+    assert(!strcmp(jnet_lobby_labels(&view).action,"Join"));
+    assert(!jnet_join_confirm(&view,&room,1));
+    assert(!jnet_join_connected(&view,12,1));
+    assert(!strcmp(jnet_lobby_labels(&view).name,"Updating lobby"));
+    assert(!jnet_lobby_refresh(&view,&room));
+    struct jnet_lobby_labels labels=jnet_lobby_labels(&view);
+    assert(!strcmp(labels.action,"Leave") && !strcmp(labels.name,"Evening journey"));
+    assert(!strcmp(labels.level,"Desert") && !strcmp(labels.population,"Players 2/3"));
+    view.current.capacity=8;view.current.players=8;
+    assert(!strcmp(jnet_lobby_labels(&view).population,"Players 8/8"));
+    view.current.id=13;
+    assert(!strcmp(jnet_lobby_labels(&view).name,"Updating lobby"));
+    assert(!jnet_lobby_labels(&view).population[0]);
+    view.room=0;
+    assert(!strcmp(jnet_lobby_labels(&view).action,"Join"));
+
+    struct jnet_appearance_edit edit={.applied={1,5,0,0,0,0},.draft={6,10,1,0,0,0}};
+    assert(jnet_appearance_apply(&edit,10,0)==JNET_MENU_UNAVAILABLE);
+    assert(jnet_appearance_apply(&edit,9,1u<<JNET_CHARACTER_LONGTAIL)==JNET_MENU_INVALID);
+    assert(!jnet_appearance_apply(&edit,10,1u<<JNET_CHARACTER_LONGTAIL));
+    assert(edit.applied.outfit==1 && s.room==9);
+    assert(jnet_appearance_apply(&edit,10,1u<<JNET_CHARACTER_LONGTAIL)==JNET_MENU_BUSY);
+    edit.draft.outfit=2;
+    assert(!jnet_appearance_complete(&edit,1) && edit.applied.outfit==6 && edit.draft.outfit==2);
+    assert(!jnet_appearance_apply(&edit,10,1u<<JNET_CHARACTER_LONGTAIL));
+    assert(!jnet_appearance_complete(&edit,0) && edit.applied.outfit==6 && s.room==9);
+    struct jnet_appearance_edit arrows={.draft={3,0,0,0,0,0}};
+    const unsigned order[]={JNET_CHARACTER_LONGTAIL,JNET_CHARACTER_WHALE,JNET_CHARACTER_WAR_MACHINE,JNET_CHARACTER_FLOW_1,JNET_CHARACTER_FLOW_2,JNET_CHARACTER_ROCKET,JNET_CHARACTER_WAYFARER};
+    for(unsigned i=1;i<=JNET_CHARACTER_COUNT;++i){
+        assert(!jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,1,29));
+        assert(arrows.draft.character==order[i-1]);
+    }
+    for(unsigned i=JNET_CHARACTER_COUNT;i>0;--i){
+        assert(!jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,-1,29));
+        assert(arrows.draft.character==order[(i+JNET_CHARACTER_COUNT-2)%JNET_CHARACTER_COUNT]);
+    }
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,-1,29) && arrows.draft.character==JNET_CHARACTER_ROCKET);
+    assert(jnet_appearance_apply(&arrows,29,1u<<JNET_CHARACTER_LONGTAIL)==JNET_MENU_UNAVAILABLE);
+    assert(!jnet_appearance_apply(&arrows,29,1u<<JNET_CHARACTER_ROCKET));
+    assert(!jnet_appearance_complete(&arrows,0) && arrows.applied.character==JNET_CHARACTER_WAYFARER);
+    arrows.draft.character=JNET_CHARACTER_COUNT;
+    assert(jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,1,29)==JNET_MENU_INVALID);
+    assert(jnet_appearance_apply(&arrows,29,~0u)==JNET_MENU_INVALID);
+    arrows.draft.character=JNET_CHARACTER_WAYFARER;
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_SCARF_MODE,1,29));
+    assert(arrows.draft.infinite_scarf==1 && arrows.draft.scarf_segments==0);
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_SCARF_MODE,1,29) && arrows.draft.infinite_scarf==0);
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_SCARF_MODE,-1,29) && arrows.draft.infinite_scarf==1);
+    arrows.draft.infinite_scarf=2;
+    assert(jnet_appearance_apply(&arrows,29,1u<<JNET_CHARACTER_LONGTAIL)==JNET_MENU_INVALID);
+    arrows.draft.infinite_scarf=0;
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_SCARF_GROW,1,29) && arrows.draft.locked_scarf==1);
+    assert(!arrows.draft.infinite_scarf && !arrows.draft.scarf_segments);
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_SCARF_GROW,-1,29) && !arrows.draft.locked_scarf);
+    assert(!jnet_scarf_white(&arrows));
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_ROBE,1,29) && jnet_scarf_white(&arrows));
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_ROBE,-1,29) && !jnet_scarf_white(&arrows));
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_SCARF,-1,29) && arrows.draft.scarf_segments==29);
+    for(unsigned i=0;i<40;++i)assert(!jnet_appearance_step(&arrows,JNET_SELECT_SCARF,1,29));
+    assert(arrows.draft.scarf_segments==9);
+    for(unsigned i=0;i<30;++i)assert(!jnet_appearance_step(&arrows,JNET_SELECT_SYMBOL,1,29));
+    assert(arrows.draft.symbol==9 && arrows.applied.symbol==0);
+    assert(!jnet_appearance_apply(&arrows,29,1u<<JNET_CHARACTER_LONGTAIL));
+    assert(jnet_appearance_step(&arrows,JNET_SELECT_SYMBOL,-1,29)==JNET_MENU_BUSY);
+    assert(!jnet_appearance_complete(&arrows,0) && arrows.applied.symbol==0);
+    arrows.draft.symbol=21;assert(jnet_appearance_apply(&arrows,29,1u<<JNET_CHARACTER_LONGTAIL)==JNET_MENU_INVALID);
+    view.room=room.id;view.current=room;
+    assert(jnet_level_host(&view,room.host) && !jnet_level_host(&view,room.host+1));
+    view.room=0;assert(!jnet_level_host(&view,room.host));
+    puts("JNET menu model: private discovery, host permissions, confirmed switching, departure/load order, stale responses, mode reload and transactional Apply passed.");
+    return 0;
+}

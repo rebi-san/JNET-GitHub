@@ -1,0 +1,82 @@
+JNET @VERSION@ — SETUP AND ONLINE TESTING
+
+Send the complete JNET ZIP, not just JNET.exe. Everyone in the test must use
+this same release. The archive extracts into JNET/. Keep all extracted files
+together, including JNET.dll, JNET_ animation files, and JNETCharacter_ assets.
+
+SETUP
+1. Install the Steam version of Journey and sign into your own Steam account.
+2. Close Journey and JNET. Extract JNET/ directly inside the Journey game folder,
+   next to the original Journey.exe. Do not replace original game files.
+3. Run JNET/JNET.exe with Steam running. Use Select .exe if needed to select
+   the supported Journey.exe, then Launch Journet.
+4. The Windows package works on any drive; no Whisky bottle or test-account
+   configuration is required. Use the clean release ZIP for friends.
+
+The helper verifies the executable and its matching DLL. Unsupported builds
+are rejected. The optional Journey PC Sound Fix 0.3.1 executable is supported
+through Select .exe, but is not included. No game executable is distributed.
+The selected executable is remembered in JNET-launch.ini.
+
+UPDATING
+Close Journey and JNET. Back up your existing mod folder. Replace the release
+files together, retaining your JNET-launch.ini and JNET-network.ini if present.
+Older installations may use a folder named Journet; that location still works.
+The current animation files start with JNET_. Old JC_ animation files are no
+longer needed by this release; do not mix DLL/helper versions.
+To share, send the clean release ZIP, not your installed folder or personal logs.
+
+ONLINE TEST
+Use World from the title/pause menu. The host creates a public lobby, or a
+private lobby and shares its generated code. Guests join the public listing or
+enter the private code. Maximum population is three including the host.
+Start with two players; then add the third. Check movement, chirps, distinct
+robes/scarves/symbols, character switching, travel, departure and rejoining.
+Changing a symbol while connected now updates the native companion feed.
+Real online rendering and all combinations still require gameplay testing.
+
+CHARACTER AND WORLD OPTIONS
+Meet Everywhere is always enabled; there is no World-menu toggle.
+Character changes are applied with Apply. Creature resources and transport
+support Wayfarer, Longtail, Whale, War Machine and Rocket modes; availability
+is guarded by native resource readiness. War Machine autonomous attacks remain
+unavailable. Rocket Deathmatch has been reported working locally; three-player
+online behavior is not yet confirmed.
+
+Chapter Select and Broken Bridge: Day / Night / Cycle.
+Pink Desert: Day / Dusk / Cycle. Sunken City: Day / Dawn / Cycle.
+Cycle takes 15 minutes to reach Night/Dusk/Dawn and 15 minutes to return to Day.
+Normal progression retains the mode. A guest adopts the host's non-Day mode
+on entering a supported level; joining in the same level does not force a
+lighting change. Cycle clocks may differ. Host Day override and late metadata
+arrival were identified in an offline audit and intentionally left unchanged.
+At night, Chapter Select FlatMist, DomeMist and GraveyardDust disappear, as do
+Broken Bridge GraveyardDust and MistCardSphere effects. Their daytime values
+return gradually during Cycle. Chapter Select gate rays use cooler colors.
+Paradise offers Normal / Cutscene. Only World-menu Go selects the enlarged
+cutscene hull. Normal progression from Mountain always uses Normal Paradise.
+
+CMATW Off hides companion names under the World menu heading. Public lobbies
+with CMATW Off are named Random's Lobby and have Chat locked Off. Private
+lobbies can use chat independently. With chat enabled, press T, then Enter.
+Credits On/Off is in audio options; the closing text is Thank you for playing.
+Graphics offers Default / 30 / 60 FPS. Two separate presses/clicks skip startup
+logos by finishing the current slide and omitting the rest; no black cover is used.
+
+TROUBLESHOOTING
+JNET retains bounded diagnostic buffers in memory, including after Journey exits
+while JNET remains open. No client/runtime/fault/exit/hang logs are automatically
+written. Save Session Report next to Copy All writes a report only to the location
+you choose. Save or copy before closing JNET; unsaved reports are then discarded.
+Normal game/settings persistence is unchanged.
+Keep JNET open after Journey exits until Exit recorder finished appears, then
+use Copy All. Keep the exact JNET version, steps, level/mode, character and
+which participant was host with the report. An exit code alone is not a cause.
+Avoid sharing account identifiers or personal paths publicly without review.
+Report visual problems with screenshots and reports from each affected player.
+
+VALIDATION
+Build, package hashes and offline regression tests are checked separately from
+live gameplay. Do not treat a passing fixture as proof of three-player gameplay.
+This release uses in-memory session reports and always-on Meet Everywhere.
+Live Windows report export, crash retention and multiplayer remain to be checked.

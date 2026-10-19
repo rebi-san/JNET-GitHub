@@ -1,0 +1,165 @@
+import hashlib
+import json
+import re
+from pathlib import Path
+import struct
+import unittest
+import zipfile
+
+from diagnostic.build_diagnostic import VERSION, c_string, exports, file_offset, imports, verify_reference
+from inspect_build import pe_sections
+
+
+LAB = Path(__file__).resolve().parent
+
+
+def synthetic_dll():
+    data = bytearray(2048)
+    data[:2] = b"MZ"
+    struct.pack_into("<I", data, 60, 128)
+    data[128:132] = b"PE\0\0"
+    struct.pack_into("<HH", data, 132, 0x8664, 1)
+    struct.pack_into("<H", data, 148, 240)
+    struct.pack_into("<H", data, 152, 0x20b)
+    struct.pack_into("<II", data, 152 + 112, 4096, 128)
+    struct.pack_into("<8sIIII", data, 392, b".rdata\0\0", 1536, 4096, 1536, 512)
+    struct.pack_into("<IIIII", data, 512 + 20, 1, 1, 4160, 4176, 4192)
+    struct.pack_into("<I", data, 576, 4608)
+    struct.pack_into("<I", data, 592, 4208)
+    struct.pack_into("<H", data, 608, 0)
+    data[624:635] = b"JNETStatus\0"
+    return data
+
+
+class DiagnosticTests(unittest.TestCase):
+    def test_chirp_fingerprint_matches_original_executable(self):
+        data = (LAB.parent.parent / "JourneyPC/Journey.exe").read_bytes()
+        sections = verify_reference(data)
+        header = (LAB / "diagnostic/native_companion_chirp.h").read_text()
+        match = re.search(r"static const unsigned char jc_chirp_enqueue_code\[16\]=\{([^}]+)\}", header)
+        self.assertIsNotNone(match)
+        expected = bytes(int(value.strip(), 0) for value in match.group(1).split(','))
+        at = file_offset(sections, 0x13fbb0, 16)
+        self.assertEqual(expected, data[at:at+16])
+
+    def test_export_data_and_rva_translation(self):
+        data = synthetic_dll()
+        self.assertEqual(exports(data), {"JNETStatus": 4608})
+        sections = pe_sections(data)
+        self.assertEqual(file_offset(sections, 4608, 4), 1024)
+        with self.assertRaises(ValueError):
+            file_offset(sections, 5600, 64)
+        self.assertEqual(imports(data), [])
+
+    def test_invalid_ordinals_forwarders_and_missing_terminators(self):
+        data = synthetic_dll()
+        struct.pack_into("<H", data, 608, 1)
+        with self.assertRaises(ValueError):
+            exports(data)
+        data = synthetic_dll()
+        struct.pack_into("<I", data, 576, 4140)
+        with self.assertRaises(ValueError):
+            exports(data)
+        with self.assertRaises(ValueError):
+            c_string(b"a" * 600, 0)
+
+    def test_unknown_reference_rejected(self):
+        with self.assertRaises(ValueError):
+            verify_reference(synthetic_dll())
+
+    def test_cloth_resource_contract_matches_pinned_executable(self):
+        data = (LAB.parent.parent / "JourneyPC/Journey.exe").read_bytes()
+        sections = verify_reference(data)
+        header = (LAB / "diagnostic/native_companion_cloth.h").read_text()
+        for name, table in (("base", 0x5c41f0), ("glow", 0x5c4230), ("mask", 0x5c4268)):
+            declared = re.search(r"\*const " + name + r"\[\]=\{([^}]+)\}", header).group(1)
+            names = re.findall(r'"([^"\n]+)"', declared)
+            pointers = struct.unpack_from("<7Q", data, file_offset(sections, table, 56))
+            actual = [c_string(data, file_offset(sections, p - 0x140000000)) for p in pointers]
+            self.assertEqual(names, actual)
+        for match in re.finditer(r"\{(0x[0-9a-f]+),\{([^}]+)\}\}", header):
+            rva = int(match.group(1), 16)
+            expected = bytes(int(x, 16) for x in match.group(2).split(","))
+            at = file_offset(sections, rva, len(expected))
+            self.assertEqual(data[at:at + len(expected)], expected, hex(rva))
+
+    def test_built_startup_orders_spin_before_wayfarer(self):
+        from startup_resources import extract_persistent
+        header = LAB / "work/diagnostic-build/startup_candidate.h"
+        if not header.exists():
+            self.skipTest("Build the diagnostic before startup verification")
+        text = header.read_text()
+        def string(name):
+            return json.loads(re.search(r"static const char " + name + r"\[\] = (.*);", text)[1]).encode("ascii")
+        def numbers(name):
+            return [int(v.strip(), 0) for v in re.search(name + r"\[\d*\] = \{([^}]*)\}", text)[1].split(",")]
+        native = bytearray(extract_persistent((LAB.parent.parent / "JourneyPC/Journey.exe").read_bytes()))
+        for offset, before, after in zip(numbers("jc_startup_offsets"), numbers("jc_startup_before"), numbers("jc_startup_after")):
+            self.assertEqual(native[offset], before)
+            native[offset] = after
+        candidate = string("jc_wayfarer_startup") + native + string("jc_character_startup")
+        self.assertEqual(len(candidate), int(re.search(r"JC_STARTUP_CANDIDATE_SIZE (\d+)", text)[1]))
+        self.assertEqual(hashlib.sha256(candidate).digest(), bytes(numbers("jc_startup_candidate_hash")))
+        declarations = re.findall(rb'resource "(\w+)" "([^"\r\n]+)"', candidate)
+        for name in (b"JNETSpin3",b"JNETFlipL",b"JNETFlipR"):
+            self.assertEqual(declarations.count((b"MeshAnimation",name)),1)
+            self.assertLess(declarations.index((b"MeshAnimation",name)),declarations.index((b"Mesh",b"BlendNinja")))
+        self.assertEqual(declarations.count((b"Mesh", b"BlendNinja")), 1)
+        self.assertLess(declarations.index((b"MeshAnimation", b"JNETSpin3")), declarations.index((b"Mesh", b"BlendNinja")))
+
+    def test_built_package_contains_only_listed_diagnostic_files(self):
+        path = LAB / f"work/JNET-{VERSION}.zip"
+        if not path.exists():
+            self.skipTest("Build the diagnostic package before package verification")
+        with zipfile.ZipFile(path) as archive:
+            manifest = json.loads(archive.read("JNET/manifest.json"))
+            names = set(archive.namelist())
+            expected = {"JNET/" + name for name in manifest["artifacts"]}
+            expected.add("JNET/manifest.json")
+            self.assertEqual(names, expected)
+            self.assertFalse(any(Path(name).name.startswith("JC_") for name in names))
+            self.assertEqual({n for n in archive.namelist() if n.endswith(".txt")},
+                             {"JNET/README.txt"})
+            self.assertIn("JNET " + VERSION, archive.read("JNET/README.txt").decode())
+            self.assertIn("JNET/JNET.exe", names)
+            self.assertIn("JNET/JNET.dll", names)
+            self.assertFalse(any(Path(name).suffix.lower() in (".ini", ".bin", ".py", ".log") for name in names))
+            self.assertFalse(manifest["automatic_diagnostic_logs"])
+            self.assertTrue(manifest["session_report_export"])
+            self.assertTrue(manifest["meet_everywhere_always"])
+            self.assertTrue(manifest["portable_windows_package"])
+            self.assertFalse(manifest["runtime_verified"])
+            self.assertFalse(manifest["three_player_supported"])
+            self.assertEqual(manifest["version"], VERSION)
+            self.assertIn("CurrentLevelString", manifest["source_entry_points"])
+            for name, rva in (("MaterialScalarLookup", 0x273a00), ("MaterialVectorSet", 0x273200),
+                              ("MaterialTextureSet", 0x273640)):
+                self.assertEqual(manifest["source_entry_points"][name]["rva"], rva)
+            self.assertIn("JNETAppearance", manifest["exports"])
+            self.assertIn("JNETRoom", manifest["exports"])
+            self.assertIn("JNETMotion", manifest["exports"])
+            self.assertIn("JNETBodies", manifest["exports"])
+            self.assertIn("JNETDual", manifest["exports"])
+            self.assertIn("JNETSkeleton", manifest["exports"])
+            self.assertIn("JNETEvaluation", manifest["exports"])
+            self.assertIn("JNETNativePlayback", manifest["exports"])
+            self.assertIn("JNETNativeOutputs", manifest["exports"])
+            self.assertEqual(manifest["source_entry_points"]["AnimationSubmit"]["rva"], 0x262680)
+            self.assertEqual(manifest["source_entry_points"]["AnimationFinish"]["rva"], 0x2628d0)
+            self.assertIn("JNETFlight", manifest["exports"])
+            for removed in ("DrawPlain", "DrawInstanced", "DrawIndexed", "DrawIndexedInstanced"):
+                self.assertNotIn(removed, manifest["source_entry_points"])
+            for name, expected_hash in manifest["artifacts"].items():
+                self.assertEqual(hashlib.sha256(archive.read("JNET/" + name)).hexdigest(), expected_hash)
+            dll = archive.read("JNET/JNET.dll")
+            self.assertEqual(exports(dll), manifest["exports"])
+            offset = file_offset(pe_sections(dll), manifest["exports"]["JNETBuildId"], 32)
+            self.assertEqual(dll[offset:offset + 32].hex(), manifest["build_id"])
+            self.assertEqual(imports(dll), manifest["dll_imports"])
+            helper = archive.read("JNET/JNET.exe")
+            pe = struct.unpack_from("<I", helper, 60)[0]
+            self.assertEqual(struct.unpack_from("<H", helper, pe + 24 + 68)[0], 2)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,1320 @@
+{
+  "version": "0.283",
+  "files": [
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/README.md",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/README.md",
+      "sha256": "694b3ced3b5ad908d8280eeb8add2a0fa7ae0f374ddd50a9b6f7ce6ba1f467c1"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/RESEARCH.md",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/RESEARCH.md",
+      "sha256": "7b787e77fd27637727c4372bc85a8872af2d912fad8df9b8369a88320765acd7"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/analyze_connection_scan.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/analyze_connection_scan.py",
+      "sha256": "b81d0a0cd5e5977296df46119607ed8c102082cd40e666f97639ebd63162d03f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/character_resources.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/character_resources.py",
+      "sha256": "e7ff78eafab28d28911b9722d50d2a86481b155cfa8e67cd73d12ee1c6fdbe59"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/companion_probe.lua",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/companion_probe.lua",
+      "sha256": "1ff971c54a2a7bdb8e79b704855876a781116ff9991b8fc7d50889e508241252"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/control_resources.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/control_resources.py",
+      "sha256": "8adcd044dd2ce8e328d1437711377221a917357d1aad5e6aceaadef23efeb06c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/daynight_resources.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/daynight_resources.py",
+      "sha256": "57b30edfe72694e1d658931d8c02256701913869934928c13267e232fb4afd42"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/QUICKSTART.txt",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/QUICKSTART.txt",
+      "sha256": "b9ab97818f248517d5eb2bd3f2444ead2766d4a522523c152877d805a98cb4cc"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/README.txt",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/README.txt",
+      "sha256": "602a5307a15633c3277ba000ad3f1aa5584793f84c0e580b464ec83afc2a3510"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/THIRD-PARTY.txt",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/THIRD-PARTY.txt",
+      "sha256": "5d61d31a7019f36255b1b58ffa70fece385c79b4a37c03cb7b3fd4d7bd2eadf0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/build_diagnostic.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/build_diagnostic.py",
+      "sha256": "d4c31954d0d3561a66155fa35cde31e023bf8b5782552bef83c5fb659c3e9732"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_companion_components.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_companion_components.py",
+      "sha256": "59c347784c9011db03f2b0f2bbbc42a92e600094ffd3a0a65c63c043e59f5f4b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_menu.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_menu.py",
+      "sha256": "9714a20a392b399d3a78cc5cf62d95bd294739a76cdd5e9777944b7be31ccfc2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_native_actor.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_native_actor.py",
+      "sha256": "17eff9ba6ece33f13b95ff6268c754600bbab766e8f9307b65d3209820599942"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_native_cloth.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_native_cloth.py",
+      "sha256": "db218a5153a7bb0b3bfb6ac97776a9ce2a736867d0bd40429a70edc0dff1686b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_native_receiver.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_native_receiver.py",
+      "sha256": "5a13cc4a7958b55fa0825e42a2ead49fd045229c7d5b17f5990af7ec42f918e9"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_network.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/check_network.py",
+      "sha256": "4cb813c899be0c250eb39038cafa7e7001da558ef334b2771b7865450e4c7fda"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_actor_packet.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_actor_packet.h",
+      "sha256": "9697b797fff80e5e1dba440856db38ee0f97ef3ed987525f117eb81daf157fb0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_actor_stream.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_actor_stream.h",
+      "sha256": "6aa03ec97d02562fccade8c9e34d2e157e9f81eeef20a983561a3af09ca15546"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_animation.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_animation.h",
+      "sha256": "683c7b68cb8b6302ba88e6a8d10a576fa4d0f30f4486600cecac6ce003ae8f9a"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_chirp_packet.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_chirp_packet.h",
+      "sha256": "e23c7bff74cce792342cbf8a5b313c8ca2e831d8495c2443e3768af799b087d1"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_connection.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_connection.h",
+      "sha256": "ada84b0377b408a97245d3aa7a4ea8bf334694c74134362f09e04ffd87ce63ee"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_pose.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_pose.h",
+      "sha256": "aa1c83badb0cd3cd07cbe88bd53bdb0abaffd9028f9067a8619265a074821e72"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_room.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_room.h",
+      "sha256": "cb1f23171c15cc200bd7c51f66b84cb2aa6051bdc4b819417ef5f1d517586a08"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_script_peer.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_script_peer.h",
+      "sha256": "04aba02a81c23e562e09af4387c02cf94052aabac979a79c95374c28b9885d12"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_session.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/companion_session.h",
+      "sha256": "20c311bef0d7ef9fc88aa2942e9d2c4e10c189658986ade6dd629236f4d7f59d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/connection_recorder.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/connection_recorder.h",
+      "sha256": "8f9f931d5bd5b8cadd7cb066aedb04b2ab7ef555a4190948d50ea059f6788908"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/diagnostic_checkpoint.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/diagnostic_checkpoint.h",
+      "sha256": "623f0cd2a996a15a75e0f8a81a6147fd11ec66ccb60a9516bbbbc7958efd6caf"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/diagnostic_fault.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/diagnostic_fault.h",
+      "sha256": "64eada89a403b6c7411db33229d3107b9213c934de0a1a730c81be10ac2015ec"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/extract_menu_images.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/extract_menu_images.py",
+      "sha256": "8effa83b38a24d77b12301c764822e283fecddb76418d1efff9a394feffa0b85"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_appearance_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_appearance_live.h",
+      "sha256": "4a5a4a7c5c42a3fbb503eed26792d1d2952ebd0e20f60e78a6ed2a43b06f9680"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character.h",
+      "sha256": "3e86b8acca04d6d6a7c1388919c6fa528af2daccc1dea8af5bb1947ee4df495f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_assets.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_assets.h",
+      "sha256": "3eae7f0ebad643fe8741821641b68c44470a63e9ac79513b9e15c3886431c244"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_audio.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_audio.h",
+      "sha256": "c87bb5c3479f57fdbf25656e6f5deb4fb1f2ab19f30e9e16be065b756ccc9833"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_factory.lua",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_factory.lua",
+      "sha256": "4ab76505bdac279166ea8fd3ccda6e28e98979309e1f2e52c3f6c989ee82cbdc"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_live.h",
+      "sha256": "4bd58fdff59c0fe4a1f022bbc5b4bbf11b5aa6fc77be76ee1bfa43dad7f76c2d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_native.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_native.h",
+      "sha256": "585b495323638990cf45b9d6d106a411e8a1f77c7d345802c1ebd1f68d3a52fd"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_volume_hook.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_character_volume_hook.h",
+      "sha256": "814d2cf73cd61ecbb2934b90093ec0401e730bd79a94a84e26fb52f3dfd884b3"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_chat.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_chat.h",
+      "sha256": "0dbd92de45cbded5855c67f5e3b71967b7c80f0c0bde94959d159279569793a5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_chat_image.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_chat_image.h",
+      "sha256": "1062a33133302b0203c406bde3d8e23e69b1ee649503501949580e5b49bd5a17"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_chat_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_chat_live.h",
+      "sha256": "807583d7934e69cb27df49a48ece781fc9b0cfcc2790b9cc8b24eb987f03394c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_controls_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_controls_live.h",
+      "sha256": "9610716474a473c418e1da0dfce47aecdd507b028aeca69c9699ade255f33f4d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_daynight.lua",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_daynight.lua",
+      "sha256": "07d0a1e5c962d7cab10eb0a9967134be7af49dcd6c4b5b9ece83b0964fe4ad58"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_daynight_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_daynight_live.h",
+      "sha256": "f5d33a864581e4e23242916cf9d4f19c9a4c9b4a41d366e77e8400b668658373"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_frame_pacing.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_frame_pacing.h",
+      "sha256": "1149b9503a7b8ec0c6616e3cd8cdacd787b2d24dd6bd475bc420577ee7314a9f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_freeplay_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_freeplay_live.h",
+      "sha256": "28084a7454b18bedc044f5be8c18bec2e6e2dcaf45f63a2c62a8be725d4c41e0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_group_travel.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_group_travel.h",
+      "sha256": "83dff79615e89fa29e04397d7b1166d3b917aef6c44d6f61be19973bd6dafe60"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_intro_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_intro_live.h",
+      "sha256": "d1c74a78b023598623fa17ffe1d993e6d5ed9b3df222553f358c2f7995beb51d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_level_fixes.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_level_fixes.h",
+      "sha256": "fb7f63975681eb8682ee0d93c2b36c2ff3b9135f214370ab674adedb750d6bd1"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_lobby_bridge.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_lobby_bridge.h",
+      "sha256": "d44e4b8dd5ab22be9d26e4082c9b2d680ad920fafb446b238549cc87baeb14df"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_lobby_runtime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_lobby_runtime.h",
+      "sha256": "81ec64ea45ce6a160e59cbb127c27d0d64613ccdba7d9d6eda77a42ea65e4615"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_draw.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_draw.h",
+      "sha256": "0baa0047c8d1b3fafa56442430831db0d97b13e19a54f235d1a5e26ba813b117"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_images.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_images.h",
+      "sha256": "f6d74a9bb5d0269e061e3f5faf60bcef61172045760adabcdd6652fcd8ee4837"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_live.h",
+      "sha256": "bc5f8d5c856eef3435aa876839223012e2ec6b31e1d83ec751c20c9ae5965080"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_model.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_menu_model.h",
+      "sha256": "b9af3f472544fb20caa9c897417d4d53b7a6821c41404faccc76cf2b1eadb1fb"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_motion.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_motion.h",
+      "sha256": "1d6a62afa3ac86e6bf0e79a656671b1334e8c5a5935f8c7a3194943aceda854f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_options_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_options_live.h",
+      "sha256": "1c894179f399ee03bbad4a269a2ec3dd8076e7f9c0220ed823ffa365cc778814"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_rocket_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_rocket_live.h",
+      "sha256": "3091ab965580651f4480305b9b55422c9c3dc43cc8d932a590e87ae1769ef19f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_session_log.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_session_log.h",
+      "sha256": "10e227016a0a14e94f8d84c2b47b8d5f70f50169402effa980e2bf457efd5e38"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_game.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_game.h",
+      "sha256": "cf76c0ffe5557f74dbdd5e1f21f4bbed10b50036a9b27657b2cc3f2001f03717"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_game_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_game_live.h",
+      "sha256": "546696b593a92b53ede067401937601904828849eeb07142e71ce02c9b92cf6b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_lobby.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_lobby.h",
+      "sha256": "9295f7eb040477ce4351735d36cb696708643773db5f4c87f0e156031e11ca07"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_maintenance.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_maintenance.h",
+      "sha256": "f1cc4b0979469379b3cd45c745ad36c248f843333f9e5c1b3640555d8d9fca34"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_probe.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_probe.h",
+      "sha256": "fd6716b56fe01e2bb210b709536800f9067f6fca981ccd4d23db644dc962f209"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_realtime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_realtime.h",
+      "sha256": "d8a1bb0cac3e26a48c8749141db09318630e67049d2445f8fc62af0617096f81"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_transport.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_steam_transport.h",
+      "sha256": "cb1fbd13ac18cceeee83be85e9fdcf6c8ee152cc6f8827f62696926801cb0507"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_texture_guard.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_texture_guard.h",
+      "sha256": "b0905f83223308d7aa4ba033d558445260712d6439814443ac35fdf6916b65e2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_travel_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_travel_live.h",
+      "sha256": "c7a6950b384471f987c983347ef3509f1b1458ea2ed6b34d44dce9fe9a8506ad"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_departure.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_departure.h",
+      "sha256": "7804b659ed1b9562cb0c6035645d6434a55faad73fb6f7bffec12a3987e1facf"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_frame.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_frame.h",
+      "sha256": "8605b41b4dd3dd4d1f1142c947c25b8d9fa844bd59883146e7061faee3ed5feb"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_live.h",
+      "sha256": "05d4c793896af520874f160976360333de5a0f18ecf29cc719d4949b7bfa88b3"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_material.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_material.h",
+      "sha256": "82a452e67fddfe1d9e2813cc4864dd63127a0b9b4af02a599d16ae3f03f8d9c4"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_runtime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_actor_runtime.h",
+      "sha256": "901deb9211673be75ab819294e2d24f7893f2a62ff981766794144815ac03579"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_allocation.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_allocation.h",
+      "sha256": "3b01ad6011ada2c88bd3e73e5b41a521cc15f8ab7ff4bc86634abbaf0b9faf08"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_animation_playback.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_animation_playback.h",
+      "sha256": "0d48e58e4d17f0a1ac8c6d8dc7ecf2aaffb82d81a5053a18c239dd433d650747"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_animation_storage.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_animation_storage.h",
+      "sha256": "e9978524d247929733a452b10d15777ab99c15f2f249ded01949cf857e5bc85e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_appearance.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_appearance.h",
+      "sha256": "b9e5effccf006e8b9e3e17617be705efe5724df776616567ef2c2c6cfd21b747"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_chapter_gate.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_chapter_gate.h",
+      "sha256": "0c6624c637a71ee7074099d956ab3240a5a3f4ffdad37a80706aa948e5dcb795"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_chirp_charge.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_chirp_charge.h",
+      "sha256": "6abbf98a018728f999b3289c14d3794231f3686d1b9b6f830f1ac47c5909863e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_clone_pool.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_clone_pool.h",
+      "sha256": "381268cb1c34fcc05de7eb7d60d9202f982eb8927dc70dbad389938f05c60119"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_commands.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_commands.h",
+      "sha256": "4abe4084c14398236eefdc4b9c68a6f4d4de9bac977ff9dc9eb053679ab0f088"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_draw.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_draw.h",
+      "sha256": "02e6f17e3920090d5d45311154e7a4ecbbb5441696a51f13dc45e8cc62ab2245"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_frame.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_frame.h",
+      "sha256": "7d19e57963721e0a7d39b43c69827356d0588e440412424ba395500877a09bd0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_live.h",
+      "sha256": "53d9fc5fd23b91b1fb489fb7e6728e88613cd1504bf95acd6baa663edb95a69f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_material_live.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_material_live.h",
+      "sha256": "d3d7874e9cc4b1ff2fe8d1428258d7bfb97bd77ab755e49ff0156d6825056882"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_partition.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_partition.h",
+      "sha256": "aa0cc788b6501f69f30bf602c23bd5f40313d44f9fc66dfd43a932f904777118"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_prelaunch.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_prelaunch.h",
+      "sha256": "4a132e689d00f2e07b9283ddd7cecdc04cc12171a2de9324e126b6a59b6379be"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_producer.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_producer.h",
+      "sha256": "52080340accd5fd252fd5290a173c2bb4d74f2696f48a1cd4a34d729e6c9ad28"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_publication.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_publication.h",
+      "sha256": "ae0524895a78698a03a26da67be8407c38ae1dc1890759d6d3b35ab4a26ef14d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_render_runtime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_cloth_render_runtime.h",
+      "sha256": "35f54d8cc19290ffa550ec5b17aa851c3c14c9ccd654324c930da358832c0522"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_companion_chirp.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_companion_chirp.h",
+      "sha256": "71ddd6e6e0fae7d14746b0fe0591237d2695e8786092d197df7661508ca0f43a"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_companion_cloth.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_companion_cloth.h",
+      "sha256": "df46293d592caaa28171657cae0c9c5422e656d73b3487a191e946d83b6f2a7f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_connection_scan.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_connection_scan.h",
+      "sha256": "561a70abbbb2d751b7824dfb4c61cbc8cc28015b66b3c08eb83ee37e930583da"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_dual_body.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_dual_body.h",
+      "sha256": "ace15f9fc4b942f13e35e0f6d2a53eaeeb2f83cef365184651e3bb0fbb397c8b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_environment_probe.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_environment_probe.h",
+      "sha256": "8595103220522adaa3cac8060155179da9d63d5f1b75e81e44dc71349a4a898e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_evaluation_layout.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_evaluation_layout.h",
+      "sha256": "20d0e50f5f4b56c75b199a4e58217b866838b54e7d8cf37c59bbbbde83b2c892"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_evaluation_run.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_evaluation_run.h",
+      "sha256": "83786e65399f840e23a4f166b07f35d343a6056921102e643d9615984698584e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_geometry_pool.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_geometry_pool.h",
+      "sha256": "23679a0effdf6c38763fe63be15fe215ac03433580564d76b6ed5ff1e347b561"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_idle_pose.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_idle_pose.h",
+      "sha256": "43fecd49f562b42f7a394589d91ea6616cedd56b7ad0032dc5384326dafb28e1"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_initialized_lifetime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_initialized_lifetime.h",
+      "sha256": "bed85c75431f03a818ac31a85ed5d51f826cba4f163024c3d2b3bf2e8f79120e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_layout.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_layout.h",
+      "sha256": "24a4248374fbaf7af1932e5b328eaa964295dd61a1cdbd067828e6e06b1bfff7"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_lifecycle_hooks.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_lifecycle_hooks.h",
+      "sha256": "0408f1b9511fa63430232bd34dd9652535c55a50d34994458113e8855f042a3b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_lifecycle_trace.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_lifecycle_trace.h",
+      "sha256": "712aa715524ed7a07f12e43a4a3701d68154bcfcb447d9a62d521f59c9965a77"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_lifetime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_lifetime.h",
+      "sha256": "a5efec822dbae67ac1b815f495825fa61bf40936a09978bea76f570bddc203fc"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_local_peer.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_local_peer.h",
+      "sha256": "2a0f9367498e912b70df2a399da5c59b413e964d18f897e9e621ef4091075e52"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_local_read.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_local_read.h",
+      "sha256": "e61acd899fdf482b701b2166ccca995f150e24cda31c03e47963fe2e0ff43637"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_material_ready.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_material_ready.h",
+      "sha256": "71c10d1b30db0471ca25d52d735b45ee693c94409a5f5ea8d78ec975fa0cd1a8"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_mesh_callbacks.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_mesh_callbacks.h",
+      "sha256": "23c924cf9b48c484e2a8101e01a5c3f7e494a209e17f80b78d10de54e1d283e0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_mesh_guard.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_mesh_guard.h",
+      "sha256": "1a3fbb5ef317ec3771edc4b527539534e1da181868ab478cde17a96841a7e581"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_mesh_rehearsal.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_mesh_rehearsal.h",
+      "sha256": "ed2c7991e2c8b9accc91d9360326892826494c5e69a585050991c85e35bacdad"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_peer_lifecycle.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_peer_lifecycle.h",
+      "sha256": "a1a8f3e6d9922ccf619942a6e0431ac2df8dec2144692fdd65c6af54ea4b788a"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_pose_storage.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_pose_storage.h",
+      "sha256": "f282a59d15e99ef9a7232dcb63a33e9dd977aacf25ca55bba2d2a4aa67e77ca2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_pose_writes.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_pose_writes.h",
+      "sha256": "f7e271fe00549936a36d4b3037ca63dbd5e2d649f7ea03f02033e70ee0afd1a4"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_read_batch.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_read_batch.h",
+      "sha256": "44d0d8c41782f100249d22abc3b02677d4f8077e17dbf3c29774fdd6cb66d7db"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_receiver.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_receiver.h",
+      "sha256": "3865543f4485c770bba80f08927de04c038c066a846afeab7991c6de027a2ee0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_render_queue.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_render_queue.h",
+      "sha256": "a075cc91ed4e102e0a3443b51896e8ffa94c5fdfc044425ad6abb9edf9d02375"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_render_retirement.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_render_retirement.h",
+      "sha256": "16a68e0cbd2a583df40c2ec7f926128391775ff7003d3a81a62802de60a9f228"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_resources.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_resources.h",
+      "sha256": "d100869cf9cf846f0ed1eb32b85f305ec557f711d34f2cb0296074f61dcf6b78"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_scarf_growth.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_scarf_growth.h",
+      "sha256": "1d8416182b74939070fc10c6d8a166c7de5db6959192ee4bee173087f120189b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_shader_inputs.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_shader_inputs.h",
+      "sha256": "3d0a6c2e14e350dab8010f299065aa626548d497c285d0df52fdc7391678c3f2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_skeleton_mirror.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_skeleton_mirror.h",
+      "sha256": "921319a4d5f63b10463e5731b2787293764ad359afb3263bed0e9627dfb638b5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_spawn_preflight.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_spawn_preflight.h",
+      "sha256": "9553b65128c447688e993058832e8aa2c62ad4d278b93f9a02f6893c179184a8"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_traveler_trial.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_traveler_trial.h",
+      "sha256": "240c89ed9bf11cdb72e25edeebc9193e1c122482b0071a66cd78f6c33f5bc300"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_trial_shader.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/native_trial_shader.h",
+      "sha256": "41c163f096325d1d18670ef6d2bc6239ef85ee90b52b9e56d51430dd3672d76a"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/platform.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/platform.h",
+      "sha256": "54939966385c39dc2d4953768eab9283dcee3a1b551c73b6fe7ded0e56b44cef"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/pose_link.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/pose_link.h",
+      "sha256": "ccad47c872e07818ebf18abe059bba6519084e1eb9d2f68fd10ec9db561b50ac"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/probe_dll.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/probe_dll.c",
+      "sha256": "092b84a030fc8743d7cfe7d2e94cfff7838efdd8a33ef959b3197d161a4452c5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/probe_helper.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/probe_helper.c",
+      "sha256": "a79daa7136c5002c95d872147aa9ee3cd466641234d394de62ece5a193dcdd6d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/remote_pe.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/remote_pe.h",
+      "sha256": "16fad675a451c7e587cdbcbceae4637ed04d99d66f52911cd786ba1808410f28"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_actor_packet.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_actor_packet.c",
+      "sha256": "f891291d5b7d0167aa9eeba96ebd99a9b5556f0f8295383c2312bf5c4ddfbedd"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_actor_stream.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_actor_stream.c",
+      "sha256": "ec641c6766b23d817d3528743d16e5f7d6e8a723484d75fb0ce7e174dbf5917e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_connection.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_connection.c",
+      "sha256": "c25760f8e9ed87d83b4446e8e7b8e60e931edae4edb2c30d6afc3bdd56d5e6f5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_pose.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_pose.c",
+      "sha256": "4654d9e32c65af9554d1e970c2b3977a7d31bf72943c4941da9927773b8f8532"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_room.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_room.c",
+      "sha256": "728d3e28fff1dc91f9f8eace8ba1c2291d3b23b9ec7222cc268364b05b5809a4"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_session.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_companion_session.c",
+      "sha256": "8213b6842d768552581487161c437745913ae675088afb0963eb2daf6d208d1f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_diagnostic_checkpoint.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_diagnostic_checkpoint.c",
+      "sha256": "a0ee1737b9f79b501df65c9340e11d54416ad6846f9eb323498db2b38aaaa8e5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_diagnostic_fault.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_diagnostic_fault.c",
+      "sha256": "4c7e7f79ea7a00d9953d035b22c9cfe0d172c5dacdc239be3117aace5017adfb"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_appearance_live.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_appearance_live.c",
+      "sha256": "ea6af41eca8f2c35ed21a180fc035189146c83162eb5dd4a92bc85f447086835"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character.c",
+      "sha256": "02856ae85d21ccf55f06ae449b9a126fc369a1baf9d58094fc5514265aeb340b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character_assets.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character_assets.c",
+      "sha256": "ab96c3fab562477df6b0fceaa3f1d72b5b965fe7b354c4af9d9351a592948cb2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character_native.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character_native.c",
+      "sha256": "7a6bf049859db48ceb83f4965560103d35b4da8c2a034a29c3ad8792e9fb331b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character_volume.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_character_volume.c",
+      "sha256": "ae07a95f4060abfbf8ae9d3e582d203bca7738d40d7853136fbd88afafeecfec"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_chat_input.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_chat_input.c",
+      "sha256": "d581f1aa1334ca7fd4aeb4b059ca881d94a94e8d4b25a32b215fc31ba4bcc00e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_controls.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_controls.c",
+      "sha256": "1156ecf8e581ac9cc58df18a56fee9a7edf756356259b7345bb7c573745e7a17"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_frame_pacing.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_frame_pacing.c",
+      "sha256": "b1c6b0602346916d71ccf5997ad544aff6b5516d466afc2c157fbda7ea67e168"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_freeplay_live.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_freeplay_live.c",
+      "sha256": "29c3cf1495e7d08d9826f0a031db2f34cd6f78f13c5477a3d57f82af59edfe57"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_group_travel.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_group_travel.c",
+      "sha256": "491490cfc5a27c8576173964f9357cfb33638aa5cd447f8c65c0444a44ef9e81"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_intro.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_intro.c",
+      "sha256": "ebca6eb3430c5d628f6d8096d5d698c4c687be13aacbf80812e2b65fd8dfe5d2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_lobby_runtime.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_lobby_runtime.c",
+      "sha256": "39ae084da6cd9a86f16becdd499ed3e5dce78333178ee2bdd92fdb1e12286963"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_menu_draw.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_menu_draw.c",
+      "sha256": "26ef445dfdd2acfa47f27b52f8f45e5eb0af6e4bdf3848d87d03bd4b24d9b19c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_menu_live.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_menu_live.c",
+      "sha256": "08d4139b4a6afc483abaf776b382997a8c20ab725e231fbf84c3e57ebbde5777"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_menu_model.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_menu_model.c",
+      "sha256": "a2043a2af2252e6f8a3ba32de7a0b05314121db07043ff483f5fb6c415146d8a"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_paths.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_paths.c",
+      "sha256": "0c6ba8f27375255882204b3b7af950be60e9433caddf3cc922c455f31b9deb57"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_report_export.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_report_export.c",
+      "sha256": "69fbf26848171d6a5fc74fcd8db284026acce645d773e3c875cabe99d9808d6c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_rocket.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_rocket.c",
+      "sha256": "9c7972a9bbf9601648d701531942e1986bdd1a8254a8c2348fbe8cd687c0a7b2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_save_status.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_save_status.c",
+      "sha256": "05b1cd6ada552fb2aa82f285c8c09e5e2d69c1ee94a59a1c538448dd36153ee0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_session_log.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_session_log.c",
+      "sha256": "c5746d4a2ab79b060432d2183d5d473ec71c13a46184716d9224f5425a21d433"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_settings.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_settings.c",
+      "sha256": "428ce44769c6c0c0fcd1f09669f0f190e0ede003ba03ae1f4857f73bf12ec7b6"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_steam_lobby.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_steam_lobby.c",
+      "sha256": "4fc57b72fcdcf457a0d902c64b5c073dc485eebe6ddb66849c03150ac6374c17"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_steam_probe.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_steam_probe.c",
+      "sha256": "07cf792caf0190c92cb3d9500bc1e46f8c3b487c21cfa47ea00e487f18029cf3"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_texture_guard.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_texture_guard.c",
+      "sha256": "a89f1a60a12e7dc09185f5823fb43c4dd483502770096ad94dc6358967cd5d03"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_travel_native.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_jnet_travel_native.c",
+      "sha256": "bcaa0ed38ec59e6fade48b11c3812748c063115722fd432a4c384c67f6c1c0cb"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_actor_departure.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_actor_departure.c",
+      "sha256": "8a23012fe30b4499fba7bc2f1f3328a83fb929aa90be0b303322f9ec8df1dfcd"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_actor_engine.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_actor_engine.c",
+      "sha256": "80e2f2b5a6d37e65f8b173135ae9ca44ddf895c3293a1d3314f0ccdfaa7e9444"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_allocation.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_allocation.c",
+      "sha256": "48c80cd39a332f4680d3406ddbd976cca6a86066a38ce891a7a556788143550b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_animation_playback.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_animation_playback.c",
+      "sha256": "18083073aba5f1efe7e0bf74d2d380d9f8a2520ed9a310fc7ab319b0bfedf332"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_animation_storage.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_animation_storage.c",
+      "sha256": "ff04e4f55eddea26732120a85442c44ebf759bfa27e13a293c5ef16158fc2ba3"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_appearance.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_appearance.c",
+      "sha256": "a4a72595a6666522369e3b04a63d041813b821bee5bf3786dbc8e151fffee0b2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_chapter_gate.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_chapter_gate.c",
+      "sha256": "6aba29b0f4debbc2280c851273d006436e8f7f8db411ae7036afe081f67d0e74"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_chirp_charge.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_chirp_charge.c",
+      "sha256": "dc41714cd7e6043eda1c4e9dd0c38c9ddbee9410f6f4584c766e735edfb99adf"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_chirp_glyph.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_chirp_glyph.c",
+      "sha256": "8c80de10d129794c8faadd28052516b0dfe9c677bad324b85e874726fc1b233c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_clone_pool.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_clone_pool.c",
+      "sha256": "6e06fdf1a7ec21c116b1b8a69434b59e40737c651a0caba9c45b394dd4ae75a0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_engine.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_engine.c",
+      "sha256": "07c57a69c47e256961fd3de956f28cc50b262d4e936df048ddf998e372e0213d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_frame.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_frame.c",
+      "sha256": "df94271fc7698db2d6a4a18f1800023e3518e95d5912b3e8cd674b190a3c13d5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_material_live.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_material_live.c",
+      "sha256": "d375df445bd065a1da5c75e256c586ce07113258cffb59f673474b1730f56740"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_partition.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_partition.c",
+      "sha256": "51f2ae433f62f6d02e91b3f92c1e0acf2aefafc10fbc00452e2bb63646f73f2b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_prelaunch.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_prelaunch.c",
+      "sha256": "df4b930be743170557a899799d89abd4595513ec07b8ef339f0914fda3bb7b3e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_producer.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_cloth_producer.c",
+      "sha256": "e2cab180ec0c4a2b5d8bd3091433b6c1f29df623077bb662a43f9b637805d033"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_companion_chirp.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_companion_chirp.c",
+      "sha256": "b9244b5f332d48d61233350c15b1839d936f47561ec0c3ba9e4cc122e29c2cde"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_companion_cloth.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_companion_cloth.c",
+      "sha256": "36419de1b4d0747964fbfd58383d91ebffadb6afb905f64c0ac010e284248d21"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_connection_scan.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_connection_scan.c",
+      "sha256": "d9451bcc3fdea8f82c70be21e2f4ff8cb2dc282eacebf2915e937d71b01330d5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_dual_body.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_dual_body.c",
+      "sha256": "584ed7fdfa833cd15a2fe51f3f50176b994297f8412a59c07cbb349777ad57f3"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_evaluation_layout.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_evaluation_layout.c",
+      "sha256": "3a174a3d87553eb49e7987be6eeefe069be5f0b5b986f0bff4368806f7d77d65"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_evaluation_run.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_evaluation_run.c",
+      "sha256": "79ec68d45fea84aa26e9d31229aa4c4fa470fdbbe7c70eb63db0e7e418ecdc8b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_geometry_pool.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_geometry_pool.c",
+      "sha256": "4cf4b5faa0cac212e823833b0ca6de5769e96cee2c5d5b2b1149707c6594766e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_idle_pose.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_idle_pose.c",
+      "sha256": "3110108b2561cdefd71196185130071a7773fff93cdf70f5b7115d177ef26e9c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_initialized_lifetime.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_initialized_lifetime.c",
+      "sha256": "5285c92e2a98e94f08626958e8b3054a4add8bdb8157275e9c90dcd49de9d24c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_layout.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_layout.c",
+      "sha256": "6811ecb9548d02dcf431ed1dd288706eb97cbc651988fef69390d44215fee42b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_lifecycle_abi.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_lifecycle_abi.c",
+      "sha256": "71f63c5fcc841b745c87a8830fda7a2c1f09dc92e486bda02e832f90d90143f8"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_lifecycle_trace.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_lifecycle_trace.c",
+      "sha256": "199a18840f6766e8b9be45ef8614e4e7c28db5cba5fea4af562526f5c2f47703"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_local_peer.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_local_peer.c",
+      "sha256": "a7383975cfc6ab6b51c7da693d464d6ee8cf8370f73defd8392db1673719286a"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_local_read.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_local_read.c",
+      "sha256": "31bb2208495fbd316e780ff443beedfa4e6f9d4352e8ea2f08ffd5d353fd4d64"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_material_ready.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_material_ready.c",
+      "sha256": "ec85d553fcb16d5fd8b39898064fbe65e924bd4393997e04a081ff91a60aa325"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_mesh_callbacks.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_mesh_callbacks.c",
+      "sha256": "4edf762e80a8ad819b357d3326fac3fe9e60f2d40c1fa13070d4479bc2816079"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_mesh_guard.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_mesh_guard.c",
+      "sha256": "0d9696fb6603ea7a3bd7a9ea16dbfe39659ac37dc34c9138ea956ea8ba95db6f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_mesh_rehearsal.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_mesh_rehearsal.c",
+      "sha256": "fc4091fbd99d417b79df6fa3f5f534dc7c056f485cec5de498f389f7f6dd8775"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_peer_lifecycle.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_peer_lifecycle.c",
+      "sha256": "c6a709e69b64f21fc3b87401689a83a5dd79d32919331a17acfac4e8e5f2b830"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_pose_storage.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_pose_storage.c",
+      "sha256": "d85295934696b129ae7d0586cbda733936de35364d8cea8f6408df48a7957e43"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_pose_writes.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_pose_writes.c",
+      "sha256": "8c030d157ff7ae4c5ea5cc62ab4222aa1312a697fe2e463f6fddfd5f5bcac8fa"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_read_batch.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_read_batch.c",
+      "sha256": "0f265abe5e06ca2f6621c72db8b1404718c8feb6cc20930b58366cc374e10915"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_receiver.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_receiver.c",
+      "sha256": "554c23b9ce7a25d491ccea3d433645d8ecf5c892b04e0d420831f082c5f995b2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_receiver_engine.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_receiver_engine.c",
+      "sha256": "c0a12c70dccc468bcc931dfe0bf098aaf8d17104b9e5904751c837e010268ac2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_render_gpu.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_render_gpu.c",
+      "sha256": "2134023ccae9f46c1d74af584dfd39fac6ca5190544ec0378e3eaebd8dbe6770"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_render_queue.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_render_queue.c",
+      "sha256": "75b3aedc3fd709c65a8ab6c4436ee0b5f51a3d3c6eb9452d64914200134c56bb"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_render_retirement.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_render_retirement.c",
+      "sha256": "4503b3ffe9f65083bad7682713c9cbff6ac723df610fc35d5234762f838ad1ff"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_resources.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_resources.c",
+      "sha256": "51ae8469968fe3b5734425b883b8a1b502a1fa4d2bad69cb73fed29b05188202"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_sand_consumer.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_sand_consumer.c",
+      "sha256": "6e7859d251fab669fcd4e9ff957021f5ea093ad45a440cd47d0788ef8d326cc4"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_scarf_growth.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_scarf_growth.c",
+      "sha256": "b26a0fb3e4b5ee3c653714e0f4838e77af294b3adffd54bae48c8c978e86285e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_shader_inputs.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_shader_inputs.c",
+      "sha256": "0482edc239e9c8fdce9e59109f298558ef51ed55d2326dbd2a78562797a83c06"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_skeleton_mirror.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_skeleton_mirror.c",
+      "sha256": "13a3302cf77b99034af3266f817057842a981a38dbd178fa87df9143e2e9f7bf"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_spawn_preflight.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_spawn_preflight.c",
+      "sha256": "94994fdaad46f4665bb368a99cc33e52a6e65652659d8845749c08b515b75dd9"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_traveler_trial.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_native_traveler_trial.c",
+      "sha256": "0a9bf67fa6733b043da5512c9909bf3e9c4bff0839ab8a0435203980e4424cac"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_remote_pe.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_remote_pe.c",
+      "sha256": "edafe732b4a3deda76f0f0c6449683fa6025d252be8884cdfce111c6216e21ac"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_traveler_network.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_traveler_network.c",
+      "sha256": "597dceb0c787d3bbe1797a9d78ccd52741f3466a6deeeae05409434c2b4e4dc6"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_traveler_stream_admission.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_traveler_stream_admission.c",
+      "sha256": "d9d0ef621e6270d571acfff1efd96142bd5cf84b0af3021fb16f48775bfdf358"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_traveler_trial_runtime.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_traveler_trial_runtime.c",
+      "sha256": "9284e16dfa8e1222bdb706ce62f4f563b2aad0dd879d70622aaeb30dcbcbebf0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_actor_runtime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_actor_runtime.h",
+      "sha256": "450939955cc583ee7f0188ba0d96825d286ce97784ccbc39ecfc397d9bf37d94"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_chirp_charge.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_chirp_charge.h",
+      "sha256": "0e71a71b51fbfa6c6908fc5caa92beec711ba7f638fef1338f16d5426972d9e6"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_chirp_glyph.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_chirp_glyph.h",
+      "sha256": "e54da6a64d082d3790a08d62e8cb05ef52a40e37534dfc0871867bd0f5aa457d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_glyph_init.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_glyph_init.h",
+      "sha256": "26e28e0742b1948e35d04cbe3f6714e2a2bc58d8f071d2c077ee97b137e96367"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_glyph_trace.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_glyph_trace.h",
+      "sha256": "3349ceecd04e60599d58b851c8a58db11bc958d1cba921eb9acaf86b28c0c665"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_live_backend.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_live_backend.h",
+      "sha256": "28b63b6c2670cc22660075d61c62c2c98604c7d6a43fc1130af59c60511d8db8"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_local_peer.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_local_peer.h",
+      "sha256": "518766b414ecb2a5f0b26034f065ba4396432be9d16aabf9da7b80b4c71a63c3"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_network.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_network.h",
+      "sha256": "0797f812fe074a48b96ded9bbe834b4c910d28c79282ef75e7bd509857b20cef"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_peer_lifecycle.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_peer_lifecycle.h",
+      "sha256": "8860725febc98c48f87305dfaf1955ea0aee89cdf30f12b6c2a26c7234fcf713"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_sand_guard.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_sand_guard.h",
+      "sha256": "67524fbf2c3c2c9d65110e2c3800b8297f9b2cc2be5088b57434fe770f1b1416"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_stream_test.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_stream_test.h",
+      "sha256": "e5b164a5a623b5e924bd39e86e15d2a83e3fbf23dae4f080642f8b3503e4eee8"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_stream_udp.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_stream_udp.h",
+      "sha256": "fe1e9e7e2a9fe1b1ba543158ebbbf1711f014ec5607c8a6af662a228f643f431"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_trial_runtime.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/diagnostic/traveler_trial_runtime.h",
+      "sha256": "96e049a2dacb49f26570b218ecea4dcee9c96fdbe1e1bb72426ffc2998a00513"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/inspect_build.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/inspect_build.py",
+      "sha256": "b080bb97c216a06410388052653bd98d3af632f519090dc41b4d20adb87e85a7"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/inspect_menu.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/inspect_menu.py",
+      "sha256": "6380058046ae62c22f06d988961ebf51e755ab0a2c32432e99d2e4ae7b25cf87"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/native_map.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/native_map.py",
+      "sha256": "8b11b993337a5d24426b1c61b46ede391ab2f84572bf61dd3c49963ef1e54272"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/startup_resources.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/startup_resources.py",
+      "sha256": "f48a82860d54f7e96456dabd491b24d13cb8122ebb3903fc76a39fcb196de62b"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_character_resources.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_character_resources.py",
+      "sha256": "657d0059544f802db19583a2f12feb1f66f5f12eb482d479e355dc7d8d3b7964"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_connection_scan.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_connection_scan.py",
+      "sha256": "0abfd31bc5badbc1e52947f58ab2c90cfb47de65160892ef2eb78ba7cce16ae7"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_controls.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_controls.py",
+      "sha256": "d4db722d56ce9b5a432edf61236e99a129f15e31d60f95005aa14a7464881b15"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_daynight_resources.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_daynight_resources.py",
+      "sha256": "fd3e14c85c8e889985cb843e9d7cf205723e86e24adf37b6890d79117e97fbb1"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_diagnostic.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_diagnostic.py",
+      "sha256": "3806bf9cc55910d74a82539e9fe324db4576cc7a565f1fa0d1c99641c84abcb9"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_inspect_build.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_inspect_build.py",
+      "sha256": "3526167f3d1e75484f33976f499b3b25aa1ec835f9ab3356ad097b0a0a4a8bc0"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_native_map.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_native_map.py",
+      "sha256": "9a354ac4ed87ef5a2fa658dc00592381ae48340cfdbfb7cdfb284b9e0942384c"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_paradise.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_paradise.py",
+      "sha256": "d046a07cdb673bbd97f5497edff8bd84bf1bd2bde0803fa5bdec5594050ef814"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_probe.lua",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_probe.lua",
+      "sha256": "3b0db62f9b6356312ed0a1c3bd789964b699591289a1e22461c29244e6916240"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_session_reports.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_session_reports.py",
+      "sha256": "6fd9482958e3136f38394997f489d12eef3835d56d622560980dce7a6ddb8645"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/test_startup_resources.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/test_startup_resources.py",
+      "sha256": "66af20b3b569e0549fcd918ddfd898d77035b442453298d99392b3b45aef3bc1"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/verify_native_orchestration.py",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/verify_native_orchestration.py",
+      "sha256": "874626cdc9034afe1cf66748716de3cf4e0ec210a6f89099e5010d4b497b8aad"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/check_image_write.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/check_image_write.c",
+      "sha256": "80224fab4160c86799fc140752b03836a927e0f458f06e97d0c1f15872367b0d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/remote_control_fixture.h",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/remote_control_fixture.h",
+      "sha256": "0e7754d87ae5973f9d8f40a3ae420d8066dd9727772ad2e0663d7b03b7d3b694"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/native_actor_appearance_fixture.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/native_actor_appearance_fixture.c",
+      "sha256": "e08b78fbafdc872f9c0e5d6ca36d82e28539595a0b669e847e07b39198a7d8c7"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/native_cloth_appearance_fixture.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/native_cloth_appearance_fixture.c",
+      "sha256": "5630834c587966e4fa689540d79ae39124875561f70cab4a18d289bcb4c31fde"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/native_cloth_atlas_fixture.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/native_cloth_atlas_fixture.c",
+      "sha256": "9ae725d6cd42fee039707cf80d6db76e96ddc37f0401805287cea8d5fb9347d5"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/native_cloth_orchestration_fixture.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/native_cloth_orchestration_fixture.c",
+      "sha256": "add8b637bf9574f389d2707e07bbbcdb87270b80c9d8f9ae28ecbd24bb2f9a18"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/test-report-context-0.280.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/test-report-context-0.280.c",
+      "sha256": "ce83964290661ffbe78ec816b43152ad5c3395cb5082277cdb3af38b6339a82d"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/test_helper_exit.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/test_helper_exit.c",
+      "sha256": "44cbffbab61a566b6111370a6fa31ffbf70da13da97ad8974fea60f8e18bce95"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/test-link-report-0.63.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/test-link-report-0.63.c",
+      "sha256": "f0ebe7b72cab5027731ac7725671215c0b325ab4c48ea64feb1dd287549b616e"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/companion-components/check_connection_recorder.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/companion-components/check_connection_recorder.c",
+      "sha256": "20a245f9b9d48f898054efde49e0929cd48651606a637423407eb0de5863d5d9"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/companion-components/check_dual_context.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/companion-components/check_dual_context.c",
+      "sha256": "8e35dd9f10e28009e5ed09bfa130a6dd4a3f01b103a8cf09e7412d7e16173da4"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/companion-components/check_exit_watch.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/companion-components/check_exit_watch.c",
+      "sha256": "5d11cb8d6c7d050fdc848b148528940da9b1018394829e091af520ebf10a57c2"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/companion-components/check_room_status.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/companion-components/check_room_status.c",
+      "sha256": "eaf655c56a204fcbc2b381d8ce662327f33a2360393094f70dfd8cc30a414a51"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/companion-components/check_skeleton_report.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/companion-components/check_skeleton_report.c",
+      "sha256": "614f61ce8bc01ced71278ca58dc684d675658b8c403f8407ddfd660d785842ad"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/companion-components/replay_native_clocks.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/companion-components/replay_native_clocks.c",
+      "sha256": "c87e95c9568728cf14cc1b91df1e4e1e98deeac5043c036c9348089fedfc7192"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/menu/image-state-check.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/menu/image-state-check.c",
+      "sha256": "375dc5f2db387e5d65403b3eea06d8096cce3fa337c86ca7db76b1ca0d9e9124"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/menu/test_body_input_0227.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/menu/test_body_input_0227.c",
+      "sha256": "ed3c7afacf0729f10ee5939b287052f2d15d9795776ad4cfe45cd7754845b41f"
+    },
+    {
+      "source": "JourneyPC-CompanionsMod/CompanionLab/work/native-actor/network_reconnect_fixture.c",
+      "destination": "JourneyPC-CompanionsMod/CompanionLab/research/native-actor/network_reconnect_fixture.c",
+      "sha256": "b99b104d511cc8f8c2a59e78863a52c3f6c94b52c382c7f0d65e3f5ac62cb387"
+    }
+  ]
+}

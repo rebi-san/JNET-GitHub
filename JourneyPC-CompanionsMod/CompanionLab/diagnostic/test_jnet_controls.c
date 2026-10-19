@@ -1,0 +1,74 @@
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <math.h>
+typedef unsigned DWORD;
+#define VK_LBUTTON 1
+#define VK_RBUTTON 2
+#define VK_MBUTTON 4
+#define VK_XBUTTON1 5
+#define VK_XBUTTON2 6
+static unsigned char actor_storage[0x14700],game[0x200],menu[0xe00];
+static unsigned char *actor=actor_storage+0xb0;
+static uintptr_t fault_image,jnet_menu_last;
+static int jnet_bindings[3][7]={{'C','B','V','G'},{0},{0}};
+static unsigned jnet_binding_down[7],jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready=1;
+static unsigned jnet_chat_focus;
+static unsigned keys[256],buttons,foreground=1,calls;
+static char last[32];
+static int jnet_menu_read(uintptr_t at,void *out,size_t n){memcpy(out,(void *)at,n);return 1;}
+static int own_read(void *ctx,uintptr_t at,void *out,size_t n){(void)ctx;return jnet_menu_read(at,out,n);}
+static void *GetForegroundWindow(void){return NULL;}
+static void GetWindowThreadProcessId(void *w,DWORD *p){(void)w;*p=foreground;}
+static unsigned GetCurrentProcessId(void){return 1;}
+static unsigned GetAsyncKeyState(unsigned key){return keys[key]?0x8000:0;}
+static unsigned jnet_controls_buttons(void){return buttons;}
+static void queue(uintptr_t controller,const char *name){
+    assert(controller==(uintptr_t)actor+0xa390);++calls;strcpy(last,name);
+    unsigned pending;memcpy(&pending,(void *)(controller+0x6734),4);++pending;
+    memcpy((void *)(controller+0x6734),&pending,4);
+}
+#include "controls_fixture.h"
+static void set(unsigned offset,unsigned value){memcpy(actor+0xa390+offset,&value,4);}
+static void tick(unsigned kind){set(0x6734,0);jnet_controls_tick((uintptr_t)actor-0xb0,(uintptr_t)game,kind);}
+int main(void){
+    fault_image=(uintptr_t)queue-0xaea60;jnet_menu_last=(uintptr_t)menu;
+    uintptr_t barn=(uintptr_t)actor-0xb0;memcpy(game+0x1e0,&barn,8);
+    const char *names[]={"Crouch","SlideJump2","SlideJump1","CrouchToIdle","JNETSpin3","RollF","JNETFlipL","JNETFlipR"};
+    set(0x64a0,8);
+    for(unsigned i=0;i<8;++i)strcpy((char *)actor+0xa390+0x33a0+i*0x40+0x28,names[i]);
+    assert(!jnet_controls_action((uintptr_t)actor,"Missing"));
+    set(0x6734,16);assert(!jnet_controls_action((uintptr_t)actor,"Crouch"));
+    set(0x64a0,197);assert(!jnet_controls_action((uintptr_t)actor,"Crouch"));set(0x64a0,8);
+    keys['B']=1;tick(0);assert(calls==1 && !strcmp(last,"SlideJump2"));tick(0);assert(calls==1);
+    keys['B']=0;tick(0);keys['B']=1;tick(1);assert(calls==1);
+    keys['B']=0;keys['C']=1;tick(0);assert(jnet_crouch_active && !strcmp(last,"Crouch"));
+    menu[0xd68]=1;keys['C']=0;tick(0);assert(jnet_crouch_active);
+    menu[0xd68]=0;tick(0);assert(jnet_crouch_active);
+    float move=.005f;memcpy(actor-0xb0+0x30,&move,4);tick(0);assert(jnet_crouch_active);
+    move=.5f;memcpy(actor-0xb0+0x30,&move,4);tick(0);
+    assert(!jnet_crouch_active && !strcmp(last,"CrouchToIdle"));
+    move=0;memcpy(actor-0xb0+0x30,&move,4);
+    keys['C']=1;tick(0);assert(jnet_crouch_active);
+    keys['C']=0;tick(0);assert(jnet_crouch_active);
+    keys['C']=1;tick(0);assert(!jnet_crouch_active);keys['C']=0;tick(0);
+    keys['G']=1;tick(2);assert(jnet_spotlight_down);menu[0xd68]=1;tick(2);assert(!jnet_spotlight_down);
+    menu[0xd68]=0;foreground=2;keys['V']=1;unsigned before=calls;tick(0);assert(calls==before);
+    foreground=1;tick(0);assert(calls==before);keys['V']=0;tick(0);keys['V']=1;tick(0);assert(!strcmp(last,"SlideJump1"));
+    keys['V']=0;tick(0);keys['V']=1;tick(0);assert(!strcmp(last,"JNETSpin3"));
+    keys['V']=0;tick(0);keys['V']=1;tick(0);assert(!strcmp(last,"SlideJump1"));
+    jnet_bindings[2][1]=16;buttons=1u<<15;tick(0);assert(!strcmp(last,"SlideJump2"));
+    buttons=0;tick(0);jnet_bindings[1][1]=5;keys[VK_XBUTTON2]=1;tick(0);assert(!strcmp(last,"SlideJump2"));
+    memset(keys,0,sizeof(keys));buttons=0;tick(0);
+    for(unsigned device=0;device<3;++device)for(unsigned action=4;action<7;++action){
+        memset(jnet_bindings,0,sizeof(jnet_bindings));
+        jnet_bindings[device][action]=device==0?'F':device==1?1:11;
+        if(device==0)keys['F']=1;else if(device==1)keys[VK_LBUTTON]=1;else buttons=1u<<10;
+        before=calls;tick(0);assert(calls==before+1 && !strcmp(last,names[action+1]));
+        tick(0);assert(calls==before+1);
+        memset(keys,0,sizeof(keys));buttons=0;tick(0);
+    }
+    before=calls;jnet_controls_ready=0;keys['C']=1;tick(0);assert(calls==before);
+    puts("Controls: queue bounds, missing actions, key edges, sticky crouch, movement cancel, second-press cancel, pause, focus, creature gating, mouse and trigger bindings passed.");
+}
