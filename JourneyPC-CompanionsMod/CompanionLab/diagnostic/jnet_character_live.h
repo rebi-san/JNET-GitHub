@@ -1,6 +1,7 @@
 #ifndef JNET_CHARACTER_LIVE_H
 #define JNET_CHARACTER_LIVE_H
 #include "jnet_character_native.h"
+#include "jnet_flower_trail.h"
 #include "jnet_character_audio.h"
 #include "jnet_level_fixes.h"
 #include "jnet_character_payloads.h"
@@ -672,6 +673,7 @@ static void jnet_character_attack_handler(uintptr_t event,uintptr_t game) {
     jnet_character_attack_handler_original(event,game);
     if(!jnet_character_attack_sync(instance))jnet_character_fail(instance);
 }
+static void jnet_flower_after_motion(unsigned kind,const float position[3],float dt,jnet_flower_floor_function floor,void *context);
 static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     jnet_controls_tick(barn,game,jnet_menu_edit.applied.character);
     struct jnet_character_state *instance=&jnet_character_instance;
@@ -719,8 +721,10 @@ static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     instance->failure_stage="target binding/pose";
     int result=jnet_character_target_step(own_read,jnet_character_write_memory,instance,&instance->binding,
         jnet_character_generation,&intent,jnet_character_speed(instance->kind)*(1+instance->sprint),jnet_character_frame_dt,jnet_character_ground);
-    if(result){instance->failure_detail=result;jnet_character_fail(instance);}
-
+    if(result){instance->failure_detail=result;jnet_character_fail(instance);return;}
+    float flower_position[3];
+    if(own_read(NULL,instance->binding.target+0x10,flower_position,sizeof(flower_position)))
+        jnet_flower_after_motion(instance->kind,flower_position,jnet_character_frame_dt,jnet_character_ground,instance);
 }
 static void jnet_character_after_player(uintptr_t barn,uintptr_t game) {
     struct jnet_character_state *instance=&jnet_character_instance;

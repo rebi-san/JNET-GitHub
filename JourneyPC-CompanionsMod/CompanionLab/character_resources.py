@@ -24,6 +24,9 @@ TOKEN = re.compile(r'\s+|--[^\n]*|"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z_0-9]*|[-+]?
 
 
 class LiteralReader:
+    # Lua keeps the last of repeated keys; the strict default rejects them so Journey data cannot silently change.
+    allow_duplicates = False
+
     def __init__(self, text):
         self.tokens = []
         at = 0
@@ -68,7 +71,7 @@ class LiteralReader:
                     else:
                         key = self.take()
                     self.take('=')
-                    if key in fields:
+                    if key in fields and not self.allow_duplicates:
                         raise ValueError(f"Duplicate field {key}")
                     fields[key] = self.value()
                 else:

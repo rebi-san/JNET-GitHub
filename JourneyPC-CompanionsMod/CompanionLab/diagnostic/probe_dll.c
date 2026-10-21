@@ -3256,6 +3256,7 @@ static int traveler_peer_replace(uint64_t peer,uint64_t generation);
 #include "jnet_options_live.h"
 #include "jnet_appearance_live.h"
 #include "jnet_character_live.h"
+#include "jnet_flower_live.h"
 #include "jnet_rocket_live.h"
 #include "jnet_intro_live.h"
 static void (*jnet_character_skeleton_build_original)(uintptr_t,uintptr_t);
@@ -3375,6 +3376,7 @@ static void jnet_online_game_tick(uintptr_t game) {
     if(JC_NATIVE_CHARACTERS_ENABLED)jnet_character_tick_native(game);
     jnet_appearance_game(game);
     jnet_daynight_game(game);
+    jnet_flower_tick(game);
     jnet_rocket_game(game);
     if(JC_NATIVE_CHARACTERS_ENABLED)jnet_character_remote_tick(game);
     JNETSteamGame[76]=jnet_diagnostic_scan_last;JNETSteamGame[77]=jnet_diagnostic_scan_peak;

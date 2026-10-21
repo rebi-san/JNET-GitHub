@@ -31,8 +31,11 @@ static inline const char *jc_chirp_sound_name(unsigned sound,int companion) {
         {"Player2Coo","Player2Chirp","Player2Call","Player2Shout"}};
     static const char *const creatures[]={"FishComeHere","Guardian_OutOfSnowVO","HappyWhale",
         "FishIdleMoveShort","FishIdleMoveMedium","FishIdleMoveLong","ClothGuardianShout", "JNTFishShort", "JNTFishMedium", "JNTFishLong", "JNTFishCall",
-        "JNTWarVoice", "JNTWarLock", "JNTWhale", "JNTWarHungry", "JNTWarAway", "JNTFlowSnake", "JNTFlowHunter"};
-    if(sound>=5 && sound<=22)return creatures[sound-5];
+        "JNTWarVoice", "JNTWarLock", "JNTWhale", "JNTWarHungry", "JNTWarAway", "JNTFlowSnake", "JNTFlowHunter",
+        "Flower"};
+    /* 23 is Journey's own Flower response sound (the Desert flower's shout), played locally by Flower Trail; it is never captured
+       from native shouts, so jc_chirp_sound_kind stops at 22. */
+    if(sound>=5 && sound<=23)return creatures[sound-5];
     return sound>=1 && sound<=4 ? names[companion!=0][sound-1] : NULL;
 }
 static inline unsigned jc_chirp_sound_kind(const unsigned char name[32]) {

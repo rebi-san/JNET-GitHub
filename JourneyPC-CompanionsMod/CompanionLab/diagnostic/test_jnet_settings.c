@@ -5,7 +5,7 @@
 #include <wchar.h>
 #include <stdlib.h>
 #include "jnet_character.h"
-static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][7],jnet_creature_saved[JNET_CHARACTER_COUNT][3][7];
+static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][8],jnet_creature_saved[JNET_CHARACTER_COUNT][3][8];
 typedef int32_t LONG;
 typedef unsigned DWORD;
 typedef int HANDLE;
@@ -76,13 +76,13 @@ int main(void){
     jnet_bindings[0][4]=70;jnet_bindings[1][5]=2;jnet_bindings[2][6]=12;jnet_bindings[0][7]=16;jnet_bindings[2][7]=7;
     assert(!act("Revert") && !jnet_bindings[0][4] && !jnet_bindings[1][5] && !jnet_bindings[2][6]);
     jnet_bindings[0][4]=70;jnet_bindings[1][5]=2;jnet_bindings[2][6]=12;jnet_bindings[0][7]=16;jnet_bindings[2][7]=7;
-    jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]=76;
+    jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]=76;jnet_creature_bindings[JNET_CHARACTER_FLOW_1][0][7]=71;
     jnet_bindings[0][0]=88;assert(!act("Apply") && strstr(disk,"Binding00=88") && !jnet_settings_dirty(3));
-    assert(strstr(disk,"Creature302=76"));
+    assert(strstr(disk,"Creature302=76") && strstr(disk,"Creature507=71"));
     page("Keyboard",0);assert(!act("Back"));
     memset(jnet_bindings,0,sizeof(jnet_bindings));jnet_credits=1;jnet_fps_limit=0;
     jnet_controls_initialize();
-    assert(jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]==76);
+    assert(jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]==76 && jnet_creature_bindings[JNET_CHARACTER_FLOW_1][0][7]==71);
     jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]=80;
     assert(jnet_settings_dirty(3));page("Controls",1);assert(!act("Revert"));
     assert(jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]==76);
@@ -91,6 +91,13 @@ int main(void){
     assert(jnet_bindings[0][1]==66 && jnet_bindings[0][2]==86 && jnet_bindings[0][3]==71);
     assert(jnet_bindings[0][0]==88 && jnet_credits==0 && jnet_fps_limit==1);
     assert(!jnet_settings_dirty(1) && !jnet_settings_dirty(2) && !jnet_settings_dirty(3));
+    /* Settings files written before Flower Trail existed have no Creature507 line: the defaults are F, no mouse button, right stick. */
+    char kept[8192];strcpy(kept,disk);
+    for(char *line=strstr(disk,"Creature5");line;line=strstr(line+1,"Creature5"))if(line[10]=='7')line[0]='X';
+    memset(jnet_creature_bindings,0,sizeof(jnet_creature_bindings));jnet_controls_initialize();
+    assert(jnet_creature_bindings[JNET_CHARACTER_FLOW_1][0][7]=='F' && !jnet_creature_bindings[JNET_CHARACTER_FLOW_1][1][7] &&
+           jnet_creature_bindings[JNET_CHARACTER_FLOW_1][2][7]==8);
+    strcpy(disk,kept);jnet_controls_initialize();assert(jnet_creature_bindings[JNET_CHARACTER_FLOW_1][0][7]==71);
     for(unsigned lighting=0;lighting<3;++lighting){
         jnet_daynight_mode=lighting;assert(jnet_settings_apply(4));
         jnet_daynight_mode=99;jnet_controls_initialize();assert(jnet_daynight_mode==lighting);

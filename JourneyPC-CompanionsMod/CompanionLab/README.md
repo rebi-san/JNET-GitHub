@@ -1,6 +1,16 @@
 # JNET (Journet)
 
-Current release: **0.286**. Distribute `work/JNET-0.286.zip`; it extracts into `JNET/`.
+Current release: **0.312**. Distribute `work/JNET-0.312.zip`; it extracts into `JNET/`.
+
+0.312 is the intended Flower Trail release: the 0.311 test confirmed the flowers draw, so the screen-space test pattern and the pixel probe are removed and the `flower trail camera` and `flower trail frame` report lines are now written every 30 seconds instead of every 4 to 5. The camera position (node `+0x1a0`) is still located by matching Lua's world matrix at startup, and the private depth buffer matches Journey's 8x multisampled back buffer.
+
+0.311 fixes the cause found by the 0.310 pixel probe: Journey's swap-chain buffer is 8x multisampled (`format 28 samples 8`) while Flower Trail's private depth buffer was single-sample, and D3D drops every draw when the colour and depth targets disagree. The depth buffer now copies the target's sample count and quality. The screen-space test pattern is still enabled for this build; the pixel probe cannot read a multisampled buffer and reports `unread`.
+
+0.310 is a diagnostic build for Flower Trail. In the 0.309 test the camera calibrated (the position was at `+0x1a0` all along, about 7 units from the player) and 12 flowers were submitted for drawing, yet nothing appeared. While flowers exist it now also draws one oversized flower in screen space, with no camera maths, and logs the back buffer's centre pixel before and after (`flower trail pixel probe`). Seeing the pattern means the pass reaches the screen and the world projection is at fault; not seeing it, with the pixel changed, means something overwrites the back buffer after JNET draws; an unchanged pixel means the draw never lands.
+
+0.309 follows the first 0.308 test, where Flower Trail planted flowers and started its renderer but nothing was visible and the camera position it used was about 118 units from the player. The camera position is now located by matching Lua's world matrix against the camera node and object memory; flowers are 1.9 times larger (0.3 per Flower unit); and the session report adds periodic `flower trail frame` lines (flowers, how many are drawn, hidden behind terrain, too far or outside the view, and the nearest flower's clip coordinates) and `not drawing` reasons.
+
+0.308 adds Flower Trail for fl0w 1 and fl0w 2: a remappable creature action (default F; pad right stick click) that plants a random assortment of the eight Flower flowers on the floor around the creature while it is within 2 units of the floor. `flower_resources.py` extracts every Flower flower (petal and bud meshes with all morph frames, assembled bloom OBJs, the petal atlas, colours, atlas cells and the compiled Flower shaders) from `FlowerPC/` into `work/flower/`; the same data is embedded as the runtime model list and `JNET-flowers.dds` ships beside the DLL. The flowers are drawn locally by a private D3D11 pass with its own shader (Flower's compiled shaders are extracted, not used), are not sent to other players, have no scene depth, and use a camera layout and field-of-view correction that have only been checked offline. Live rendering is unverified.
 
 0.286 leaves the Steam lobby and cancels pending group travel when Quit to Title is confirmed, then preserves Journey's original menu action. Cancelling the confirmation leaves the lobby unchanged. Native title-screen playback remains unverified.
 

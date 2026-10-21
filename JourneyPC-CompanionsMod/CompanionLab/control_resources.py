@@ -54,6 +54,7 @@ def menu_bytes():
                 if kind==2:actions.append((5,'Spotlight'))
                 if kind==1:actions.append((5,'Grab'))
                 actions.append((6,'Sprint'))
+                if kind==5:actions.append((7,'Flower Trail'))
             for action,label in actions:
                 setting=f'%JNET_BIND_{device}_{action}%' if kind==0 else f'%JNET_CREATURE_{kind}_{device}_{action}%'
                 choices=options[device]

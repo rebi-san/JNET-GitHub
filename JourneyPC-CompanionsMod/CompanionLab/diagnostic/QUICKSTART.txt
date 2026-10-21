@@ -43,6 +43,17 @@ is guarded by native resource readiness. War Machine autonomous attacks remain
 unavailable. Rocket Deathmatch has been reported working locally; three-player
 online behavior is not yet confirmed.
 
+FLOWER TRAIL (fl0w)
+Options > Controls > Character > fl0w has a Flower Trail action (default F, right stick
+click on a pad). While it is held and fl0w is within 2 units of the floor, a random mix
+of the eight Flower flowers is planted around it, up to 512 at a time (the oldest is
+replaced) and cleared when the level changes. The flowers are drawn locally by JNET
+with Flower's petal atlas (JNET-flowers.dds, which must stay beside JNET.dll); other
+players do not see them. The pass has no scene depth: flowers hidden behind terrain are
+detected by line of sight and skipped, and distant flowers fade out, but a flower under
+fl0w's own body can draw over it. If nothing appears, the session report holds the
+"flower trail" lines naming the failed step (camera layout, atlas or shader).
+
 Chapter Select and Broken Bridge: Day / Night / Cycle.
 Pink Desert: Day / Dusk / Cycle. Sunken City: Day / Dawn / Cycle.
 Cycle takes 15 minutes to reach Night/Dusk/Dawn and 15 minutes to return to Day.

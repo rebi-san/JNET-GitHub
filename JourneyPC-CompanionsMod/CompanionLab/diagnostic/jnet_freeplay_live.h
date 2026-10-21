@@ -74,6 +74,7 @@ static void jnet_script_execute_at(uintptr_t resource,lua_State *state,uintptr_t
     }
     jnet_script_execute_original(resource,state);
     jnet_daynight_install(state);
+    jnet_flower_install(state);
     {
         char code[512];
         snprintf(code,sizeof(code),

@@ -16,8 +16,8 @@ static uintptr_t fault_image,jnet_menu_last;
 static int jnet_bindings[3][8]={{'C','B','V','G'},{0},{0}};
 static unsigned jnet_binding_down[8],jnet_sprint_down,jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready=1;
 static unsigned jnet_chat_focus;
-static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][7];
-static unsigned jnet_creature_down[7],jnet_grab_down,jnet_fly_up_down,jnet_fly_down_down,jnet_level_down,jnet_tilt_left_down,jnet_tilt_right_down;
+static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][8];
+static unsigned jnet_creature_down[8],jnet_flower_trail_down,jnet_grab_down,jnet_fly_up_down,jnet_fly_down_down,jnet_level_down,jnet_tilt_left_down,jnet_tilt_right_down;
 static unsigned keys[256],buttons,foreground=1,calls;
 static char last[32];
 static int jnet_menu_read(uintptr_t at,void *out,size_t n){memcpy(out,(void *)at,n);return 1;}
@@ -108,5 +108,23 @@ int main(void){
     keys['G']=0;tick(JNET_CHARACTER_LONGTAIL);assert(!jnet_grab_down);
     keys['G']=1;menu[0xd68]=1;tick(JNET_CHARACTER_LONGTAIL);assert(!jnet_grab_down);
     menu[0xd68]=0;tick(JNET_CHARACTER_WHALE);assert(!jnet_grab_down);
+    for(unsigned device=0;device<3;++device){
+        memset(jnet_creature_bindings,0,sizeof(jnet_creature_bindings));
+        jnet_creature_bindings[JNET_CHARACTER_FLOW_1][device][7]=device==0?'F':device==1?5:8;
+        for(unsigned kind=0;kind<JNET_CHARACTER_COUNT;++kind){
+            memset(keys,0,sizeof(keys));buttons=0;tick(kind);assert(!jnet_flower_trail_down);
+            if(device==0)keys['F']=1;else if(device==1)keys[VK_XBUTTON2]=1;else buttons=1u<<7;
+            tick(kind);
+            /* Only fl0w holds a trail; both fl0w skins share the fl0w 1 binding, and no other creature or Wayfarer reacts. */
+            assert(jnet_flower_trail_down==(unsigned)jnet_character_is_flow(kind));
+            if(jnet_character_is_flow(kind)){
+                tick(kind);assert(jnet_flower_trail_down);
+                menu[0xd68]=1;tick(kind);assert(!jnet_flower_trail_down);menu[0xd68]=0;
+                foreground=2;tick(kind);assert(!jnet_flower_trail_down);foreground=1;
+                jnet_controls_ready=0;tick(kind);assert(!jnet_flower_trail_down);jnet_controls_ready=1;
+            }
+        }
+    }
+    memset(keys,0,sizeof(keys));buttons=0;memset(jnet_creature_bindings,0,sizeof(jnet_creature_bindings));
     puts("Controls: queue bounds, missing actions, key edges, sticky crouch, movement cancel, second-press cancel, pause, focus, creature gating, mouse and trigger bindings passed.");
 }

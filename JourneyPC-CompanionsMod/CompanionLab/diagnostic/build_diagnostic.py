@@ -12,13 +12,14 @@ import argparse
 
 HERE = Path(__file__).resolve().parent
 LAB = HERE.parent
-VERSION = "0.307"
+VERSION = "0.313"
 ROOT = LAB.parent.parent
 sys.path.insert(0, str(LAB))
 from inspect_build import EXPECTED_EXE, audit_signatures, pe_sections
 from daynight_resources import runtime_header as daynight_runtime_header
 from startup_resources import extract_persistent, prepare_candidate, SCRIPT_RVA, SCRIPT_SIZE
 from control_resources import menu_bytes
+from flower_resources import runtime_header as flower_runtime_header, grass_dds as flower_grass_dds, FLOWER, ATLAS as FLOWER_ATLAS
 from character_resources import character_runtime_header, character_resource_script, wayfarer_resource_script, character_animation_files, character_animation_file_header, character_mesh_files
 
 
@@ -147,7 +148,7 @@ def build(source_check=False):
     work = LAB / "work/diagnostic-build"
     package = LAB / ("work/production-check" if source_check else f"work/package-{VERSION}/JNET")
     deps = LAB / "work/deps"
-    zig = deps / "zig-macos-aarch64-0.13.0/zig"
+    zig = deps / ("zig-windows-x86_64-0.13.0/zig.exe" if os.name == "nt" else "zig-macos-aarch64-0.13.0/zig")
     minhook = deps / "minhook-1.3.4"
     if not zig.is_file() or not (minhook / "src/hook.c").is_file():
         raise ValueError("Approved workspace toolchain is missing; no downloads are performed by this script")
@@ -277,6 +278,14 @@ def build(source_check=False):
     source_parts.append(banners.encode())
     source_parts.append((work / "jnet_chat_font.h").read_bytes())
     source_parts.append((LAB / "work/menu-images/jnet_menu_assets.h").read_bytes())
+    flowers = flower_runtime_header()
+    (LAB / "work/flower").mkdir(parents=True, exist_ok=True)
+    (LAB / "work/flower/jnet_flower_assets.h").write_text(flowers)
+    source_parts.append(flowers.encode())
+    flower_atlas = (FLOWER / "Data/Textures" / FLOWER_ATLAS).read_bytes()
+    source_parts.append(flower_atlas)
+    flower_grass = flower_grass_dds()
+    source_parts.append(flower_grass)
     for file in sorted(HERE.glob("*")):
         if file.suffix in (".c", ".h", ".py"):
             source_parts.append(file.read_bytes())
@@ -333,10 +342,12 @@ def build(source_check=False):
         print(json.dumps({k: result[k] for k in ("compile_link", "artifact", "sha256", "installed")}, indent=2))
         return
     (package / "JNETMenu.xme").write_bytes(menu_bytes())
+    (package / "JNET-flowers.dds").write_bytes(flower_atlas)
+    (package / "JNET-grass.dds").write_bytes(flower_grass)
     (package / "README.txt").write_text((HERE / "README.txt").read_text().replace("@VERSION@", VERSION))
     for name, content in animation_bundles.items():
         (package / name).write_bytes(content)
-    manifest = dict(version=VERSION, automatic_diagnostic_logs=False, session_report_export=True, meet_everywhere_always=True, portable_windows_package=True, game_sha256=EXPECTED_EXE, optional_sound_fix_sha256=sha(audio_game), sound_fix_version="0.3.1", optional_drop_in_executable=True, build_id=build_id.hex(),
+    manifest = dict(version=VERSION, flower_trail=True, flower_trail_runtime_verified=False, automatic_diagnostic_logs=False, session_report_export=True, meet_everywhere_always=True, portable_windows_package=True, game_sha256=EXPECTED_EXE, optional_sound_fix_sha256=sha(audio_game), sound_fix_version="0.3.1", optional_drop_in_executable=True, build_id=build_id.hex(),
                     runtime_verified=False, three_player_supported=False, local_diagnostic_only=False, steam_lobby_transport_test=True, gameplay_over_steam=True,
                     group_travel_candidate=True, all_levels_runtime_verified=False,
                     native_character_candidates=["Longtail", "Whale", "War Machine", "fl0w"], flow_skins=["Rogue", "Hunter"], flow_shared_controls=True, flow_shared_chirps=True, war_machine_cached_skins=True, native_character_preload=True,
@@ -350,7 +361,7 @@ def build(source_check=False):
                     startup_changes=startup_changes, compiler="Zig 0.13.0 x86_64-windows-gnu",
                     minhook="1.3.4", dll_imports=dll_imports, helper_imports=helper_imports,
                     exports=exported, source_entry_points=resolved,
-                    artifacts={name: sha((package / name).read_bytes()) for name in ("JNET.dll", "JNET.exe", "README.txt", "JNETMenu.xme", *animation_bundles)})
+                    artifacts={name: sha((package / name).read_bytes()) for name in ("JNET.dll", "JNET.exe", "README.txt", "JNETMenu.xme", "JNET-flowers.dds", "JNET-grass.dds", *animation_bundles)})
     (package / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     archive = LAB / f"work/JNET-{VERSION}.zip"
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as output:

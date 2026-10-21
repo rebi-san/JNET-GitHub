@@ -4,8 +4,8 @@
 #include "jnet_character.h"
 static int jnet_bindings[3][8]={{'C','B','V','G',0,0,0,16},{0},{0,0,0,0,0,0,0,7}};
 static int jnet_bindings_saved[3][8];
-static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][7],jnet_creature_saved[JNET_CHARACTER_COUNT][3][7];
-static unsigned jnet_control_character,jnet_creature_down[7];
+static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][8],jnet_creature_saved[JNET_CHARACTER_COUNT][3][8];
+static unsigned jnet_control_character,jnet_creature_down[8],jnet_flower_trail_down;
 static unsigned jnet_grab_down,jnet_fly_up_down,jnet_fly_down_down,jnet_level_down,jnet_tilt_left_down,jnet_tilt_right_down;
 static unsigned jnet_binding_down[8],jnet_sprint_down,jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready;
 static wchar_t jnet_controls_path[MAX_PATH];
@@ -31,9 +31,9 @@ static int jnet_settings_apply(unsigned group) {
     char data[8192];int length=snprintf(data,sizeof(data),"[Settings]\r\nCredits=%u\r\nFPS=%ld\r\nLighting=%u\r\n[Controls]\r\n",credits,(long)fps,lighting);
     for(unsigned device=0;device<3;++device)for(unsigned action=0;action<8;++action)
         length+=snprintf(data+length,sizeof(data)-length,"Binding%u%u=%d\r\n",device,action,bindings[device][action]);
-    const int (*creatures)[3][7]=group==3?jnet_creature_bindings:jnet_creature_saved;
+    const int (*creatures)[3][8]=group==3?jnet_creature_bindings:jnet_creature_saved;
     for(unsigned kind=1;kind<JNET_CHARACTER_COUNT;++kind)if(jnet_character_is_creature(kind))
-        for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action){
+        for(unsigned device=0;device<3;++device)for(unsigned action=0;action<8;++action){
             int added=snprintf(data+length,sizeof(data)-(size_t)length,"Creature%u%u%u=%d\r\n",kind,device,action,creatures[kind][device][action]);
             if(added<0 || (size_t)added>=sizeof(data)-(size_t)length)return 0;
             length+=added;
@@ -101,8 +101,8 @@ static void jnet_controls_initialize(void) {
         if(value<=(unsigned)jnet_controls_limit(device))jnet_bindings[device][action]=(int)value;
     }
     for(unsigned kind=1;kind<JNET_CHARACTER_COUNT;++kind)if(jnet_character_is_creature(kind)){
-        const int defaults[3][7]={{32,'C','L','Q','E','G',16},{0},{11,12,10,9,14,13,7}};
-        for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action){
+        const int defaults[3][8]={{32,'C','L','Q','E','G',16,'F'},{0},{11,12,10,9,14,13,7,8}};
+        for(unsigned device=0;device<3;++device)for(unsigned action=0;action<8;++action){
             wchar_t key[32];swprintf(key,32,L"Creature%u%u%u",kind,device,action);
             int fallback=action==5?jnet_bindings[device][3]:action==6?jnet_bindings[device][7]:defaults[device][action];
             unsigned value=GetPrivateProfileIntW(L"Controls",key,fallback,jnet_controls_path);
@@ -154,7 +154,7 @@ static uintptr_t jnet_setting(uintptr_t context,uintptr_t out,uintptr_t name) {
     }
     if(length==21 && !memcmp(key,"%JNET_CREATURE_",15) && key[16]=='_' && key[18]=='_' && key[20]=='%'){
         unsigned kind=(unsigned)(key[15]-'0'),device=(unsigned)(key[17]-'0'),action=(unsigned)(key[19]-'0');
-        if(kind<JNET_CHARACTER_COUNT && jnet_character_is_creature(kind) && device<3 && action<7){
+        if(kind<JNET_CHARACTER_COUNT && jnet_character_is_creature(kind) && device<3 && action<8){
             *(uintptr_t *)out=(uintptr_t)&jnet_creature_bindings[kind==JNET_CHARACTER_FLOW_2?JNET_CHARACTER_FLOW_1:kind][device][action];return out;
         }
     }
@@ -234,7 +234,7 @@ static int jnet_controls_action(uintptr_t dude,const char *name) {
 }
 static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
     uintptr_t local=0;unsigned char menu=0;DWORD process=0;
-    jnet_sprint_down=jnet_spotlight_down=0;
+    jnet_sprint_down=jnet_spotlight_down=jnet_flower_trail_down=0;
     jnet_fly_up_down=jnet_fly_down_down=jnet_level_down=jnet_tilt_left_down=jnet_tilt_right_down=0;
     if(!jnet_controls_ready)return;
     if(!own_read(NULL,game+0x1e0,&local,8) || local!=barn)return;
@@ -255,8 +255,8 @@ static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
     static const unsigned mouse[]={0,VK_LBUTTON,VK_RBUTTON,VK_MBUTTON,VK_XBUTTON1,VK_XBUTTON2};
     if(jnet_character_is_creature(kind)){
         if(kind==JNET_CHARACTER_FLOW_2)kind=JNET_CHARACTER_FLOW_1;
-        unsigned held[7]={0};
-        for(unsigned action=0;action<7;++action){
+        unsigned held[8]={0};
+        for(unsigned action=0;action<8;++action){
             int key=jnet_creature_bindings[kind][0][action],m=jnet_creature_bindings[kind][1][action],pad=jnet_creature_bindings[kind][2][action];
             unsigned down=(key>0 && key<256 && (GetAsyncKeyState(key)&0x8000)) ||
                 (m>0 && m<6 && (GetAsyncKeyState(mouse[m])&0x8000)) ||
@@ -269,6 +269,7 @@ static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
         if(kind==JNET_CHARACTER_WHALE || kind==JNET_CHARACTER_WAR_MACHINE){jnet_tilt_left_down=held[3];jnet_tilt_right_down=held[4];}
         jnet_grab_down=kind==JNET_CHARACTER_LONGTAIL && held[5];
         jnet_sprint_down=held[6];
+        jnet_flower_trail_down=kind==JNET_CHARACTER_FLOW_1 && held[7];
         return;
     }
     for(unsigned action=0;action<8;++action){

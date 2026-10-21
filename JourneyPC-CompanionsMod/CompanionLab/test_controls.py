@@ -40,7 +40,7 @@ class ControlsTests(unittest.TestCase):
                 labels=[row.get('Text') for row in group]
                 labels[:2]=['Move','Look']
                 if index==0:labels[3]='Fly'
-                self.assertEqual(labels,expected[index] if index<4 else ['Move','Look','Chirp','Fly Up','Fly Down','Level','Sprint'])
+                self.assertEqual(labels,expected[index] if index<4 else ['Move','Look','Chirp','Fly Up','Fly Down','Level','Sprint','Flower Trail'])
                 self.assertEqual(group.get('Flags'),f'Show.Never;Traverse.IfSelected.{index}')
                 for row in group:
                     if row.tag.startswith('JNETAction'):self.assertEqual(len(row.get('Options').split(';')),count)

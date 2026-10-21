@@ -322,7 +322,9 @@ static void jnet_image_draw(uintptr_t renderer) {
 done:
     JNET_RELEASE(target);JNET_RELEASE(back);JNET_RELEASE(device);
 }
+#include "jnet_flower_render.h"
 static unsigned char jnet_present(uintptr_t renderer) {
+    jnet_flower_draw(renderer);
     jnet_image_draw(renderer);
     LONG fps=jnet_fps_limit;
     jnet_frame_wait(fps==1?30:fps==2?60:0);
