@@ -1,10 +1,12 @@
 # JNET
 
-Private source repository for the Journey companion mod and its native-code research tools. This snapshot contains the 0.283 source. Package installation and offline tests do not establish live multiplayer correctness.
+Private source repository for the Journey companion mod and its native-code research tools. This snapshot contains the 0.284s source. Package installation and offline tests do not establish live multiplayer correctness.
 
-## Current version: 0.283
+## Current version: 0.284s
 
-This version addresses receiver admission getting stuck after JNET has already owned a native companion slot. It can resume that retained slot after a receiver reset when storage, ownership, chapter and gate checks pass. Vanilla connection guards remain enabled. A stale result 124 is cleared only after successful state publication without an ownership guard failure. This does not establish that every reported visibility issue is fixed in live play.
+0.284s adds a Night choice to World Select for Pink Desert, Sunken City, Cave, Ruins, Mountain and the Summit, using the Level_Chris night sky, and keeps Dusk (Pink Desert) and Dawn (Sunken City) as their own steps beside it. Night on Pink Desert and Sunken City is a new fourth lighting value (3); values 0 to 2 are unchanged. It is built from the 0.283 source and does not contain the separately built 0.284 to 0.286 releases. Offline checks only; the new Night skies, the menu rows and the larger Lua payload have not been verified in the game.
+
+Version 0.283 addressed receiver admission getting stuck after JNET has already owned a native companion slot. It can resume that retained slot after a receiver reset when storage, ownership, chapter and gate checks pass. Vanilla connection guards remain enabled. A stale result 124 is cleared only after successful state publication without an ownership guard failure. This does not establish that every reported visibility issue is fixed in live play.
 
 ## Contents
 

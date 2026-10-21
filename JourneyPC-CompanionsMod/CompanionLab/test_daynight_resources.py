@@ -1,8 +1,23 @@
+import functools
 import unittest
 from pathlib import Path
 from lupa import LuaRuntime
 from character_resources import lua_literal, decorations
-from daynight_resources import profiles, records, MAPPINGS
+from daynight_resources import profiles as generate_profiles, records, MAPPINGS, MINIATURES, ALTERNATES, luminance, params, runtime_payload, PART_LIMIT
+profiles = functools.lru_cache(maxsize=1)(generate_profiles)
+payload = functools.lru_cache(maxsize=1)(lambda: runtime_payload(profiles()))
+LEVELS = range(len(MAPPINGS))
+ALTERNATE_LEVELS = tuple(i for i, m in enumerate(MAPPINGS) if m[0] in ALTERNATES)
+
+
+def active(level, mode):
+    """The profile the runtime applies: Desert and Canyon use their Matt Dusk/Dawn look for modes 1 and 2."""
+    profile = profiles()[level]
+    return profile['alternate'] if 'alternate' in profile and mode in (1, 2) else profile
+
+
+def night_mode(level):
+    return 3 if level in ALTERNATE_LEVELS else 1
 
 LAB=Path(__file__).resolve().parent
 
@@ -58,19 +73,24 @@ class DayNightTests(unittest.TestCase):
 
         ''')
         lua.execute((LAB/'work/pc_scripts/EnvFX.lua').read_text())
-        lua.execute('local profiles='+lua_literal(profiles())+'\n'+(LAB/'diagnostic/jnet_daynight.lua').read_text(),lua.globals().visit)
+        lua.execute(payload()['source'],lua.globals().visit)
         self.load(lua,level)
         lua.globals().allocations=0
         lua.globals().updating=True
         return lua
 
-    def load(self,lua,level):
+    def load(self,lua,level,parts=True):
         lua.globals().updating=False
         name='Level_'+MAPPINGS[level][0]
         lua.execute('EnvNodeInstances='+lua_literal(list(records(name,'EnvNode').values()))+';ParticleEmitterInstances='+lua_literal(list(records(name,'ParticleEmitter').values())))
         lua.execute('Names={} LoadEnvNodes({}) LoadEnvFXParticles(fx,particles)')
         for key in decorations(name): lua.globals().Names[key]=lua.globals().object()
+        if parts:self.load_parts(lua,level)
         lua.globals().updating=True
+
+    def load_parts(self,lua,level):
+        # what jnet_daynight_load_level() does in C: compile and run each part separately
+        for part in payload()['parts'][level]:lua.execute(part)
 
     def test_update_before_particle_initialization(self):
         lua=self.scene(0)
@@ -79,7 +99,7 @@ class DayNightTests(unittest.TestCase):
         self.assertEqual(lua.globals().allocations,0)
 
     def test_full_cycle_and_restore(self):
-        for level in range(4):
+        for level in LEVELS:
             lua=self.scene(level)
             update=lua.globals()['__JNETDayNightUpdate']
             key=next(iter(profiles()[level]['nodes']))
@@ -89,7 +109,7 @@ class DayNightTests(unittest.TestCase):
             self.assertEqual(lua.globals().allocations,0)
             for time,amount in [(0,0),(450,.5),(900,1),(1350,.5),(1800,0),(2700,1),(3600,0)]:
                 update(time,level,2)
-                night=profiles()[level]['nodes'][key]['SkyMaxColor'][0]
+                night=active(level,2)['nodes'][key]['SkyMaxColor'][0]
                 actual=node.SetSkyValue[1][1]
                 self.assertAlmostEqual(actual,(day['SkyMaxColor'][0]*(1-amount)+night*amount)/255)
             count=lua.globals().allocations
@@ -100,12 +120,12 @@ class DayNightTests(unittest.TestCase):
             self.assertIsNone(lua.eval('rawget')(node,'SetEnabledValue'))
 
     def test_fixed_night_and_cycle_switch(self):
-        for level in range(4):
+        for level in LEVELS:
             lua=self.scene(level)
             update=lua.globals()['__JNETDayNightUpdate']
             key=next(iter(profiles()[level]['nodes']))
             node=lua.globals().Names[key]
-            night=profiles()[level]['nodes'][key]['SkyMaxColor'][0]/255
+            night=active(level,1)['nodes'][key]['SkyMaxColor'][0]/255
             day=records('Level_'+MAPPINGS[level][0],'EnvNode')[key]['SkyMaxColor'][0]/255
             for time in (0,1800,3600,7200):
                 update(time,level,1)
@@ -118,12 +138,14 @@ class DayNightTests(unittest.TestCase):
             self.assertAlmostEqual(node.SetSkyValue[1][1],day)
 
     def test_existing_sun_moon_texture_and_restore(self):
-        for level in (0,1):
+        for level in LEVELS:
             lua=self.scene(level)
             update=lua.globals()['__JNETDayNightUpdate']
             lua.globals().updating=True
             profile=profiles()[level]
-            for time,mode,texture in ((0,1,'Moon'),(1,0,'Sun'),(2,2,'Sun'),(902,2,'Moon'),(1802,2,'Sun')):
+            sequence=((0,night_mode(level),'Moon'),(1,0,'Sun'))
+            if level not in ALTERNATE_LEVELS:sequence+=((2,2,'Sun'),(902,2,'Moon'),(1802,2,'Sun'))
+            for time,mode,texture in sequence:
                 update(time,level,mode)
                 for name,values in profile['suns'].items():
                     mesh=lua.globals().Names[name]
@@ -133,7 +155,8 @@ class DayNightTests(unittest.TestCase):
             self.assertEqual(lua.globals().allocations,0)
 
     def test_stars_follow_moon_and_clear_before_sun_returns(self):
-        for level in (0,1):
+        for level in LEVELS:
+            if level in ALTERNATE_LEVELS:continue
             lua=self.scene(level)
             update=lua.globals()['__JNETDayNightUpdate']
             for time in (0,225,450,675,900,1125,1350,1575,1800):
@@ -157,12 +180,15 @@ class DayNightTests(unittest.TestCase):
 
     def test_credits_effect_colors_and_day_restoration(self):
         data=profiles()
-        for level in range(4):
+        for level in LEVELS:
             lua=self.scene(level)
             update=lua.globals()['__JNETDayNightUpdate']
             for time,mode,amount in ((0,1,1),(1,0,0),(2,2,0),(452,2,.5),(902,2,1),(1802,2,0)):
                 update(time,level,mode)
-                for name,values in data[level]['clouds'].items():
+                applied=[active(level,mode)]
+                if mode==0 and 'alternate' in data[level]:applied.append(data[level]['alternate'])
+                for profile in applied:
+                  for name,values in profile['clouds'].items():
                     actual=lua.globals().Names[name].shaderValues
                     for param,value in values.items():
                         a,b=value['day'],value['night']
@@ -183,10 +209,12 @@ class DayNightTests(unittest.TestCase):
                     self.assertEqual(data[level]['clouds'][name]['mltColor']['night'],expected)
                 if row['Mesh'] in ('P_Level1MountainClouds','P_Level1MountainClouds2'):
                     self.assertEqual(data[level]['clouds'][name]['mltColor']['night'],params(chris['b612c4987ff83c47a0cc7b1efb845c0a'])['mltColor'])
+        strip=[r for r in chris.values() if r['Mesh']=='P_CloudStripDesert_A']
+        self.assertEqual(len(strip),1)
         for name,row in decorations('Level_Desert').items():
             if row['Mesh']=='P_CloudStripDesert_A':
                 values=data[2]['clouds'][name]
-                self.assertEqual(values['mltColor']['night'],params(row)['mltColor'])
+                self.assertEqual(values['mltColor']['night'],params(strip[0])['mltColor'])
 
     def test_night_dust_fades_out_and_day_restores_opacity(self):
         from daynight_resources import params
@@ -230,8 +258,8 @@ class DayNightTests(unittest.TestCase):
         self.assertEqual(lua.globals()['__JNETDayNight'].started,2000)
 
     def test_all_level_reload_pairs(self):
-        for source in range(4):
-            for destination in range(4):
+        for source in LEVELS:
+            for destination in LEVELS:
                 lua=self.scene(source)
                 update=lua.globals()['__JNETDayNightUpdate']
                 update(0,source,1)
@@ -248,7 +276,7 @@ class DayNightTests(unittest.TestCase):
 
     def test_unsupported_level_does_not_allocate(self):
         lua=self.scene(0)
-        for level in range(4,12):lua.globals()['__JNETDayNightUpdate'](1800,level,2)
+        for level in range(len(MAPPINGS),12):lua.globals()['__JNETDayNightUpdate'](1800,level,2)
         self.assertEqual(lua.globals().allocations,0)
 
     def test_star_loading_is_scoped_to_supported_scenes(self):
@@ -259,14 +287,14 @@ class DayNightTests(unittest.TestCase):
             lua.globals().updating=False
             lua.execute('Names={} EnvNodeInstances='+lua_literal(nodes)+';ParticleEmitterInstances='+lua_literal(emitters))
             lua.execute('allocations=0 LoadEnvNodes({}) LoadEnvFXParticles(fx,particles)')
-            self.assertEqual(lua.globals().allocations,len(emitters)+(4 if level=='Barrens' else 0),level)
+            added=0 if level in ('Graveyard','Credits','Bryan','Matt','Chris') else 4
+            self.assertEqual(lua.globals().allocations,len(emitters)+added,level)
 
     def test_miniature_horizontal_landmark_mapping(self):
         landmarks=[('P_GraveyardGate','P_GraveyardGateGrate_A_OIC'),
-                   ('P_RockBackWallTop','P_AquaductCrateAdd1'),
-                   ('P_DesertFinalTower','P_DesertFinalTowerGrate'),
-                   ('P_CaveEntranceFacade','P_RuinFence')]
+                   ('P_RockBackWallTop','P_AquaductCrateAdd1')]
         for (target,source,offset,_),names in zip(MAPPINGS,landmarks):
+            self.assertIn(target,MINIATURES)
             a=list(decorations('Level_'+target).values())
             b=list(decorations('Level_'+source).values())
             for name in names:
@@ -285,7 +313,160 @@ class DayNightTests(unittest.TestCase):
             self.assertNotIn(forbidden,script)
         for i,(_,source,_,anchors) in enumerate(MAPPINGS):
             for anchor in anchors:self.assertIn(anchor,records('Level_'+source,'EnvNode'))
-            self.assertEqual(len(profiles()[i]['emitters']),4 if i<2 else 0)
-            if i<2:self.assertTrue(profiles()[i]['moon'])
+            self.assertEqual(source,'Chris')
+            self.assertEqual(len(profiles()[i]['emitters']),4)
+            self.assertTrue(profiles()[i]['moon'])
+
+    def test_every_world_select_level_uses_the_chris_night(self):
+        self.assertEqual([m[0] for m in MAPPINGS],['Graveyard','Barrens','Desert','Canyon','Cave','Ruins','Mountain','Summit'])
+        self.assertEqual({m[1] for m in MAPPINGS},{'Chris'})
+        travel=(LAB/'diagnostic/jnet_travel_live.h').read_text()
+        names=travel.split('jnet_travel_levels[]={')[1].split('};')[0].replace('"','').replace(' ','').replace(chr(10),'').replace(chr(13),'').split(',')
+        self.assertEqual(['Level_'+m[0] for m in MAPPINGS],names[:len(MAPPINGS)])
+
+    def test_palette_levels_copy_chris_night_and_never_exceed_day(self):
+        chris=records('Level_Chris','EnvNode')
+        anchor=chris['b4ad6f584115d4b81fb5b91c022aa353']
+        data=profiles()
+        for level,(target,_,_,_) in enumerate(MAPPINGS):
+            if target in MINIATURES:continue
+            day=records('Level_'+target,'EnvNode')
+            self.assertEqual(set(data[level]['nodes']),set(day),target)
+            for key,night in data[level]['nodes'].items():
+                for field in ('Env_LightDir','FogFarAlpha','BloomIntensity','VelvetInt','Env_SpecularPower','Env_AmbientColor'):
+                    self.assertEqual(night[field],anchor[field],(target,field))
+                for field in ('FogCloseColor','FogFarColor','SkyMinColor','SkyLowColor','SkyMidColor','SkyHighColor','SkyMaxColor'):
+                    self.assertLessEqual(luminance(night[field]),luminance(day[key][field])+1e-9,(target,key,field))
+                    self.assertLessEqual(luminance(night[field]),luminance(anchor[field])+1e-9,(target,key,field))
+                for color,intensity in (('Env_AmbientColor','Env_AmbientInt'),('Env_LightColor','Env_LightInt'),('Env_SpecularColor','Env_SpecularInt')):
+                    self.assertLessEqual(luminance(night[color])*night[intensity],luminance(day[key][color])*day[key][intensity]+1e-9,(target,key,color))
+                    self.assertLessEqual(night[intensity],anchor[intensity]+1e-9)
+
+    def test_hidden_summit_sun_stays_hidden(self):
+        suns=profiles()[7]['suns']
+        self.assertIn('c3786080cece66f6a8b5eb53c8de6e84',suns)
+        self.assertNotIn('b8a81a650dfb58459c0c41a2d39754b3',suns)
+        for level,data in enumerate(profiles()):
+            for values in data['suns'].values():self.assertGreater(values['day']['alpha'],0,level)
+
+    def test_unmatched_clouds_get_a_dim_cool_tint_and_lightning_is_untouched(self):
+        for level,(target,_,_,_) in enumerate(MAPPINGS):
+            if target in MINIATURES:continue
+            clouds=profiles()[level]['clouds']
+            tinted=0
+            for name,row in decorations('Level_'+target).items():
+                if 'lightning' in row['Mesh'].lower():
+                    self.assertNotIn(name,clouds,row['Mesh'])
+                if name not in clouds or set(clouds[name])!={'mltColor'}:continue
+                value=clouds[name]['mltColor']
+                self.assertEqual(value['day'],params(row)['mltColor'])
+                night=value['night']
+                self.assertEqual(night[3],value['day'][3])
+                self.assertLessEqual(luminance(night),luminance(value['day'])+1e-9)
+                self.assertLessEqual(luminance(night),0.4667)
+                self.assertLessEqual(night[0],night[1]);self.assertLessEqual(night[1],night[2])
+                tinted+=1
+            self.assertGreater(tinted,0,target)
+
+    def test_dusk_and_dawn_are_preserved_beside_night(self):
+        self.assertEqual(set(ALTERNATES),{'Desert','Canyon'})
+        for level in ALTERNATE_LEVELS:
+            target=MAPPINGS[level][0]
+            main,alternate=profiles()[level],profiles()[level]['alternate']
+            self.assertEqual(ALTERNATES[target][0],'Matt')
+            self.assertEqual(set(main['nodes']),set(alternate['nodes']))
+            self.assertEqual(main['nodeCount'],alternate['nodeCount'])
+            self.assertTrue(main['moon'])
+            self.assertFalse(alternate['moon'])
+            self.assertEqual(alternate['emitters'],[])
+            for values in alternate['suns'].values():self.assertEqual(values['night'],values['day'])
+            self.assertNotEqual(main['nodes'],alternate['nodes'])
+            matt=records('Level_Matt','EnvNode')
+            for anchor in ALTERNATES[target][2]:self.assertIn(anchor,matt)
+
+    def test_night_is_a_fourth_mode_that_switches_cleanly_with_dusk_and_dawn(self):
+        for level in ALTERNATE_LEVELS:
+            main,alternate=profiles()[level],profiles()[level]['alternate']
+            lua=self.scene(level)
+            update=lua.globals()['__JNETDayNightUpdate']
+            key=next(iter(main['nodes']))
+            node=lua.globals().Names[key]
+            day=records('Level_'+MAPPINGS[level][0],'EnvNode')[key]['SkyMaxColor'][0]/255
+            sky=lambda profile:profile['nodes'][key]['SkyMaxColor'][0]/255
+            self.assertNotAlmostEqual(sky(main),sky(alternate))
+            effects=lua.globals()['__JNETDayNight']
+            for time,mode,expected,stars in ((0,1,sky(alternate),False),(1,3,sky(main),True),(2,1,sky(alternate),False),
+                                             (3,3,sky(main),True),(4,0,day,False)):
+                update(time,level,mode)
+                self.assertAlmostEqual(node.SetSkyValue[1][1],expected,msg=(level,mode))
+                for row in effects.effects.values():
+                    effect=lua.globals().Names[row.name]
+                    self.assertEqual(effect.SetEnabledValue[1],stars,(level,mode))
+                if mode==3:
+                    for name,values in main['suns'].items():
+                        self.assertEqual(lua.globals().Names[name].SetShaderTextureParamValue[3],'Moon')
+                if mode==1 and time>0:
+                    for name,values in main['suns'].items():
+                        self.assertEqual(lua.globals().Names[name].SetShaderTextureParamValue[3],'Sun')
+                    for name,values in main['clouds'].items():
+                        if name in alternate['clouds']:continue
+                        shader=lua.globals().Names[name].shaderValues
+                        for param,value in values.items():
+                            a=value['day']
+                            if isinstance(a,(tuple,list)):
+                                for axis in range(len(a)):self.assertAlmostEqual(shader[param][axis+1],a[axis])
+                            else:self.assertAlmostEqual(shader[param],a)
+            self.assertEqual(lua.globals().allocations,0)
+            update(5,level,2)
+            self.assertAlmostEqual(node.SetSkyValue[1][1],day)
+            update(455,level,2)
+            self.assertAlmostEqual(node.SetSkyValue[1][1],(day+sky(alternate))/2)
+            update(905,level,2)
+            self.assertAlmostEqual(node.SetSkyValue[1][1],sky(alternate))
+
+    def test_update_does_nothing_until_the_level_data_has_been_loaded(self):
+        lua=self.scene(4)
+        self.load(lua,4,parts=False)
+        lua.globals().allocations=0
+        update=lua.globals()['__JNETDayNightUpdate']
+        key=next(iter(profiles()[4]['nodes']))
+        node=lua.globals().Names[key]
+        for mode in (0,1,2,3):update(100,4,mode)
+        self.assertIsNone(lua.eval('rawget')(node,'SetSkyValue'))
+        self.assertFalse(lua.globals()['__JNETDayNight'].active)
+        self.load_parts(lua,4)
+        update(200,4,1)
+        self.assertAlmostEqual(node.SetSkyValue[1][1],profiles()[4]['nodes'][key]['SkyMaxColor'][0]/255)
+        self.assertEqual(lua.globals().allocations,0)
+
+    def test_level_parts_rebuild_each_profile_exactly_and_stay_small(self):
+        built=payload()
+        self.assertEqual(len(built['parts']),len(MAPPINGS))
+        self.assertLess(len(built['source']),24000)
+        for level,parts in enumerate(built['parts']):
+            self.assertTrue(parts)
+            for part in parts:self.assertLessEqual(len(part),PART_LIMIT+1600,(level,len(part)))
+            lua=self.scene(level)
+            data=lua.globals()['__JNETDayNight'].data
+            others=[i for i in range(len(MAPPINGS)) if i!=level and data[i+1] is not None]
+            self.assertEqual(others,[],'only the loaded level may have data')
+            for name,source in (('main',profiles()[level]),('alternate',profiles()[level].get('alternate'))):
+                loaded=data[level+1] if name=='main' else data[level+1].alternate
+                if source is None:
+                    self.assertIsNone(loaded);continue
+                self.assertEqual(set(loaded.nodes.keys()),set(source['nodes']))
+                self.assertEqual(set(loaded.suns.keys()),set(source['suns']))
+                clouds={}
+                for part in loaded.clouds.values():clouds.update(dict(part.items()))
+                self.assertEqual(set(clouds),set(source['clouds']))
+                self.assertEqual(bool(loaded.moon),source['moon'])
+                self.assertEqual(len(loaded.emitters),len(source['emitters']))
+                key=next(iter(source['nodes']))
+                self.assertAlmostEqual(loaded.nodes[key].SkyMaxColor[1],source['nodes'][key]['SkyMaxColor'][0])
+                for name_,values in list(source['clouds'].items())[:5]:
+                    for param,value in values.items():
+                        night=clouds[name_][param].night
+                        if isinstance(value['night'],(tuple,list)):self.assertAlmostEqual(night[1],value['night'][0])
+                        else:self.assertAlmostEqual(night,value['night'])
 
 if __name__=='__main__':unittest.main()

@@ -263,6 +263,12 @@ static void maintenance_test(uint64_t room) {
     assert(jnet_maintenance_poll(&population)==1 && !jnet_daynight_host);
     jnet_daynight_enter(0);assert(!jnet_daynight_mode);
     jnet_daynight_host=~0u;jnet_daynight_mode=2;jnet_daynight_enter(0);assert(jnet_daynight_mode==2);
+    jnet_daynight_host=3;jnet_daynight_enter(2);assert(jnet_daynight_mode==3);
+    jnet_daynight_enter(3);assert(jnet_daynight_mode==3);
+    jnet_daynight_enter(0);assert(jnet_daynight_mode==1);jnet_daynight_enter(7);assert(jnet_daynight_mode==1);
+    jnet_daynight_host=4;jnet_daynight_mode=0;jnet_daynight_enter(2);assert(!jnet_daynight_mode);
+    assert(jnet_daynight_normalize(2,3)==3 && jnet_daynight_normalize(3,3)==3 && jnet_daynight_normalize(0,3)==1 && jnet_daynight_normalize(2,1)==1);
+    jnet_daynight_host=~0u;
     jnet_daynight_mode=0;
     jnet_sl.identity=42;jnet_sl.room=0;
     puts("Background maintenance: immutable jobs, cached roster, generation/event invalidation, expiration, owner/nonce rejection and worker failure fallback passed. Fixture runs worker jobs deterministically.");

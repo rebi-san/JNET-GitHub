@@ -21,7 +21,7 @@ static int jnet_settings_apply(unsigned group) {
     unsigned credits=group==1?jnet_credits:jnet_saved_credits;
     LONG fps=group==2?jnet_fps_limit:jnet_saved_fps;
     unsigned lighting=group==4?jnet_daynight_mode:jnet_saved_lighting;
-    if(lighting>2)return 0;
+    if(lighting>3)return 0;
     char data[1024];int length=snprintf(data,sizeof(data),"[Settings]\r\nCredits=%u\r\nFPS=%ld\r\nLighting=%u\r\n[Controls]\r\n",credits,(long)fps,lighting);
     for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action)
         length+=snprintf(data+length,sizeof(data)-length,"Binding%u%u=%d\r\n",device,action,bindings[device][action]);
@@ -80,7 +80,7 @@ static void jnet_controls_initialize(void) {
         if(value<=(unsigned)jnet_controls_limit(device))jnet_bindings[device][action]=(int)value;
     }
     unsigned lighting=GetPrivateProfileIntW(L"Settings",L"Lighting",0,jnet_controls_path);
-    jnet_daynight_mode=jnet_saved_lighting=lighting<=2?lighting:0;
+    jnet_daynight_mode=jnet_saved_lighting=lighting<=3?lighting:0;
     unsigned credits=GetPrivateProfileIntW(L"Settings",L"Credits",1,jnet_controls_path);
     unsigned fps=GetPrivateProfileIntW(L"Settings",L"FPS",0,jnet_controls_path);
     jnet_credits=jnet_saved_credits=credits<=1?credits:1;

@@ -28,6 +28,23 @@ local function light(node, day, night, t)
     node:SetBloom(d.BloomSize,d.BloomIntensity,d.BloomOverbright,d.ChromaticAberration)
     node:SetVelvet(d.VelvetRatio,d.VelvetInt)
 end
+-- `profiles` is only an index (node names and star emitters) so the level can be recognised while it loads. The level's lighting
+-- data arrives afterwards as many small parts, one per call, and only when a lighting mode is in use; see jnet_daynight_live.h.
+local function fresh(emitters) return {nodes={},clouds={},suns={},emitters=emitters,moon=false} end
+function __JNETDayNightPart(level,alt,kind,value)
+    local data=state.data
+    if not data then return end
+    local entry=data[level+1]
+    if not entry then entry=fresh(profiles[level+1].emitters) data[level+1]=entry end
+    local target=entry
+    if alt==1 then
+        if not entry.alternate then entry.alternate=fresh({}) end
+        target=entry.alternate
+    end
+    if kind=='meta' then target.moon=value.moon
+    elseif kind=='clouds' then target.clouds[#target.clouds+1]=value
+    else for key,item in pairs(value) do target[kind][key]=item end end
+end
 function __JNETDayNightInstall()
 if type(LoadEnvNodes)=='function' and LoadEnvNodes~=state.load then
     local original=LoadEnvNodes
@@ -43,7 +60,7 @@ if type(LoadEnvNodes)=='function' and LoadEnvNodes~=state.load then
                 emitter:GetBlueprint():intensity(emitterData[name].intensity or 1)
             end
         end
-        state.nodes={} state.active=false state.mode=nil state.started=nil state.sunTextures={} state.reported=false
+        state.nodes={} state.active=false state.mode=nil state.started=nil state.sunTextures={} state.reported=false state.profile=nil state.data={}
         for _,d in ipairs(EnvNodeInstances) do
             state.nodes[d.ObjectName]={day=copy(d)}
         end
@@ -87,31 +104,23 @@ if type(LoadEnvFXParticles)=='function' and LoadEnvFXParticles~=state.particles 
     LoadEnvFXParticles=state.particles
 end
 end
-function __JNETDayNightUpdate(now,level,mode)
-    local profile=profiles[level+1]
-    if not profile or not state.nodes then return end
-    local enabled=mode~=0
-    if mode==2 and state.mode~=2 then state.started=now end
-    state.mode=mode
-    if not enabled and not state.active then return end
-    if enabled and not state.started then state.started=now end
-    local phase=mode==2 and ((now-state.started)%1800)/900 or 0
-    local amount=phase<=1 and phase or 2-phase
-    amount=mode==1 and 1 or amount*amount*(3-2*amount)
-    local function trace(stage) if not state.reported and traceCallback then traceCallback(stage) end end
+local function quiet() end
+local function apply(profile,enabled,amount,trace)
     trace('environment')
     for name,row in pairs(state.nodes) do
         local node=Names[name]
         if node and profile.nodes[name] then light(node,row.day,profile.nodes[name],amount) end
     end
     trace('clouds, wind and dust')
-    for name,values in pairs(profile.clouds) do
-        local mesh=Names[name]
-        if mesh then for key,value in pairs(values) do
-            local mixed=blend(value.day,value.night,amount)
-            if type(mixed)=='table' then mesh:SetShaderParam4f(key,mixed,100000)
-            else mesh:SetShaderParamf(key,mixed,100000) end
-        end end
+    for _,part in ipairs(profile.clouds) do
+        for name,values in pairs(part) do
+            local mesh=Names[name]
+            if mesh then for key,value in pairs(values) do
+                local mixed=blend(value.day,value.night,amount)
+                if type(mixed)=='table' then mesh:SetShaderParam4f(key,mixed,100000)
+                else mesh:SetShaderParamf(key,mixed,100000) end
+            end end
+        end
     end
     trace('sun/moon textures')
     for name,values in pairs(profile.suns) do
@@ -135,6 +144,7 @@ function __JNETDayNightUpdate(now,level,mode)
     end
     trace('star intensity')
     local stars=profile.moon and math.max(0,2*amount-1) or amount
+    if #profile.emitters==0 then stars=0 end
     local barn=game:particleBarn()
     for i=0,barn:GetNumEmitters()-1 do
         local emitter=barn:GetEmitter(i)
@@ -151,6 +161,25 @@ function __JNETDayNightUpdate(now,level,mode)
             if not enabled then effect:killParticlesOnDisable(row.kill) end
         end
     end
+end
+-- Modes: 0 Day, 1 fixed night (Dusk/Dawn on levels with an alternate), 2 30 minute cycle (alternate where present), 3 fixed night on levels with an alternate.
+function __JNETDayNightUpdate(now,level,mode)
+    local base=state.data and state.data[level+1]
+    if not base or not state.nodes then return end
+    local profile=base
+    if base.alternate and (mode==1 or mode==2) then profile=base.alternate end
+    local enabled=mode~=0
+    if mode==2 and state.mode~=2 then state.started=now end
+    state.mode=mode
+    if not enabled and not state.active then return end
+    if enabled and not state.started then state.started=now end
+    local phase=mode==2 and ((now-state.started)%1800)/900 or 0
+    local amount=phase<=1 and phase or 2-phase
+    amount=(mode==1 or mode==3) and 1 or amount*amount*(3-2*amount)
+    local function trace(stage) if not state.reported and traceCallback then traceCallback(stage) end end
+    if state.profile and state.profile~=profile then apply(state.profile,false,0,quiet) end
+    state.profile=profile
+    apply(profile,enabled,amount,trace)
     trace('complete; no runtime object allocations')
     state.reported=true
     state.active=enabled

@@ -11,6 +11,25 @@ static uint64_t jnet_menu_selected_room,jnet_menu_selected_host;
 static unsigned jnet_menu_create,jnet_menu_private,jnet_menu_password_focus;
 static char jnet_menu_password[33];
 static unsigned jnet_menu_chat,jnet_menu_cmatw=1,jnet_menu_daynight,jnet_menu_paradise;
+/* World Select variant row. Most levels: Day, Night, Cycle (lighting 0, 1, 2). Pink Desert and Sunken City add Night as a
+   fourth step after Dusk/Dawn (lighting 0, 1, 3, 2). The Summit's second step is the Paradise cutscene (lighting 0, 0, 1, 2). */
+static inline unsigned jnet_menu_variant_count(unsigned level){return level==2 || level==3 || level==7?4u:3u;}
+static inline unsigned jnet_menu_variant_step(unsigned level){
+    unsigned mode=jnet_daynight_normalize(level,jnet_menu_daynight);
+    if(level==7)return jnet_menu_paradise?1u:mode==0?0u:mode==1?2u:3u;
+    if(level==2 || level==3)return mode==0?0u:mode==1?1u:mode==3?2u:3u;
+    return mode;
+}
+static inline void jnet_menu_variant_apply(unsigned level,unsigned step){
+    static const unsigned summit[]={0,0,1,2},split[]={0,1,3,2};
+    jnet_menu_paradise=level==7 && step==1;
+    jnet_menu_daynight=level==7?summit[step]:(level==2 || level==3)?split[step]:step;
+}
+static inline const char *jnet_menu_variant_label(unsigned level,unsigned step){
+    static const char *const regular[]={"Day","Night","Cycle"},*const desert[]={"Day","Dusk","Night","Cycle"},
+        *const canyon[]={"Day","Dawn","Night","Cycle"},*const summit[]={"Normal","Cutscene","Night","Cycle"};
+    return level==7?summit[step]:level==2?desert[step]:level==3?canyon[step]:regular[step];
+}
 static struct jnet_appearance_edit jnet_menu_edit;
 static unsigned jnet_menu_level,jnet_menu_page,jnet_menu_closing;
 static uintptr_t jnet_menu_last;
@@ -181,15 +200,15 @@ static void jnet_menu_controls(uintptr_t menu) {
     if(x>-.92f && x<-.04f && y>.0f && y<.3f)jnet_menu_selected_room=jnet_menu_selected_host=0;
     int direction=fabsf(x-jnet_level_right)<.06f?1:(fabsf(x-jnet_level_left)<.06f?-1:0);
     int variant_direction=fabsf(x-(.60f+jnet_variant_arrow))<.045f?1:(fabsf(x-(.60f-jnet_variant_arrow))<.045f?-1:0);
-    if(variant_direction && y>.17f && y<.29f && (jnet_daynight_supported(jnet_menu_level) || jnet_menu_level==7) && (!view.room || view.self==view.host)){
-        if(jnet_menu_level==7)jnet_menu_paradise=!jnet_menu_paradise;
-        else jnet_menu_daynight=(jnet_menu_daynight+(variant_direction>0?1:2))%3;return;
+    if(variant_direction && y>.17f && y<.29f && jnet_daynight_supported(jnet_menu_level) && (!view.room || view.self==view.host)){
+        unsigned count=jnet_menu_variant_count(jnet_menu_level);
+        jnet_menu_variant_apply(jnet_menu_level,(jnet_menu_variant_step(jnet_menu_level)+(variant_direction>0?1u:count-1u))%count);return;
     }
     if(direction && y>.38f && y<.58f && (!view.room || view.self==view.host)) {
         jnet_menu_level=jnet_menu_level_step(jnet_menu_level,direction);
     }
     if(x>.45f && x<.75f && y>.05f && y<.17f && (!view.room || view.self==view.host)) {
-        struct jnet_lobby_action action={.kind=6,.level=jnet_menu_level,.lighting=jnet_menu_daynight,.paradise=jnet_menu_level==7 && jnet_menu_paradise};jnet_lobby_submit(&action);
+        struct jnet_lobby_action action={.kind=6,.level=jnet_menu_level,.lighting=jnet_menu_level==7 && jnet_menu_paradise?0u:jnet_daynight_normalize(jnet_menu_level,jnet_menu_daynight),.paradise=jnet_menu_level==7 && jnet_menu_paradise};jnet_lobby_submit(&action);
     }
 
 }
@@ -278,7 +297,7 @@ static void jnet_menu_input(uintptr_t menu,uintptr_t rows) {
             points[count][0]=-.08f;points[count++][1]=-.89f;
             if(!view.room || view.self==view.host){
                 points[count][0]=jnet_level_right;points[count++][1]=.48f;
-                if(jnet_daynight_supported(jnet_menu_level) || jnet_menu_level==7){points[count][0]=.60f+jnet_variant_arrow;points[count++][1]=.23f;}
+                if(jnet_daynight_supported(jnet_menu_level)){points[count][0]=.60f+jnet_variant_arrow;points[count++][1]=.23f;}
                 points[count][0]=.60f;points[count++][1]=.11f;
             }
             if(view.room){points[count][0]=.60f;points[count++][1]=-.79f;}
@@ -566,16 +585,15 @@ static int jnet_menu_draw_live(uintptr_t menu) {
             JNET_LINE(view.status,-.88f,-.50f,.84f);
             JNET_CENTER(jnet_menu_level==9?"Level 09":jnet_level_names[jnet_menu_level],.60f,.75f,.64f);
             if(!view.room || view.self==view.host){JNET_CENTER("<",jnet_level_left,.48f,.1f);JNET_CENTER(">",jnet_level_right,.48f,.1f);JNET_CENTER("Go",.60f,.11f,.3f);}
-            if(jnet_daynight_supported(jnet_menu_level) || jnet_menu_level==7){
-                const char *alternate=jnet_menu_level<2?"Night":jnet_menu_level==3?"Dawn":"Dusk";
-                const char *labels[]={jnet_menu_level==7?"Normal":"Day",jnet_menu_level==7?"Cutscene":alternate,"Cycle"};
+            if(jnet_daynight_supported(jnet_menu_level)){
+                unsigned count=jnet_menu_variant_count(jnet_menu_level),selected=jnet_menu_variant_step(jnet_menu_level);
                 float widest=0;
-                for(unsigned n=0;n<3;++n){float advance=0;
-                    for(const char *c=labels[n];*c;++c)advance+=jnet_menu_font.glyphs[(unsigned char)*c-32].advance;
+                for(unsigned n=0;n<count;++n){float advance=0;
+                    for(const char *c=jnet_menu_variant_label(jnet_menu_level,n);*c;++c)advance+=jnet_menu_font.glyphs[(unsigned char)*c-32].advance;
                     widest=fmaxf(widest,fminf(.4f,advance*scale/aspect));
                 }
                 jnet_variant_arrow=widest*.5f+.045f;
-                JNET_CENTER(jnet_menu_level==7?labels[jnet_menu_paradise?1:0]:labels[jnet_menu_daynight],.60f,.23f,.4f);
+                JNET_CENTER(jnet_menu_variant_label(jnet_menu_level,selected),.60f,.23f,.4f);
                 if(!view.room || view.self==view.host){JNET_CENTER("<",.60f-jnet_variant_arrow,.23f,.1f);JNET_CENTER(">",.60f+jnet_variant_arrow,.23f,.1f);}
             }
             if(view.room){

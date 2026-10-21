@@ -14,10 +14,12 @@ static _Atomic unsigned jnet_options_failed;
 static _Atomic unsigned jnet_credits=1;
 static _Atomic unsigned jnet_paradise_cutscene;
 static _Atomic unsigned jnet_daynight_mode,jnet_daynight_host=~0u;
-static inline int jnet_daynight_supported(unsigned level){return level<4;}
+static inline int jnet_daynight_supported(unsigned level){return level<8;}
+/* Lighting 0 Day, 1 Night (Dusk on Pink Desert, Dawn on Sunken City), 2 Cycle, 3 Night on Pink Desert and Sunken City only. */
+static inline unsigned jnet_daynight_normalize(unsigned level,unsigned mode){return mode==3 && level!=2 && level!=3?1u:mode;}
 static inline void jnet_daynight_enter(unsigned level){
     unsigned host=jnet_daynight_host;
-    if(host<=2 && jnet_daynight_supported(level))jnet_daynight_mode=host;
+    if(host<=3 && jnet_daynight_supported(level))jnet_daynight_mode=jnet_daynight_normalize(level,host);
 }
 static _Atomic unsigned jnet_character_spotlight;
 static int (*jnet_character_capture_rotation)(float *);

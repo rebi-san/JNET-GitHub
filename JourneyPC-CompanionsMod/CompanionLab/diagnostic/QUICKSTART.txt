@@ -43,9 +43,12 @@ is guarded by native resource readiness. War Machine autonomous attacks remain
 unavailable. Rocket Deathmatch has been reported working locally; three-player
 online behavior is not yet confirmed.
 
-Chapter Select and Broken Bridge: Day / Night / Cycle.
-Pink Desert: Day / Dusk / Cycle. Sunken City: Day / Dawn / Cycle.
-Cycle takes 15 minutes to reach Night/Dusk/Dawn and 15 minutes to return to Day.
+Chapter Select, Broken Bridge, Cave, Ruins and Mountain: Day / Night / Cycle.
+Pink Desert: Day / Dusk / Night / Cycle. Sunken City: Day / Dawn / Night / Cycle.
+Summit: Normal / Cutscene / Night / Cycle (the cutscene is the Paradise ending).
+Night uses the Level_Chris night sky (moon, stars and cool cloud tints). Cycle takes
+15 minutes to reach Night/Dusk/Dawn and 15 minutes to return to Day; on Pink Desert
+and Sunken City Cycle is still Day to Dusk/Dawn and back.
 Normal progression retains the mode. A guest adopts the host's non-Day mode
 on entering a supported level; joining in the same level does not force a
 lighting change. Cycle clocks may differ. Host Day override and late metadata

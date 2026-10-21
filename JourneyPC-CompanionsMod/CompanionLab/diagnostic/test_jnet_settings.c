@@ -75,11 +75,11 @@ int main(void){
     assert(jnet_bindings[0][1]==66 && jnet_bindings[0][2]==86 && jnet_bindings[0][3]==71);
     assert(jnet_bindings[0][0]==88 && jnet_credits==0 && jnet_fps_limit==1);
     assert(!jnet_settings_dirty(1) && !jnet_settings_dirty(2) && !jnet_settings_dirty(3));
-    for(unsigned lighting=0;lighting<3;++lighting){
+    for(unsigned lighting=0;lighting<4;++lighting){
         jnet_daynight_mode=lighting;assert(jnet_settings_apply(4));
         jnet_daynight_mode=99;jnet_controls_initialize();assert(jnet_daynight_mode==lighting);
         assert(jnet_bindings[0][0]==88 && jnet_credits==0 && jnet_fps_limit==1);
     }
-    jnet_daynight_mode=1;fail=1;assert(!jnet_settings_apply(4) && jnet_saved_lighting==2);fail=0;
+    jnet_daynight_mode=1;fail=1;assert(!jnet_settings_apply(4) && jnet_saved_lighting==3);fail=0;
     puts("JNET settings: clean Back, dirty prompt, isolated Apply, Revert, failed atomic save and original-action passthrough passed.");
 }

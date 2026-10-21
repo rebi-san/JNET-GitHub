@@ -113,15 +113,15 @@ static uint64_t jnet_sl_decimal(const char *s) {
 }
 static unsigned jnet_sl_lighting(uint64_t room) {
     const char *mode=jnet_sl_api.data(jnet_sl_api.mm,room,"journet.lighting");
-    if(mode && mode[0]>='0' && mode[0]<='2' && !mode[1])return (unsigned)(mode[0]-'0');
+    if(mode && mode[0]>='0' && mode[0]<='3' && !mode[1])return (unsigned)(mode[0]-'0');
     return jnet_sl_equal(room,"journet.daynight","1")?2:0;
 }
 static void jnet_sl_travel(const struct jnet_lobby_action *action) {
-    if(action->lighting>2 || action->paradise>1 || (action->paradise && action->level!=7))return;
+    if(action->lighting>3 || action->paradise>1 || (action->paradise && action->level!=7))return;
     unsigned previous=jnet_paradise_cutscene;
     jnet_paradise_cutscene=action->level==7 && action->paradise;
     if(jnet_travel_request(action->level)){
-        if(jnet_daynight_supported(action->level))jnet_daynight_mode=action->lighting;
+        if(jnet_daynight_supported(action->level))jnet_daynight_mode=jnet_daynight_normalize(action->level,action->lighting);
     } else jnet_paradise_cutscene=previous;
 }
 static int jnet_sl_metadata_check(uint64_t room,uint64_t expected,const char *nonce) {
@@ -393,7 +393,7 @@ publish:
         else if(jnet_sl.host==jnet_sl.identity){
             unsigned wanted=jnet_daynight_mode;jnet_daynight_host=~0u;
             if((published_room!=jnet_sl.room || published_daynight!=wanted) &&
-               jnet_sl_api.set_data(jnet_sl_api.mm,jnet_sl.room,"journet.lighting",wanted==2?"2":wanted==1?"1":"0") &&
+               jnet_sl_api.set_data(jnet_sl_api.mm,jnet_sl.room,"journet.lighting",wanted==3?"3":wanted==2?"2":wanted==1?"1":"0") &&
                jnet_sl_api.set_data(jnet_sl_api.mm,jnet_sl.room,"journet.daynight",wanted==2?"1":"0")){
                 published_room=jnet_sl.room;published_daynight=wanted;
             }

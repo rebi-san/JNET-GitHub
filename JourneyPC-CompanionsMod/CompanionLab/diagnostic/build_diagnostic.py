@@ -12,7 +12,7 @@ import argparse
 
 HERE = Path(__file__).resolve().parent
 LAB = HERE.parent
-VERSION = "0.283"
+VERSION = "0.284s"
 ROOT = LAB.parent.parent
 sys.path.insert(0, str(LAB))
 from inspect_build import EXPECTED_EXE, audit_signatures, pe_sections
@@ -147,7 +147,7 @@ def build(source_check=False):
     work = LAB / "work/diagnostic-build"
     package = LAB / ("work/production-check" if source_check else f"work/package-{VERSION}/JNET")
     deps = LAB / "work/deps"
-    zig = deps / "zig-macos-aarch64-0.13.0/zig"
+    zig = deps / ("zig-windows-x86_64-0.13.0/zig.exe" if os.name == "nt" else "zig-macos-aarch64-0.13.0/zig")
     minhook = deps / "minhook-1.3.4"
     if not zig.is_file() or not (minhook / "src/hook.c").is_file():
         raise ValueError("Approved workspace toolchain is missing; no downloads are performed by this script")
