@@ -88,6 +88,24 @@ int main(void) {
     assert(!jnet_flower_number("",&parsed) && !jnet_flower_number("-",&parsed) && !jnet_flower_number("nan",&parsed) && !jnet_flower_number("inf",&parsed) &&
            !jnet_flower_number("1.5x",&parsed) && !jnet_flower_number("1e",&parsed) && !jnet_flower_number("1e999",&parsed) && !jnet_flower_number(NULL,&parsed) &&
            !jnet_flower_number("1",NULL));
+    /* Screen position for the light sample: centre ahead, clamped at the edges, none behind the camera. */
+    float uv[2];
+    assert(jnet_flower_screen_uv(vp,(float[]){0,0,-10},uv) && near(uv[0],.5f,1e-5f) && near(uv[1],.5f,1e-5f));
+    assert(jnet_flower_screen_uv(vp,(float[]){1,-1,-10},uv) && uv[0]>.5f && uv[1]>.5f);
+    assert(jnet_flower_screen_uv(vp,(float[]){500,0,-10},uv) && uv[0]==.97f && !jnet_flower_screen_uv(vp,(float[]){0,0,10},uv));
+    /* Depth probes: a plausible standard buffer, a reversed one, flat or out-of-range ones, and ambiguous ends that keep the mode. */
+    float probes[JNET_FLOWER_PROBES];unsigned reversed=7;
+    for(unsigned i=0;i<JNET_FLOWER_PROBES;++i)probes[i]=i<8?.999f-.0001f*i:.97f-.001f*i;
+    assert(jnet_flower_depth_assess(probes,&reversed) && reversed==0);
+    for(unsigned i=0;i<JNET_FLOWER_PROBES;++i)probes[i]=1.f-(i<8?.999f-.0001f*i:.97f-.001f*i);
+    assert(jnet_flower_depth_assess(probes,&reversed) && reversed==1);
+    for(unsigned i=0;i<JNET_FLOWER_PROBES;++i)probes[i]=.5f+(i%2?.0002f:0);reversed=0;
+    assert(!jnet_flower_depth_assess(probes,&reversed));
+    for(unsigned i=0;i<JNET_FLOWER_PROBES;++i)probes[i]=(i%4)*.1f;reversed=1;
+    assert(jnet_flower_depth_assess(probes,&reversed) && reversed==1);        /* varied but top and bottom alike: unchanged */
+    probes[3]=1.5f;assert(!jnet_flower_depth_assess(probes,&reversed));probes[3]=NAN;assert(!jnet_flower_depth_assess(probes,&reversed));
+    assert(near(jnet_flower_linear_depth(0,0,.15f,2200.f),.15f,1e-5f) && near(jnet_flower_linear_depth(1,0,.15f,2200.f),2200.f,50.f) &&
+           near(jnet_flower_linear_depth(0,1,.15f,2200.f),2200.f,50.f) && near(jnet_flower_linear_depth(1,1,.15f,2200.f),.15f,1e-5f));
     /* Animation: grows from the ground, opens part way, and a touch opens it fully with a glow that settles; a future touch waits. */
     struct jnet_flower_item plant={{0,0,0},0,1.f,0,1000,0};
     struct jnet_flower_look look=jnet_flower_animate(&plant,1000);

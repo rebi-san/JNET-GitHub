@@ -41,6 +41,8 @@ static void (*jnet_travel_poll)(void);
 static void (*jnet_travel_session_reset)(void);
 static int (*jnet_rocket_receive)(unsigned,const unsigned char *,size_t);
 static void (*jnet_rocket_poll)(void);
+static int (*jnet_flower_receive)(unsigned,const unsigned char *,size_t);
+static void (*jnet_flower_poll)(void);
 static int (*jnet_chat_receive)(unsigned,const unsigned char *,size_t);
 static void (*jnet_chat_poll)(struct jnet_lobby_view *);
 static void (*jnet_member_view)(struct jnet_lobby_view *);

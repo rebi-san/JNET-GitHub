@@ -9,9 +9,9 @@
    vertical axis, a random assortment of the eight Flower types is planted on the floor around it. The placement list is a ring:
    the oldest flower is replaced once JNET_FLOWER_CAPACITY is reached, and it is emptied when the level changes. */
 #define JNET_FLOWER_TYPES 8u
-#define JNET_FLOWER_CAPACITY 512u
+#define JNET_FLOWER_CAPACITY 1024u
 #define JNET_FLOWER_FLOOR_RANGE 2.0f
-#define JNET_FLOWER_RATE 7.0f
+#define JNET_FLOWER_RATE 14.0f
 #define JNET_FLOWER_SPREAD 1.6f
 #define JNET_FLOWER_BURST 4u
 #define JNET_FLOWER_TOUCH_RADIUS 1.0f
@@ -82,7 +82,7 @@ static inline unsigned jnet_flower_trail_step(struct jnet_flower_trail *trail,un
         if(!floor(context,spot,&ground) || !isfinite(ground) || fabsf(ground-height)>JNET_FLOWER_FLOOR_RANGE)continue;
         spot[1]=ground;
         unsigned type=jnet_flower_random(trail)%JNET_FLOWER_TYPES;
-        float yaw=6.28318530718f*jnet_flower_unit(trail),scale=.8f+.5f*jnet_flower_unit(trail);
+        float yaw=6.28318530718f*jnet_flower_unit(trail),scale=.9f+.2f*jnet_flower_unit(trail);
         jnet_flower_trail_add(trail,spot,type,yaw,scale,now);++planted;
     }
     if(trail->carry>=1.f)trail->carry=0;

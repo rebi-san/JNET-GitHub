@@ -85,7 +85,7 @@ class FlowerResourcesTest(unittest.TestCase):
             vertices, triangles = fr.flower_model(flower, table, grid)
             ys = [v[0][1] for v in vertices]
             self.assertAlmostEqual(min(ys[:2*fr.STEM_SIDES]), 0)
-            self.assertGreater(max(ys), fr.STEM_HEIGHT*fr.WORLD_UNIT*0.9)
+            self.assertGreater(max(ys), .2)
             self.assertTrue(all(0 <= c <= 1 for v in vertices for c in v[2]))
 
     def test_atlas_file_matches_what_the_dll_accepts(self):

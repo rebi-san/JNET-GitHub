@@ -46,13 +46,14 @@ online behavior is not yet confirmed.
 FLOWER TRAIL (fl0w)
 Options > Controls > Character > fl0w has a Flower Trail action (default F, right stick
 click on a pad). While it is held and fl0w is within 2 units of the floor, a random mix
-of the eight Flower flowers is planted around it, up to 512 at a time (the oldest is
-replaced) and cleared when the level changes. The flowers are drawn locally by JNET
-with Flower's petal atlas (JNET-flowers.dds, which must stay beside JNET.dll); other
-players do not see them. The pass has no scene depth: flowers hidden behind terrain are
-detected by line of sight and skipped, and distant flowers fade out, but a flower under
-fl0w's own body can draw over it. If nothing appears, the session report holds the
-"flower trail" lines naming the failed step (camera layout, atlas or shader).
+of the eight Flower flowers is planted around it (14 a second, 1,024 kept, cleared when
+the level changes), each with a ring of grass. Flowers grow, rest half open, and open
+fully with a glow when fl0w touches them or any chirp of yours comes within 9 units,
+playing the Desert flower's response sound. Other players see your flowers (everyone
+needs the same JNET build), and flowers stay visible in menus. They take on the light
+of the scene and are hidden by objects in front of them. JNET-flowers.dds and
+JNET-grass.dds must stay beside JNET.dll. If something is wrong the session report has
+"flower trail" lines naming the failed step (camera, atlas, shader or scene depth).
 
 Chapter Select and Broken Bridge: Day / Night / Cycle.
 Pink Desert: Day / Dusk / Cycle. Sunken City: Day / Dawn / Cycle.

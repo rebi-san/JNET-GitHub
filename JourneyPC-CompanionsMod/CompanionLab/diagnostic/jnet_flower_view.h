@@ -135,6 +135,38 @@ static inline int jnet_flower_line_clear(const struct jnet_flower_camera *camera
     }
     return 1;
 }
+/* Screen position (0..1, y down) of a world point, where the light under a flower is sampled from the scene. 0 when behind the camera. */
+static inline int jnet_flower_screen_uv(const float view_projection[16],const float point[3],float uv[2]) {
+    float clip[4];
+    jnet_flower_clip(view_projection,point,clip);
+    if(!(clip[3]>0))return 0;
+    uv[0]=.5f+.5f*clip[0]/clip[3];uv[1]=.5f-.5f*clip[1]/clip[3];
+    for(unsigned i=0;i<2;++i)uv[i]=uv[i]<.03f?.03f:uv[i]>.97f?.97f:uv[i];
+    return 1;
+}
+/* The scene's depth buffer can only be trusted if it looks like a depth buffer: finite values in 0..1 with real variation between the
+   sixteen probe points (the first eight along the top of the screen, the last eight along the bottom). Looking at the ground, the top is
+   farther than the bottom, which says whether depth grows with distance (standard) or shrinks (reversed). *reversed is left alone when
+   the two ends are too alike to tell. */
+#define JNET_FLOWER_PROBES 16u
+static inline int jnet_flower_depth_assess(const float values[JNET_FLOWER_PROBES],unsigned *reversed) {
+    float low=2,high=-1,top=0,bottom=0;
+    for(unsigned i=0;i<JNET_FLOWER_PROBES;++i){
+        if(!isfinite(values[i]) || values[i]<0 || values[i]>1)return 0;
+        if(values[i]<low)low=values[i];
+        if(values[i]>high)high=values[i];
+        if(i<JNET_FLOWER_PROBES/2)top+=values[i];else bottom+=values[i];
+    }
+    if(high-low<.0005f)return 0;
+    top/=JNET_FLOWER_PROBES/2;bottom/=JNET_FLOWER_PROBES/2;
+    if(top>bottom+.0005f)*reversed=0;else if(top<bottom-.0005f)*reversed=1;
+    return 1;
+}
+/* Distance along the view direction for a depth value (D3D 0..1, near maps to 0 unless reversed): what the shader compares. */
+static inline float jnet_flower_linear_depth(float depth,unsigned reversed,float near_plane,float far_plane) {
+    if(reversed)depth=1.f-depth;
+    return near_plane*far_plane/(far_plane-depth*(far_plane-near_plane));
+}
 /* How a planted flower looks at `now`: it grows from the ground and opens part way; a touch or chirp opens it fully with a glow and a
    shiver that fade over a few seconds, after which it settles back to its idle state. */
 #define JNET_FLOWER_IDLE_BLOOM 0.45f

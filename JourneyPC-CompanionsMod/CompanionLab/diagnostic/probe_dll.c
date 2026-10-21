@@ -3256,6 +3256,7 @@ static int traveler_peer_replace(uint64_t peer,uint64_t generation);
 #include "jnet_options_live.h"
 #include "jnet_appearance_live.h"
 #include "jnet_character_live.h"
+#include "jnet_flower_net.h"
 #include "jnet_flower_live.h"
 #include "jnet_rocket_live.h"
 #include "jnet_intro_live.h"
@@ -5180,6 +5181,7 @@ static DWORD WINAPI initialize(void *unused) {
         }
     }
     jnet_rocket_receive=jnet_rocket_message;jnet_rocket_poll=jnet_rocket_poll_live;
+    jnet_flower_receive=jnet_flower_message;jnet_flower_poll=jnet_flower_poll_live;
     jnet_chat_receive=jnet_chat_message;jnet_chat_poll=jnet_chat_lobby;
     jnet_member_view=jnet_travel_members_view;jnet_travel_session_reset=jnet_travel_reset;
     jnet_quit_to_title=jnet_travel_quit_to_title;

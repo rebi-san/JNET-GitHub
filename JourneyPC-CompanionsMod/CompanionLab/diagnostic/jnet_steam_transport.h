@@ -257,7 +257,7 @@ static void jnet_sn_receive_inner(unsigned slot) {
         struct jnet_sn_message *m=messages[i];
         if(m && m->connection==jnet_sn.peers[slot].handle && jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity)jnet_sn_arrival(slot,m);
         if(m && m->bytes>0 && m->data && m->connection==jnet_sn.peers[slot].handle &&
-            jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity && ( (jnet_rocket_receive && jnet_rocket_receive(slot,m->data,(size_t)m->bytes)) || (jnet_chat_receive && jnet_chat_receive(slot,m->data,(size_t)m->bytes)) || (jnet_travel_receive && jnet_travel_receive(slot,m->data,(size_t)m->bytes)) || jnet_sg_receive(slot,m->data,(size_t)m->bytes))){m->release(m);continue;}
+            jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity && ( (jnet_rocket_receive && jnet_rocket_receive(slot,m->data,(size_t)m->bytes)) || (jnet_flower_receive && jnet_flower_receive(slot,m->data,(size_t)m->bytes)) || (jnet_chat_receive && jnet_chat_receive(slot,m->data,(size_t)m->bytes)) || (jnet_travel_receive && jnet_travel_receive(slot,m->data,(size_t)m->bytes)) || jnet_sg_receive(slot,m->data,(size_t)m->bytes))){m->release(m);continue;}
         unsigned char p[72];int valid=m && m->bytes==72 && m->data &&
             m->connection==jnet_sn.peers[slot].handle && jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity;
         if(valid)memcpy(p,m->data,sizeof(p));if(m)m->release(m);
@@ -326,6 +326,7 @@ static void jnet_sn_tick_inner(void) {
     }
     jnet_sg_tick();
     if(jnet_rocket_poll)jnet_rocket_poll();
+    if(jnet_flower_poll)jnet_flower_poll();
     JNETSteamLobby[12]=(LONG)admitted;
     if(admitted){JNETSteamLobby[11]=3;jnet_sl_status("Steam connected - gameplay active");}
     else if(jnet_sl.host==jnet_sl.identity){JNETSteamLobby[11]=1;jnet_sl_status("Hosting Steam lobby - waiting for P2P guests");}

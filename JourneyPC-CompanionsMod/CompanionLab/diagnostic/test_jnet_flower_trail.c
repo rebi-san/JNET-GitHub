@@ -35,16 +35,16 @@ int main(void) {
     }
     trail.placed=0;
     assert(run(120,JNET_CHARACTER_FLOW_1,0,low,floor_slope)==0 && !trail.count);
-    /* Rate: about seven a second. */
+    /* Rate: about fourteen a second. */
     unsigned planted=run(600,JNET_CHARACTER_FLOW_2,1,low,floor_slope);
-    assert(planted>=60 && planted<=80);
+    assert(planted>=130 && planted<=150);
     /* Every flower is on the floor within the spread, with a valid type, scale and yaw; all eight types appear. */
     unsigned seen=0;
     for(unsigned i=0;i<trail.count;++i){
         const struct jnet_flower_item *f=&trail.items[i];
         assert(fabsf(f->position[1]-.1f*f->position[0])<1e-5f);
         assert(hypotf(f->position[0]-low[0],f->position[2]-low[2])<=JNET_FLOWER_SPREAD+1e-4f);
-        assert(f->type<JNET_FLOWER_TYPES && f->scale>=.8f && f->scale<=1.3f && f->yaw>=0 && f->yaw<=6.2832f);
+        assert(f->type<JNET_FLOWER_TYPES && f->scale>=.9f && f->scale<=1.1f && f->yaw>=0 && f->yaw<=6.2832f);
         seen|=1u<<f->type;
     }
     assert(seen==(1u<<JNET_FLOWER_TYPES)-1);
@@ -74,7 +74,7 @@ int main(void) {
     /* The oldest flower is replaced at capacity, and the level change empties the list. */
     jnet_flower_trail_clear(&trail);
     uint64_t before=trail.placed;
-    run(60*80,JNET_CHARACTER_FLOW_1,1,low,floor_slope);
+    run(60*100,JNET_CHARACTER_FLOW_1,1,low,floor_slope);
     assert(trail.placed-before>JNET_FLOWER_CAPACITY && trail.count==JNET_FLOWER_CAPACITY && trail.next<JNET_FLOWER_CAPACITY);
     jnet_flower_trail_step(&trail,4,JNET_CHARACTER_FLOW_1,0,low,1.f/60.f,floor_slope,NULL,clock);
     assert(trail.count==0 && trail.level==4);

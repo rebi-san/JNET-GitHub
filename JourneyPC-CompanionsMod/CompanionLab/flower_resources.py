@@ -183,7 +183,12 @@ def shader_files():
 
 
 # Runtime model: the in-game flowers are far smaller than Flower's 3.6-unit heads, so geometry is scaled once here.
-WORLD_UNIT = .15
+# World size. Flower's types differ wildly (Wheat is 4.5 times taller than Yellow, Purple twice), so each flower gets its own unit:
+# SIZE_K / (height**.85 * width**.15) of its stem and head in Flower units, which puts every flower within about a quarter of
+# the others' height, and Yellow at about 0.31 world units tall. The grass ring uses one fixed unit.
+SIZE_K = .354
+SIZE_EXPONENT = .85
+GRASS_UNIT = .075
 STEM_HEIGHT = 3.2
 STEM_SIDES = 6
 STEM_RADII = (.16, .09)
@@ -257,7 +262,12 @@ def flower_model(flower, mesh_table, grid):
     first = len(vertices)
     vertices += [(p, n, c, uv, KIND_GRASS, p, c) for p, n, c, uv in grass]
     triangles += [tuple(first + i for i in t) for t in grass_triangles]
-    vertices = [(tuple(a*WORLD_UNIT for a in p), n, c, uv, kind, tuple(a*WORLD_UNIT for a in p0), c0)
+    body = [v for v in vertices if v[4] != KIND_GRASS]
+    tall = max(max(v[0][1], v[5][1]) for v in body)
+    wide = 2*max(max(abs(v[0][0]), abs(v[0][2]), abs(v[5][0]), abs(v[5][2])) for v in body)
+    unit = SIZE_K/(tall**SIZE_EXPONENT*wide**(1 - SIZE_EXPONENT))
+    vertices = [(tuple(a*(GRASS_UNIT if kind == KIND_GRASS else unit) for a in p), n, c, uv, kind,
+                 tuple(a*(GRASS_UNIT if kind == KIND_GRASS else unit) for a in p0), c0)
                 for p, n, c, uv, kind, p0, c0 in vertices]
     if len(vertices) > 65535: raise ValueError('Flower model exceeds 16-bit indices: ' + flower['flowerName'])
     return vertices, triangles

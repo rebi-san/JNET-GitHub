@@ -68,6 +68,7 @@ static int jnet_flower_ground(void *context,const float position[3],float *heigh
 }
 static int evaluation_writable(void *opaque,uint64_t address,size_t bytes);
 static uintptr_t jnet_flower_game;
+static unsigned jnet_flower_net_logged;
 static uint32_t jnet_flower_sound_next;
 static unsigned jnet_flower_sound_sequence,jnet_flower_sound_reported;
 /* Journey's own response for the Desert flower is a "Flower" shout (sound FlowerRespond in the LvlSfx bank). Emits one at `position`
@@ -96,12 +97,17 @@ static void jnet_flower_after_motion(unsigned kind,const float position[3],float
     uint32_t now=(uint32_t)GetTickCount64();
     AcquireSRWLockExclusive(&jnet_flower_lock);
     unsigned planted=jnet_flower_trail_step(&jnet_flower_trail_state,jnet_current_level,kind,jnet_flower_trail_down,position,dt,floor,context,now);
-    float woken[3]={0};
+    float woken[3]={0};struct jnet_flower_item sent[JNET_FLOWER_BURST];unsigned sent_count=0;
     unsigned touched=jnet_flower_trail_touch(&jnet_flower_trail_state,position,now,woken);
-    for(unsigned n=1;n<=planted;++n)jnet_flower_hidden[(jnet_flower_trail_state.next+JNET_FLOWER_CAPACITY-n)%JNET_FLOWER_CAPACITY]=0;
+    for(unsigned n=1;n<=planted;++n){
+        unsigned at=(jnet_flower_trail_state.next+JNET_FLOWER_CAPACITY-n)%JNET_FLOWER_CAPACITY;
+        jnet_flower_hidden[at]=0;
+        if(sent_count<JNET_FLOWER_BURST)sent[sent_count++]=jnet_flower_trail_state.items[at];
+    }
     if(!jnet_flower_trail_state.count)memset(jnet_flower_hidden,0,sizeof(jnet_flower_hidden));
     unsigned level=jnet_flower_trail_state.level;
     ReleaseSRWLockExclusive(&jnet_flower_lock);
+    for(unsigned n=0;n<sent_count;++n)jnet_flower_net_queue(sent+n);
     if(touched)jnet_flower_respond(woken);
     if(planted && jnet_flower_planted_level!=level){
         jnet_flower_planted_level=level;
@@ -183,6 +189,10 @@ static void jnet_flower_chirp_poll(uintptr_t game) {
 }
 /* Per game tick: publishes the camera to the render thread and refreshes terrain hiding for a slice of the flowers. */
 static void jnet_flower_tick(uintptr_t game) {
+    unsigned received=jnet_flower_net_drain((uint32_t)GetTickCount64());
+    if(received && jnet_flower_net_logged<3){
+        ++jnet_flower_net_logged;char line[100];snprintf(line,sizeof(line),"[JNET] flower trail: %u flowers received from other players",received);message(line);
+    }
     AcquireSRWLockShared(&jnet_flower_lock);unsigned count=jnet_flower_trail_state.count;ReleaseSRWLockShared(&jnet_flower_lock);
     if(!count)return;
     uint64_t now=GetTickCount64();
@@ -190,14 +200,15 @@ static void jnet_flower_tick(uintptr_t game) {
     jnet_flower_chirp_poll(game);
     jnet_flower_lens_poll(game,now);
     uintptr_t camera_object=0,node=0;float rows[16];struct jnet_flower_camera camera;
-    if(!jnet_flower_lens_valid || !jnet_flower_player_valid || !own_read(NULL,game+0x60,&camera_object,8) || !camera_object ||
+    if(!jnet_flower_lens_valid || !own_read(NULL,game+0x60,&camera_object,8) || !camera_object ||
        !own_read(NULL,camera_object+0x30,&node,8) || !node || !own_read(NULL,node+0x170,rows,sizeof(rows)))return;
     if(jnet_flower_probe_ready && !jnet_flower_calibrated)jnet_flower_calibrate(camera_object,node);
     if(jnet_flower_calibrated==1){
         float position[3];
         if(own_read(NULL,(jnet_flower_position_base?camera_object:node)+jnet_flower_position_offset,position,sizeof(position)))memcpy(rows+12,position,sizeof(position));
     }
-    if(!jnet_flower_camera_rows(&camera,rows,jnet_flower_player) ||
+    /* A player who is not flying a creature still sees other players' flowers, with no creature position to sanity-check the camera against. */
+    if(!jnet_flower_camera_rows(&camera,rows,jnet_flower_player_valid?jnet_flower_player:NULL) ||
        !jnet_flower_camera_lens(&camera,jnet_flower_lens[0],jnet_flower_lens[1],jnet_flower_lens[2],jnet_flower_lens[3])){
         if(!jnet_flower_reported){
             /* The node layout was inferred, not proven. Record what was read so the offsets can be corrected from a session report. */
