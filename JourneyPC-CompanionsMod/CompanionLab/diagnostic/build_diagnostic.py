@@ -12,7 +12,7 @@ import argparse
 
 HERE = Path(__file__).resolve().parent
 LAB = HERE.parent
-VERSION = "0.306"
+VERSION = "0.307"
 ROOT = LAB.parent.parent
 sys.path.insert(0, str(LAB))
 from inspect_build import EXPECTED_EXE, audit_signatures, pe_sections

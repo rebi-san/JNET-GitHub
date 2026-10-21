@@ -1,12 +1,12 @@
 {
-  "installed_utc": "2026-10-21T03:38:54.711932+00:00",
-  "version": "0.306",
-  "package_sha256": "04e48e3ce3fdd44c7d9046e2b795b6896e4f18db687da8b36ca877e17827f686",
+  "installed_utc": "2026-10-21T03:51:45.026138+00:00",
+  "version": "0.307",
+  "package_sha256": "ea3d255b33a4b91f6b8c96f38265cfd5d80cb47333d3687c9819b054ce34f04c",
   "directory": "/Users/rebisan/Library/Containers/com.isaacmarovitz.Whisky/Bottles/9FAD618B-4D76-4C96-B0AA-4A3A85EC24A0/drive_c/Program Files (x86)/Steam/steamapps/common/Journey/JNET",
   "files": {
-    "JNET.dll": "43cef0a41af7564540aef07a6e465940f5710f9ec91ae781b99c4a4987d72d06",
-    "JNET.exe": "e3e269d2b61d0dc4ab9b38dea345fa4751f57e5d034e6cb5aec95cd017475f48",
-    "README.txt": "c9e7a680c2aa5332c72945670ec3173d41e8113600af52c4ac1f0b35ce87a48a",
+    "JNET.dll": "16e1c91f10d3c50e97be075abe2b58f5d0a3a4329c619bee0b7303390bdb75cd",
+    "JNET.exe": "a70c8fdfe5dc0466eca56aafd4ebd1938f8233f21b3d3ca88090b9f0ba2fee17",
+    "README.txt": "8b1b1299228ce908f131c8065053ff2fe98bb7c15465456c5b87aa6add2e0fbc",
     "JNETMenu.xme": "f84f0b1513b014e817b12029653a3ac47461dc52954359884722a1cce194fab6",
     "JNETSpin3.D3D11x64": "5d4af83666f1377817948db9cc96c943b81182da043bf6e305bc5d2696d71b3f",
     "JNET_FlatFishFlip.D3D11x64": "35e20069e83257faf77a3f0d49abe3cbbb35946d311bd15f4f6864d6df84e5d5",
@@ -35,7 +35,7 @@
     "JNETCharacter_P_MechHeadGrate.D3D11x64": "029e7f94a724e1c1f796736a386f2a4f70d0b28fdd94dd7d58acba83afcd3efd",
     "JNETCharacter_P_MechTail.D3D11x64": "9517f08174cfd0e2537f501f29b6886cea11e15ba7099628c132f9419686fc13",
     "JNETCharacter_P_MechWing.D3D11x64": "d535037cba5521d8af7fc1712d0db1d8af09c22aa607ff95672208688f2c42fd",
-    "manifest.json": "8d47035a02310271f5c8cd2171010add6184d18f9fbb4f7ddae65674ab002d09",
+    "manifest.json": "652088340761d6cc212241c56595c994bd534d815ce78f348a4f4832ded83c72",
     "JNETCharacter_P_FlowHunter_Fins.D3D11x64": "dbc264f736258ca6578f31f1f55ef280b44fb671d062005c39156bf5a9e191d6",
     "JNETCharacter_P_FlowCreature_Body.D3D11x64": "0e4f8e957bbd635e198fa08d5560ccbfd61f67f827942e4d0256cd62427277ab",
     "JNETCharacter_P_FlowHunter_FinsLarge.D3D11x64": "a8a544db34ac393a86f00644c599602addfc7744b3b3f7376f509c1b6d5f3b42",
@@ -54,14 +54,14 @@
   "runtime_verified": false,
   "helper_launched": false,
   "connection_scope": "devishaz and rebishaz local installations; noremac uses separate Windows installation",
-  "validation": "0.306 initializes and caches each War Machine coating separately; no live shader rebinding. fl0w uses Rogue/Hunter skins with shared controls and both chirp families. Offline regression and package verified; gameplay unverified.",
+  "validation": "0.307 initializes and caches each War Machine coating separately; no live shader rebinding. fl0w uses Rogue/Hunter skins with shared controls and both chirp families. Offline regression and package verified; gameplay unverified.",
   "folder_renamed_utc": "2026-10-12T02:43:42.440093+00:00",
   "log_cleanup": {
     "utc": "2026-10-12T02:43:42.456081+00:00",
     "files_deleted": 165,
     "bytes_deleted": 226421
   },
-  "rollback_directory": "/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/rollback-0.306-rebishaz",
-  "rollback": "/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/rollback-0.306-rebishaz",
+  "rollback_directory": "/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/rollback-0.307-rebishaz",
+  "rollback": "/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/rollback-0.307-rebishaz",
   "bottle": "rebishaz"
 }

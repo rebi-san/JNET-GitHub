@@ -138,12 +138,14 @@ else
 end
 events[#events + 1] = ride
 if assembly.character == 'Longtail' then
-    local grab = CreaB_WhaleRide.cast(game:eventBarn():MetaAddEvent('CreaB_WhaleRide'))
-    grab:creatures(selfClump)
-    grab:allignMult(1)
-    grab:magnetizeMult(1)
-    grab:pullMult(1)
-    grab:disableHintRegions(nil)
+    local grab = ProtoClothMagnetize.cast(game:eventBarn():MetaAddEvent('ProtoClothMagnetize'))
+    grab:cloth(cloth)
+    grab:alignToDirection(1)
+    grab:bridgeStiffness(1)
+    grab:clothStiffness(1)
+    grab:magnetizeToPlayer(1)
+    grab:snapToCenter(1)
+    grab:attractToCloth(1)
     events[#events + 1] = grab
 end
 local attack, handler

@@ -122,6 +122,7 @@ class CharacterResourcesTest(unittest.TestCase):
                 lua = LuaRuntime()
                 lua.execute('''
                     created, initialized, rides, glows, rideValues, colors, materials, attacks = {}, {}, {}, {}, {}, {}, {}, {}
+                    rideSettings = {}
                     eventCount, persistentCount = 0, 0
                     local function matrixCopy(matrix)
                         assert(#matrix == 4, 'Expected four vector tables')
@@ -186,8 +187,10 @@ class CharacterResourcesTest(unittest.TestCase):
                             end
                             if kind == 'CreaB_WhaleRide' or kind == 'ProtoClothMagnetize' then
                                 rides[#rides + 1] = kind
-                                for _, field in ipairs({'allignMult','magnetizeMult','pullMult','attractToCloth'}) do
-                                    event[field] = function(_, value) rideValues[field] = value end
+                                local settings = {}
+                                rideSettings[#rideSettings + 1] = settings
+                                for _, field in ipairs({'allignMult','magnetizeMult','pullMult','attractToCloth','alignToDirection','bridgeStiffness','clothStiffness','magnetizeToPlayer','snapToCenter'}) do
+                                    event[field] = function(_, value) rideValues[field] = value; settings[field] = value end
                                 end
                             end
                             return event
@@ -219,10 +222,20 @@ class CharacterResourcesTest(unittest.TestCase):
                 self.assertEqual(lua.globals().eventCount, int(budget[1].split(',')[3]))
                 self.assertEqual(lua.globals().persistentCount, int(character == 'War Machine'))
                 self.assertEqual(list(lua.globals().rides.values()),
-                                 ['ProtoClothMagnetize','CreaB_WhaleRide'] if character == 'Longtail' else ['CreaB_WhaleRide'])
+                                 ['ProtoClothMagnetize','ProtoClothMagnetize'] if character == 'Longtail' else ['CreaB_WhaleRide'])
                 values = dict(lua.globals().rideValues.items())
-                self.assertEqual(values, {'attractToCloth': 1, 'allignMult': 1, 'magnetizeMult': 1, 'pullMult': 1} if character == 'Longtail' else
+                self.assertEqual(values, {'attractToCloth': 1, 'alignToDirection': 1, 'bridgeStiffness': 1, 'clothStiffness': 1, 'magnetizeToPlayer': 1, 'snapToCenter': 1} if character == 'Longtail' else
                                  {'allignMult': 1, 'magnetizeMult': 1, 'pullMult': 1})
+                if character == 'Longtail':
+                    root = assembly['objects'][assembly['root']]
+                    self.assertEqual(len(assembly['objects'][root['Vars']['segments']['ref']]['Objects']), 1)
+                    normal = dict(lua.globals().rideSettings[1].items())
+                    held = dict(lua.globals().rideSettings[2].items())
+                    self.assertEqual(normal['alignToDirection'], .5)
+                    self.assertEqual(normal['bridgeStiffness'], .5)
+                    self.assertEqual(normal['snapToCenter'], 0)
+                    self.assertEqual(held['alignToDirection'], 1)
+                    self.assertEqual(held['snapToCenter'], 1)
                 if character in ('Longtail', 'Whale'):
                     self.assertEqual(len(lua.globals().colors), 0)
                     for index, variant in enumerate((1, 0, 1), 1):

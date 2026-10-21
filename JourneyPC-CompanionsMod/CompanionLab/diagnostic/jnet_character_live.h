@@ -312,7 +312,11 @@ static inline int jnet_character_prepare_native(uintptr_t game,uintptr_t barn,un
             uint64_t first=jnet_character_instance.pools.decorations+0x10+
                 (uint64_t)jnet_character_instance.pools.decoration_count*0x10d0;
             if(!jnet_character_cloth_ride_ready(own_read,NULL,fault_image,event,first,spec->mesh_count))goto failed;
-            jnet_character_instance.ride_event=event;continue;
+            if(!jnet_character_instance.ride_event)jnet_character_instance.ride_event=event;
+            else if(kind==JNET_CHARACTER_LONGTAIL && !jnet_character_instance.grab_event)
+                jnet_character_instance.grab_event=event;
+            else goto failed;
+            continue;
         }
         if(type==fault_image+0x6718b0){
             static const unsigned char entry[]={0x48,0x89,0x5c,0x24,0x08,0x48,0x89,0x74,0x24,0x10,0x57,0x48,0x83,0xec,0x20,0x48};
@@ -322,8 +326,7 @@ static inline int jnet_character_prepare_native(uintptr_t game,uintptr_t barn,un
             void (*prepare_ride)(uintptr_t)=(void *)(fault_image+0x1c2b70);
             prepare_ride(event);
             if(!jnet_character_ride_ready(own_read,NULL,fault_image,event,creature,1))goto failed;
-            if(kind==JNET_CHARACTER_LONGTAIL)jnet_character_instance.grab_event=event;
-            else jnet_character_instance.ride_event=event;
+            jnet_character_instance.ride_event=event;
             message("[JNET] native WhaleRide prepared for private creature");
             continue;
         }
@@ -1040,7 +1043,7 @@ static void jnet_character_ride(uintptr_t event,uintptr_t game) {
         uintptr_t ride=instance->kind==JNET_CHARACTER_LONGTAIL && grab?instance->grab_event:instance->ride_event;
         float head[3],distance=0;
         if(!fresh || !jnet_character_head_position(own_read,NULL,&instance->binding,jnet_character_generation,head) ||
-           ((instance->kind!=JNET_CHARACTER_LONGTAIL || grab) &&
+           (instance->kind!=JNET_CHARACTER_LONGTAIL &&
             !jnet_character_ride_ready(own_read,NULL,fault_image,ride,instance->binding.creature,1)))continue;
         for(unsigned k=0;k<3;++k){float d=head[k]-local[k];distance+=d*d;}
         if(distance<nearest){nearest=distance;selected=ride;}
