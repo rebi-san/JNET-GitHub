@@ -12,6 +12,7 @@ static int MH_EnableHook(void *target){assert(target);return MH_OK;}
 static int MH_DisableHook(void *target){assert(target);return MH_OK;}
 static int MH_RemoveHook(void *target){assert(target);return MH_OK;}
 static int BCryptGenRandom(void *algorithm,unsigned char *out,unsigned bytes,unsigned flags){static unsigned seed;assert(!algorithm && flags==2);for(unsigned i=0;i<bytes;++i)out[i]=(unsigned char)(++seed*37);return 0;}
+#define JC_BUILD_ID_HEX "fixture-build"
 #include "jnet_steam_lobby.h"
 #include "jnet_steam_transport.h"
 static struct {uint64_t id,host,people[3];unsigned count,limit,joinable,type,local_member;char keys[16][32],values[16][80];unsigned fields;} rooms[8];
@@ -70,9 +71,9 @@ static unsigned char close_listener(void *self,uint32_t listener){assert(self &&
 static unsigned rocket_sends;static unsigned char rocket_sent[128];
 static unsigned chat_sends;
 static unsigned char chat_sent[184];
-static unsigned char travel_sent[96];
+static unsigned char travel_sent[104];
 static unsigned char sent[72],game_sent[JNET_GAME_BYTES];static unsigned sent_type,game_sent_flags;
-static int send_message(void *self,uint32_t connection,const void *data,uint32_t bytes,int flags,int64_t *number){assert(self && connection && !number);if(bytes==128){assert(flags==9);memcpy(rocket_sent,data,128);++rocket_sends;return 1;}if(bytes==184){assert(flags==9);memcpy(chat_sent,data,bytes);++chat_sends;return 1;}if(bytes==96){assert(!memcmp(data,"JNT2",4) && flags==9);memcpy(travel_sent,data,96);return 1;}if(bytes==JNET_GAME_BYTES){assert(!memcmp(data,"JNG1",4) && (flags==1 || flags==9));memcpy(game_sent,data,bytes);game_sent_flags=(unsigned)flags;return 1;}assert(bytes==72);memcpy(sent,data,72);sent_type=sent[4];assert(flags==(sent_type<=2?9:1));return 1;}
+static int send_message(void *self,uint32_t connection,const void *data,uint32_t bytes,int flags,int64_t *number){assert(self && connection && !number);if(bytes==128){assert(flags==9);memcpy(rocket_sent,data,128);++rocket_sends;return 1;}if(bytes==184){assert(flags==9);memcpy(chat_sent,data,bytes);++chat_sends;return 1;}if(bytes==104){assert(!memcmp(data,"JNT3",4) && flags==9);memcpy(travel_sent,data,104);return 1;}if(bytes==JNET_GAME_BYTES){assert(!memcmp(data,"JNG1",4) && (flags==1 || flags==9));memcpy(game_sent,data,bytes);game_sent_flags=(unsigned)flags;return 1;}assert(bytes==72);memcpy(sent,data,72);sent_type=sent[4];assert(flags==(sent_type<=2?9:1));return 1;}
 static unsigned char incoming[72];static unsigned incoming_count,releases;
 static struct jnet_sn_message incoming_message;
 static void release_message(struct jnet_sn_message *m){assert(m==&incoming_message);++releases;}
@@ -433,6 +434,7 @@ static int fake_chirp(jc_layout_reader read,void *ctx,uint64_t game,uint64_t fra
 #define jc_actor_capture_sender fake_capture
 #define jc_chirp_capture_local fake_chirp
 #define own_read NULL
+static unsigned jnet_grab_down;
 #include "jnet_steam_game_live.h"
 #undef own_read
 #undef jc_chirp_capture_local
@@ -489,8 +491,20 @@ static void game_bridge_test(void) {
     assert(traveler_network.peers[1].connection.peer==45 && !traveler_network.peers[1].connection.admitted);
     jnet_lobby_view.member_count=3;jnet_lobby_view.members[2]=46;jnet_sg_game_tick(1);
     assert(traveler_network.peers[1].connection.peer==46 && traveler_network.peers[1].connection.admitted);
+    jnet_sg_mail.records[0]=game_record(44,8);memset(jnet_sg_mail.records+2,0,sizeof(jnet_sg_mail.records[2]));
+    jnet_lobby_view.member_count=2;jnet_lobby_view.members[0]=43;jnet_lobby_view.members[1]=44;
+    traveler_local_state=2;jnet_sg_game_tick(1);
+    assert(traveler_network.peers[0].connection.peer==44 && traveler_network.peers[1].connection.peer==46);
+    traveler_local_state=4;jnet_sg_game_tick(1);
+    assert(traveler_network.peers[0].connection.peer==44 && !traveler_network.peers[1].connection.peer);
+    traveler_actor=NULL;traveler_actor_trial_join_pending=1;jnet_sg_game_tick(1);
+    assert(traveler_network.peers[0].connection.peer==44 && !traveler_network.peers[1].connection.peer);
+    traveler_actor_trial_join_pending=0;jnet_sg_game_tick(1);
+    assert(!traveler_network.peers[0].connection.peer && traveler_network.peers[1].connection.peer==44);
+    assert(traveler_network.peers[1].connection.admitted);
+    LONG retained_extra_samples=JNETSteamGame[27];
     memset(&jnet_lobby_view,0,sizeof(jnet_lobby_view));
-    jnet_sg_reset();jnet_sg_game_tick(1);assert(traveler_network.paused && !JNETSteamGame[26] && !JNETSteamGame[34] && JNETSteamGame[27]==2);
+    jnet_sg_reset();jnet_sg_game_tick(1);assert(traveler_network.paused && !JNETSteamGame[26] && !JNETSteamGame[34] && JNETSteamGame[27]==retained_extra_samples);
     jnet_travel_epoch=original_epoch;
     puts("Steam native bridge fixture: state capture, ordered chirp bursts, stable independent slots, cleanup before replacement, return after separation, stable lobby identity without invented expiry, explicit leave release and stale state expiry passed; no game engine calls.");
 }
@@ -577,39 +591,53 @@ static void travel_test(uint64_t room) {
     struct jnet_lobby_view view={.room=room,.host=42};jnet_travel_members_view(&view);
     assert(view.member_count==3 && view.members[0]==42 && view.members[2]==44);
     JNETSteamLobby[10]=0;
-    assert(jnet_travel_native_request(0) && jnet_travel.restart && !jnet_travel.chapter_select);
+    assert(jnet_travel_native_request(0,0) && jnet_travel.restart && !jnet_travel.chapter_select);
     assert(jc_packet_get(travel_sent+92,4)==2);jnet_travel_reset();
-    assert(jnet_travel_native_request(3) && jnet_travel_busy && jnet_travel.level==3);
+    for(unsigned guest=0;guest<2;++guest){
+        jnet_sl.room=room;jnet_sl.host=42;jnet_sl.identity=guest?43:42;
+        jnet_travel_busy=1;jnet_travel.room=room;jnet_travel_epoch=9;
+        jnet_sl.deferred.kind=2;
+        uint64_t generation=jnet_sl.generation;
+        jnet_travel_leave_for_title();
+        assert(!jnet_sl.room && !jnet_sl.host && !jnet_sl.deferred.kind);
+        assert(!jnet_travel_busy && !jnet_travel.room && !jnet_travel_epoch);
+        assert(jnet_sl.generation==generation+1);
+        assert(!jnet_travel_native_request(0,0));
+    }
+    jnet_sl.room=room;jnet_sl.host=jnet_sl.identity=42;
+    assert(jnet_travel_native_request(0,1) && jnet_travel.restart && jnet_travel.chapter_select);
+    assert(jc_packet_get(travel_sent+92,4)==3);jnet_travel_reset();
+    assert(jnet_travel_native_request(3,0) && jnet_travel_busy && jnet_travel.level==3);
     jnet_travel_reset();jnet_sl.identity=43;
-    assert(jnet_travel_native_request(4) && !jnet_travel_busy);
+    assert(jnet_travel_native_request(4,0) && !jnet_travel_busy);
     jnet_sl.identity=42;
     JNETSteamLobby[10]=0;assert(!jnet_travel_begin(12));assert(jnet_travel_begin(8));
     assert(jnet_travel_busy && jnet_travel_epoch==1 && jc_packet_get(travel_sent+56,4)==8);
     assert(jc_packet_get(travel_sent+92,4)==2 && jnet_travel.restart);
-    unsigned char proposal[96];memcpy(proposal,travel_sent,96);
+    unsigned char proposal[104];memcpy(proposal,travel_sent,104);
     assert(!jnet_travel_begin(9));jnet_travel.local_loaded=1;jnet_travel.loaded=1;
-    jc_packet_put(proposal+4,2,4);proposal[16]^=1;jnet_travel_message(0,proposal,96);assert(jnet_travel.loaded==1);proposal[16]^=1;
-    jnet_travel_message(0,proposal,96);assert(jnet_travel.loaded==3);jnet_travel_poll_live();assert(!jnet_travel_busy);
-    jnet_travel_message(1,proposal,96);assert(jnet_travel.loaded==7);jnet_travel_poll_live();assert(!jnet_travel_busy && jc_packet_get(travel_sent+4,4)==1);
+    jc_packet_put(proposal+4,2,4);proposal[16]^=1;jnet_travel_message(0,proposal,104);assert(jnet_travel.loaded==1);proposal[16]^=1;
+    jnet_travel_message(0,proposal,104);assert(jnet_travel.loaded==3);jnet_travel_poll_live();assert(!jnet_travel_busy);
+    jnet_travel_message(1,proposal,104);assert(jnet_travel.loaded==7);jnet_travel_poll_live();assert(!jnet_travel_busy && jc_packet_get(travel_sent+4,4)==1);
     jnet_travel_reset();jnet_sl.identity=43;jnet_sn.peers[0].identity=42;
     jc_packet_put(proposal+4,1,4);jnet_travel_message(0,proposal,95);assert(!jnet_travel_busy);
-    jnet_travel_message(1,proposal,96);assert(!jnet_travel_busy);
-    jnet_travel_message(0,proposal,96);assert(jnet_travel_busy && jnet_travel.level==8);
-    jc_packet_put(proposal+56,9,4);jnet_travel_message(0,proposal,96);assert(jnet_travel.level==8);jc_packet_put(proposal+56,8,4);
-    jc_packet_put(proposal+4,3,4);jnet_travel_message(0,proposal,96);assert(jnet_travel_busy);
+    jnet_travel_message(1,proposal,104);assert(!jnet_travel_busy);
+    jnet_travel_message(0,proposal,104);assert(jnet_travel_busy && jnet_travel.level==8);
+    jc_packet_put(proposal+56,9,4);jnet_travel_message(0,proposal,104);assert(jnet_travel.level==8);jc_packet_put(proposal+56,8,4);
+    jc_packet_put(proposal+4,3,4);jnet_travel_message(0,proposal,104);assert(jnet_travel_busy);
     jnet_travel.local_loaded=1;jnet_travel_poll_live();assert(!jnet_travel_busy);
-    jnet_travel_message(0,proposal,96);assert(!jnet_travel_busy);
+    jnet_travel_message(0,proposal,104);assert(!jnet_travel_busy);
     jnet_travel_reset();jc_packet_put(proposal+4,1,4);jc_packet_put(proposal+56,7,4);jc_packet_put(proposal+88,0,4);jc_packet_put(proposal+92,6,4);
-    jnet_travel_message(0,proposal,96);assert(jnet_travel_busy && jnet_travel.paradise && jnet_travel.level==7);
+    jnet_travel_message(0,proposal,104);assert(jnet_travel_busy && jnet_travel.paradise && jnet_travel.level==7);
     jnet_travel_reset();jc_packet_put(proposal+92,4,4);
-    jnet_travel_message(0,proposal,96);assert(!jnet_travel_busy);
+    jnet_travel_message(0,proposal,104);assert(!jnet_travel_busy);
     jc_packet_put(proposal+56,8,4);
     jnet_travel_reset();jc_packet_put(proposal+4,1,4);jc_packet_put(proposal+92,1,4);
-    jnet_travel_message(0,proposal,96);assert(!jnet_travel_busy);
+    jnet_travel_message(0,proposal,104);assert(!jnet_travel_busy);
     jc_packet_put(proposal+56,0,4);jc_packet_put(proposal+88,0,4);
-    jnet_travel_message(0,proposal,96);assert(jnet_travel_busy && jnet_travel.chapter_select);
+    jnet_travel_message(0,proposal,104);assert(jnet_travel_busy && jnet_travel.chapter_select);
     jnet_travel.queued=1;jc_packet_put(proposal+48,jnet_travel_epoch+1,8);
-    jnet_travel_message(0,proposal,96);assert(jnet_travel.queued==0);
+    jnet_travel_message(0,proposal,104);assert(jnet_travel.queued==0);
     jnet_travel_reset();assert(!jnet_travel_epoch);jnet_sl.identity=42;
     jnet_sn.peers[0].identity=43;assert(jnet_travel_begin(9));clock_ms=jnet_travel.deadline+1;
     jnet_travel_poll_live();assert(!jnet_travel_busy && jnet_sl.room==room);
@@ -619,19 +647,35 @@ static void travel_test(uint64_t room) {
     rooms[ri].count=2;jnet_sn_members.loaded=0;
     travel_playable=0;jnet_travel_poll_live();assert(!jnet_travel_busy);
     travel_playable=1;jnet_travel_poll_live();assert(jnet_travel_busy && jnet_travel.level==6);
-    unsigned char first_join[96];memcpy(first_join,travel_sent,96);
+    unsigned char first_join[104];memcpy(first_join,travel_sent,104);
     jnet_travel.local_loaded=1;jnet_travel_poll_live();assert(!jnet_travel_busy);
     rooms[ri].count=3;jnet_sn_members.loaded=0;
     jnet_sn.peers[1].admitted=jnet_sn.peers[1].connected=1;
     jnet_travel_poll_live();assert(jnet_travel_busy && jnet_travel_epoch==2);
-    unsigned char second_join[96];memcpy(second_join,travel_sent,96);
+    unsigned char second_join[104];memcpy(second_join,travel_sent,104);
     jnet_travel_reset();jnet_sl.identity=43;jnet_sn.peers[0].identity=42;
-    jnet_travel_message(0,first_join,96);assert(jnet_travel_busy && jnet_travel_epoch==1);
+    jnet_travel_message(0,first_join,104);assert(jnet_travel_busy && jnet_travel_epoch==1);
     jnet_travel.queued=1;jnet_travel.init_before=77;
-    jnet_travel_message(0,second_join,96);
+    jnet_travel_message(0,second_join,104);
     assert(jnet_travel_epoch==2 && jnet_travel.queued==1 && jnet_travel.init_before==77);
     jnet_travel.local_loaded=1;jnet_travel_poll_live();assert(!jnet_travel_busy && jnet_sl.room==room);
     jnet_travel_reset();jnet_current_level=2;
+    jnet_sl.identity=42;jnet_sn.peers[0].identity=43;
+    jnet_daynight_mode=2;jnet_daynight_elapsed=1350000;
+    assert(jnet_travel_begin(3));
+    assert(jc_packet_get(travel_sent+96,4)==2 && jc_packet_get(travel_sent+100,4)==1350000);
+    memcpy(proposal,travel_sent,sizeof(proposal));
+    jnet_travel_reset();jnet_sl.identity=43;jnet_sn.peers[0].identity=42;
+    jc_packet_put(proposal+100,1800000,4);jnet_travel_message(0,proposal,sizeof(proposal));assert(!jnet_travel_busy);
+    jc_packet_put(proposal+100,1350000,4);jc_packet_put(proposal+96,3,4);
+    jnet_travel_message(0,proposal,sizeof(proposal));assert(!jnet_travel_busy);
+    jc_packet_put(proposal+96,2,4);jnet_travel_message(0,proposal,sizeof(proposal));
+    assert(jnet_travel_busy && jnet_daynight_mode==2 && jnet_daynight_sync==1350001);
+    jnet_daynight_sync=0;jnet_travel_message(0,proposal,sizeof(proposal));assert(!jnet_daynight_sync);
+    jnet_travel_reset();jnet_sl.identity=42;jnet_sn.peers[0].identity=43;
+    jnet_daynight_mode=3;assert(jnet_travel_native_request(3,0));
+    assert(jnet_travel.lighting==0 && !jnet_travel.cycle_ms && !jnet_daynight_mode);
+    jnet_travel_reset();jnet_daynight_host=~0u;
     (void)jnet_travel_levels;
     puts("Live travel protocol with fake Steam: host authority, independent local completion, authenticated nonce, replay, invalid destination, ignored legacy resume, local timeout without lobby loss and session reset passed. Native loading not exercised.");
 }
@@ -693,6 +737,9 @@ int JNET_LOBBY_TEST_MAIN(void) {
     set_data((void *)1,public_room,"journet.protocol","steam-game-12");
     assert(jnet_sl_metadata_result(public_room,42)==2);
     set_data((void *)1,public_room,"journet.protocol",JNET_STEAM_PROTOCOL);
+    set_data((void *)1,public_room,"journet.build","different-assets");
+    assert(jnet_sl_metadata_result(public_room,42)==9);
+    set_data((void *)1,public_room,"journet.build",JC_BUILD_ID_HEX);
     assert(!jnet_sl_metadata_result(public_room,42));
     assert(jnet_sl_equal(public_room,"journet.chat","0") && jnet_sl_equal(public_room,"journet.cmatw","0"));
     assert(jnet_sl_equal(public_room,"journet.visibility","public") && !strcmp(data((void *)1,public_room,"journet.code"),""));

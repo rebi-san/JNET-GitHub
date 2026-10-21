@@ -1,6 +1,8 @@
-local creature, decorations, assembly, spawn = ...
-assert(creature and decorations and assembly and spawn)
+local creature, decorations, railBarn, levelEvents, assembly, spawn = ...
+assert(creature and decorations and railBarn and levelEvents and assembly and spawn)
 assert(not __JNETCharacterNative, 'Previous character must be retired first')
+local skin = assembly.character == "War Machine" and (__JNETCharacterSkin or 0) or 0
+assert(skin >= 0 and skin <= 2)
 local objects, events, meshes, markers = {}, {}, {}, {}
 local rows = assembly.objects
 local names = {}
@@ -60,6 +62,11 @@ for _, name in ipairs(names) do
     elseif row.kind == 'Decoration' then
         local desc = resolve(row)
         for axis = 1, 3 do desc.Transformation[12 + axis] = desc.Transformation[12 + axis] + delta[axis] end
+        if row.CoatingParams and skin ~= 0 then
+            desc.Shader = "JNETCharacter_MeshSnowTopSide"
+            desc.ShaderParams = resolve(row.CoatingParams)
+            desc.ShaderParams[#desc.ShaderParams + 1] = {ParamType="texture", ParamName="duneTexture", ParamVal=skin == 2 and "White" or "DuneColorShadow"}
+        end
         local matrix = desc.Transformation
         desc.Transformation = {
             {matrix[1], matrix[2], matrix[3], matrix[4]},
@@ -71,7 +78,7 @@ for _, name in ipairs(names) do
         mesh:SetEnabled(false)
         DecorationInitialize(resources, mesh, desc)
         objects[name] = mesh
-        meshes[#meshes + 1] = {object = mesh, visible = row.CharacterVisible}
+        meshes[#meshes + 1] = {object = mesh, visible = row.CharacterVisible, shader = row.Shader, params = row.ShaderParams, coating = row.CoatingParams}
     elseif row.kind == 'Clump' then
         objects[name] = clumps:CreateClump()
     elseif row.kind ~= 'DynamicNode' and row.kind ~= 'Trigger' then
@@ -120,16 +127,63 @@ if #segments.Objects == 1 then
     ride:clothStiffness(1)
     ride:magnetizeToPlayer(1)
     ride:snapToCenter(0)
-    ride:attractToCloth(2)
+    ride:attractToCloth(1)
 else
     ride = CreaB_WhaleRide.cast(game:eventBarn():MetaAddEvent('CreaB_WhaleRide'))
     ride:creatures(selfClump)
-    ride:allignMult(1.5)
-    ride:magnetizeMult(2)
-    ride:pullMult(2)
+    ride:allignMult(1)
+    ride:magnetizeMult(1)
+    ride:pullMult(1)
     ride:disableHintRegions(nil)
 end
 events[#events + 1] = ride
+if assembly.character == 'Longtail' then
+    local grab = CreaB_WhaleRide.cast(game:eventBarn():MetaAddEvent('CreaB_WhaleRide'))
+    grab:creatures(selfClump)
+    grab:allignMult(1)
+    grab:magnetizeMult(1)
+    grab:pullMult(1)
+    grab:disableHintRegions(nil)
+    events[#events + 1] = grab
+end
+local attack, handler
+if assembly.attack then
+    local targets = clumps:CreateClump()
+    clumps:AllocateClumpStorage(targets, 3)
+    for index = 0, 2 do
+        local marker = markerBarn:CreateMarker()
+        MarkerInitialize(marker, {Position = spawn, Quaternion = {0, 0, 0, 1}, Scale = {1, 1, 1}, Enabled = false})
+        targets:SetAt(index, Class.cast(marker))
+    end
+    local rails = {}
+    for index, desc in ipairs(assembly.attack.rails) do
+        local barn = railBarn
+        local rail = barn:CreateRail()
+        barn:AllocateRailPointStorage(rail, #desc.RailDataPoints)
+        barn:AllocateRailArcParam(rail)
+        RailInitialize(rail, desc)
+        rails[index] = rail
+    end
+    attack = Crea_Attack.cast(levelEvents:MetaAddEvent('Crea_Attack'))
+    attack:creature(creature)
+    attack:guardianEyeSim(objects[assembly.eye])
+    attack:attackTargets(targets)
+    attack:attackRail(rails[1])
+    attack:attackRailRecover(rails[2])
+    attack:angryDuration(assembly.attack.angryDuration)
+    attack:angrySpeed(assembly.attack.angrySpeed)
+    attack:attackSpeed(assembly.attack.attackSpeed)
+    attack:attackTargLerp(assembly.attack.attackTargLerp)
+    attack:considerShouts(false)
+    attack:useHintCam(false)
+    local attacks = clumps:CreateClump()
+    clumps:AllocateClumpStorage(attacks, 1)
+    attacks:SetAt(0, Class.cast(attack))
+    handler = Crea_AttackHandler.cast(game:eventBarn():MetaAddEvent('Crea_AttackHandler'))
+    handler:creature(creature)
+    handler:attackTriggers(attacks)
+    events[#events + 1] = handler
+end
 local native = {
     creature = creature,
     selfClump = selfClump,
@@ -141,6 +195,26 @@ local native = {
     meshes = meshes,
     started = false
 }
+function native:setAppearance(variant)
+    if assembly.character == 'Longtail' or assembly.character == 'Whale' then
+        assert(variant == 0 or variant == 1, 'Invalid cloth appearance')
+        local color = ClothSetColors.cast(game:eventBarn():MetaAddEvent('ClothSetColors'))
+        color:meshes(cloth)
+        color:duration(0)
+        color:playerConversion(false)
+        color:disableAfterInvis(false)
+        color:toDefault(variant == 0)
+        color:toWhite(variant == 1)
+        self.colorEvent = color
+        return
+    end
+    assert(assembly.character == 'War Machine' and variant == skin, 'Coating requires its initialized instance')
+end
+function native:finishAppearance()
+    local color = assert(self.colorEvent)
+    self.colorEvent = nil
+    color:Start()
+end
 function native:teleport(position)
     self.target:SetPosition(position)
     local event = Crea_Teleport.cast(game:eventBarn():MetaAddEvent('Crea_Teleport'))
@@ -170,5 +244,5 @@ function native:startEvents()
         event:Start()
     end
 end
-__JNETCharacterInstances[tostring(__JNETCharacterOwner) .. "|" .. assembly.character] = native
+__JNETCharacterInstances[tostring(__JNETCharacterOwner) .. "|" .. assembly.character .. "|" .. tostring(skin)] = native
 __JNETCharacterNative = native

@@ -1,0 +1,4755 @@
+{
+  "version": "0.248",
+  "scope": "CompanionLab only; no original game files or installed bottles",
+  "retained_rollbacks": [
+    "rollback-0.189-rebishaz",
+    "rollback-0.189-smooviepuffs",
+    "rollback-0.248-devishaz"
+  ],
+  "evidence": "work/research-history/runtime-evidence.json",
+  "removals": [
+    {
+      "path": "work/package-0.174",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5994033
+    },
+    {
+      "path": "work/rollback-0.181-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982224
+    },
+    {
+      "path": "work/package-0.180",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6026276
+    },
+    {
+      "path": "work/rollback-0.180-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 12,
+      "bytes": 4968402
+    },
+    {
+      "path": "work/install-0.229.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10569
+    },
+    {
+      "path": "work/package-0.187",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6028554
+    },
+    {
+      "path": "work/package-0.173",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5989166
+    },
+    {
+      "path": "work/rollback-0.234-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67418534
+    },
+    {
+      "path": "work/rollback-0.235-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67419863
+    },
+    {
+      "path": "work/package-0.145",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3567570
+    },
+    {
+      "path": "work/build-0.243.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/package-0.189",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6035209
+    },
+    {
+      "path": "work/rollback-0.243-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 65,
+      "bytes": 67550551
+    },
+    {
+      "path": "work/rollback-0.242-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 65,
+      "bytes": 67550036
+    },
+    {
+      "path": "work/build-0.242.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.239.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10818
+    },
+    {
+      "path": "work/rollback-0.180-rebishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 12,
+      "bytes": 4968376
+    },
+    {
+      "path": "work/rollback-0.181-rebishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982198
+    },
+    {
+      "path": "work/package-0.188",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6029066
+    },
+    {
+      "path": "work/install-0.188.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/install-0.219.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9765
+    },
+    {
+      "path": "work/check-character-0.221.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/package-0.172",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5987401
+    },
+    {
+      "path": "work/build-0.240.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/package-0.186",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6028042
+    },
+    {
+      "path": "work/package-0.181",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6026506
+    },
+    {
+      "path": "work/package-0.175",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5994331
+    },
+    {
+      "path": "work/check-0.225-menu.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/check-0.224-menu.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/build-0.241.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/runtime-0.233-character-review.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 28931
+    },
+    {
+      "path": "work/rollback-0.200-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5081411
+    },
+    {
+      "path": "work/rollback-0.201-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5240571
+    },
+    {
+      "path": "work/check-character-0.220.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/install-0.209.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7728
+    },
+    {
+      "path": "work/install-0.198.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/build-0.137.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/check-character-build.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.218.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9629
+    },
+    {
+      "path": "work/install-0.189.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6693
+    },
+    {
+      "path": "work/rollback-0.223-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 57,
+      "bytes": 6697710
+    },
+    {
+      "path": "work/rollback-0.222-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 47,
+      "bytes": 6474556
+    },
+    {
+      "path": "work/check-character-0.218.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/build-0.245.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/rollback-0.196-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4998822
+    },
+    {
+      "path": "work/rollback-0.197-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4999577
+    },
+    {
+      "path": "work/package-0.235",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7515342
+    },
+    {
+      "path": "work/package-0.232",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7510882
+    },
+    {
+      "path": "work/build-0.244.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/check-character-0.219.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/package-0.204",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6225397
+    },
+    {
+      "path": "work/install-0.199.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/install-0.208.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7728
+    },
+    {
+      "path": "work/package-0.203",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6228294
+    },
+    {
+      "path": "work/rollback-0.178-rebishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4960110
+    },
+    {
+      "path": "work/install-0.228.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9903
+    },
+    {
+      "path": "work/rollback-0.229-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 57,
+      "bytes": 6726228
+    },
+    {
+      "path": "work/rollback-0.228-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 57,
+      "bytes": 6720746
+    },
+    {
+      "path": "work/build-0.246.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/package-0.202",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6227005
+    },
+    {
+      "path": "work/package-0.205",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6276465
+    },
+    {
+      "path": "work/glyph-reconnect-before-0.143.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 109
+    },
+    {
+      "path": "work/build-0.247.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/package-0.233",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7513426
+    },
+    {
+      "path": "work/rollback-0.217-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 43,
+      "bytes": 6253442
+    },
+    {
+      "path": "work/rollback-0.216-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 43,
+      "bytes": 6253069
+    },
+    {
+      "path": "work/install-0.238.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10788
+    },
+    {
+      "path": "work/package-0.234",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7514701
+    },
+    {
+      "path": "work/rollback-0.178-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4960136
+    },
+    {
+      "path": "work/package-0.229",
+      "reason": "superseded release package",
+      "files": 44,
+      "bytes": 7927970
+    },
+    {
+      "path": "work/build-0.142.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/JNET-0.212.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1498392
+    },
+    {
+      "path": "work/rollback-0.224-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 57,
+      "bytes": 6706912
+    },
+    {
+      "path": "work/JNET-0.206.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1473886
+    },
+    {
+      "path": "work/rollback-0.225-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 57,
+      "bytes": 6708818
+    },
+    {
+      "path": "work/package-0.216",
+      "reason": "superseded release package",
+      "files": 33,
+      "bytes": 7245624
+    },
+    {
+      "path": "work/menu-check-0.247.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/package-0.211",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6176336
+    },
+    {
+      "path": "work/package-0.218",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7460144
+    },
+    {
+      "path": "work/install-0.175.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/rollback-0.191-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4991564
+    },
+    {
+      "path": "work/build-0.208.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.158.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1329498
+    },
+    {
+      "path": "work/package-0.227",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7489866
+    },
+    {
+      "path": "work/install-0.246.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10797
+    },
+    {
+      "path": "work/rollback-0.190-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4991126
+    },
+    {
+      "path": "work/JNET-0.164.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1347087
+    },
+    {
+      "path": "work/build-0.234.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.186.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/install-0.217.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9416
+    },
+    {
+      "path": "work/build-0.220.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.170.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1356571
+    },
+    {
+      "path": "work/install-0.223.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9795
+    },
+    {
+      "path": "work/check-character-controls.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/zig-cache",
+      "reason": "regenerable compiler cache",
+      "files": 8199,
+      "bytes": 221692589
+    },
+    {
+      "path": "work/package-0.220",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7465306
+    },
+    {
+      "path": "work/check-0.238.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6615
+    },
+    {
+      "path": "work/build-war-machine-development.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 181
+    },
+    {
+      "path": "work/install-0.233.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10240
+    },
+    {
+      "path": "work/check-0.210.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/install-0.151.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4940
+    },
+    {
+      "path": "work/JNET-0.171.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1356965
+    },
+    {
+      "path": "work/build-0.221.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.207.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7532
+    },
+    {
+      "path": "work/install-0.196.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/build-0.235.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.165.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1347237
+    },
+    {
+      "path": "work/JNET-0.159.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1337099
+    },
+    {
+      "path": "work/build-0.209.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.165.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5380
+    },
+    {
+      "path": "work/package-0.245",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7651221
+    },
+    {
+      "path": "work/JNET-0.207.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1474939
+    },
+    {
+      "path": "work/JNET-0.213.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1499430
+    },
+    {
+      "path": "work/build-0.143.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/native-check-0.246.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5444
+    },
+    {
+      "path": "work/package-0.242",
+      "reason": "superseded release package",
+      "files": 38,
+      "bytes": 7645302
+    },
+    {
+      "path": "work/check-menu-0.199.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5473
+    },
+    {
+      "path": "work/package-0.221",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7466330
+    },
+    {
+      "path": "work/JNET-0.239.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1878220
+    },
+    {
+      "path": "work/JNET-0.205.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1497651
+    },
+    {
+      "path": "work/build-0.141.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/JNET-0.211.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1473905
+    },
+    {
+      "path": "work/package-0.219",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7464794
+    },
+    {
+      "path": "work/menu-check-0.244.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/package-0.226",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7485574
+    },
+    {
+      "path": "work/install-0.145.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9034
+    },
+    {
+      "path": "work/JNET-0.198.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1391147
+    },
+    {
+      "path": "work/install-0.227.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9817
+    },
+    {
+      "path": "work/build-0.223.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.173.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1358915
+    },
+    {
+      "path": "work/package-0.210",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6276237
+    },
+    {
+      "path": "work/JNET-0.167.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1354543
+    },
+    {
+      "path": "work/build-0.237.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/package-0.228",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7495262
+    },
+    {
+      "path": "work/install-0.171.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/package-0.217",
+      "reason": "superseded release package",
+      "files": 33,
+      "bytes": 7247189
+    },
+    {
+      "path": "work/install-0.213.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7728
+    },
+    {
+      "path": "work/install-0.182.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/install-0.242.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10843
+    },
+    {
+      "path": "work/package-0.243",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7650197
+    },
+    {
+      "path": "work/install-0.192.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/install-0.203.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6674
+    },
+    {
+      "path": "work/check-0.213.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/install-0.161.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5041
+    },
+    {
+      "path": "work/build-0.236.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.166.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1347443
+    },
+    {
+      "path": "work/JNET-0.172.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1358301
+    },
+    {
+      "path": "work/build-0.222.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.237.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10223
+    },
+    {
+      "path": "work/package-0.244",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7650709
+    },
+    {
+      "path": "work/JNET-0.199.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1422897
+    },
+    {
+      "path": "work/install-0.155.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4967
+    },
+    {
+      "path": "work/zig-local-cache",
+      "reason": "regenerable compiler cache",
+      "files": 1195,
+      "bytes": 1562664300
+    },
+    {
+      "path": "work/JNET-0.210.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1497540
+    },
+    {
+      "path": "work/build-0.140.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/JNET-0.204.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1446702
+    },
+    {
+      "path": "work/JNET-0.238.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1859504
+    },
+    {
+      "path": "work/check-resources-0.218.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 117
+    },
+    {
+      "path": "work/rollback-0.210-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5135713
+    },
+    {
+      "path": "work/check-menu-0.198.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5473
+    },
+    {
+      "path": "work/rollback-0.211-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5233523
+    },
+    {
+      "path": "work/JNET-0.200.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1451817
+    },
+    {
+      "path": "work/build-0.144.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/JNET-0.214.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1498249
+    },
+    {
+      "path": "work/JNET-0.228.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1848763
+    },
+    {
+      "path": "work/rollback-0.186-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4983952
+    },
+    {
+      "path": "work/menu-check-0.241.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/rollback-0.187-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4983952
+    },
+    {
+      "path": "work/JNET-0.189.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1379425
+    },
+    {
+      "path": "work/build-0.226.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.176.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1364528
+    },
+    {
+      "path": "work/JNET-0.162.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1345814
+    },
+    {
+      "path": "work/build-0.232.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.226.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9822
+    },
+    {
+      "path": "work/install-0.170.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/rollback-0.233-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67415942
+    },
+    {
+      "path": "work/install-0.183.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/install-0.212.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7728
+    },
+    {
+      "path": "work/rollback-0.232-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67415955
+    },
+    {
+      "path": "work/install-0.243.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10853
+    },
+    {
+      "path": "work/install-0.202.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6774
+    },
+    {
+      "path": "work/install-0.193.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/package-0.157",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5920404
+    },
+    {
+      "path": "work/install-0.160.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5040
+    },
+    {
+      "path": "work/package-0.168",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5981043
+    },
+    {
+      "path": "work/package-0.150",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3582808
+    },
+    {
+      "path": "work/install-0.236.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10342
+    },
+    {
+      "path": "work/build-0.233.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.163.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1346488
+    },
+    {
+      "path": "work/JNET-0.177.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1367813
+    },
+    {
+      "path": "work/build-0.227.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/rollback-0.244-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 65,
+      "bytes": 67546905
+    },
+    {
+      "path": "work/JNET-0.188.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1377016
+    },
+    {
+      "path": "work/rollback-0.245-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 65,
+      "bytes": 67576494
+    },
+    {
+      "path": "work/audit-menu-0.245.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/install-0.154.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4967
+    },
+    {
+      "path": "work/package-0.166",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5963760
+    },
+    {
+      "path": "work/menu-check-0.240.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/package-0.192",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6038234
+    },
+    {
+      "path": "work/package-0.159",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5934568
+    },
+    {
+      "path": "work/JNET-0.229.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 2030947
+    },
+    {
+      "path": "work/package-0.195",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6042785
+    },
+    {
+      "path": "work/JNET-0.215.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1781355
+    },
+    {
+      "path": "work/build-0.145.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 203
+    },
+    {
+      "path": "work/JNET-0.201.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1423257
+    },
+    {
+      "path": "work/package-0.161",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5942446
+    },
+    {
+      "path": "work/check-resources-0.221.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 113
+    },
+    {
+      "path": "work/components-current.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 10230
+    },
+    {
+      "path": "work/rollback-0.238-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67423095
+    },
+    {
+      "path": "work/JNET-0.217.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1782157
+    },
+    {
+      "path": "work/JNET-0.203.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1447042
+    },
+    {
+      "path": "work/menu-check-0.242.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/install-0.174.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/JNET-0.161.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1340172
+    },
+    {
+      "path": "work/build-0.231.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.247.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10743
+    },
+    {
+      "path": "work/build-0.225.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.175.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1361727
+    },
+    {
+      "path": "work/JNET-0.149.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 552685
+    },
+    {
+      "path": "work/install-0.216.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9482
+    },
+    {
+      "path": "work/install-0.187.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/build-0.219.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.222.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9543
+    },
+    {
+      "path": "work/check-0.228.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6266
+    },
+    {
+      "path": "work/rollback-0.182-smooviepuffs",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982418
+    },
+    {
+      "path": "work/package-0.160",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5938807
+    },
+    {
+      "path": "work/package-0.194",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6041276
+    },
+    {
+      "path": "work/check-0.229.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6372
+    },
+    {
+      "path": "work/install-0.232.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9944
+    },
+    {
+      "path": "work/install-0.150.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4916
+    },
+    {
+      "path": "work/rollback-0.207-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5133288
+    },
+    {
+      "path": "work/rollback-0.206-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5233545
+    },
+    {
+      "path": "work/build-0.218.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.197.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/install-0.206.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7506
+    },
+    {
+      "path": "work/JNET-0.148.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 552410
+    },
+    {
+      "path": "work/package-0.193",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6039853
+    },
+    {
+      "path": "work/JNET-0.174.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1361028
+    },
+    {
+      "path": "work/build-0.224.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/package-0.167",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5977519
+    },
+    {
+      "path": "work/build-0.230.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.160.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1338573
+    },
+    {
+      "path": "work/install-0.164.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5298
+    },
+    {
+      "path": "work/check-0.222-menu.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/package-0.158",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5921701
+    },
+    {
+      "path": "work/check-0.223-menu.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/menu-check-0.243.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/package-0.151",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3583320
+    },
+    {
+      "path": "work/package-0.156",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5918513
+    },
+    {
+      "path": "work/JNET-0.202.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1446801
+    },
+    {
+      "path": "work/JNET-0.216.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1781446
+    },
+    {
+      "path": "work/package-0.169",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5981250
+    },
+    {
+      "path": "work/JNET-0.233.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1852791
+    },
+    {
+      "path": "work/JNET-0.227.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1846605
+    },
+    {
+      "path": "work/check-character-controls-0.205.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/install-0.225.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9904
+    },
+    {
+      "path": "work/JNET-0.186.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1376369
+    },
+    {
+      "path": "work/JNET-0.192.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1380860
+    },
+    {
+      "path": "work/JNET-0.179.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1374904
+    },
+    {
+      "path": "work/build-0.229.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.147.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4854
+    },
+    {
+      "path": "work/build-0.215.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.145.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 548673
+    },
+    {
+      "path": "work/JNET-0.151.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 553760
+    },
+    {
+      "path": "work/build-0.201.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.240.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10747
+    },
+    {
+      "path": "work/install-0.211.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7728
+    },
+    {
+      "path": "work/install-0.180.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6542
+    },
+    {
+      "path": "work/check-0.230.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6372
+    },
+    {
+      "path": "work/install-0.173.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/check-network-0.141.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 399
+    },
+    {
+      "path": "work/install-0.163.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5260
+    },
+    {
+      "path": "work/check-0.231.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6372
+    },
+    {
+      "path": "work/check-pending-source.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 181
+    },
+    {
+      "path": "work/install-0.190.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/install-0.201.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6778
+    },
+    {
+      "path": "work/package-0.184",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6027018
+    },
+    {
+      "path": "work/package-0.170",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5982937
+    },
+    {
+      "path": "work/JNET-0.150.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 553379
+    },
+    {
+      "path": "work/package-0.148",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3580674
+    },
+    {
+      "path": "work/build-0.214.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.157.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4967
+    },
+    {
+      "path": "work/build-0.228.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.178.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1368555
+    },
+    {
+      "path": "work/JNET-0.193.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1381663
+    },
+    {
+      "path": "work/package-0.177",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6010600
+    },
+    {
+      "path": "work/check-0.225-characters.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 116
+    },
+    {
+      "path": "work/JNET-0.187.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1376775
+    },
+    {
+      "path": "work/package-0.183",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6027018
+    },
+    {
+      "path": "work/install-0.235.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10277
+    },
+    {
+      "path": "work/rollback-0.214-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5238029
+    },
+    {
+      "path": "work/rollback-0.215-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 31,
+      "bytes": 5460318
+    },
+    {
+      "path": "work/JNET-0.226.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1844254
+    },
+    {
+      "path": "work/JNET-0.232.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1851276
+    },
+    {
+      "path": "work/package-0.179",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6024727
+    },
+    {
+      "path": "work/package-0.146",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3578619
+    },
+    {
+      "path": "work/JNET-0.218.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1831233
+    },
+    {
+      "path": "work/JNET-0.224.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1839873
+    },
+    {
+      "path": "work/JNET-0.230.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1849987
+    },
+    {
+      "path": "work/rollback-0.220-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 47,
+      "bytes": 6473020
+    },
+    {
+      "path": "work/rollback-0.221-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 47,
+      "bytes": 6473532
+    },
+    {
+      "path": "work/install-0.184.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/install-0.215.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 8935
+    },
+    {
+      "path": "work/JNET-0.191.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1380654
+    },
+    {
+      "path": "work/JNET-0.185.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1376340
+    },
+    {
+      "path": "work/install-0.244.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10746
+    },
+    {
+      "path": "work/JNET-0.152.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1325358
+    },
+    {
+      "path": "work/build-0.202.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/build-0.216.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.146.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 551786
+    },
+    {
+      "path": "work/rollback-0.195-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4997313
+    },
+    {
+      "path": "work/rollback-0.194-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4995890
+    },
+    {
+      "path": "work/install-0.221.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9765
+    },
+    {
+      "path": "work/check-0.227.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6125
+    },
+    {
+      "path": "work/check-0.233.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6481
+    },
+    {
+      "path": "work/check-network-0.142.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 470
+    },
+    {
+      "path": "work/package-0.178",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6012067
+    },
+    {
+      "path": "work/check-0.222-characters.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 115
+    },
+    {
+      "path": "work/install-0.153.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4967
+    },
+    {
+      "path": "work/package-0.147",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3578773
+    },
+    {
+      "path": "work/install-0.231.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9957
+    },
+    {
+      "path": "work/JNET-0.147.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 552113
+    },
+    {
+      "path": "work/build-0.217.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.167.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/build-0.203.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.153.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 554535
+    },
+    {
+      "path": "work/JNET-0.184.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1375822
+    },
+    {
+      "path": "work/JNET-0.190.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1379579
+    },
+    {
+      "path": "work/install-0.205.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7497
+    },
+    {
+      "path": "work/install-0.194.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/package-0.149",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3581707
+    },
+    {
+      "path": "work/rollback-0.178-smooviepuffs",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4960138
+    },
+    {
+      "path": "work/package-0.182",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6027018
+    },
+    {
+      "path": "work/package-0.176",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6003889
+    },
+    {
+      "path": "work/JNET-0.231.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1851286
+    },
+    {
+      "path": "work/JNET-0.225.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1843827
+    },
+    {
+      "path": "work/JNET-0.219.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1832934
+    },
+    {
+      "path": "work/package-0.171",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5983589
+    },
+    {
+      "path": "work/rollback-0.180-smooviepuffs",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 12,
+      "bytes": 4968404
+    },
+    {
+      "path": "work/package-0.185",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6028042
+    },
+    {
+      "path": "work/package-0.231",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7510882
+    },
+    {
+      "path": "work/JNET-0.221.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1833467
+    },
+    {
+      "path": "work/JNET-0.235.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1853269
+    },
+    {
+      "path": "work/JNET-0.209.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1474966
+    },
+    {
+      "path": "work/package-0.236",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7515445
+    },
+    {
+      "path": "work/check-0.223-characters.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 115
+    },
+    {
+      "path": "work/package-0.209",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6178427
+    },
+    {
+      "path": "work/JNET-0.194.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1382327
+    },
+    {
+      "path": "work/install-0.214.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7984
+    },
+    {
+      "path": "work/install-0.185.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/package-0.200",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6284670
+    },
+    {
+      "path": "work/JNET-0.180.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1375420
+    },
+    {
+      "path": "work/install-0.245.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10737
+    },
+    {
+      "path": "work/JNET-0.157.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1328789
+    },
+    {
+      "path": "work/build-0.207.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/build-0.213.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/glyph-reconnect-after-0.143.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 791
+    },
+    {
+      "path": "work/install-0.176.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/install-0.220.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9765
+    },
+    {
+      "path": "work/package-0.207",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6178187
+    },
+    {
+      "path": "work/rollback-0.188-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4984464
+    },
+    {
+      "path": "work/check-0.236.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6463
+    },
+    {
+      "path": "work/package-0.238",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7530389
+    },
+    {
+      "path": "work/rollback-0.189-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4984976
+    },
+    {
+      "path": "work/check-0.237.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6463
+    },
+    {
+      "path": "work/check-0.226-menu.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6125
+    },
+    {
+      "path": "work/install-0.152.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4958
+    },
+    {
+      "path": "work/install-0.230.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9966
+    },
+    {
+      "path": "work/install-0.166.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5464
+    },
+    {
+      "path": "work/glyph-0.118.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 46782
+    },
+    {
+      "path": "work/rollback-0.203-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5182924
+    },
+    {
+      "path": "work/build-0.212.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/build-0.206.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/rollback-0.202-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5082306
+    },
+    {
+      "path": "work/JNET-0.156.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1327992
+    },
+    {
+      "path": "work/install-0.195.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/install-0.204.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6734
+    },
+    {
+      "path": "work/JNET-0.181.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1375459
+    },
+    {
+      "path": "work/JNET-0.195.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1382960
+    },
+    {
+      "path": "work/research-history.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 125408
+    },
+    {
+      "path": "work/JNET-0.208.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1475054
+    },
+    {
+      "path": "work/JNET-0.234.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1852936
+    },
+    {
+      "path": "work/JNET-0.220.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1833233
+    },
+    {
+      "path": "work/package-0.206",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6176224
+    },
+    {
+      "path": "work/rollback-0.182-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982416
+    },
+    {
+      "path": "work/check-0.224-characters.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 115
+    },
+    {
+      "path": "work/rollback-0.183-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982928
+    },
+    {
+      "path": "work/JNET-0.236.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1853459
+    },
+    {
+      "path": "work/JNET-0.222.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1834011
+    },
+    {
+      "path": "work/package-0.239",
+      "reason": "superseded release package",
+      "files": 38,
+      "bytes": 7642230
+    },
+    {
+      "path": "work/package-0.201",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6126383
+    },
+    {
+      "path": "work/JNET-0.183.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1375808
+    },
+    {
+      "path": "work/rollback-0.237-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67420655
+    },
+    {
+      "path": "work/install-0.224.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 9795
+    },
+    {
+      "path": "work/rollback-0.236-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67420487
+    },
+    {
+      "path": "work/rollback-0.181-smooviepuffs",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982226
+    },
+    {
+      "path": "work/JNET-0.197.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1389122
+    },
+    {
+      "path": "work/package-0.237",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7518004
+    },
+    {
+      "path": "work/build-0.210.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.154.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1325890
+    },
+    {
+      "path": "work/build-0.204.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.146.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4843
+    },
+    {
+      "path": "work/package-0.208",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6178427
+    },
+    {
+      "path": "work/build-0.238.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.168.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1355763
+    },
+    {
+      "path": "work/package-0.230",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7499383
+    },
+    {
+      "path": "work/install-0.241.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10807
+    },
+    {
+      "path": "work/install-0.181.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6504
+    },
+    {
+      "path": "work/install-0.210.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 7728
+    },
+    {
+      "path": "work/check-0.209.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/install-0.172.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/check-0.235.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6463
+    },
+    {
+      "path": "work/check-0.234.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6463
+    },
+    {
+      "path": "work/rollback-0.241-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67435544
+    },
+    {
+      "path": "work/install-0.162.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5216
+    },
+    {
+      "path": "work/install-0.200.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6756
+    },
+    {
+      "path": "work/install-0.191.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6813
+    },
+    {
+      "path": "work/JNET-0.169.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1356004
+    },
+    {
+      "path": "work/build-0.239.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/install-0.156.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4967
+    },
+    {
+      "path": "work/build-0.205.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.155.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1326672
+    },
+    {
+      "path": "work/build-0.211.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 204
+    },
+    {
+      "path": "work/JNET-0.196.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1383267
+    },
+    {
+      "path": "work/JNET-0.182.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1375630
+    },
+    {
+      "path": "work/install-0.234.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 10294
+    },
+    {
+      "path": "work/rollback-0.209-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5135713
+    },
+    {
+      "path": "work/rollback-0.208-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5135277
+    },
+    {
+      "path": "work/JNET-0.223.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1838654
+    },
+    {
+      "path": "work/rollback-0.182-rebishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982390
+    },
+    {
+      "path": "work/JNET-0.237.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1854140
+    },
+    {
+      "path": "work/check-menu-0.197.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5305
+    },
+    {
+      "path": "work/check-pending-menu.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/JNET-0.244.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1878346
+    },
+    {
+      "path": "work/menu-check-0.239.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 6783
+    },
+    {
+      "path": "work/check-character-0.217.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/package-0.241",
+      "reason": "superseded release package",
+      "files": 38,
+      "bytes": 7644790
+    },
+    {
+      "path": "work/package-0.246",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7655829
+    },
+    {
+      "path": "work/rollback-0.204-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5184113
+    },
+    {
+      "path": "work/rollback-0.205-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5181276
+    },
+    {
+      "path": "work/package-0.212",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6278538
+    },
+    {
+      "path": "work/package-0.215",
+      "reason": "superseded release package",
+      "files": 33,
+      "bytes": 7245287
+    },
+    {
+      "path": "work/chirp-reconnect-before.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 1129
+    },
+    {
+      "path": "work/package-0.223",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7476054
+    },
+    {
+      "path": "work/install-0.169.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/JNET-0.245.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1878288
+    },
+    {
+      "path": "work/package-0.224",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7477960
+    },
+    {
+      "path": "work/package-0.247",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7656341
+    },
+    {
+      "path": "work/JNET-0.247.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1879236
+    },
+    {
+      "path": "work/install-0.149.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4882
+    },
+    {
+      "path": "work/package-0.240",
+      "reason": "superseded release package",
+      "files": 38,
+      "bytes": 7643254
+    },
+    {
+      "path": "work/rollback-0.185-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982928
+    },
+    {
+      "path": "work/rollback-0.184-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4982928
+    },
+    {
+      "path": "work/source-check-0.238.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 181
+    },
+    {
+      "path": "work/rollback-0.231-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 64,
+      "bytes": 67412251
+    },
+    {
+      "path": "work/package-0.225",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7485228
+    },
+    {
+      "path": "work/rollback-0.246-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 65,
+      "bytes": 67576997
+    },
+    {
+      "path": "work/package-0.222",
+      "reason": "superseded release package",
+      "files": 37,
+      "bytes": 7466852
+    },
+    {
+      "path": "work/package-0.214",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6453957
+    },
+    {
+      "path": "work/install-0.159.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5236
+    },
+    {
+      "path": "work/JNET-0.246.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1878870
+    },
+    {
+      "path": "work/package-0.213",
+      "reason": "superseded release package",
+      "files": 21,
+      "bytes": 6280743
+    },
+    {
+      "path": "work/package-0.153",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 3585708
+    },
+    {
+      "path": "work/JNET-0.242.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1879672
+    },
+    {
+      "path": "work/package-0.198",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6057977
+    },
+    {
+      "path": "work/install-0.148.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4869
+    },
+    {
+      "path": "work/package-0.154",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5913185
+    },
+    {
+      "path": "work/tmp",
+      "reason": "regenerable compiler cache",
+      "files": 1,
+      "bytes": 1277
+    },
+    {
+      "path": "work/rollback-0.198-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5010314
+    },
+    {
+      "path": "work/rollback-0.199-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 5014014
+    },
+    {
+      "path": "work/package-0.196",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6043540
+    },
+    {
+      "path": "work/package-0.162",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5959688
+    },
+    {
+      "path": "work/package-0.165",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5963760
+    },
+    {
+      "path": "work/package-0.191",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6037734
+    },
+    {
+      "path": "work/install-0.158.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 4967
+    },
+    {
+      "path": "work/rollback-0.213-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5235824
+    },
+    {
+      "path": "work/rollback-0.212-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 21,
+      "bytes": 5133622
+    },
+    {
+      "path": "work/JNET-0.243.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1878015
+    },
+    {
+      "path": "work/package-0.190",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6035527
+    },
+    {
+      "path": "work/rollback-0.227-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 57,
+      "bytes": 6716459
+    },
+    {
+      "path": "work/package-0.164",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5963248
+    },
+    {
+      "path": "work/rollback-0.226-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 57,
+      "bytes": 6716195
+    },
+    {
+      "path": "work/JNET-0.241.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1879599
+    },
+    {
+      "path": "work/build-0.139.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/install-0.178.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 6841
+    },
+    {
+      "path": "work/package-0.163",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5961904
+    },
+    {
+      "path": "work/package-0.197",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6054277
+    },
+    {
+      "path": "work/rollback-0.192-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4993771
+    },
+    {
+      "path": "work/package-0.155",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5916606
+    },
+    {
+      "path": "work/rollback-0.193-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 11,
+      "bytes": 4994271
+    },
+    {
+      "path": "work/package-0.152",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 5911333
+    },
+    {
+      "path": "work/package-0.199",
+      "reason": "superseded release package",
+      "files": 11,
+      "bytes": 6125374
+    },
+    {
+      "path": "work/rollback-0.219-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 47,
+      "bytes": 6468397
+    },
+    {
+      "path": "work/rollback-0.218-devishaz",
+      "reason": "superseded rollback; latest retained per bottle",
+      "files": 43,
+      "bytes": 6254941
+    },
+    {
+      "path": "work/check-war-machine-development.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 5972
+    },
+    {
+      "path": "work/install-0.168.py",
+      "reason": "superseded one-release installer; receipts and stable installer retained",
+      "files": 1,
+      "bytes": 5611
+    },
+    {
+      "path": "work/build-0.138.log",
+      "reason": "old log; selected evidence preserved in research history",
+      "files": 1,
+      "bytes": 228
+    },
+    {
+      "path": "work/JNET-0.240.zip",
+      "reason": "superseded release or extracted history archive",
+      "files": 1,
+      "bytes": 1879028
+    },
+    {
+      "path": "__pycache__",
+      "reason": "regenerable Python or debug cache",
+      "files": 15,
+      "bytes": 234140
+    },
+    {
+      "path": "diagnostic/__pycache__",
+      "reason": "regenerable Python or debug cache",
+      "files": 1,
+      "bytes": 33943
+    },
+    {
+      "path": "work/native_cloth_appearance_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 31288
+    },
+    {
+      "path": "work/test_evaluation_batch_before.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 102140
+    },
+    {
+      "path": "work/native_cloth_orchestration_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 91710
+    },
+    {
+      "path": "work/read-count-0.60",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 119280
+    },
+    {
+      "path": "work/test_native_cloth_material_live",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 88720
+    },
+    {
+      "path": "work/audit-state-0.245",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 17520
+    },
+    {
+      "path": "work/read-count-0.61",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 119328
+    },
+    {
+      "path": "work/test-native-peer-lifecycle",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 125416
+    },
+    {
+      "path": "work/test_native_appearance.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 239196
+    },
+    {
+      "path": "work/test-appearance-0.126",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 298408
+    },
+    {
+      "path": "work/test_native_cloth_prelaunch",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 88232
+    },
+    {
+      "path": "work/test_native_companion_chirp.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 63066
+    },
+    {
+      "path": "work/native_actor_appearance_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 127376
+    },
+    {
+      "path": "work/test_evaluation_batch_after",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 160328
+    },
+    {
+      "path": "work/test-appearance-0.127",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 335288
+    },
+    {
+      "path": "work/native_cloth_fallback_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 123752
+    },
+    {
+      "path": "work/native_report_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 53872
+    },
+    {
+      "path": "work/test_native_companion_chirp",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 100264
+    },
+    {
+      "path": "work/test-chirp-0.224",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 147632
+    },
+    {
+      "path": "work/test-render-runtime",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 110960
+    },
+    {
+      "path": "work/test_native_cloth_frame",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 350552
+    },
+    {
+      "path": "work/test_evaluation_batch_after.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 105702
+    },
+    {
+      "path": "work/test-chirp-0.225",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 147632
+    },
+    {
+      "path": "work/test-native-peer-lifecycle-0.122",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 125424
+    },
+    {
+      "path": "work/test_traveler_trial_runtime",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 127528
+    },
+    {
+      "path": "work/test_binding_stamp.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 84584
+    },
+    {
+      "path": "work/__pycache__",
+      "reason": "regenerable Python or debug cache",
+      "files": 2,
+      "bytes": 23054
+    },
+    {
+      "path": "work/test_binding_stamp",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 150896
+    },
+    {
+      "path": "work/native_callback_reader_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 56176
+    },
+    {
+      "path": "work/test-native-chirp-0.142",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 146488
+    },
+    {
+      "path": "work/test-link-report-0.63",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 110584
+    },
+    {
+      "path": "work/native_reader_watchdog_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 19234
+    },
+    {
+      "path": "work/test_evaluation_run_after",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 272392
+    },
+    {
+      "path": "work/native_cloth_atlas_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 105358
+    },
+    {
+      "path": "work/JCProbe-production-check.dll",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 624640
+    },
+    {
+      "path": "work/test_native_companion_cloth.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 68654
+    },
+    {
+      "path": "work/test-native-geometry-pool-0.121",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 72640
+    },
+    {
+      "path": "work/test_evaluation_run_after.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 215806
+    },
+    {
+      "path": "work/native_actor_appearance_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 99472
+    },
+    {
+      "path": "work/native_body_appearance_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 258046
+    },
+    {
+      "path": "work/test-drop-in",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 50880
+    },
+    {
+      "path": "work/native_report_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 180760
+    },
+    {
+      "path": "work/native_orchestration_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 96690
+    },
+    {
+      "path": "work/test-packet-0.224",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 103696
+    },
+    {
+      "path": "work/test_helper_exit.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 156160
+    },
+    {
+      "path": "work/test_evaluation_batch_before",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 142160
+    },
+    {
+      "path": "work/test_native_render_gpu",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 727224
+    },
+    {
+      "path": "work/JCProbe-production-check.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1986560
+    },
+    {
+      "path": "work/test-material-0.129",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 145616
+    },
+    {
+      "path": "work/native_cloth_atlas_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 127688
+    },
+    {
+      "path": "work/test-packet-0.225",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 103696
+    },
+    {
+      "path": "work/test-companion-connection-0.141",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 77208
+    },
+    {
+      "path": "work/native_reader_watchdog_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 55232
+    },
+    {
+      "path": "work/check_image_write.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 156160
+    },
+    {
+      "path": "work/native_body_probe_detach_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 30358
+    },
+    {
+      "path": "work/test_native_companion_cloth",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 98216
+    },
+    {
+      "path": "work/native_orchestration_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 182272
+    },
+    {
+      "path": "work/test-glyph-reconnect-0.143",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 228096
+    },
+    {
+      "path": "work/native_body_probe_detach_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 61968
+    },
+    {
+      "path": "work/check_image_write.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1060864
+    },
+    {
+      "path": "work/native_cloth_fallback_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 158064
+    },
+    {
+      "path": "work/probe_dll.lib",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 9500
+    },
+    {
+      "path": "work/test_native_appearance",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 279560
+    },
+    {
+      "path": "work/native_cloth_appearance_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 60416
+    },
+    {
+      "path": "work/native_body_appearance_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 322240
+    },
+    {
+      "path": "work/test_helper_exit.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 761856
+    },
+    {
+      "path": "work/native_cloth_orchestration_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 125616
+    },
+    {
+      "path": "work/test_traveler_trial_runtime.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 106430
+    },
+    {
+      "path": "work/native_callback_reader_fixture.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 24542
+    },
+    {
+      "path": "work/menu/test_jnet_travel_native",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 67504
+    },
+    {
+      "path": "work/menu/test_jnet_texture_guard",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 14544
+    },
+    {
+      "path": "work/menu/test_jnet_frame_pacing",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 19648
+    },
+    {
+      "path": "work/menu/test_jnet_character_volume",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 25056
+    },
+    {
+      "path": "work/menu/test_jnet_character_assets",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 19632
+    },
+    {
+      "path": "work/menu/test_jnet_chat_input",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 25416
+    },
+    {
+      "path": "work/menu/test_jnet_menu_model",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 83000
+    },
+    {
+      "path": "work/menu/test_native_companion_chirp",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 148360
+    },
+    {
+      "path": "work/menu/test_jnet_save_status",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 22536
+    },
+    {
+      "path": "work/menu/test_jnet_character",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 70264
+    },
+    {
+      "path": "work/menu/test_jnet_intro",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 21072
+    },
+    {
+      "path": "work/menu/test_jnet_freeplay_live",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 30696
+    },
+    {
+      "path": "work/menu/image-state-check",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 69376
+    },
+    {
+      "path": "work/menu/test_jnet_steam_lobby",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 609864
+    },
+    {
+      "path": "work/menu/test_jnet_group_travel",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 46744
+    },
+    {
+      "path": "work/menu/test_jnet_appearance_live",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 40296
+    },
+    {
+      "path": "work/menu/test_body_input_0227",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 52360
+    },
+    {
+      "path": "work/menu/test_jnet_menu_draw",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 47592
+    },
+    {
+      "path": "work/menu/test_jnet_rocket",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 642072
+    },
+    {
+      "path": "work/menu/test_jnet_steam_probe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 59104
+    },
+    {
+      "path": "work/menu/test_jnet_menu_live",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 166112
+    },
+    {
+      "path": "work/menu/test_jnet_character_native",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 118088
+    },
+    {
+      "path": "work/menu/test_observation_filter",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 53352
+    },
+    {
+      "path": "work/menu/test_jnet_lobby_runtime",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 54728
+    },
+    {
+      "path": "work/native-actor/test_companion_actor_stream",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 56160
+    },
+    {
+      "path": "work/native-actor/test_native_actor_sanitized",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 168512
+    },
+    {
+      "path": "work/native-actor/test_native_actor_engine",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 520392
+    },
+    {
+      "path": "work/native-actor/test_traveler_trial_runtime",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 236712
+    },
+    {
+      "path": "work/native-actor/test_native_chirp_charge",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 101408
+    },
+    {
+      "path": "work/native-actor/network_reconnect_fixture",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 50760
+    },
+    {
+      "path": "work/native-actor/test_native_scarf_growth",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 97752
+    },
+    {
+      "path": "work/native-actor/compile.o",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 9719
+    },
+    {
+      "path": "work/native-actor/test_traveler_stream_admission",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 54992
+    },
+    {
+      "path": "work/native-actor/test_companion_actor_packet",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 108520
+    },
+    {
+      "path": "work/native-actor/test_native_actor_departure",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 228176
+    },
+    {
+      "path": "work/native-actor/test_native_local_peer",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 146504
+    },
+    {
+      "path": "work/native-actor/test_native_chirp_glyph",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 94648
+    },
+    {
+      "path": "work/native-actor/test_native_sand_consumer",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 76992
+    },
+    {
+      "path": "work/native-actor/test_native_actor_sanitized.dSYM",
+      "reason": "regenerable Python or debug cache",
+      "files": 3,
+      "bytes": 107592
+    },
+    {
+      "path": "work/native-receiver/test_native_receiver_engine",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 31672
+    },
+    {
+      "path": "work/native-cloth/test_native_cloth_engine",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 177728
+    },
+    {
+      "path": "work/network-0.142/test_jnet_menu_model.obj",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 35834
+    },
+    {
+      "path": "work/network-0.142/test_jnet_menu_model",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 68824
+    },
+    {
+      "path": "work/network-0.142/test_traveler_network",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 101376
+    },
+    {
+      "path": "work/network-0.142/test_companion_connection",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 77208
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_partition",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 178104
+    },
+    {
+      "path": "work/companion-components/test_native_lifecycle_abi.lib",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1352
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_producer",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 339048
+    },
+    {
+      "path": "work/companion-components/test_native_dual_body.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1048576
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_material_live",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 195552
+    },
+    {
+      "path": "work/companion-components/test_native_mesh_guard.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1044480
+    },
+    {
+      "path": "work/companion-components/test_native_idle_pose.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 195072
+    },
+    {
+      "path": "work/companion-components/check_skeleton_report",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 70392
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_producer.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 283648
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_producer.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1097728
+    },
+    {
+      "path": "work/companion-components/test_native_idle_pose.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1077248
+    },
+    {
+      "path": "work/companion-components/test_native_mesh_guard.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 159232
+    },
+    {
+      "path": "work/companion-components/test_native_idle_pose",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 142392
+    },
+    {
+      "path": "work/companion-components/test_native_dual_body.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 182784
+    },
+    {
+      "path": "work/companion-components/check_connection_recorder",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 141208
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_prelaunch",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 88232
+    },
+    {
+      "path": "work/companion-components/test_native_animation_playback",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 212000
+    },
+    {
+      "path": "work/companion-components/test_native_shader_inputs",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 125592
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_fault.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1044480
+    },
+    {
+      "path": "work/companion-components/test_native_companion_chirp",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 179544
+    },
+    {
+      "path": "work/companion-components/replay_native_clocks",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 412424
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_partition.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1064960
+    },
+    {
+      "path": "work/companion-components/test_native_receiver",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 106696
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_prelaunch.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 177152
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_frame",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 349976
+    },
+    {
+      "path": "work/companion-components/test_native_companion_chirp.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 199168
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_checkpoint.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1060864
+    },
+    {
+      "path": "work/companion-components/test_native_receiver.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 176640
+    },
+    {
+      "path": "work/companion-components/test_native_lifecycle_abi.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 765952
+    },
+    {
+      "path": "work/companion-components/test_native_receiver.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1064960
+    },
+    {
+      "path": "work/companion-components/test_native_lifecycle_abi.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 157184
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_checkpoint.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 158720
+    },
+    {
+      "path": "work/companion-components/test_native_companion_chirp.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1073152
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_partition.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 212992
+    },
+    {
+      "path": "work/companion-components/test_native_mesh_guard",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 54792
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_prelaunch.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1052672
+    },
+    {
+      "path": "work/companion-components/test_traveler_trial_runtime",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 236712
+    },
+    {
+      "path": "work/companion-components/check_room_status",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 179200
+    },
+    {
+      "path": "work/companion-components/test_companion_room",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 179168
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_fault.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 156672
+    },
+    {
+      "path": "work/companion-components/test_companion_session.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 183808
+    },
+    {
+      "path": "work/companion-components/test_native_evaluation_run",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 417832
+    },
+    {
+      "path": "work/companion-components/test_companion_pose.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1089536
+    },
+    {
+      "path": "work/companion-components/test_native_evaluation_run.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1138688
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_frame.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 823296
+    },
+    {
+      "path": "work/companion-components/test_native_evaluation_layout.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1101824
+    },
+    {
+      "path": "work/companion-components/test_native_initialized_lifetime.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1089536
+    },
+    {
+      "path": "work/companion-components/test_native_peer_lifecycle.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1056768
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_fault",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 54344
+    },
+    {
+      "path": "work/companion-components/test_traveler_trial_runtime.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 228352
+    },
+    {
+      "path": "work/companion-components/test_native_appearance.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1138688
+    },
+    {
+      "path": "work/companion-components/test_native_read_batch",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 89448
+    },
+    {
+      "path": "work/companion-components/test_native_traveler_trial",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 69784
+    },
+    {
+      "path": "work/companion-components/test_native_render_retirement",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 71264
+    },
+    {
+      "path": "work/companion-components/test_native_chapter_gate.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1048576
+    },
+    {
+      "path": "work/companion-components/test_native_shader_inputs.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 192512
+    },
+    {
+      "path": "work/companion-components/test_native_connection_scan",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 209928
+    },
+    {
+      "path": "work/companion-components/test_native_traveler_trial.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 161792
+    },
+    {
+      "path": "work/companion-components/test_native_initialized_lifetime",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 214896
+    },
+    {
+      "path": "work/companion-components/test_native_skeleton_mirror.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 231424
+    },
+    {
+      "path": "work/companion-components/test_native_local_read.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1069056
+    },
+    {
+      "path": "work/companion-components/test_native_read_batch.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1048576
+    },
+    {
+      "path": "work/companion-components/test_native_companion_cloth.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1077248
+    },
+    {
+      "path": "work/companion-components/test_native_companion_cloth.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 218624
+    },
+    {
+      "path": "work/companion-components/test_native_read_batch.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 169984
+    },
+    {
+      "path": "work/companion-components/test_native_skeleton_mirror.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1114112
+    },
+    {
+      "path": "work/companion-components/test_native_local_read.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 166912
+    },
+    {
+      "path": "work/companion-components/test_native_chapter_gate.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 157184
+    },
+    {
+      "path": "work/companion-components/test_native_shader_inputs.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1069056
+    },
+    {
+      "path": "work/companion-components/test_native_traveler_trial.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1044480
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_checkpoint",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 55560
+    },
+    {
+      "path": "work/companion-components/test_native_chapter_gate",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 53608
+    },
+    {
+      "path": "work/companion-components/test_native_appearance.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 334848
+    },
+    {
+      "path": "work/companion-components/check_dual_context",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 124016
+    },
+    {
+      "path": "work/companion-components/test_traveler_trial_runtime.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1101824
+    },
+    {
+      "path": "work/companion-components/test_native_peer_lifecycle.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 186880
+    },
+    {
+      "path": "work/companion-components/test_native_initialized_lifetime.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 223744
+    },
+    {
+      "path": "work/companion-components/test_native_evaluation_layout.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 232448
+    },
+    {
+      "path": "work/companion-components/test_companion_pose.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 197632
+    },
+    {
+      "path": "work/companion-components/test_companion_session.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1073152
+    },
+    {
+      "path": "work/companion-components/test_companion_session",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 107320
+    },
+    {
+      "path": "work/companion-components/test_native_evaluation_run.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 328192
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_frame.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 220672
+    },
+    {
+      "path": "work/companion-components/test_native_evaluation_layout",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 207280
+    },
+    {
+      "path": "work/companion-components/test_companion_room.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1093632
+    },
+    {
+      "path": "work/companion-components/test_native_render_gpu.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 484864
+    },
+    {
+      "path": "work/companion-components/test_native_lifecycle_trace.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 160256
+    },
+    {
+      "path": "work/companion-components/test_native_geometry_pool",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 72104
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_material_live.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 247808
+    },
+    {
+      "path": "work/companion-components/test_native_render_gpu",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 658888
+    },
+    {
+      "path": "work/companion-components/test_native_render_queue.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1077248
+    },
+    {
+      "path": "work/companion-components/check_dual_context.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 174080
+    },
+    {
+      "path": "work/companion-components/test_native_render_queue",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 223864
+    },
+    {
+      "path": "work/companion-components/test_native_animation_playback.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 227328
+    },
+    {
+      "path": "work/companion-components/test_native_geometry_pool.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 163328
+    },
+    {
+      "path": "work/companion-components/test_native_connection_scan.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1118208
+    },
+    {
+      "path": "work/companion-components/test_native_render_retirement.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 161280
+    },
+    {
+      "path": "work/companion-components/test_native_companion_cloth",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 198584
+    },
+    {
+      "path": "work/companion-components/test_native_render_retirement.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1044480
+    },
+    {
+      "path": "work/companion-components/test_native_skeleton_mirror",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 207928
+    },
+    {
+      "path": "work/companion-components/test_native_animation_playback.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1097728
+    },
+    {
+      "path": "work/companion-components/test_native_connection_scan.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 230400
+    },
+    {
+      "path": "work/companion-components/test_native_geometry_pool.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1048576
+    },
+    {
+      "path": "work/companion-components/test_native_dual_body",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 103848
+    },
+    {
+      "path": "work/companion-components/check_dual_context.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1056768
+    },
+    {
+      "path": "work/companion-components/test_native_lifecycle_trace",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 71352
+    },
+    {
+      "path": "work/companion-components/test_native_render_queue.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 219136
+    },
+    {
+      "path": "work/companion-components/check_exit_watch",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 74544
+    },
+    {
+      "path": "work/companion-components/test_native_appearance",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 460840
+    },
+    {
+      "path": "work/companion-components/test_native_local_read",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 54360
+    },
+    {
+      "path": "work/companion-components/test_native_cloth_material_live.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1179648
+    },
+    {
+      "path": "work/companion-components/test_companion_pose",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 160416
+    },
+    {
+      "path": "work/companion-components/test_companion_room.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 209920
+    },
+    {
+      "path": "work/companion-components/test_native_lifecycle_trace.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1044480
+    },
+    {
+      "path": "work/companion-components/test_native_render_gpu.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1253376
+    },
+    {
+      "path": "work/production-check/JNET.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1726464
+    },
+    {
+      "path": "work/production-check/JNET.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 1044480
+    },
+    {
+      "path": "work/production-check/JNET.dll",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 3507712
+    },
+    {
+      "path": "work/production-check/probe_dll.lib",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 9928
+    },
+    {
+      "path": "work/diagnostic-build/Scarfhelper-gui-check.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 888832
+    },
+    {
+      "path": "work/diagnostic-build/Scarfhelper-gui-check.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 282624
+    },
+    {
+      "path": "work/diagnostic-build/Scarfhelper-window-position.pdb",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 876544
+    },
+    {
+      "path": "work/diagnostic-build/Scarfhelper-window-position.exe",
+      "reason": "generated experiment or build binary; source retained",
+      "files": 1,
+      "bytes": 269312
+    },
+    {
+      "path": "work/sound-fix-source.zip",
+      "reason": "source archive duplicates verified extracted reference tree",
+      "files": 1,
+      "bytes": 318702
+    },
+    {
+      "path": "work/helper-exit-fixture-1144",
+      "reason": "old generated exit-recorder fixture logs",
+      "files": 4,
+      "bytes": 69
+    },
+    {
+      "path": "work/rollback-0.247-devishaz",
+      "reason": "superseded rollback after verified 0.248 installation; 0.247 restored by newest rollback",
+      "files": 65,
+      "bytes": 67581665
+    }
+  ],
+  "removed": true,
+  "completed_utc": "2026-10-16T05:20:19.732473+00:00",
+  "followup_0.249": {
+    "completed_utc": "2026-10-16T05:25:29.921327+00:00",
+    "removed": [
+      {
+        "path": "work/install-0.248.py",
+        "reason": "Superseded installer or build log after verified 0.249 installation",
+        "bytes": 11161,
+        "files": 1
+      },
+      {
+        "path": "work/build-0.248.log",
+        "reason": "Superseded installer or build log after verified 0.249 installation",
+        "bytes": 204,
+        "files": 1
+      }
+    ]
+  },
+  "followup_0.250": {
+    "completed_utc": "2026-10-16T05:33:22.343460+00:00",
+    "removed": [
+      {
+        "path": "work/install-0.249.py",
+        "bytes": 11146
+      },
+      {
+        "path": "work/build-0.249.log",
+        "bytes": 204
+      }
+    ]
+  },
+  "followup_0.251": {
+    "completed_utc": "2026-10-16T06:03:04.761753+00:00",
+    "removed": [
+      {
+        "path": "work/install-0.250.py",
+        "bytes": 11082
+      },
+      {
+        "path": "work/build-0.250.log",
+        "bytes": 204
+      },
+      {
+        "path": "work/JNET-0.250.zip",
+        "bytes": 1856906
+      }
+    ]
+  },
+  "followup_0.252": {
+    "completed_utc": "2026-10-16T15:38:17.385717+00:00",
+    "removed": [
+      {
+        "path": "work/install-0.251.py",
+        "bytes": 11076
+      },
+      {
+        "path": "work/build-0.251.log",
+        "bytes": 204
+      },
+      {
+        "path": "work/JNET-0.251.zip",
+        "bytes": 1856917
+      }
+    ]
+  },
+  "followups": [
+    {
+      "version": "0.253",
+      "utc": "2026-10-17T15:19:55.026759+00:00",
+      "reason": "Verified devishaz installation; remove superseded release archives, version installers and routine build logs; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.252.log",
+          "bytes": 204,
+          "sha256": "1832b30c3225255e0735e33c5f76a382a7caedc2e08fca5769e7e44016008292"
+        },
+        {
+          "path": "install-0.252.py",
+          "bytes": 11151,
+          "sha256": "5365d994d33cb77cb45f29b2f3f16a3c1f5dad50443825ad46eec1d0910766f8"
+        },
+        {
+          "path": "JNET-0.252.zip",
+          "bytes": 1859128,
+          "sha256": "6af031acf92b820ec1bb54dce96d144b7f2f5b9b338702beb4daee7daa7f0f5d"
+        }
+      ]
+    },
+    {
+      "version": "0.254",
+      "utc": "2026-10-17T15:45:37.655832+00:00",
+      "reason": "Verified devishaz installation; remove superseded release archives, version installers and routine build logs; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.253.log",
+          "bytes": 204,
+          "sha256": "91b9045d1aa7525b85b45b00da98be2373aed2e5df4d318a736839cf008b060f"
+        },
+        {
+          "path": "install-0.253.py",
+          "bytes": 11209,
+          "sha256": "db54d34c39a18708132056c443c6143fd7b3437beb2c6af233dc58b2a5c4cdb6"
+        },
+        {
+          "path": "JNET-0.253.zip",
+          "bytes": 1891590,
+          "sha256": "01ab89fd7cfc474299be5506ad6509d14ab4f82e942379010722af48e06e4d18"
+        }
+      ]
+    },
+    {
+      "version": "0.255",
+      "utc": "2026-10-17T15:55:48.498974+00:00",
+      "reason": "Verified devishaz installation; remove superseded release archives, version installers and routine build logs; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.254.log",
+          "bytes": 204,
+          "sha256": "2c3bf1bfb12457a676806b4e5ce7fa17eddca77297252533d8d8d17b29a4fe9f"
+        },
+        {
+          "path": "install-0.254.py",
+          "bytes": 11244,
+          "sha256": "2033a98a3d18ccb94add1103d0189d68722b579503bcad6c19fd32897c69adc8"
+        },
+        {
+          "path": "JNET-0.254.zip",
+          "bytes": 1889696,
+          "sha256": "22cc4e7300291c6c38a27d1acbd911d184215a30dce2415b882cbfb4dcd1658e"
+        }
+      ]
+    },
+    {
+      "version": "0.257",
+      "utc": "2026-10-17T16:17:10.180850+00:00",
+      "reason": "Verified devishaz installation; remove superseded release archives, installers and routine build logs; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.256.log",
+          "bytes": 204,
+          "sha256": "4d18d9564bf4da7de7180693f475f23f1606d66c327c7ec71926709a405cd4ab"
+        },
+        {
+          "path": "build-0.255.log",
+          "bytes": 204,
+          "sha256": "b17a81f3353373a72dd37b5bb990bbdf6c29afe925f46704fe66d0e2563402b7"
+        },
+        {
+          "path": "install-0.256.py",
+          "bytes": 11182,
+          "sha256": "800e443f05d3f34ec791c3e10777da20d0dda21717c3c22f0d8400cebce8c774"
+        },
+        {
+          "path": "install-0.255.py",
+          "bytes": 11245,
+          "sha256": "f93c5d1760b4ec15f4e6b3d55a16531d841c614e6516bac1eef2d2e46f120752"
+        },
+        {
+          "path": "JNET-0.256.zip",
+          "bytes": 1891415,
+          "sha256": "b1891023f16db1ba83c9ec6d4b687c686078172361b0e77870fc64d26961b9be"
+        },
+        {
+          "path": "JNET-0.255.zip",
+          "bytes": 1891255,
+          "sha256": "df91c56c12cfbddd78f1b8ef15c8e162806fae5d6b5961a2254030581cba34b5"
+        }
+      ]
+    },
+    {
+      "version": "0.258",
+      "utc": "2026-10-17T16:27:34.501710+00:00",
+      "reason": "Verified devishaz installation; remove superseded release archive, installer and routine build log; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.257.log",
+          "bytes": 204,
+          "sha256": "9087a18cb2014b731a09b7ec2f466208e5ef79e525f8ee44958da5a68f66bf59"
+        },
+        {
+          "path": "install-0.257.py",
+          "bytes": 11207,
+          "sha256": "01ba5629aeace59d296c947e237502fb3aea99168e03c664e58ee743f5627261"
+        },
+        {
+          "path": "JNET-0.257.zip",
+          "bytes": 1891623,
+          "sha256": "6d3ebc260e2c57d752e5b63cf7c5a299ac4276a77ff693a2b1723179031a2a41"
+        }
+      ]
+    },
+    {
+      "version": "0.259",
+      "utc": "2026-10-17T16:32:44.445889+00:00",
+      "reason": "Verified devishaz installation; remove superseded release archive, installer and routine build log; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.258.log",
+          "bytes": 204,
+          "sha256": "1b0e9c611fa089288a81ec9f9d6b157a23177edecf8ad403ff444b1499de2abb"
+        },
+        {
+          "path": "install-0.258.py",
+          "bytes": 11295,
+          "sha256": "17448f04f565ee30d7aa1bca41c16bfb2f9d85e0922f7922aa288044f976c178"
+        },
+        {
+          "path": "JNET-0.258.zip",
+          "bytes": 1931526,
+          "sha256": "e97ad3d5dc6bb73d0fa76f1891e30c941ccafba43fc9ecffd85aa5119e663be8"
+        }
+      ]
+    },
+    {
+      "version": "0.260",
+      "utc": "2026-10-17T16:36:54.821257+00:00",
+      "reason": "Verified devishaz diagnostic installation; remove superseded archive, installer and routine build log; preserve research, tests and rollback.",
+      "removed": [
+        {
+          "path": "build-0.259.log",
+          "bytes": 204,
+          "sha256": "1e8f69f39bae82e73ff904bde3394414d88b669d804824143849a95807f92e2b"
+        },
+        {
+          "path": "install-0.259.py",
+          "bytes": 11251,
+          "sha256": "44206658191e59d98c6965b4cf06c3f035c9bd13570657c07a7f0c42cb2b3a04"
+        },
+        {
+          "path": "JNET-0.259.zip",
+          "bytes": 1931592,
+          "sha256": "1e27f54c85d6cfb23a9f6d51ee25f81cd1baf494bd88750d7a368e84a07db0ba"
+        }
+      ]
+    },
+    {
+      "version": "0.261",
+      "utc": "2026-10-17T16:40:45.629811+00:00",
+      "reason": "Verified devishaz installation; remove superseded archive, installer and routine build log; preserve diagnostic research, tests and rollback.",
+      "removed": [
+        {
+          "path": "build-0.260.log",
+          "bytes": 204,
+          "sha256": "640842b0a0fee4f01b7f425342ca36cebd85b6fe6f4c00317468ab13e243e041"
+        },
+        {
+          "path": "install-0.260.py",
+          "bytes": 11226,
+          "sha256": "b513dad4b16ecda7aa8968a1ac3e84628985ac22968ed8815c04753c52ec8200"
+        },
+        {
+          "path": "JNET-0.260.zip",
+          "bytes": 1931671,
+          "sha256": "d775dd58ade759172d74345f2b93954abf3a86d6969ff8acde582282c63f58f3"
+        }
+      ]
+    },
+    {
+      "version": "0.262",
+      "utc": "2026-10-17T16:45:17.758499+00:00",
+      "reason": "Verified devishaz diagnostic installation; remove superseded archive, installer and routine build log; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.261.log",
+          "bytes": 204,
+          "sha256": "2a4a7c1e2e6d6554bf1d318f056e61f65ff640d35815a92e15c12ab838c416f3"
+        },
+        {
+          "path": "install-0.261.py",
+          "bytes": 11240,
+          "sha256": "7715510150b49e2886a8c9055a8764932c921b80cd4b0be14c5f407a52e33e5d"
+        },
+        {
+          "path": "JNET-0.261.zip",
+          "bytes": 1931651,
+          "sha256": "5ad80596a659cefd28a5abf363c8122aa7f2284f01f86311ec20eadd4c7ae7f5"
+        }
+      ]
+    },
+    {
+      "version": "0.263",
+      "utc": "2026-10-17T16:52:40.037307+00:00",
+      "reason": "Verified devishaz installation; remove superseded archive, installer and routine build log; preserve research and rollback.",
+      "removed": [
+        {
+          "path": "build-0.262.log",
+          "bytes": 204,
+          "sha256": "f46312c09c0b62a8ba9e22783d8f7dbec5d050d9509b031fe5b1ec55dac9a08e"
+        },
+        {
+          "path": "install-0.262.py",
+          "bytes": 11161,
+          "sha256": "442a630050c7c3d0117ccb9e7107496ccd40e428fc54babb58b8f12b2b652877"
+        },
+        {
+          "path": "JNET-0.262.zip",
+          "bytes": 1933554,
+          "sha256": "12594560b606efa4df458e74f0504dc08941f2d9fd212f6225ee88721ea0cfa2"
+        }
+      ]
+    }
+  ]
+}

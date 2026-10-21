@@ -1,0 +1,29 @@
+
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float4 color       VS_ATTR(COLOR0);
+};
+
+struct f2f
+{
+    half4 color        : FINAL_COLOR;
+};
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( v2f IN, out f2f OUT )
+
+FS_START(float4,,)
+
+	output = input.color;
+
+
+SH_END()

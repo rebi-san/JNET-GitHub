@@ -1,0 +1,50 @@
+#include "Migratory.sh"
+
+
+#ifndef _IOS64
+
+// screen width / screen height
+float aspectRatio;
+// maxRadius is the diagnal UV distance from center to the corner
+// sqrt(.25+.25/aspectRatio/aspectRatio)
+float maxRadius;
+float fov;
+float R; // = maxRadius/tan(fov*.5);
+
+struct v2f
+{
+	float4 position VS_ATTR(POSITION);
+	float2 uv       VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+	float4 color : FINAL_COLOR;
+};
+
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+FS_START(float4,,)
+
+	float x = input.uv.x - 0.5;
+	//though screenspace is -1 to 1, field of view on Y is usually smaller than X
+	float y = (input.uv.y - 0.5)/GET_LOCAL(aspectRatio);
+	float r = max(0.00001f, sqrt(x*x + y*y));
+	float t = GET_LOCAL(R)/r*tan(r/GET_LOCAL(maxRadius)*GET_LOCAL(fov)*0.5);
+
+	float2 finalUV;
+	finalUV.x = 0.5 + x*t;
+	finalUV.y = 0.5 + y*t*GET_LOCAL(aspectRatio);
+
+	float2 uvOffset = (finalUV - input.uv);
+	output.rg = uvOffset.xy;
+
+SH_END()
+

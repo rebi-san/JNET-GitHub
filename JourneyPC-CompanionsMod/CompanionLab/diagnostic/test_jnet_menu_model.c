@@ -3,6 +3,21 @@
 #include <stdio.h>
 
 int main(void) {
+    struct jnet_appearance_edit cloth={.draft={.character=JNET_CHARACTER_LONGTAIL}};
+    assert(jnet_appearance_row_count(cloth.draft.character)==7);
+    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,-1,JNET_SCARF_MAX) && cloth.draft.variant==1);
+    assert(!jnet_appearance_apply(&cloth,JNET_SCARF_MAX,1u<<JNET_CHARACTER_LONGTAIL));
+    assert(!jnet_appearance_complete(&cloth,1) && cloth.applied.variant==1);
+    assert(!jnet_appearance_step(&cloth,JNET_SELECT_CHARACTER,1,JNET_SCARF_MAX) && !cloth.draft.variant);
+    assert(cloth.draft.character==JNET_CHARACTER_WHALE);
+    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX) && cloth.draft.variant==1);
+    cloth.draft.character=JNET_CHARACTER_WAR_MACHINE;
+    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX) && cloth.draft.variant==2);
+    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX) && cloth.draft.variant==0);
+    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,-1,JNET_SCARF_MAX) && cloth.draft.variant==2);
+    cloth.draft.character=JNET_CHARACTER_WAYFARER;
+    assert(jnet_appearance_apply(&cloth,JNET_SCARF_MAX,0)==JNET_MENU_INVALID);
+    assert(jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX)==JNET_MENU_UNAVAILABLE);
     struct jnet_appearance_edit maximum={0};
     maximum.draft.scarf_segments=29;
     assert(!jnet_appearance_step(&maximum,JNET_SELECT_SCARF,1,JNET_SCARF_MAX) && maximum.draft.scarf_segments==30);
@@ -89,7 +104,7 @@ int main(void) {
     view.room=0;
     assert(!strcmp(jnet_lobby_labels(&view).action,"Join"));
 
-    struct jnet_appearance_edit edit={.applied={1,5,0,0,0,0},.draft={6,10,1,0,0,0}};
+    struct jnet_appearance_edit edit={.applied={1,5,0,0,0,0,0},.draft={6,10,1,0,0,0,0}};
     assert(jnet_appearance_apply(&edit,10,0)==JNET_MENU_UNAVAILABLE);
     assert(jnet_appearance_apply(&edit,9,1u<<JNET_CHARACTER_LONGTAIL)==JNET_MENU_INVALID);
     assert(!jnet_appearance_apply(&edit,10,1u<<JNET_CHARACTER_LONGTAIL));
@@ -99,20 +114,26 @@ int main(void) {
     assert(!jnet_appearance_complete(&edit,1) && edit.applied.outfit==6 && edit.draft.outfit==2);
     assert(!jnet_appearance_apply(&edit,10,1u<<JNET_CHARACTER_LONGTAIL));
     assert(!jnet_appearance_complete(&edit,0) && edit.applied.outfit==6 && s.room==9);
-    struct jnet_appearance_edit arrows={.draft={3,0,0,0,0,0}};
-    const unsigned order[]={JNET_CHARACTER_LONGTAIL,JNET_CHARACTER_WHALE,JNET_CHARACTER_WAR_MACHINE,JNET_CHARACTER_FLOW_1,JNET_CHARACTER_FLOW_2,JNET_CHARACTER_ROCKET,JNET_CHARACTER_WAYFARER};
-    for(unsigned i=1;i<=JNET_CHARACTER_COUNT;++i){
+    struct jnet_appearance_edit arrows={.draft={3,0,0,0,0,0,0}};
+    const unsigned order[]={JNET_CHARACTER_LONGTAIL,JNET_CHARACTER_WHALE,JNET_CHARACTER_WAR_MACHINE,JNET_CHARACTER_FLOW_1,JNET_CHARACTER_ROCKET,JNET_CHARACTER_WAYFARER};
+    for(unsigned i=1;i<JNET_CHARACTER_COUNT;++i){
         assert(!jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,1,29));
         assert(arrows.draft.character==order[i-1]);
     }
-    for(unsigned i=JNET_CHARACTER_COUNT;i>0;--i){
+    for(unsigned i=JNET_CHARACTER_COUNT-1;i>0;--i){
         assert(!jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,-1,29));
-        assert(arrows.draft.character==order[(i+JNET_CHARACTER_COUNT-2)%JNET_CHARACTER_COUNT]);
+        assert(arrows.draft.character==order[(i+JNET_CHARACTER_COUNT-3)%(JNET_CHARACTER_COUNT-1)]);
     }
     assert(!jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,-1,29) && arrows.draft.character==JNET_CHARACTER_ROCKET);
     assert(jnet_appearance_apply(&arrows,29,1u<<JNET_CHARACTER_LONGTAIL)==JNET_MENU_UNAVAILABLE);
     assert(!jnet_appearance_apply(&arrows,29,1u<<JNET_CHARACTER_ROCKET));
     assert(!jnet_appearance_complete(&arrows,0) && arrows.applied.character==JNET_CHARACTER_WAYFARER);
+    arrows.draft.character=JNET_CHARACTER_FLOW_1;
+    assert(jnet_appearance_row_count(arrows.draft.character)==7);
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_VARIANT,1,29));
+    assert(arrows.draft.character==JNET_CHARACTER_FLOW_2 && arrows.draft.variant==0);
+    assert(!jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,1,29));
+    assert(arrows.draft.character==JNET_CHARACTER_ROCKET);
     arrows.draft.character=JNET_CHARACTER_COUNT;
     assert(jnet_appearance_step(&arrows,JNET_SELECT_CHARACTER,1,29)==JNET_MENU_INVALID);
     assert(jnet_appearance_apply(&arrows,29,~0u)==JNET_MENU_INVALID);

@@ -1,0 +1,71 @@
+#define GLOBAL_LEAN_AND_MEAN
+#include "Migratory.sh"
+
+struct a2v
+{
+#if defined(__ORBIS__)
+	float4 position     POSITION;
+#else
+	float3 position     VS_ATTR(POSITION);
+#endif
+#if defined(TEXTURE_UVW)
+	float3 uv           VS_ATTR(TEXCOORD0);
+#else
+	float2 uv           VS_ATTR(TEXCOORD0);
+#endif
+};
+
+struct v2f
+{
+	float4 position     FS_ATTR(HW_POSITION);
+#if defined(TEXTURE_UVW)
+	float3 uv           FS_ATTR(TEXCOORD0);
+#else
+	float2 uv           FS_ATTR(TEXCOORD0);
+#endif
+};
+
+
+//----------------------------------------------
+//  Resample
+//     - Requires input coords in clip space
+//       Doesn't do any real work, just meant
+//       for resampling (for example, for blurs)
+//----------------------------------------------
+/*
+vertex v2f VS_SlideShow(
+      a2v input [[stage_in]]
+    , constant UniformLocal & UL [[ buffer(kBufferIndexLocalUniforms) ]]
+    , constant UniformGlobal & UG [[ buffer(kBufferIndexGlobalUniforms) ]]
+)
+{
+    v2f output;
+*/
+
+#if SHADERNAME==SlideShow
+
+VS_START()
+
+#else
+
+VS_START()
+
+#endif
+
+#if defined(D_PLATFORM_D3D11) || defined(_IOS64)
+    output.position = float4(input.position.x,-input.position.y, input.position.z, 1);
+#else
+    output.position = float4(input.position.xyz,1);
+#endif
+    output.uv = input.uv;
+
+#if defined(SLIDESHOW_INV_POS_CALC)
+    // scale the vertex position rather than stretch the uv coordinates out of bounds...
+
+    //float scalar = 1.f / ((GET_LOCAL(stretch) + 1) / 2.f);
+    float scalar = 1.f / ((GET_LOCAL(stretch)));
+
+   output.position.x *= scalar;
+#endif
+
+SH_END()

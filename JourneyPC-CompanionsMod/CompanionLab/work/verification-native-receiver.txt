@@ -1,0 +1,66 @@
+native receiver: private staging, sender appearance, invalid input, replay and replacement passed
+Full traveler orchestration: automatic setup, chapter filtering, single initialization, ownership refusal, matching cleanup, restoration and quarantine passed
+Full traveler ownership: glyph append/bounds, source aliasing, animation tables and sound handles passed
+native lifecycle: role identities, wrap/overrun and torn/reused-slot rejection passed
+Session core: three simulated clients / 1800 independent state deliveries; rejection, reconnect, chapter, timeout and 10000 mutation checks passed. No sockets or game clients.
+Inspection batching: full borrow 170 -> 138 underlying reads; ten mid-check mutations, live texture fault, shader write invalidation and isolated results checked.
+Material snapshots: 23 reads single / 25 repeated-list; 16 aliases, both variants, changed owners, interior faults and every truncated read budget checked.
+Full borrow check: 170 reader calls (0.61: 204); all three texture types and fresh identity rereads checked.
+Material batches: dense, sparse, aliased and tagged names; bounds, fresh rereads, partial failures and read limits checked.
+Borrow diagnostics: accepted, definition, original texture, live source identity and trial storage failures distinguished without bypassing checks.
+Spine lookup: identical transform, 33 reads versus 199 for full 63-node scan.
+Appearance: indexed texture slots and 600 frame rotations; trial spine transforms and isolated shader writes; invalid indices, table replacement, cycles, singular matrices, overlapping properties and partial writes rejected. Native setters simulated; no game calls.
+Appearance: repeated instances, validated live texture bindings, named source failures, complete preparation and borrowed-resource changes passed. Native setters simulated; no game calls.
+Geometry pool/build: 19 bounded read-only synthetic checks passed; no native game code executed.
+Ownership retry: every truncated read budget recovers with fresh validation; changed entries/pool and real read failures remain fatal.
+Ownership batches: 23 reads for the three-slot fixture.
+Initialized lifetime: legacy cleanup and four-slot partial/full ownership, missing fourth slot and read faults passed; native calls simulated.
+Dual body: independent objects/controllers/clones, exact four-slot ownership, sole expected slot addition, changed first-body ownership and partial failures checked.
+Mesh guard: growth and free-slot reuse lifecycles, duplicate/context/caller/range rejection passed; no native game code executed.
+Idle matrix inputs: 142 hierarchy rows in 9 reads; final-row NaN/fault, cyclic parent, changed table and count rejected.
+Idle batch: 65 entries in 57 reads; changed headers, pointer tables, entry fields, interior faults and final partial batch checked.
+Idle detail: accepted input and six distinct rejection fields checked; rejected outputs remain empty.
+Idle pose inputs/context: 17 synthetic checks passed; no native calls.
+Animation collection: 245 descriptors, two active clips: 33 reads (scalar scan would use 521).
+Animation batching: unreadable collection tail rejected; every prewrite read-budget interruption preserves active state and retries successfully.
+Binding stamp: same-frame rearm changes only owned payload stamp; fresh frames need no write; rollover, alias, mutation, read budget and write failure rejected; native consumption reports exact row/field.
+Native animation: named schema, exact clip times, additive routing, zero-weight clearing; alias, capacity, descriptor, time, unreadable/mutating storage and write failure checks passed. No native calls.
+Connection scan base-only: 28 reads versus 67 deep; animation arrays are not read on base samples.
+Connection scan: native solo/connected/departure flags, symbols, clips and clocks, shout slots, partial reads, changed context, invalid ranges/nonfinite values; no game writes. Largest format 9137/32000; every truncation checked.
+skeleton mirror: named mapping, independent roots/sibling/originals, mutation/bounds/partial-write checks passed; 3-bone fixture 64 reads
+skeleton mirror batching: 44 underlying reads including native-render postcheck; originals preserved
+142-bone fixture: 132 copy reads, 20 post-render reads; fresh full metadata and all four skeletons checked
+evaluation metadata recheck: 200 scalar reads reduced to 4 fresh bounded reads; unreadable-gap fallback, late mutation and large-range checks passed
+evaluation layout: read-only ownership, pending jobs, bounds, original/sibling preservation and metadata rechecks passed; 280 reads
+Evaluator inspection batching: 483 -> 288 underlying reads in full fixture.
+evaluation run guards: accepted native graphs, activity pruning, callback identity, allocator bounds, output ownership, metadata isolation and rechecks passed
+Companion chirp: stable capture, priming, serial wrap/order, same-frame binding, two independent environmental pulses, no local/remote replay, exact enqueue postcheck, native fingerprint/sound/capacity guards; no Journey calls.
+native companion cloth: scarf charge/length, per-participant outfit/symbol, atlas changes and isolated descriptor failures passed
+native companion cloth: phase, capacity, peer handoff, ownership, native sequencing and retirement scenarios passed
+Read batches: 100 neighboring requests in one read; repeated/overlapping ranges refresh, large reads and write resets invalidate, eviction and partial-page fallbacks preserve faults. No cross-inspection byte cache.
+Shader buffer batching: 54 reads; larger-buffer fallback 64 reads with identical parameter values.
+Read-only native scalar lookup: 50 reads; native first-match precedence, alias/duplicate declarations, missing names, partial reads, mutations and bounds checked. Write guards unchanged.
+Shader input reader: 20 synthetic cases passed; no native shader calls or writes.
+Reciprocal pose policy: distinct transforms; authenticated endpoint pinning, reflection, capability changes, old protocol and chapter recovery checked.
+Animation protocol: numeric clips round-trip; authenticated bad counts, indices, additive flags, non-finite times/speeds, bounds and duplicates preserve last accepted state.
+UDP loopback omitted; authenticated codec and policy tests ran without sockets.
+Pose link: HMAC known answer, per-player appearance, packet validation, identity/replay/chapter/staleness/rate, truncation, 10000 mutations and authenticated non-finite rejection passed. Simulated endpoints, not Journey gameplay.
+Three-endpoint UDP exercise omitted; room admission/relay policies ran without sockets.
+companion room: per-player appearance relay, authentication, admission cap, identity/port pinning, replay, chapter isolation, stale recovery, authenticated departure relay, surviving peer traffic, terminal identity and bounded UDP error policy passed
+mesh transform: 12 native point/direction comparisons, 3 relative origins, 8 unchanged rejections passed
+location: 6 level identity and 6 relative bounds cases passed; no game execution
+chapter policy: hub, unknown, excluded and cross-chapter pairs rejected; eligible same-chapter pairs accepted
+render queue: 10 cases passed
+render retirement planning: 12 cases passed; no native calls or writes
+render reference tracking: acquisition, reuse, replacement, retirement and failure scenarios passed; simulated events only
+private preview: 5 queue cases passed; no rendering executed
+render budget: transient retry, recovery, eight-timeout stop, real errors and pending native work checked
+visibility: 6 model-list/filter/bounds cases passed; no rendering executed
+draw input: 6 count/gate/context/rejection cases and 4 local-item attribution cases passed; no draw calls
+command range: 8 bounded range cases passed
+command attribution: 7 header and geometry-input cases passed
+appearance checkpoints: reproduced 161-byte rejection; all five production formats fit for 891/8191 masks and full signed/unsigned extremes
+checkpoint: 64-record run continues through return/postchecks; 128-record/20,736-byte cap, oversize and each I/O failure passed
+Fault records: exact bounds, full-width codes, relative module offsets and exception filtering passed; no faults raised.
+Inspection reader: 1000 fresh-value reads / one permission query; inspection resets, cross-region rejection, changed permissions, bounded eviction and invalid ranges passed. Host uses simulated mappings; Windows fault recovery requires runtime.
+Verification receipt: /Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/companion-components/verification-no-sockets.json

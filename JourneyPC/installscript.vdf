@@ -1,0 +1,27 @@
+"installscript"
+{
+	"Registry"
+	{
+		"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers"
+		{
+			"string"
+			{
+				"%INSTALLDIR%\\Journey.exe"		"~ HIGHDPIAWARE"
+			}
+		}
+	}
+	"Registry"
+	{
+		"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers"
+		{
+			"string"
+			{
+				"%INSTALLDIR%\\Journey.exe"		"~ HIGHDPIAWARE"
+			}
+		}
+	}
+}
+"kvsignatures"
+{
+	"installscript"		"a623d55018c6ff7b1613dde38170936511a32930cfaa2ee304195d3648f8ea17ce8c5678a9b28a8eb838d0f65787bffe0ee8a49e74c37211bd0b634c6e2f16b67ea20c3e7f7ba54f0551979d61a009c870848bb23909d0dd74c4af809f8d43e046cf2c0f2ba92bb532ec6955e57a41c5ff378f92d6f3e08239aed90edad3182f"
+}

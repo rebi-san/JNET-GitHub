@@ -1,0 +1,58 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+// From Phyre:
+// From environment:
+float4 f_se;
+float4 f_cc, f_fc;
+
+#endif
+
+// Input/output structs
+struct a2v
+{
+	float4 position VS_ATTR(POSITION);
+	float4 color VS_ATTR(COLOR0);
+	float3 normal VS_ATTR(NORMAL);
+};
+
+struct v2f
+{
+	float4 position FS_ATTR(POSITION);
+	float4 color    FS_ATTR(COLOR0);
+	float3 normal   FS_ATTR(TEXCOORD1);
+	float3 eye      FS_ATTR(TEXCOORD2);
+	float3 loc      FS_ATTR(TEXCOORD3);
+	float4 fog      FS_ATTR(TEXCOORD4);
+};
+
+// Program entry
+VS_START()
+
+	// Transform point into clipSpace
+	float3 vPosition = input.position.xyz;
+	output.position = MatrixMul(GET_LOCAL(modelViewProj), float4(vPosition, 1.0f) );
+	output.color = input.color;
+	float4 pos = MatrixMul( GET_LOCAL(model), float4(vPosition, 1.0f) );
+	output.eye = GET_GLOBAL(eyePositionWS.xyz) - pos.xyz;
+	output.normal = input.normal;
+	
+	//float light = saturate(dot( input.normal, normalize( float3( 0, 1, 0 ) ) ));
+	//output.color.rgb = light * output.color.rgb;
+	
+	output.loc.xyz = input.position.xyz;
+	
+	// Fog
+	float hc = GET_GLOBAL(eyePositionWS.y) - GET_GLOBAL(f_se.z);
+	float h = pos.y - GET_GLOBAL(f_se.z);
+	float H = GET_GLOBAL(f_se.w) - GET_GLOBAL(f_se.z);
+	
+	float fogY = 0.5 * (1 - saturate( h / H ) + 1 - saturate( hc / H ));
+	fogY *= (h>hc)?saturate( (H - hc) / (h - hc) ):saturate( (H - h) / (hc - h) );
+	
+	float fogRatio = saturate( (fogY * length( output.eye.xyz ) - GET_GLOBAL(f_se.x)) / (GET_GLOBAL(f_se.y) - GET_GLOBAL(f_se.x)) );
+	fogRatio *= fogRatio;
+	float4 fogColorAlpha = lerp( GET_GLOBAL(f_cc), GET_GLOBAL(f_fc), fogRatio );
+	output.fog = float4( fogColorAlpha.rgb, fogRatio*fogColorAlpha.a );
+
+SH_END()

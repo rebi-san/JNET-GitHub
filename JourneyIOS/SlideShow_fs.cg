@@ -1,0 +1,104 @@
+#include "Migratory.sh"
+// Authour: John Edwards
+// Date C: 8-29-2007
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+#ifndef _IOS64
+
+// Blending params.
+float3 bgColor;
+float gameInt;
+float slideInt;
+float stretch;
+float slideFade;
+
+// The current slide texture.
+D_DECLARE_TEXTURE2D_4(slideTex);
+D_DECLARE_TEXTURE2D_4(slideTex2);
+
+
+
+// Stream structs:
+struct v2f
+{
+	float4 clipSpace    VS_ATTR(POSITION);
+	float2 uv           VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+	float4 color : FINAL_COLOR;
+};
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+/*
+//DECL_SHADERSTART(fragment, float4)
+fragment float4 FS_SlideShow
+(
+      v2f IN [[stage_in]]
+    , constant UniformLocal & UL [[ buffer(kBufferIndexLocalUniforms) ]]
+    , constant UniformGlobal & UG [[ buffer(kBufferIndexGlobalUniforms) ]]
+    TEX2(
+        2D, slideTex,
+        2D, slideTex2)
+)
+{
+    float4 output;
+    SMP_TEX2(
+        2D, slideTex,
+        2D, slideTex2)
+*/
+
+/*
+fragment float4 FS_SlideShow(
+      v2f IN [[stage_in]]
+    , constant UniformLocal & UL [[ buffer(kBufferIndexLocalUniforms) ]]
+    , constant UniformGlobal & UG [[ buffer(kBufferIndexGlobalUniforms) ]]
+    , texture2d<float> t_slideTex [[texture(0)]]
+    , sampler s_slideTex [[sampler(0)]]
+    , texture2d<float> t_slideTex2 [[texture(1)]]
+    , sampler s_slideTex2 [[sampler(1)]]
+)
+{
+    sampler2D slideTex = { t_slideTex, s_slideTex };
+    sampler2D slideTex2 = { t_slideTex2, s_slideTex2 };
+    float4 output;
+*/
+
+
+
+FS_START(float4,
+    TEX2(
+        2D, slideTex,
+        2D, slideTex2),)
+
+#if defined(D_PLATFORM_D3D11)
+	float2 slideUv = float2( 0.5 + (input.uv.x - 0.5) * GET_LOCAL(stretch), 1.0f - input.uv.y );
+#else
+	//float2 slideUv = float2( 0.5 + (input.uv.x - 0.5) * GET_LOCAL(stretch), input.uv.y );
+    float2 slideUv = input.uv.xy;
+#endif
+	float3 slideColor1 = tex2D( slideTex, slideUv ).rgb;
+	float3 slideColor2 = tex2D( slideTex2, slideUv ).rgb;
+	float3 slideColor = lerp(slideColor1, slideColor2, GET_LOCAL(slideFade));
+
+	// Based on the desired intensity of the game and the slide show, we need
+	// to calculate color and alpha values for the final pixel.
+	output.rgb = lerp( GET_LOCAL(bgColor), slideColor, GET_LOCAL(slideInt) );
+	output.a = 1.0 - GET_LOCAL(gameInt);
+
+    if(GET_LOCAL(slideFade)==77)
+    {
+        output.a *= tex2D( slideTex, slideUv ).a;
+    }
+
+SH_END()
+

@@ -1,0 +1,317 @@
+
+#ifndef _SHADERCOMMON_
+#define _SHADERCOMMON_
+
+//-------------------------------------------------------------------------------
+// platform specific markup defines
+//-------------------------------------------------------------------------------
+
+#ifdef SHADERNAME
+	#ifndef _WIN64
+		#define _IOS64          // we just assume its ios if the shadername is set...
+	#endif
+#endif
+
+#if defined(_WIN64)
+
+#include "ShaderCommonWin64.cg"
+#define NO_SHADER_DEFINES
+
+#elif defined(_IOS64)
+
+#include "ShaderCommonIOS64.cg"
+#define NO_SHADER_DEFINES
+
+#elif defined(__ORBIS__)
+
+//-------------------------------------------------------------------------------
+//	PS4
+//-------------------------------------------------------------------------------
+
+#	define	HW_COLOR(N)			S_TARGET_OUTPUT##N
+#	define	HW_POSITION			S_POSITION
+#	define	HW_DEPTH			S_DEPTH_OUTPUT
+
+// hardware sprites done via geometry shader
+#	define	SPRITECOORD			TEXCOORD0
+
+// centroid parameter modifier - goes before type, like const
+#	define	CENTROID(TYPE,NAME,SEMANTIC)			centroid TYPE NAME : SEMANTIC
+
+// MB: Currently PS4 does not use halves?
+#	define	half				float
+#	define	half2				float2
+#	define	half3				float3
+#	define	half4				float4
+#	define	half3x4				float3x4
+
+// row major matrices
+#pragma pack_matrix (row_major) 
+
+// 6459 - semantic
+// 5203 - paramter unref'd
+// 5206 - local unref'd
+#pragma warning (disable: 6459 5203 5206)
+
+struct sampler2D
+{
+	Texture2D		tex;
+	SamplerState	sampler;
+};
+
+struct samplerCUBE
+{
+	TextureCube		tex;
+	SamplerState	sampler;
+};
+
+#if defined(__PSSL_PS__)
+float4 tex2D( const sampler2D tex, float2 uv )
+{
+	return tex.tex.Sample(tex.sampler,uv);
+}
+float4 texCUBE( const samplerCUBE tex, float3 uv )
+{
+	return tex.tex.Sample(tex.sampler,uv);
+}
+#else
+float4 tex2D( const sampler2D tex, float2 uv )
+{
+	return tex.tex.SampleLOD(tex.sampler,uv,0);
+}
+#endif
+
+#define h4tex2D(X,Y)	((half4)tex2D(X,Y))
+#define h3tex2D(X,Y)	((half3)tex2D(X,Y).rgb)
+#define h2tex2D(X,Y)	((half2)tex2D(X,Y).rg)
+#define h1tex2D(X,Y)	((half)tex2D(X,Y).r)
+#define f1tex2D(X,Y)	(tex2D(X,Y).r)
+
+#define h3texCUBE(X,Y)	((half3)texCUBE(X,Y).rgb)
+
+
+float4 ReadTexProj( const sampler2D tex, float4 uv )
+{
+	return tex.tex.Sample(tex.sampler,uv.xy/uv.w);
+}
+
+float ReadDepth( const sampler2D tex, float2 uv )
+{
+	return tex.tex.Sample(tex.sampler,uv).r;
+}
+float ReadDepthProj( const sampler2D tex, float4 uv )
+{
+	return tex.tex.Sample(tex.sampler,uv.xy/uv.w).r;
+}
+
+int imodulo(float numer, uint denom)
+{
+	return ((int)floor(numer))%denom;
+}
+
+
+float alphaRef;
+void DiscardLE( float alpha, float ref=alphaRef )
+{
+	if( alpha<=ref )
+		discard;
+}
+
+void DiscardGE( float alpha, float ref=alphaRef )
+{
+	if( alpha>=ref )
+		discard;
+}
+
+#elif defined(__psp2__)
+
+//-------------------------------------------------------------------------------
+//	vita
+//-------------------------------------------------------------------------------
+
+#	define	NATIVECOLOR		__nativecolor __regformat
+#	define	REGFORMAT		__regformat
+#	define	FRAGBLEND
+#	if defined(MSAA)
+#		define	MSAA __msaa
+#	endif
+#	define	CENTROID(TYPE,NAME,SEMANTIC)			TYPE NAME : SEMANTIC##_CENTROID
+
+// 6204 - does not support default valueson uniforms
+#pragma warning (disable: 6204)
+
+
+half4 ReadTexProj( sampler2D tex, float4 uv )
+{
+	return tex2Dproj(tex,uv.xyw);
+}
+
+float ReadDepth( sampler2D tex, float2 uv )
+{
+	return tex2D<float>(tex,uv);
+}
+
+float ReadDepthProj( sampler2D tex, float4 uv )
+{
+	return tex2Dproj<float>(tex,uv.xyw);
+}
+
+int imodulo(float numer, float denom )
+{
+	return (int)floor(numer - floor(numer/denom)*denom);
+}
+
+
+float alphaRef;
+void DiscardLE( float alpha, float ref=alphaRef )
+{
+	if( alpha <= ref )
+		discard;
+}
+void DiscardLE( half alpha, half ref=(half)alphaRef )
+{
+	if( alpha <= ref )
+		discard;
+}
+void DiscardGE( float alpha, float ref=alphaRef )
+{
+	if( alpha >= ref )
+		discard;
+}
+void DiscardGE( half alpha, half ref=(half)alphaRef )
+{
+	if( alpha >= ref )
+		discard;
+}
+
+
+#else
+
+    #pragma error "unknown platform"
+
+#endif
+
+
+
+
+#ifndef PASS_UG
+    #define PASS_UG
+#endif
+
+#ifndef UNIFORM_PASS_PARAM
+    #define UNIFORM_PASS_PARAM
+#endif
+
+#ifndef CBG
+    #define CBG(xxx)                xxx
+#endif
+
+#ifndef DEPTHTEX_SAMPLER
+    #define DEPTHTEX_SAMPLER                sampler2D depthTex,
+#endif
+
+
+
+
+
+//-------------------------------------------------------------------------------
+//	defaults
+//-------------------------------------------------------------------------------
+#ifndef HW_POSITION
+#	define HW_POSITION		POSITION
+#endif
+#ifndef HW_COLOR
+#	define	HW_COLOR(X)		COLOR##X
+#endif
+#ifndef HW_DEPTH
+#	define	HW_DEPTH		DEPTH
+#endif
+
+#ifndef REGFORMAT
+#	define REGFORMAT
+#endif
+#ifndef NATIVECOLOR
+#	define NATIVECOLOR
+#endif
+
+#ifndef _IOS64 //wtf why is MSAA always defined??
+    #ifndef MSAA
+        #	define MSAA
+    #endif
+#endif
+
+#ifndef CENTROID
+#	define CENTROID(TYPE,NAME,SEMANTIC)		TYPE NAME : SEMANTIC
+#endif
+
+
+//-------------------------------------------------------------------------------
+//	Depth buffer
+//-------------------------------------------------------------------------------
+
+#ifdef _IOS64
+
+
+inline float4x4 GetClipToProjMatrix()
+{
+    float4x4 ClipToProjTexMtx(
+        float4( 0.5f, 0.0f, 0.0f, 0.5f ),
+        float4( 0.0f, -0.5f, 0.0f, 0.5f ),
+        float4( 0.0f, 0.0f, 1.0f, 0.0f ),
+        float4( 0.0f, 0.0f, 0.0f, 1.0f ));
+    return ClipToProjTexMtx;
+}
+
+#define SCALE_BIAS GetClipToProjMatrix()
+
+inline float4 ClipToProjTex( float4 hPos )
+{
+    float4x4 ClipToProjTexMtx(
+        float4( 0.5f, 0.0f, 0.0f, 0.5f ),
+        float4( 0.0f, -0.5f, 0.0f, 0.5f ),
+        float4( 0.0f, 0.0f, 0.5f, 0.5f ),
+        float4( 0.0f, 0.0f, 0.0f, 1.0f ));
+    return mul( ClipToProjTexMtx, hPos );
+}
+
+#else
+
+#if defined(__psp2__) || defined(__ORBIS__) || defined(_WIN64)
+const static float4x4 ClipToProjTexMtx = float4x4(
+	float4( 0.5, 0.0, 0.0, 0.5 ),
+	float4( 0.0, -0.5, 0.0, 0.5 ),
+	float4( 0.0, 0.0, 0.5, 0.5 ),
+	float4( 0.0, 0.0, 0.0, 1.0 )
+	);
+#elif defined(_IOS64)
+// inside the function below...
+#else
+const static float4x4 ClipToProjTexMtx = float4x4(
+	float4( 0.5, 0.0, 0.0, 0.5 ),
+	float4( 0.0, 0.5, 0.0, 0.5 ),
+	float4( 0.0, 0.0, 0.5, 0.5 ),
+	float4( 0.0, 0.0, 0.0, 1.0 )
+	);
+#endif
+
+inline float4 ClipToProjTex( float4 hPos )
+{
+	return mul( ClipToProjTexMtx, hPos );
+}
+
+#endif
+
+
+
+
+
+#ifndef ADD_TECHNIQUE
+	#define ADD_TECHNIQUE
+#endif
+
+#ifndef SHADER_NO_PERSPECTIVE
+	#define SHADER_NO_PERSPECTIVE
+#endif
+
+#endif
+

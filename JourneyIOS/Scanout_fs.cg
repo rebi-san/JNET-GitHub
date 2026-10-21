@@ -1,0 +1,61 @@
+#include "Migratory.sh"
+// Notes:  Applies lens distortion.
+//         Meant to be used as the scanout shader.
+//
+// Author: John Edwards
+// Date C: 5-6-2010
+
+
+#ifndef _IOS64
+
+D_DECLARE_TEXTURE2D_4(texUvOffset);
+D_DECLARE_TEXTURE2D_4(texColor);
+
+float4x4 colorCorrect;
+
+struct v2f
+{
+	float4 position VS_ATTR(POSITION);
+	float2 uv       VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+	float4 color : FINAL_COLOR;
+};
+
+#endif
+
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+FS_START(half4,
+    TEX2(
+        2D, texUvOffset,
+        2D, texColor),)
+
+
+	float2 uvOffset = tex2D( texUvOffset, input.uv ).xy;
+	float2 finalUV = input.uv + uvOffset;
+
+	output = (half4)tex2D( texColor, finalUV );
+
+	// The input texture comes out of EdgePost, which shuffles colors around.
+#if defined(D_PLATFORM_GCM)
+	output.color.rgba = output.color.gbar;
+#endif
+	// Color correction is a simple matrix multiplication.  Can't deal
+	// with gamma, this way ...
+#ifdef _IOS64
+    output.rgb = ((half4x4)GET_LOCAL(colorCorrect) * half4( output.rgb, 1.0h )).rgb; // note - inverse ordering, as we upload transposed!
+    output.a = dot(output.rgb, half3(0.299h, 0.587h, 0.114h));
+#else
+	output.rgb =  mul( GET_LOCAL(colorCorrect), float4( output.rgb, 1.0 ) ).rgb;
+    output.a = dot(output.rgb, float3(0.299f, 0.587f, 0.114f));
+#endif
+
+
+SH_END()

@@ -1,0 +1,23 @@
+
+#include "Migratory.sh"
+
+struct p2v
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+};
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+};
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+void main( in p2v IN, out v2f OUT )
+{
+	OUT.position = IN.position;
+	OUT.uv = IN.uv;
+}

@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include "native_companion_chirp.h"
+#include "jnet_character.h"
+#include "jnet_character_audio.h"
 static unsigned char game_data[0x200],barn_data[JC_CHIRP_BARN_BYTES],sound_data[0x7c7b8],code_data[16],trampoline[24];
 static const uint64_t game=0x100000,barn=0x200000,sounds=0x300000,image=0x140000000;
 static unsigned reads,mutate,fail,deny;
@@ -192,6 +194,21 @@ int main(void) {
         assert(!strcmp((char *)bridge.name,jc_chirp_sound_name(sound,0)));
         native_stub(&bridge);assert(!jc_chirp_bridge_post(read_memory,NULL,2,&bridge));
     }
+    for(unsigned kind=0;kind<JNET_CHARACTER_COUNT;++kind)
+        for(unsigned charge=1;charge<=4;++charge)
+            for(unsigned sequence=0;sequence<4;++sequence){
+                unsigned variant=jnet_character_chirp_variant(kind,sequence,charge);
+                unsigned sound=variant?variant:charge;
+                fixture();u32(sound_data+0x7c7b4,9);
+                strcpy((char *)sound_data+0x70234+8*0x13c,jc_chirp_sound_name(sound,0));
+                assert(!poll(1));shout(3,0,1,0,variant?8:charge-1);
+                assert(!poll(2) && batch.count==1 && batch.source[0].event.sound==sound);
+                e=extra(201);assert(!prepare(&e,2));
+                assert(!strcmp((char *)bridge.name,jc_chirp_sound_name(sound,1)));
+                assert(!memcmp(bridge.input,e.position,12));
+                native_stub(&bridge);assert(!jc_chirp_bridge_post(read_memory,NULL,2,&bridge));
+            }
+    puts("All seven characters: four charge levels and four variants captured and delivered with preserved origin; native audio playback is stubbed.");
     ready(); e=extra(201); for (unsigned i=0;i<16;++i) barn_data[i*0x70+0x68]=1;
     assert(prepare(&e,2)==JC_CHIRP_FULL);
     ready(); e=extra(201); assert(!prepare(&e,2)); native_stub(&bridge); ++barn_data[3*0x70+0x4d];

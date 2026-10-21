@@ -1,0 +1,313 @@
+{
+  "game_runtime_tested": false,
+  "transport_implemented": "IPv4 localhost pose prototype; Wine runtime unverified",
+  "installed": false,
+  "checks": {
+    "native_peer_lifecycle": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Peer lifecycle policy: 128 replacements, ordered departure, two-second med hold, abrupt/timeout fallback, identity rejection, effect/GPU drain gates, reentrancy and quarantine passed; native services mocked, no Journey validation"
+    },
+    "native_cloth_producer": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Cloth producer: 28 current-job ownership, pass0/pass1, partition sizing, fresh capture, rollback and quarantine scenarios passed; no native scheduling or GPU publication"
+    },
+    "native_cloth_prelaunch": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Cloth prelaunch: late output/base adoption, native ring checks, all eight partial-write rollback points, changed mappings and uncertain restoration; no game runtime"
+    },
+    "native_chapter_gate": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Chapter gate: retained request after native clear, delayed drain, once-only replay, latest target, failed drain, changed game/thread and unterminated target rejected; no game runtime"
+    },
+    "native_render_gpu": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Actor whole-frame marker: body/glyph consumption and main-renderer identity guards, flush-before-reserve, arm-before-handoff, GPU-delayed retirement and failed-reservation retention passed\nAutomatic native render publication: shared-shader item scopes, nested dispatch isolation, private stream redirection, mixed/reversed native handoffs, all-batch EVENT retirement, changed command/executor and premature-discard rejection, native culling and exact-frame closure passed\nRender registration: stock plus private models, empty-stock fallback, queue publication and precise pre-publication refusals passed; material commit simulated.\nProduction D3D backend: private buffer creation/mapping, exclusive leases, worker-gated unmap, publication armed before synchronous handoff, GPU-gated chapter cleanup, End/GetData ordering and errors passed with intercepted COM; no GPU runtime or material construction"
+    },
+    "native_cloth_material_live": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Cloth material guards: recursive graphics lock/failure balance; private atlas copy, reload isolation, frame pins, all partial clone rollback, changed source rejection, unsupported layout rejection and sampler cache alias; subscriber and shader guards passed. GPU calls mocked, native construction not executed"
+    },
+    "native_render_retirement": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Render retirement: command-range ownership, containing execution, partial-range rejection, duplicate execution, pending GPU state, completion, quarantine and capacity passed; no GPU execution"
+    },
+    "native_cloth_frame": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Cloth frame: retained streams/atlases, independent peer materials, acquisition rollback, native-worker fence gate, immutable queued views, delayed retirement, reuse rejection and uncertain-publication quarantine passed"
+    },
+    "native_cloth_partition": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "cloth partition: stock plus two recipients, 1000 job orders, rounded capacity; worker routing rejects duplicate/stale/changed jobs and invalid subdivision; completion required; native worker execution checked separately"
+    },
+    "native_receiver": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "native receiver: private staging, sender appearance, invalid input, replay/replacement and bounded single-use actor projection passed"
+    },
+    "traveler_trial_runtime": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Full traveler orchestration: automatic setup, chapter filtering, single initialization, ownership refusal, matching cleanup, restoration and quarantine passed"
+    },
+    "native_traveler_trial": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Full traveler ownership: glyph append/bounds, source aliasing, animation tables and sound handles passed"
+    },
+    "native_lifecycle_trace": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "native lifecycle: role identities, wrap/overrun and torn/reused-slot rejection passed"
+    },
+    "companion_session": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Session core: three simulated clients / 1800 independent state deliveries; rejection, reconnect, chapter, timeout and 10000 mutation checks passed. No sockets or game clients."
+    },
+    "native_appearance": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Body outfit: all seven tiers select independent red/white base and glow textures; bounded leases survive color changes, missing resources fail closed, release requires native destruction.\nBody source: 49 local/retained outfit combinations accepted; invalid outfit and missing definition rejected.\nBody appearance: four retained textures, static material values, original preservation, untouched environment/glow, partial failure retention and destruction-only release passed; native setters/refcounts simulated.\nInspection batching: full borrow 170 -> 138 underlying reads; ten mid-check mutations, live texture fault, shader write invalidation and isolated results checked.\nMaterial snapshots: 23 reads single / 25 repeated-list; 16 aliases, both variants, changed owners, interior faults and every truncated read budget checked.\nFull borrow check: 170 reader calls (0.61: 204); all three texture types and fresh identity rereads checked.\nMaterial batches: dense, sparse, aliased and tagged names; bounds, fresh rereads, partial failures and read limits checked.\nBorrow diagnostics: accepted, definition, original texture, live source identity and trial storage failures distinguished without bypassing checks.\nSpine lookup: identical transform, 33 reads versus 199 for full 63-node scan.\nAppearance: indexed texture slots and 600 frame rotations; trial spine transforms and isolated shader writes; invalid indices, table replacement, cycles, singular matrices, overlapping properties and partial writes rejected. Native setters simulated; no game calls.\nAppearance: repeated instances, validated live texture bindings, named source failures, complete preparation and borrowed-resource changes passed. Native setters simulated; no game calls."
+    },
+    "native_geometry_pool": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Geometry pool/build: 19 bounded read-only synthetic checks passed; no native game code executed."
+    },
+    "native_initialized_lifetime": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Ownership retry: every truncated read budget recovers with fresh validation; changed entries/pool and real read failures remain fatal.\nOwnership batches: 23 reads for the three-slot fixture.\nInitialized lifetime: legacy cleanup and four-slot partial/full ownership, missing fourth slot and read faults passed; native calls simulated."
+    },
+    "native_dual_body": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Dual body: independent objects/controllers/clones, exact four-slot ownership, sole expected slot addition, changed first-body ownership and partial failures checked."
+    },
+    "native_mesh_guard": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Mesh guard: growth and free-slot reuse lifecycles, duplicate/context/caller/range rejection passed; no native game code executed."
+    },
+    "native_idle_pose": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Idle matrix inputs: 142 hierarchy rows in 9 reads; final-row NaN/fault, cyclic parent, changed table and count rejected.\nIdle batch: 65 entries in 57 reads; changed headers, pointer tables, entry fields, interior faults and final partial batch checked.\nIdle detail: accepted input and six distinct rejection fields checked; rejected outputs remain empty.\nIdle pose inputs/context: 17 synthetic checks passed; no native calls."
+    },
+    "native_animation_playback": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Animation collection: 245 descriptors, two active clips: 33 reads (scalar scan would use 521).\nAnimation batching: unreadable collection tail rejected; every prewrite read-budget interruption preserves active state and retries successfully.\nBinding stamp: same-frame rearm changes only owned payload stamp; fresh frames need no write; rollover, alias, mutation, read budget and write failure rejected; native consumption reports exact row/field.\nNative animation: named schema, exact clip times, additive routing, zero-weight clearing; alias, capacity, descriptor, time, unreadable/mutating storage and write failure checks passed. No native calls."
+    },
+    "native_connection_scan": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Connection scan base-only: 28 reads versus 67 deep; animation arrays are not read on base samples.\nConnection scan: native solo/connected/departure flags, symbols, clips and clocks, shout slots, partial reads, changed context, invalid ranges/nonfinite values; no game writes. Largest format 9137/32000; every truncation checked."
+    },
+    "native_skeleton_mirror": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "skeleton mirror: named mapping, independent roots/sibling/originals, mutation/bounds/partial-write checks passed; 3-bone fixture 64 reads\nskeleton mirror batching: 44 underlying reads including native-render postcheck; originals preserved\n142-bone fixture: 132 copy reads, 20 post-render reads; fresh full metadata and all four skeletons checked"
+    },
+    "native_evaluation_layout": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "evaluation metadata recheck: 200 scalar reads reduced to 4 fresh bounded reads; unreadable-gap fallback, late mutation and large-range checks passed\nevaluation layout: read-only ownership, pending jobs, bounds, original/sibling preservation and metadata rechecks passed; 280 reads"
+    },
+    "native_evaluation_run": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Evaluator inspection batching: 483 -> 288 underlying reads in full fixture.\nevaluation run guards: accepted native graphs, activity pruning, callback identity, allocator bounds, output ownership, metadata isolation and rechecks passed"
+    },
+    "native_companion_chirp": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Idle chirp capture: 6 protected reads, down from 13; no sound table scan.\nShared companion events: source-independent delivery, native ownership, identity and duplicate guards passed.\nActor chirp relay: head position, sound selection, duplicate suppression, feedback exclusion, full pool and irreversible enqueue checks passed.\nAll seven characters: four charge levels and four variants captured and delivered with preserved origin; native audio playback is stubbed.\nCompanion chirp: stable capture, priming, serial wrap/order, same-frame binding, two independent environmental pulses, no local/remote replay, exact enqueue postcheck, native fingerprint/sound/capacity guards; no Journey calls."
+    },
+    "native_companion_cloth": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "native companion cloth: scarf charge/length, per-participant outfit/symbol, atlas changes and isolated descriptor failures passed\nnative companion cloth: phase, capacity, peer handoff, ownership, native sequencing and retirement scenarios passed"
+    },
+    "native_read_batch": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Read batches: 100 neighboring requests in one read; repeated/overlapping ranges refresh, large reads and write resets invalidate, eviction and partial-page fallbacks preserve faults. No cross-inspection byte cache."
+    },
+    "native_shader_inputs": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Shader buffer batching: 54 reads; larger-buffer fallback 64 reads with identical parameter values.\nRead-only native scalar lookup: 50 reads; native first-match precedence, alias/duplicate declarations, missing names, partial reads, mutations and bounds checked. Write guards unchanged.\nShader input reader: 20 synthetic cases passed; no native shader calls or writes."
+    },
+    "companion_pose": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Reciprocal pose policy: distinct transforms; authenticated endpoint pinning, reflection, capability changes, old protocol and chapter recovery checked.\nAnimation protocol: numeric clips round-trip; authenticated bad counts, indices, additive flags, non-finite times/speeds, bounds and duplicates preserve last accepted state.\nUDP loopback omitted; authenticated codec and policy tests ran without sockets.\nPose link: HMAC known answer, per-player appearance, packet validation, identity/replay/chapter/staleness/rate, truncation, 10000 mutations and authenticated non-finite rejection passed. Simulated endpoints, not Journey gameplay."
+    },
+    "companion_room": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Three-endpoint UDP exercise omitted; room admission/relay policies ran without sockets.\ncompanion room: per-player appearance relay, authentication, admission cap, identity/port pinning, replay, chapter isolation, stale recovery, authenticated departure relay, surviving peer traffic, terminal identity and bounded UDP error policy passed"
+    },
+    "native_render_queue": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "mesh transform: 12 native point/direction comparisons, 3 relative origins, 8 unchanged rejections passed\nlocation: 6 level identity and 6 relative bounds cases passed; no game execution\nchapter policy: hub, unknown, excluded and cross-chapter pairs rejected; eligible same-chapter pairs accepted\nrender queue: 10 cases passed\nrender retirement planning: 12 cases passed; no native calls or writes\nrender reference tracking: acquisition, reuse, replacement, retirement and failure scenarios passed; simulated events only\nprivate preview: 5 queue cases passed; no rendering executed\nrender budget: transient retry, recovery, eight-timeout stop, real errors and pending native work checked\nvisibility: 6 model-list/filter/bounds cases passed; no rendering executed\ndraw input: 6 count/gate/context/rejection cases and 4 local-item attribution cases passed; no draw calls\ncommand range: 8 bounded range cases passed\ncommand attribution: 7 header and geometry-input cases passed"
+    },
+    "diagnostic_checkpoint": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "appearance checkpoints: reproduced 161-byte rejection; all five production formats fit for 891/8191 masks and full signed/unsigned extremes\ncheckpoint: 64-record run continues through return/postchecks; 128-record/20,736-byte cap, oversize and each I/O failure passed"
+    },
+    "diagnostic_fault": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Fault records: exact bounds, full-width codes, relative module offsets and exception filtering passed; no faults raised."
+    },
+    "native_local_read": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run",
+      "output": "Inspection reader: 1000 fresh-value reads / one permission query; inspection resets, cross-region rejection, changed permissions, bounded eviction and invalid ranges passed. Host uses simulated mappings; Windows fault recovery requires runtime."
+    }
+  },
+  "sources": {
+    "native_peer_lifecycle.h": "a1a8f3e6d9922ccf619942a6e0431ac2df8dec2144692fdd65c6af54ea4b788a",
+    "test_native_peer_lifecycle.c": "c6a709e69b64f21fc3b87401689a83a5dd79d32919331a17acfac4e8e5f2b830",
+    "native_actor_frame.h": "8605b41b4dd3dd4d1f1142c947c25b8d9fa844bd59883146e7061faee3ed5feb",
+    "native_actor_material.h": "82a452e67fddfe1d9e2813cc4864dd63127a0b9b4af02a599d16ae3f03f8d9c4",
+    "traveler_actor_runtime.h": "c21f56563ed6bd573c6abedd8f97b1a93c99eca45c2a6cbfacd0766a0d9ba383",
+    "traveler_live_backend.h": "c7740e86d4c351eb339f419fffbd924cf229069874a31fc62ded6b4dc841226c",
+    "traveler_glyph_init.h": "26e28e0742b1948e35d04cbe3f6714e2a2bc58d8f071d2c077ee97b137e96367",
+    "native_cloth_producer.h": "52080340accd5fd252fd5290a173c2bb4d74f2696f48a1cd4a34d729e6c9ad28",
+    "test_native_cloth_producer.c": "e2cab180ec0c4a2b5d8bd3091433b6c1f29df623077bb662a43f9b637805d033",
+    "native_actor_runtime.h": "901deb9211673be75ab819294e2d24f7893f2a62ff981766794144815ac03579",
+    "native_cloth_prelaunch.h": "4a132e689d00f2e07b9283ddd7cecdc04cc12171a2de9324e126b6a59b6379be",
+    "test_native_cloth_prelaunch.c": "df4b930be743170557a899799d89abd4595513ec07b8ef339f0914fda3bb7b3e",
+    "native_actor_live.h": "fe6e6da35c8db5e9dbce3fadc7b63acfb04bc7a517b4f47cabcbc13d3eab12b6",
+    "native_cloth_publication.h": "ae0524895a78698a03a26da67be8407c38ae1dc1890759d6d3b35ab4a26ef14d",
+    "native_cloth_render_runtime.h": "35f54d8cc19290ffa550ec5b17aa851c3c14c9ccd654324c930da358832c0522",
+    "native_chapter_gate.h": "0c6624c637a71ee7074099d956ab3240a5a3f4ffdad37a80706aa948e5dcb795",
+    "test_native_chapter_gate.c": "6aba29b0f4debbc2280c851273d006436e8f7f8db411ae7036afe081f67d0e74",
+    "native_cloth_commands.h": "4abe4084c14398236eefdc4b9c68a6f4d4de9bac977ff9dc9eb053679ab0f088",
+    "native_cloth_live.h": "53d9fc5fd23b91b1fb489fb7e6728e88613cd1504bf95acd6baa663edb95a69f",
+    "test_native_render_gpu.c": "2134023ccae9f46c1d74af584dfd39fac6ca5190544ec0378e3eaebd8dbe6770",
+    "native_cloth_material_live.h": "d3d7874e9cc4b1ff2fe8d1428258d7bfb97bd77ab755e49ff0156d6825056882",
+    "test_native_cloth_material_live.c": "19d875792363b9f47d1c2ccfb8f39a05b0dafd24e27cd2f3cb612dc8695b5a77",
+    "native_render_retirement.h": "16a68e0cbd2a583df40c2ec7f926128391775ff7003d3a81a62802de60a9f228",
+    "test_native_render_retirement.c": "4503b3ffe9f65083bad7682713c9cbff6ac723df610fc35d5234762f838ad1ff",
+    "native_cloth_frame.h": "7d19e57963721e0a7d39b43c69827356d0588e440412424ba395500877a09bd0",
+    "test_native_cloth_frame.c": "df94271fc7698db2d6a4a18f1800023e3518e95d5912b3e8cd674b190a3c13d5",
+    "native_cloth_draw.h": "02e6f17e3920090d5d45311154e7a4ecbbb5441696a51f13dc45e8cc62ab2245",
+    "native_cloth_partition.h": "aa0cc788b6501f69f30bf602c23bd5f40313d44f9fc66dfd43a932f904777118",
+    "test_native_cloth_partition.c": "51f2ae433f62f6d02e91b3f92c1e0acf2aefafc10fbc00452e2bb63646f73f2b",
+    "native_receiver.h": "3865543f4485c770bba80f08927de04c038c066a846afeab7991c6de027a2ee0",
+    "test_native_receiver.c": "554c23b9ce7a25d491ccea3d433645d8ecf5c892b04e0d420831f082c5f995b2",
+    "native_traveler_trial.h": "240c89ed9bf11cdb72e25edeebc9193e1c122482b0071a66cd78f6c33f5bc300",
+    "traveler_trial_runtime.h": "23301d1de7f6c3650ae6d3e9d7a4b9b665138cdce3b5e0d2820304a930d66592",
+    "test_native_traveler_trial.c": "0a9bf67fa6733b043da5512c9909bf3e9c4bff0839ab8a0435203980e4424cac",
+    "test_traveler_trial_runtime.c": "1636cea1e3e54d8484defb033bb20222f55efa1ab1ec484b7bcd5692ba88fb59",
+    "native_lifecycle_trace.h": "712aa715524ed7a07f12e43a4a3701d68154bcfcb447d9a62d521f59c9965a77",
+    "native_lifecycle_hooks.h": "0408f1b9511fa63430232bd34dd9652535c55a50d34994458113e8855f042a3b",
+    "test_native_lifecycle_trace.c": "199a18840f6766e8b9be45ef8614e4e7c28db5cba5fea4af562526f5c2f47703",
+    "native_companion_cloth.h": "df46293d592caaa28171657cae0c9c5422e656d73b3487a191e946d83b6f2a7f",
+    "test_native_companion_cloth.c": "36419de1b4d0747964fbfd58383d91ebffadb6afb905f64c0ac010e284248d21",
+    "native_companion_chirp.h": "71ddd6e6e0fae7d14746b0fe0591237d2695e8786092d197df7661508ca0f43a",
+    "test_native_companion_chirp.c": "a711a15eeee3e0ed18b52befd6c99f49661ff397ad7d7dc66085f0aa9f0aa2c1",
+    "native_evaluation_run.h": "83786e65399f840e23a4f166b07f35d343a6056921102e643d9615984698584e",
+    "test_native_evaluation_run.c": "79ec68d45fea84aa26e9d31229aa4c4fa470fdbbe7c70eb63db0e7e418ecdc8b",
+    "native_evaluation_layout.h": "20d0e50f5f4b56c75b199a4e58217b866838b54e7d8cf37c59bbbbde83b2c892",
+    "test_native_evaluation_layout.c": "3a174a3d87553eb49e7987be6eeefe069be5f0b5b986f0bff4368806f7d77d65",
+    "native_skeleton_mirror.h": "921319a4d5f63b10463e5731b2787293764ad359afb3263bed0e9627dfb638b5",
+    "test_native_skeleton_mirror.c": "13a3302cf77b99034af3266f817057842a981a38dbd178fa87df9143e2e9f7bf",
+    "native_connection_scan.h": "561a70abbbb2d751b7824dfb4c61cbc8cc28015b66b3c08eb83ee37e930583da",
+    "test_native_connection_scan.c": "d9451bcc3fdea8f82c70be21e2f4ff8cb2dc282eacebf2915e937d71b01330d5",
+    "connection_recorder.h": "8f9f931d5bd5b8cadd7cb066aedb04b2ab7ef555a4190948d50ea059f6788908",
+    "companion_session.h": "20c311bef0d7ef9fc88aa2942e9d2c4e10c189658986ade6dd629236f4d7f59d",
+    "test_companion_session.c": "8213b6842d768552581487161c437745913ae675088afb0963eb2daf6d208d1f",
+    "native_appearance.h": "451a0d95ad05661859288bbc1ee847f94b60c0c4c3b30b1c33f79cf97cc48110",
+    "test_native_appearance.c": "8b7ed9b4387000d0b1811735d142aca262a4a089826a48c0c8a2101102952170",
+    "native_environment_probe.h": "8595103220522adaa3cac8060155179da9d63d5f1b75e81e44dc71349a4a898e",
+    "native_material_ready.h": "71c10d1b30db0471ca25d52d735b45ee693c94409a5f5ea8d78ec975fa0cd1a8",
+    "native_layout.h": "24a4248374fbaf7af1932e5b328eaa964295dd61a1cdbd067828e6e06b1bfff7",
+    "native_geometry_pool.h": "23679a0effdf6c38763fe63be15fe215ac03433580564d76b6ed5ff1e347b561",
+    "test_native_geometry_pool.c": "4cf4b5faa0cac212e823833b0ca6de5769e96cee2c5d5b2b1149707c6594766e",
+    "native_initialized_lifetime.h": "bed85c75431f03a818ac31a85ed5d51f826cba4f163024c3d2b3bf2e8f79120e",
+    "test_native_initialized_lifetime.c": "5285c92e2a98e94f08626958e8b3054a4add8bdb8157275e9c90dcd49de9d24c",
+    "native_dual_body.h": "ace15f9fc4b942f13e35e0f6d2a53eaeeb2f83cef365184651e3bb0fbb397c8b",
+    "test_native_dual_body.c": "584ed7fdfa833cd15a2fe51f3f50176b994297f8412a59c07cbb349777ad57f3",
+    "native_mesh_guard.h": "1a3fbb5ef317ec3771edc4b527539534e1da181868ab478cde17a96841a7e581",
+    "test_native_mesh_guard.c": "0d9696fb6603ea7a3bd7a9ea16dbfe39659ac37dc34c9138ea956ea8ba95db6f",
+    "native_idle_pose.h": "43fecd49f562b42f7a394589d91ea6616cedd56b7ad0032dc5384326dafb28e1",
+    "test_native_idle_pose.c": "3110108b2561cdefd71196185130071a7773fff93cdf70f5b7115d177ef26e9c",
+    "native_shader_inputs.h": "3d0a6c2e14e350dab8010f299065aa626548d497c285d0df52fdc7391678c3f2",
+    "test_native_shader_inputs.c": "0482edc239e9c8fdce9e59109f298558ef51ed55d2326dbd2a78562797a83c06",
+    "native_trial_shader.h": "41c163f096325d1d18670ef6d2bc6239ef85ee90b52b9e56d51430dd3672d76a",
+    "native_read_batch.h": "44d0d8c41782f100249d22abc3b02677d4f8077e17dbf3c29774fdd6cb66d7db",
+    "test_native_read_batch.c": "0f265abe5e06ca2f6621c72db8b1404718c8feb6cc20930b58366cc374e10915",
+    "companion_animation.h": "683c7b68cb8b6302ba88e6a8d10a576fa4d0f30f4486600cecac6ce003ae8f9a",
+    "native_animation_playback.h": "0d48e58e4d17f0a1ac8c6d8dc7ecf2aaffb82d81a5053a18c239dd433d650747",
+    "test_native_animation_playback.c": "18083073aba5f1efe7e0bf74d2d380d9f8a2520ed9a310fc7ab319b0bfedf332",
+    "companion_room.h": "cb1f23171c15cc200bd7c51f66b84cb2aa6051bdc4b819417ef5f1d517586a08",
+    "test_companion_room.c": "728d3e28fff1dc91f9f8eace8ba1c2291d3b23b9ec7222cc268364b05b5809a4",
+    "companion_pose.h": "aa1c83badb0cd3cd07cbe88bd53bdb0abaffd9028f9067a8619265a074821e72",
+    "pose_link.h": "ccad47c872e07818ebf18abe059bba6519084e1eb9d2f68fd10ec9db561b50ac",
+    "test_companion_pose.c": "4654d9e32c65af9554d1e970c2b3977a7d31bf72943c4941da9927773b8f8532",
+    "native_render_queue.h": "a075cc91ed4e102e0a3443b51896e8ffa94c5fdfc044425ad6abb9edf9d02375",
+    "test_native_render_queue.c": "75b3aedc3fd709c65a8ab6c4436ee0b5f51a3d3c6eb9452d64914200134c56bb",
+    "diagnostic_checkpoint.h": "623f0cd2a996a15a75e0f8a81a6147fd11ec66ccb60a9516bbbbc7958efd6caf",
+    "test_diagnostic_checkpoint.c": "a0ee1737b9f79b501df65c9340e11d54416ad6846f9eb323498db2b38aaaa8e5",
+    "diagnostic_fault.h": "64eada89a403b6c7411db33229d3107b9213c934de0a1a730c81be10ac2015ec",
+    "test_diagnostic_fault.c": "e3534eb80da6710c01b2e45a5055df00fce60145e23555ae046568cde5bdedff",
+    "native_local_read.h": "e61acd899fdf482b701b2166ccca995f150e24cda31c03e47963fe2e0ff43637",
+    "test_native_local_read.c": "31bb2208495fbd316e780ff443beedfa4e6f9d4352e8ea2f08ffd5d353fd4d64",
+    "check_companion_components.py": "59c347784c9011db03f2b0f2bbbc42a92e600094ffd3a0a65c63c043e59f5f4b"
+  },
+  "skipped": [
+    "companion_pose: socket I/O only",
+    "companion_room: socket I/O only"
+  ]
+}

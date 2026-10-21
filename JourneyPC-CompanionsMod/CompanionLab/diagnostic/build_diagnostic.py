@@ -12,7 +12,7 @@ import argparse
 
 HERE = Path(__file__).resolve().parent
 LAB = HERE.parent
-VERSION = "0.283"
+VERSION = "0.306"
 ROOT = LAB.parent.parent
 sys.path.insert(0, str(LAB))
 from inspect_build import EXPECTED_EXE, audit_signatures, pe_sections
@@ -185,7 +185,7 @@ def build(source_check=False):
         entries.append("{" + str(rva) + "u," + array(data[offset:offset + 16]) + "}")
         header += f"#define JC_RVA_{name} {rva}u\n"
     # Static native lifecycle evidence is recorded in README; no signature guessing.
-    for name, rva in {"CharacterMeshUpdate": 0x9dad0, "CharacterShoutInit": 0x13f6c0, "CharacterDecorationUpdate": 0x9f5f0, "CharacterDecorationDraw": 0x9f820, "CharacterDecorationCleanup": 0x9ea20, "CharacterInteract": 0x218e50, "IntroUpdate": 0x143490, "TextureNullGuard": 0x9e3a8, "CharacterBank": 0x2c8b20, "CharacterBodyInput": 0xa54a0, "CharacterLinkEmitter": 0x23cf70, "CharacterWhaleRide": 0x1c2c50, "CharacterClothTouch": 0x179630, "CharacterClothRide": 0x235210, "CharacterEye": 0x1c53e0, "CharacterJump": 0x9a890, "CharacterCamera": 0x22ed60, "CharacterSkeletonBuild": 0x2d4530, "CharacterAnimationLoad": 0x284930, "CharacterAnimationFinish": 0x284d40, "CharacterAssetLoad": 0x2d0610, "CreatureReset": 0x9b820, "MenuInput": 0x105ed0, "MenuPop": 0x107db0, "MenuFrame": 0x21aa70, "MenuPresent": 0x36d330, "MenuBuild": 0x105840, "MenuNodes": 0x104870, "MenuAppend": 0x1024a0, "MenuFrameDrawSite": 0x21ac61,
+    for name, rva in {"EnvironmentCopy": 0xc5880, "EnvironmentUpdate": 0xc69b0, "CharacterMeshUpdate": 0x9dad0, "CharacterShoutInit": 0x13f6c0, "CharacterDecorationUpdate": 0x9f5f0, "CharacterDecorationDraw": 0x9f820, "CharacterDecorationCleanup": 0x9ea20, "CharacterInteract": 0x218e50, "IntroUpdate": 0x143490, "TextureNullGuard": 0x9e3a8, "ResourceView": 0x372ad0, "CharacterBank": 0x2c8b20, "CharacterBodyInput": 0xa54a0, "CharacterLinkEmitter": 0x23cf70, "CharacterWhaleRide": 0x1c2c50, "CharacterClothTouch": 0x179630, "CharacterClothRide": 0x235210, "CharacterEye": 0x1c53e0, "CharacterAttack": 0x198a90, "CharacterAttackHandler": 0x19b1d0, "CharacterJump": 0x9a890, "CharacterCamera": 0x22ed60, "CharacterSkeletonBuild": 0x2d4530, "CharacterAnimationLoad": 0x284930, "CharacterAnimationFinish": 0x284d40, "CharacterAssetLoad": 0x2d0610, "CreatureReset": 0x9b820, "MenuInput": 0x105ed0, "MenuPop": 0x107db0, "MenuFrame": 0x21aa70, "MenuPresent": 0x36d330, "MenuBuild": 0x105840, "MenuNodes": 0x104870, "MenuAppend": 0x1024a0, "MenuFrameDrawSite": 0x21ac61,
                       "MenuMap": 0x267d10, "MenuMapImpl": 0x345de0, "MenuFinish": 0x102310,
                       "ClothRender": 0x8a7a0, "ActorInput": 0x118030, "ActorFinish": 0x118df0,
                       "ActorNativeInput": 0xa54a0, "ActorNativeFinish": 0xa9d20,
@@ -281,7 +281,8 @@ def build(source_check=False):
         if file.suffix in (".c", ".h", ".py"):
             source_parts.append(file.read_bytes())
     build_id = hashlib.sha256(b"\0".join(source_parts)).digest()
-    header += "#define JC_BUILD_ID " + array(build_id) + "\n#endif\n"
+    header += "#define JC_BUILD_ID " + array(build_id) + "\n"
+    header += '#define JC_BUILD_ID_HEX "' + build_id.hex() + '"\n#endif\n'
     (work / "target_build.h").write_text(header)
     env = dict(os.environ)
     env.update(ZIG_GLOBAL_CACHE_DIR=str(LAB / "work/zig-cache"),
@@ -338,14 +339,14 @@ def build(source_check=False):
     manifest = dict(version=VERSION, automatic_diagnostic_logs=False, session_report_export=True, meet_everywhere_always=True, portable_windows_package=True, game_sha256=EXPECTED_EXE, optional_sound_fix_sha256=sha(audio_game), sound_fix_version="0.3.1", optional_drop_in_executable=True, build_id=build_id.hex(),
                     runtime_verified=False, three_player_supported=False, local_diagnostic_only=False, steam_lobby_transport_test=True, gameplay_over_steam=True,
                     group_travel_candidate=True, all_levels_runtime_verified=False,
-                    native_character_candidates=["Longtail", "Whale", "War Machine", "fl0w 1", "fl0w 2"], native_character_preload=True,
+                    native_character_candidates=["Longtail", "Whale", "War Machine", "fl0w"], flow_skins=["Rogue", "Hunter"], flow_shared_controls=True, flow_shared_chirps=True, war_machine_cached_skins=True, native_character_preload=True,
                     native_character_asset_mapping=False, native_character_resident_textures=True, character_asset_load_trace=True,
                     native_character_animation_bundles=False, native_character_animation_loose_files=True, isolated_animation_probe=False, private_animation_asset_namespace=True, private_mesh_asset_namespace=True, character_skeleton_stage_trace=True,
-                    character_animation_stage_trace=True, native_characters_runtime_verified=False, war_machine_available=True, war_machine_attacks=False, war_machine_spotlight=True, creature_camera_candidate=True, war_machine_resources_packaged=True, character_visibility_snapshots=True,
+                    character_animation_stage_trace=True, native_characters_runtime_verified=False, war_machine_available=True, war_machine_attacks=True, war_machine_attacks_runtime_verified=False, war_machine_attack_controls_locked=True, war_machine_attack_targets="confirmed_wayfarer_only", war_machine_spotlight=True, creature_camera_candidate=True, war_machine_resources_packaged=True, character_visibility_snapshots=True,
                     creature_appearance_replication=True, rocket_character=True, rocket_relay_participants=3, rocket_runtime_verified=False, character_resource_participants=3,
                     private_character_decoration_pool=True, native_chirps_in_private_pool=True,
-                    creature_jump_ascent=True, spotlight_input="interact/sit", creature_flight_audio_muted=False, creature_body_physics_bypassed=True, creature_motion_smoothed=True, creature_speed={"Longtail":10.8,"Whale":6.9,"War Machine":6.9,"fl0w 1":10.8,"fl0w 2":10.8},
-                    menu_option_wrap=True, intro_skip_visible=False, creature_vortex_decay=True, creature_cached_teleport_completion=True, creature_cached_resume_before_teleport_wait=True, intro_skip_any_input_twice=True, fps_choices=[30,60,"Default"], intro_mapped_loading_input=True, longtail_chirp_head=True, missing_texture_null_guard=True, bryan_tapestry_diagnostic=True, bryan_texture_replaced=False, creature_private_sound_banks=["Summit", "Cave"],
+                    creature_jump_ascent=True, spotlight_input="interact/sit", creature_flight_audio_muted=False, creature_body_physics_bypassed=True, creature_motion_smoothed=True, creature_speed={"Longtail":10.8,"Whale":8.28,"War Machine":8.28,"fl0w":10.8},
+                    fog_toggle=True, blackness_menu=True, blackness_cutoff_implemented=True, blackness_runtime_verified=False, menu_option_wrap=True, intro_skip_visible=False, creature_vortex_decay=True, creature_cached_teleport_completion=True, creature_cached_resume_before_teleport_wait=True, intro_skip_any_input_twice=True, fps_choices=[30,60,"Default"], intro_mapped_loading_input=True, longtail_chirp_head=True, missing_texture_null_guard=True, bryan_tapestry_diagnostic=True, bryan_texture_replaced=False, creature_private_sound_banks=["Summit", "Cave", "Ruins"], native_sound_bank_capacity=8, remote_chirp_sound_names_preserved=True, graphics_device_loss_report=True,
                     startup_changes=startup_changes, compiler="Zig 0.13.0 x86_64-windows-gnu",
                     minhook="1.3.4", dll_imports=dll_imports, helper_imports=helper_imports,
                     exports=exported, source_entry_points=resolved,

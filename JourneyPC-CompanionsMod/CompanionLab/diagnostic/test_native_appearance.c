@@ -515,7 +515,10 @@ static void body_tests(void) {
     assert(jc_body_appearance_prepare(read_memory,NULL,&body_ops,base+0x3000,materials,&lease)==JC_LAYOUT_CHANGED && !lease.applied);
     assert(!jc_body_appearance_release(NULL,&body_ops,materials[2],1,&lease));
     body_fixture();alternate_source_texture(4,0);
-    assert(jc_body_appearance_prepare(read_memory,NULL,&body_ops,base+0x3000,materials,&lease)==JC_LAYOUT_CHANGED && !body_holds && !setter_calls);
+    unsigned char local_before[4096];memcpy(local_before,memory+0x1004,sizeof(local_before));
+    assert(!jc_body_appearance_prepare(read_memory,NULL,&body_ops,base+0x3000,materials,&lease) && lease.applied);
+    assert(!memcmp(local_before,memory+0x1004,sizeof(local_before)));
+    assert(!jc_body_appearance_release(NULL,&body_ops,materials[2],1,&lease));
     body_fixture();put(0x20508,base+0x1000);
     assert(jc_body_appearance_prepare(read_memory,NULL,&body_ops,base+0x3000,materials,&lease)==JC_LAYOUT_CHANGED && !body_holds && !setter_calls);
     puts("Body appearance: four retained textures, static material values, original preservation, untouched environment/glow, partial failure retention and destruction-only release passed; native setters/refcounts simulated.");

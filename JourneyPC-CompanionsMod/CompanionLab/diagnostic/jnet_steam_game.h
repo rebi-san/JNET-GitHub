@@ -8,7 +8,7 @@ _Static_assert(JC_RECEIVER_STATE_BYTES==108,"Steam gameplay state wire layout");
 #define JNET_GAME_BYTES (64u+JNET_STEAM_CAPACITY*JNET_GAME_RECORD)
 struct jnet_game_record {
     uint64_t id,lease,sequence,seen,chirp_seen,processed;
-    unsigned character,character_known,spotlight,rotation_known;float rotation[4];
+    unsigned character,character_known,spotlight,grab,rotation_known,variant;float rotation[4];
     struct jc_actor_sender sample;
     struct jc_chirp_event chirp;
 };
@@ -45,7 +45,7 @@ static void jnet_sg_encode_record(unsigned char *p,const struct jnet_game_record
     for(unsigned i=0;i<JC_RECEIVER_STATE_BYTES;i+=4){uint32_t bits;memcpy(&bits,r->sample.state.bytes+i,4);jc_packet_put(p+32+i,bits,4);}
     float values[16];memcpy(values,r->sample.axes,16);memcpy(values+4,r->sample.direction,16);memcpy(values+8,r->sample.scalars,8);
     values[10]=r->sample.body_scale;memcpy(values+11,r->sample.glow_targets,12);memcpy(values+14,r->sample.chirp_shape,8);jnet_sg_floats(p+140,values,16);
-    if(r->character_known && r->character<JNET_CHARACTER_COUNT)jc_packet_put(p+252,(r->character+1)|((r->character==JNET_CHARACTER_WAR_MACHINE && r->spotlight)?0x100u:0)|(r->rotation_known?0x200u:0),4);
+    if(r->character_known && r->character<JNET_CHARACTER_COUNT)jc_packet_put(p+252,(r->character+1)|((r->character==JNET_CHARACTER_WAR_MACHINE && r->spotlight)?0x100u:0)|((r->character==JNET_CHARACTER_LONGTAIL && r->grab)?0x1000u:0)|(r->rotation_known?0x200u:0)|((r->variant&3u)<<10),4);
     if(r->rotation_known)jnet_sg_floats(p+256,r->rotation,4);
     if(r->chirp.sequence && now>=r->chirp_seen && now-r->chirp_seen<=500) {
         jc_packet_put(p+204,r->chirp.sequence,8);jc_packet_put(p+212,r->chirp.sound,4);
@@ -56,7 +56,11 @@ static void jnet_sg_encode_record(unsigned char *p,const struct jnet_game_record
 static int jnet_sg_decode_record(struct jnet_game_record *r,const unsigned char *p,uint64_t now) {
     memset(r,0,sizeof(*r));r->processed=now;r->id=jc_packet_get(p,8);r->lease=jc_packet_get(p+8,8);r->sequence=jc_packet_get(p+16,8);
     unsigned character=(unsigned)jc_packet_get(p+252,4);
-    if((character&~0x3ffu) || (character&255)>JNET_CHARACTER_COUNT || ((character&0x100u) && (character&255)!=JNET_CHARACTER_WAR_MACHINE+1))return 0;
+    if((character&~0x1fffu) || (character&255)>JNET_CHARACTER_COUNT || ((character&0x100u) && (character&255)!=JNET_CHARACTER_WAR_MACHINE+1))return 0;
+    if((character&0x1000u) && (character&255)!=JNET_CHARACTER_LONGTAIL+1)return 0;
+    r->grab=!!(character&0x1000u);
+    r->variant=(character>>10)&3u;
+    if(r->variant && (!(character&255) || r->variant>jnet_character_variant_limit((character&255)-1)))return 0;
     r->spotlight=!!(character&0x100u);r->rotation_known=!!(character&0x200u);character&=255;
     if(r->rotation_known){
         if(!character || !jnet_character_is_creature(character-1))return 0;

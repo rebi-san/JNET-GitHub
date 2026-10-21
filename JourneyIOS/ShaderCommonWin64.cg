@@ -1,0 +1,369 @@
+
+#include "../PhyreEngine/2_6_0_IOS/utilities/PSSGCoreWin64/PSSGCoreWin64Defines.h"
+
+// row major matrices
+#pragma pack_matrix (row_major)
+
+#define	half				float
+#define	half2				float2
+#define	half3				float3
+#define	half4				float4
+#define	half3x4				float3x4
+
+#define half_ios half
+#define half2_ios half2
+#define half3_ios half3
+#define half4_ios half4
+
+static const half3 hToY = half3(0.299h,  0.587h,  0.114h);
+static const half3 hToCb = half3(-0.169h, -0.331h,  0.5h);
+static const half3 hToCr = half3(0.5h, -0.419h, -0.081h);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// buffer indices
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define kBufferIndexLocalUniforms       0      // these two are used for our constant buffers
+#define kBufferIndexGlobalUniforms      1
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define DECL_CBUFFER_GLOBAL				cbuffer UG : register(CB_REGISTER(kBufferIndexGlobalUniforms))
+#define DECL_CBUFFER_LOCAL				cbuffer UL : register(CB_REGISTER(kBufferIndexLocalUniforms))
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// the vertex shader input streams are hardcoded - that way we don't need to read them from the shader'
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define knVertexAttrPOSITION            : SV_POSITION
+#define knVertexAttrCOLOR0              VS_ATTR(COLOR0)
+#define knVertexAttrCOLOR1              VS_ATTR(COLOR1)
+#define knVertexAttrNORMAL              VS_ATTR(NORMAL)
+#define knVertexAttrBINORMAL            : BINORMAL
+#define knVertexAttrTEXCOORD0           VS_ATTR(TEXCOORD0)
+#define knVertexAttrTEXCOORD1           VS_ATTR(TEXCOORD1)
+#define knVertexAttrTEXCOORD2           VS_ATTR(TEXCOORD2)
+#define knVertexAttrTEXCOORD3           VS_ATTR(TEXCOORD3)
+#define knVertexAttrTEXCOORD4           VS_ATTR(TEXCOORD4)
+#define knVertexAttrTEXCOORD5           VS_ATTR(TEXCOORD5)
+#define knVertexAttrTEXCOORD6           VS_ATTR(TEXCOORD6)
+#define knVertexAttrBLENDWEIGHT         : BLENDWEIGHT0
+#define knVertexAttrBLENDINDICES        : BLENDINDICES0      // this is an integer
+
+#define knVertexAttrHW_POSITION         knVertexAttrPOSITION
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// the fragment shader alikes point to special items, such as hw positions, colors, and others...
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#define knFragmentAttrPOSITION          : SV_POSITION
+#define knFragmentAttrHW_POSITION		: SV_POSITION
+#define knFragmentAttrPSIZE             : PSIZE
+#define knFragmentAttrHW_DEPTH          : SV_Depth
+#define knFragmentAttrHW_COLOR0			: SV_Target0
+#define knFragmentAttrSPRITECOORD       : SPRITECOORD
+#define knFragmentAttrNORMAL			VS_ATTR(NORMAL)
+#define knFragmentAttrTEXCOORD0			VS_ATTR(TEXCOORD0)
+#define knFragmentAttrTEXCOORD1			VS_ATTR(TEXCOORD1)
+#define knFragmentAttrTEXCOORD2			VS_ATTR(TEXCOORD2)
+#define knFragmentAttrTEXCOORD3			VS_ATTR(TEXCOORD3)
+#define knFragmentAttrTEXCOORD4			VS_ATTR(TEXCOORD4)
+#define knFragmentAttrTEXCOORD5			VS_ATTR(TEXCOORD5)
+#define knFragmentAttrTEXCOORD6			VS_ATTR(TEXCOORD6)
+#define knFragmentAttrTEXCOORD7			VS_ATTR(TEXCOORD7)
+#define knFragmentAttrTBINORMAL			: BINORMAL
+
+#ifdef PIXEL_SHADER
+	#define knFragmentAttrCOLOR0		: SV_Target0
+	#define knFragmentAttrCOLOR1		: SV_Target1
+#else
+	#define knFragmentAttrCOLOR0		VS_ATTR(COLOR0)
+	#define knFragmentAttrCOLOR1		VS_ATTR(COLOR1)
+#endif
+
+typedef struct
+{
+    SamplerState		smp;
+    Texture2D<float4>	tex;
+} psampler2D;
+
+typedef struct
+{
+    SamplerState		smp;
+    Texture2D<half4>     tex;
+} psampler2Dh;
+
+typedef struct
+{
+    SamplerState		smp;
+    TextureCube<float4>	tex;
+} psamplerCUBE;
+
+typedef struct
+{
+    SamplerState		smp;
+    TextureCube<half4>	tex;
+} psamplerCUBEh;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define PASTE_STRINGS(xxx,yyy)          xxx ## yyy
+#define BAKE_STRING(xxx)				xxx
+
+#define PARAM_
+#define SMP_
+
+#define TARGET_OUTPUT					: SV_TARGET
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define CB_REGISTER(index)		PASTE_STRINGS(b, index)
+#define SFP_UNIFORM             
+#define SFP_INPUT(decl)         in decl
+
+#define SAMPLER(type, name)     
+
+#define SFP_TEX2D(name, idx)                        \
+    , Texture2D<float4> t_##name : register(t##idx)	  \
+    , SamplerState s_##name : register(s##idx)
+
+#define SFP_TEX2Dh(name, idx)                       \
+    , Texture2D<half4> t_##name : register(t##idx)     \
+    , SamplerState s_##name : register(s##idx)
+
+#define SFP_TEXCUBE(name, idx)                      \
+    , TextureCube<float4> t_##name : register(t##idx)  \
+    , SamplerState s_##name : register(s##idx)
+
+#define SFP_TEXCUBEh(name, idx)                     \
+    , TextureCube<half4> t_##name : register(t##idx)   \
+    , SamplerState s_##name : register(s##idx)
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define EXT_VERTEXSHADER(xxx)               PASTE_STRINGS(VS_,xxx)
+#define EXT_FRAGMENTSHADER(xxx)             PASTE_STRINGS(FS_,xxx)
+#define EXT_LOCALUNIFORM(xxx)               PASTE_STRINGS(UL_,xxx)
+
+#define NAME_vertex                         EXT_VERTEXSHADER(Main)
+#define NAME_fragment                       EXT_FRAGMENTSHADER(Main)
+#define UniformLocal                        EXT_LOCALUNIFORM(SHADERNAME)
+
+#define DECL_SHADERSTART(type, output)      output NAME_##type
+
+#define NO_PARAM	, int ignore
+
+#define UNIFORM_ED_ENABLE                   SFP_UNIFORM
+#define UNIFORM_ED_DISABLE
+#define UNIFORM_ED_GET(xxx)                 UNIFORM_ED_##xxx
+
+
+#define TEX_TYPE(xxx)                       SFP_TEX##xxx
+
+#define TEX_TEX1(aaa)                                                   TEX_TYPE(aaa)
+#define TEX_TEX2(aaa,bbb)                   TEX_TEX1(aaa)               TEX_TYPE(bbb)
+#define TEX_TEX3(aaa,bbb,ccc)               TEX_TEX2(aaa,bbb)           TEX_TYPE(ccc)
+#define TEX_TEX4(aaa,bbb,ccc,ddd)           TEX_TEX3(aaa,bbb,ccc)       TEX_TYPE(ddd)
+#define TEX_TEX5(aaa,bbb,ccc,ddd,eee)       TEX_TEX4(aaa,bbb,ccc,ddd)   TEX_TYPE(eee)
+
+
+// this is the definition
+#define TEX1(type0,name0)                                                   TEX_TEX1(type0(name0,0))
+#define TEX2(type0,name0,type1,name1)                                       TEX_TEX2(type0(name0,0), type1(name1,1))
+#define TEX3(type0,name0,type1,name1,type2,name2)                           TEX_TEX3(type0(name0,0), type1(name1,1), type2(name2,2))
+#define TEX4(type0,name0,type1,name1,type2,name2,type3,name3)               TEX_TEX4(type0(name0,0), type1(name1,1), type2(name2,2),  type3(name3,3))
+#define TEX5(type0,name0,type1,name1,type2,name2,type3,name3,type4,name4)   TEX_TEX5(type0(name0,0), type1(name1,1), type2(name2,2),  type3(name3,3),  type4(name4,4))
+
+
+#define PVS_NO_PARAM
+#define PVS_TEX_ENABLED                                                         , const VS_ArgBuffer arg
+#define PVS_TEX1(type0,name0)                                                   PVS_TEX_ENABLED
+#define PVS_TEX2(type0,name0,type1,name1)                                       PVS_TEX_ENABLED
+#define PVS_TEX3(type0,name0,type1,name1,type2,name2)                           PVS_TEX_ENABLED
+#define PVS_TEX4(type0,name0,type1,name1,type2,name2,type3,name3)               PVS_TEX_ENABLED
+#define PVS_TEX5(type0,name0,type1,name1,type2,name2,type3,name3,type4,name4)   PVS_TEX_ENABLED
+
+#define PFS_NO_PARAM
+#define PFS_TEX_ENABLED                                                         , const FS_ArgBuffer arg
+#define PFS_TEX1(type0,name0)                                                   PFS_TEX_ENABLED
+#define PFS_TEX2(type0,name0,type1,name1)                                       PFS_TEX_ENABLED
+#define PFS_TEX3(type0,name0,type1,name1,type2,name2)                           PFS_TEX_ENABLED
+#define PFS_TEX4(type0,name0,type1,name1,type2,name2,type3,name3)               PFS_TEX_ENABLED
+#define PFS_TEX5(type0,name0,type1,name1,type2,name2,type3,name3,type4,name4)   PFS_TEX_ENABLED
+
+// this casts the arguments to local variables by better names
+#define SMP_NO_PARAM
+#define SMP_TEX1(type0,name0)                                                                                                                       SAMPLER(type0, name0)
+#define SMP_TEX2(type0,name0, type1,name1)                                          SMP_TEX1(type0,name0);                                          SAMPLER(type1, name1)
+#define SMP_TEX3(type0,name0, type1,name1, type2,name2)                             SMP_TEX2(type0,name0, type1,name1);                             SAMPLER(type2, name2)
+#define SMP_TEX4(type0,name0, type1,name1, type2,name2, type3,name3)                SMP_TEX3(type0,name0, type1,name1, type2,name2)                 SAMPLER(type3, name3)
+#define SMP_TEX5(type0,name0, type1,name1, type2,name2, type3,name3, type4,name4)   SMP_TEX4(type0,name0, type1,name1, type2,name2, type3,name3)    SAMPLER(type4, name4)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define VS_BEGIN(ufEnable, output_type, output_name, input_type, input_name, param) \
+    DECL_SHADERSTART(vertex, output_type)(                                          \
+        UNIFORM_ED_GET(ufEnable)                                                    \
+        SFP_INPUT(input_type input_name)                                            \
+        param)                                                                      \
+    {                                                                               \
+        output_type output_name;                                                    \
+        SMP_##param
+
+#define VS_END(output_name)                                                         \
+        return output_name;                                                         \
+    }
+
+
+#define FS_BEGIN(ufEnable, output_type, output_name, input_type, input_name, param) \
+    DECL_SHADERSTART(fragment, output_type)(                                        \
+        UNIFORM_ED_GET(ufEnable)                                                    \
+        SFP_INPUT(input_type input_name)                                            \
+        param) TARGET_OUTPUT														\
+    {                                                                               \
+        output_type output_name;                                                    \
+        SMP_##param
+
+#define FS_END(output_name)                                                         \
+        return output_name;                                                         \
+    }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define VS_ATTR(xxx)	knVertexAttr##xxx
+#define FS_ATTR(xxx)    knFragmentAttr##xxx
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define CBG(xxx)                        xxx
+#define CBL(xxx)                        xxx
+#define PASS_UL                 
+#define PASS_UG                 
+
+#define NO_CONST_VARS
+#define UNIFORM_PASS_PARAM              
+#define DEPTHTEX_SAMPLER                psampler2D depthTex,
+
+#define h4tex2D(X,Y)	(tex2D(X,Y))
+#define h1tex2D(X,Y)	(h4tex2D(X,Y).r)
+#define h2tex2D(X,Y)	(h4tex2D(X,Y).rg)
+#define h3tex2D(X,Y)	(h4tex2D(X,Y).rgb)
+
+#define f4tex2D(X,Y)	tex2D(X,Y)
+#define f1tex2D(X,Y)	(f4tex2D(X,Y).r)
+#define f2tex2D(X,Y)	(f4tex2D(X,Y).rg)
+#define f3tex2D(X,Y)	(f4tex2D(X,Y).rgb)
+
+#define h4texCUBE(X,Y)	(texCUBE(X,Y))
+#define h1texCUBE(X,Y)	(h4texCUBE(X,Y).r))
+#define h2texCUBE(X,Y)	(h4texCUBE(X,Y).rg)
+#define h3texCUBE(X,Y)	(h4texCUBE(X,Y).rgb)
+
+#define f4ReadTexProj(x,y)  ReadTexProj(x,y)
+#define h4ReadTexProj(x,y)  ReadTexProj(x,y)
+
+#define f1ReadDepth(x,y)    ReadDepth(x,y)
+#define h1ReadDepth f1ReadDepth
+
+#define f1ReadDepthProj(x,y)    ReadDepthProj(x,y)
+#define h1ReadDepthProj(x,y)    ReadDepthProj(x,y)
+
+
+
+DECL_CBUFFER_GLOBAL
+{
+    float4	blurZRanges;	//	[x] = fade in start
+                                    //	[y] = 1/(fade start - fade end)
+                                    //	[z] = fade out start
+                                    //	[w] = 1/(fade out end - fade out start)
+
+    // velvet
+    float4   l_vf;	// velvetColor*velvetInt, velvetRatio, from GlobalShaderParam
+
+    // lighting
+    float4   l_c,l_a;
+    float4   l_cf,l_af;		// l_c*l_i, l_a*l_ai, from GlobalShaderParam
+    float3   l_d;
+    float           l_i, l_ai, l_gi;
+
+    // fog
+    float4   f_cf, f_ff;	// fogCloseColor:fogCloseAlpha, fogFarColor:fogFarAlpha, from GlobalShaderParam
+    float2   f_range;	// fogStart, 1.0/(fogEnd-fogStart), from GlobalShaderParam
+
+    // blur
+    float           depthBias;
+    float           depthScale;
+};
+
+#ifdef PIXEL_SHADER
+
+	#define ReadDepth(texSmp, uv)		t_##texSmp.Sample(s_##texSmp, uv.xy).r
+	#define tex2D(texSmp, uv)			t_##texSmp.Sample(s_##texSmp, float2(uv))
+	#define texCUBE(texSmp, uv)			t_##texSmp.Sample(s_##texSmp, float3(uv))
+	
+	#define ReadDepthProj(texSmp, uv)	t_##texSmp.Sample(s_##texSmp, uv.xy/uv.w).r
+	#define ReadTexProj(texSmp, uv)		t_##texSmp.Sample(s_##texSmp, uv.xy/uv.w)
+
+#else
+
+	#define ReadDepth(texSmp, uv)		t_##texSmp.SampleLevel(s_##texSmp, uv.xy, 0).r
+	#define tex2D(texSmp, uv)			t_##texSmp.SampleLevel(s_##texSmp, float2(uv), 0)
+	#define texCUBE(texSmp, uv)			t_##texSmp.SampleLevel(s_##texSmp, float3(uv), 0)
+	
+	#define ReadDepthProj(texSmp, uv)	t_##texSmp.SampleLevel(s_##texSmp, uv.xy/uv.w, 0).r
+	#define ReadTexProj(texSmp, uv)		t_##texSmp.SampleLevel(s_##texSmp, uv.xy/uv.w, 0)
+
+#endif
+
+inline int imodulo(float numer, uint denom)
+{
+    return ((int)floor(numer))%denom;
+}
+
+inline float3x3 ToF3x3(float4x4 m)
+{
+    return float3x3(m[0].xyz, m[1].xyz, m[2].xyz);
+}
+
+#define TEMPLATE_lerp(T0, T1) \
+inline T0 lerp(T0 a, T0 b, T1 v) \
+{ \
+    return a + (b-a)*v; \
+}
+
+
+#define TEMPLATE_mul(M, V) \
+inline V mul(M m, V v) \
+{ \
+    return v * m; \
+}
+
+inline void DiscardLE( float alpha, float ref )
+{
+    if( alpha<=ref )
+        clip(-1);
+}
+
+inline void DiscardGE( float alpha, float ref )//=alphaRef
+{
+    if( alpha>=ref )
+        clip(-1);
+}
+
+#define ADD_TECHNIQUE \
+	technique SHADERNAME \
+	{ \
+		pass P0 \
+		{ \
+			SetVertexShader(CompileShader(vs_5_0, PASTE_STRINGS(VS_,SHADERNAME)())); \
+			SetPixelShader(CompileShader(ps_5_0, PASTE_STRINGS(FS_,SHADERNAME)())); \
+		} \
+	}

@@ -1,0 +1,22 @@
+{
+  "status": "restored",
+  "phase": "B",
+  "temporary": "W0RpYWdub3N0aWNzXQ0KU2NhbnM9MA0KT2JzZXJ2YXRpb25Mb2dzPTANCltUcmFuc3BvcnRdDQpXb3JrZXI9MA0KW01vdGlvbl0NClNtb290aE1zPTANCg==",
+  "targets": [
+    {
+      "name": "devishaz",
+      "path": "/Users/rebisan/Library/Containers/com.isaacmarovitz.Whisky/Bottles/7D2AA64D-E176-4C5B-86A5-1EB2EF88AAD4/drive_c/Program Files (x86)/Steam/steamapps/common/Journey/Journet/JNET-network.ini",
+      "original": null
+    },
+    {
+      "name": "rebishaz",
+      "path": "/Users/rebisan/Library/Containers/com.isaacmarovitz.Whisky/Bottles/9FAD618B-4D76-4C96-B0AA-4A3A85EC24A0/drive_c/Program Files (x86)/Steam/steamapps/common/Journey/Journet/JNET-network.ini",
+      "original": null
+    },
+    {
+      "name": "smooviepuffs",
+      "path": "/Users/rebisan/Library/Containers/com.isaacmarovitz.Whisky/Bottles/598C5EF7-1BBF-4C6F-815E-6068C5507D85/drive_c/Program Files (x86)/Steam/steamapps/common/Journey/Journet/JNET-network.ini",
+      "original": null
+    }
+  ]
+}

@@ -90,6 +90,8 @@ static int traveler_originals_match(uint64_t image) {
 static struct jc_traveler_identity traveler_admission_identity[2];
 static uint64_t traveler_admission_barn;
 static int traveler_admission_ready;
+static uintptr_t traveler_fresh_game,traveler_fresh_barn;
+static DWORD traveler_fresh_thread;
 static void traveler_admission_initialized(uintptr_t dude) {
     uint64_t barn=0;uintptr_t game=(uintptr_t)JNETGame;
     if(!game || !own_read(NULL,game+0x1e0,&barn,8) || !barn)return;
@@ -112,7 +114,7 @@ static int traveler_admission_storage_matches(uint64_t image) {
     }
     return 1;
 }
-static int traveler_presence(uintptr_t image,uintptr_t game) {
+static int traveler_presence(uintptr_t image,uintptr_t game,int fresh) {
     struct jc_layout_result layout;
     int code=jc_native_layout(own_read,NULL,image,game,&layout);
     for (unsigned i=20;i<28;++i) JNETTraveler[i]=-1;
@@ -123,21 +125,22 @@ static int traveler_presence(uintptr_t image,uintptr_t game) {
     JNETTraveler[24]=(LONG)layout.local_chapter;
     JNETTraveler[25]=(LONG)layout.remote_chapter;
     JNETTraveler[26]=layout.remote_gate;
-    if (layout.remote_gate) { JNETTraveler[15]=23; return 0; }
+    if (layout.remote_gate && !fresh) { JNETTraveler[15]=23; return 0; }
     return 1;
 }
-static void traveler_arm(uintptr_t game) {
+static void traveler_arm_context(uintptr_t game,int fresh) {
     uintptr_t image=(uintptr_t)GetModuleHandleW(NULL);
     if (JNETTraveler[0] || allocation_attempted || bound_state || JNETResource || pose_link.started) return;
     boundary_checkpoint_begin();
     if (JNETStartup[1]!=1 || JNETStartup[2]!=1 || JNETStartup[3] || JNETStartup[4]!=1 ||
-        !traveler_presence(image,game) ||
+        !traveler_presence(image,game,fresh) ||
         !own_read(NULL,game+0x1e0,&traveler_barn,8)) { traveler_result(-1,1,8); return; }
     traveler_game=game; traveler_thread=GetCurrentThreadId();
     traveler_deadline=GetTickCount64()+600000; allocation_attempted=1;
     resource_game=game; resource_barn=traveler_barn; resource_thread=traveler_thread;
     traveler_result(1,1,0);
 }
+static void traveler_arm(uintptr_t game) { traveler_arm_context(game,0); }
 static void traveler_mesh_report(const char *stage,unsigned index,uintptr_t mesh) {
     uint64_t source=0,payload=0,slot=0,clone=0,root=0,entries=0,count=0,slots=0,context=0;
     uint32_t capacity=0,mask=0;
@@ -156,10 +159,37 @@ static void traveler_mesh_report(const char *stage,unsigned index,uintptr_t mesh
         (unsigned long long)slots,capacity,(unsigned long long)context,(long)JNETMesh[1],(long)JNETMesh[2],(long)mesh_fault);
     if(n>0 && (size_t)n<sizeof(line))jnet_log_append(&session_logs->fault,line,(size_t)n);
 }
+static uintptr_t traveler_waiting_init[10];
+static int traveler_waiting_fresh;
+static int traveler_mesh_storage_ready(void) {
+    for(unsigned i=0;i<2;++i){
+        uintptr_t mesh=traveler_barn+(i?0x14850:0x210),slot=0,clone=0,root=0,entries=0,count=0;
+        if(!own_read(NULL,mesh+0x30,&slot,8) || !slot ||
+           !own_read(NULL,slot+0x10,&clone,8) || !clone ||
+           !own_read(NULL,clone+0x18,&root,8) || !root ||
+           !own_read(NULL,mesh+0x578,&entries,8) || !entries ||
+           !own_read(NULL,mesh+0x580,&count,8) || !count || count>4096)return 0;
+    }
+    return 1;
+}
+static uintptr_t traveler_initialize_extra(uintptr_t dude,uintptr_t manager,uintptr_t effects,uintptr_t unused,
+        uintptr_t lua,uintptr_t random,uintptr_t name,uintptr_t sound,uintptr_t decorations,uintptr_t remote,
+        uintptr_t result,int fresh);
 static uintptr_t full_init_observer(uintptr_t dude,uintptr_t manager,uintptr_t effects,uintptr_t unused,
         uintptr_t lua,uintptr_t random,uintptr_t name,uintptr_t sound,uintptr_t decorations,uintptr_t remote) {
     if((JNETTraveler[0]==4 || JNETTraveler[0]==-1) && (unsigned char)remote==1 && traveler_level_rearm)traveler_level_rearm();
     uintptr_t result=original_full_init(dude,manager,effects,unused,lua,random,name,sound,decorations,remote);
+    uintptr_t game_now=(uintptr_t)JNETGame;uint64_t barn_now=0;
+    int fresh=0;
+    if(game_now && own_read(NULL,game_now+0x1e0,&barn_now,8) && barn_now) {
+        if(dude==barn_now+0xb0 && (unsigned char)remote==0) {
+            traveler_fresh_game=game_now;traveler_fresh_barn=barn_now;traveler_fresh_thread=GetCurrentThreadId();
+        } else if(dude==barn_now+0x146f0 && (unsigned char)remote==1) {
+            fresh=traveler_fresh_game==game_now && traveler_fresh_barn==barn_now &&
+                traveler_fresh_thread==GetCurrentThreadId();
+            traveler_fresh_game=traveler_fresh_barn=0;
+        }
+    }
     traveler_admission_initialized(dude);
     if((unsigned char)remote==1 && traveler_native_initialized)traveler_native_initialized(dude);
     if (JNETTraveler[19] && !JNETTraveler[0]) {
@@ -168,10 +198,33 @@ static uintptr_t full_init_observer(uintptr_t dude,uintptr_t manager,uintptr_t e
             !jc_render_level(own_read,NULL,game,&current) && current>=0 && current<12) {
             InterlockedExchange(&JNETTraveler[19],0);
             if ((DWORD)JNETFlight[3]!=GetCurrentThreadId()) traveler_result(-1,2,8);
-            else traveler_arm(game);
+            else traveler_arm_context(game,fresh);
         }
     }
+    return traveler_initialize_extra(dude,manager,effects,unused,lua,random,name,sound,decorations,remote,result,fresh);
+}
+static void traveler_pending_initialize(void) {
+    if(!traveler_waiting_init[0])return;
+    if(JNETTraveler[0]!=1 || !traveler_context() || GetTickCount64()>=traveler_deadline){
+        memset(traveler_waiting_init,0,sizeof(traveler_waiting_init));
+        if(JNETTraveler[0]==1)traveler_result(-1,2,9);
+        return;
+    }
+    if(!traveler_mesh_storage_ready())return;
+    uintptr_t a[10];memcpy(a,traveler_waiting_init,sizeof(a));
+    traveler_initialize_extra(a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],0,traveler_waiting_fresh);
+}
+static uintptr_t traveler_initialize_extra(uintptr_t dude,uintptr_t manager,uintptr_t effects,uintptr_t unused,
+        uintptr_t lua,uintptr_t random,uintptr_t name,uintptr_t sound,uintptr_t decorations,uintptr_t remote,
+        uintptr_t result,int fresh) {
     if (JNETTraveler[0]!=1 || dude!=traveler_barn+0x146f0) return result;
+    if(!traveler_mesh_storage_ready()){
+        const uintptr_t args[]={dude,manager,effects,unused,lua,random,name,sound,decorations,remote};
+        if(!traveler_waiting_init[0])message("[JNET] extra traveler waiting for native mesh storage before allocation");
+        memcpy(traveler_waiting_init,args,sizeof(args));traveler_waiting_fresh=fresh;
+        return result;
+    }
+    memset(traveler_waiting_init,0,sizeof(traveler_waiting_init));
     int level=-1,code=jc_render_level(own_read,NULL,traveler_game,&level);
     if (code || level<0 || level>=12 || !traveler_context() || GetTickCount64()>=traveler_deadline ||
         !TryAcquireSRWLockExclusive(&lifetime_lock)) { traveler_result(-1,2,8); return result; }
@@ -190,7 +243,7 @@ static uintptr_t full_init_observer(uintptr_t dude,uintptr_t manager,uintptr_t e
     JC_TRAVELER_REQUIRE(name==image+0x5dffa0,21);
     JC_TRAVELER_REQUIRE(own_read(NULL,image+0x37c7198,&global,1) && !global,22);
     /* RVA 117740: raw activity flags alone do not identify a resident peer. */
-    if (!traveler_presence(image,traveler_game)) { code=8; goto done; }
+    if (!traveler_presence(image,traveler_game,fresh)) { code=8; goto done; }
     JC_TRAVELER_REQUIRE(own_read(NULL,traveler_game+0x180,&match,8) &&
         jc_layout_field(own_read,NULL,match,0x11db4,&connected,1),31);
     JNETTraveler[27]=connected;
@@ -306,6 +359,11 @@ static uintptr_t full_init_observer(uintptr_t dude,uintptr_t manager,uintptr_t e
     return result;
 }
 static void traveler_cleanup(uintptr_t dude,uintptr_t sound) {
+    if(traveler_waiting_init[0] && (dude==traveler_barn+0xb0 || dude==traveler_barn+0x146f0)){
+        memset(traveler_waiting_init,0,sizeof(traveler_waiting_init));
+        if(JNETTraveler[0]==1 && !traveler_object){allocation_attempted=0;JNETTraveler[0]=0;JNETTraveler[19]=1;}
+    }
+    if(dude==traveler_fresh_barn+0xb0 || dude==traveler_fresh_barn+0x146f0)traveler_fresh_game=traveler_fresh_barn=0;
     if(dude==traveler_admission_barn+0xb0 || dude==traveler_admission_barn+0x146f0)traveler_admission_ready=0;
     if (JNETTraveler[0]!=3 || dude!=traveler_barn+0xb0) return;
     uintptr_t image=(uintptr_t)GetModuleHandleW(NULL); uint64_t manager=0,value=0;

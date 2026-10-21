@@ -48,6 +48,14 @@ static void jnet_sg_game_phase(uintptr_t game,int playback) {
             if(idle)p->connection.peer=memory[slot].id;
         }
     }
+    if(!traveler_network.peers[1].connection.peer &&
+        (traveler_local_state==0 || traveler_local_state==4) &&
+        !traveler_actor && !traveler_actor_trial_join_pending &&
+        traveler_network.peers[0].connection.peer) {
+        memset(&traveler_network.peers[0],0,sizeof(traveler_network.peers[0]));
+        memset(memory,0,sizeof(memory[0]));
+        memset(jnet_motion,0,sizeof(jnet_motion[0]));
+    }
     if(!traveler_network.paused && received && now>=received && now-received<2000)for(unsigned i=0;i<JNET_STEAM_CAPACITY;++i) {
         const struct jnet_game_record *r=records+i;if(r->sample.chapter!=jnet_current_level || !r->id || r->id==identity || !r->sequence || now<r->seen || now-r->seen>=2000)continue;
         unsigned slot=2;
@@ -120,6 +128,8 @@ static void jnet_sg_game_phase(uintptr_t game,int playback) {
     int valid=!code && outgoing.sample.chapter==jnet_current_level;
     outgoing.character=jnet_menu_edit.applied.character;
     outgoing.spotlight=jnet_character_spotlight;
+    outgoing.grab=jnet_grab_down;
+    outgoing.variant=jnet_menu_edit.applied.variant;
     outgoing.rotation_known=jnet_character_capture_rotation && jnet_character_capture_rotation(outgoing.rotation);
     outgoing.character_known=outgoing.character<JNET_CHARACTER_COUNT;
     AcquireSRWLockExclusive(&jnet_sg_lock);

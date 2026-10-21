@@ -1,0 +1,9 @@
+native orchestration: 87 production-body scenarios passed for both owners, precise binding failures, alternating order and room sequences
+native report: 49 production-body scenarios passed; maximal numeric report 5058 / 10000 characters; exit report retention and 499 bounded capacities and two exit-recorder cases passed
+native companion cloth: scarf charge/length, per-participant outfit/symbol, atlas changes and isolated descriptor failures passed
+native companion cloth: phase, capacity, peer handoff, ownership, native sequencing and retirement scenarios passed
+native cloth orchestration: 8 extracted-production finish, cleanup and 14-argument forwarding scenarios passed
+native cloth appearance: 29 extracted-production buffer-disjointness, exact restoration and texture-binding scenarios passed
+Native atlas: 19 production scenarios; all seven outfits, exact resource names, protected textures, missing resources, original holders and manager mutation checked. Native loaders simulated.
+Production callback reader: 1000 fresh reads, one permission query; fault rejection, fresh inspection, fallback and deadline checks passed.
+Reader watchdog: pass, fault rejection, timeout, spawn/wait/exit-query failure, premature success and crash exit checked; only the owned child is terminated.

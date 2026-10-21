@@ -1,0 +1,73 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+float4 l_a;
+
+#ifdef FOG
+ float4 f_se;       // fogStart/fogEnd
+ float4 f_cc, f_fc; // fogCloseColor, fogFarColor
+#endif
+
+#endif
+
+
+struct a2v
+{
+#if defined(__ORBIS__)
+	float4 position  VS_ATTR(POSITION);
+#else
+	float3 position  VS_ATTR(POSITION);
+#endif
+	float3 uv        VS_ATTR(TEXCOORD0);
+	float4 color     VS_ATTR(COLOR0);
+};
+
+struct v2f
+{
+	float4 clipSpace FS_ATTR(POSITION);
+	float4 color     FS_ATTR(COLOR0);
+    float3 uv        FS_ATTR(TEXCOORD0);
+#ifdef FOG
+	HALF4  fog       FS_ATTR(TEXCOORD1);
+#endif
+};
+
+//void main( in a2v IN, out v2f OUT )
+//{
+
+VS_START()
+
+	float3 pos = input.position.xyz;
+    float3 eye = float3( GET_GLOBAL(eyePositionWS.xyz) - pos.xyz ); (void)eye;
+
+	// Transform point into clipSpace
+	output.clipSpace = MatrixMul(GET_LOCAL(modelViewProj), float4(pos, 1.0f) );
+
+	// Just pass along color and position directly.
+	output.color.rgba = input.color.rgba;
+#ifndef RIBBON
+	output.color.rgb *= GET_GLOBAL(l_a.rgb);
+#endif	
+	output.uv = input.uv;
+
+#if FOG
+	HALF rayS = min( eyePositionWS.y, pos.y );
+	HALF rayE = max( eyePositionWS.y, pos.y ) + 0.5; // Prevent div by 0.
+	HALF rayH = rayE - rayS;
+	HALF fogS = f_se.z;
+	HALF fogE = f_se.w;
+	HALF fogH = fogE - fogS;
+	HALF midS = min( rayS, fogE );
+	HALF midE = min( rayE, fogE );
+	HALF midA = 0.5 * (midS + midE);
+	HALF midH = midE - midS;
+	HALF fogY = ((fogE - midA) * midH) / (fogH * rayH);
+	HALF fogRatio = saturate( (fogY * length( eye ) - f_se.x) / (f_se.y - f_se.x) );
+	fogRatio = fogRatio*fogRatio;
+	HALF3 fogColor = lerp( f_cc.rgb, f_fc.rgb, fogRatio );
+	HALF fogAlpha = lerp( f_cc.a, f_fc.a, fogRatio );
+	output.fog = HALF4( fogColor, fogRatio*fogAlpha );
+#endif
+
+SH_END()

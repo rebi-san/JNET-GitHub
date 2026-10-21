@@ -1,0 +1,97 @@
+#define GLOBAL_LEAN_AND_MEAN
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+float4x4	modelViewProj		: modelviewproj		;
+float4		eyePositionWS		: eyePositionWS	;
+
+#ifndef D_PREPASS_ENABLED
+
+	float4 l_c;
+	float4 l_a;
+	float4 l_d;
+
+	#ifdef FOG
+	 float4 f_se;       // fogStart/fogEnd
+	 float4 f_cc, f_fc; // fogCloseColor, fogFarColor
+	#endif
+
+#endif//D_PREPASS_ENABLED
+
+
+#endif
+
+
+
+
+struct a2v
+{
+	float4 position  VS_ATTR(POSITION);
+	float3 uv        VS_ATTR(TEXCOORD0);
+	float4 lUvDirAmb VS_ATTR(TEXCOORD1);
+	float4 color     VS_ATTR(COLOR0);
+};
+
+struct v2f
+{
+	float4 clipSpace FS_ATTR(POSITION);
+	HALF4  color     FS_ATTR(COLOR0);
+    float4 uv        FS_ATTR(TEXCOORD0);
+	HALF4  lUvDirAmb FS_ATTR(TEXCOORD1);
+#ifdef FOG
+	HALF4  fog       FS_ATTR(TEXCOORD2);
+#endif
+#ifdef SOFT
+	float4 pos       FS_ATTR(TEXCOORD3);
+#endif
+};
+
+//void main( in a2v IN, out v2f OUT )
+//{
+
+VS_START()
+
+	const float3 pos = input.position.xyz;
+	float3 eye = float3( GET_GLOBAL(eyePositionWS.xyz) - pos.xyz );
+	float intensity = input.uv.z;
+
+	// Transform point into clipSpace
+	output.clipSpace = MatrixMul(GET_LOCAL(modelViewProj), float4(pos, 1.0f) );
+
+	// Determine if we are alpha or additive
+
+	float invOpacity = D_UINT_MOD((int)floor( 255.2 * input.color.a ),2) == 0 ? 1.0f : 0.001f;
+	output.color.rgba = (HALF4)input.color.rgba;
+
+	//output.color.rgb *= l_a.rgb + saturate(dot(normalize( l_d ),float3(0,1,0)))*l_c.rgb;
+	output.uv = float4( input.uv.xy, invOpacity, intensity );
+
+	// Just pass along this data vector.
+	output.lUvDirAmb = (HALF4)input.lUvDirAmb;
+
+#ifdef FOG
+	HALF rayS = min( GET_GLOBAL(eyePositionWS.y), pos.y );
+	HALF rayE = max( GET_GLOBAL(eyePositionWS.y), pos.y ) + 0.5; // Prevent div by 0.
+	HALF rayH = rayE - rayS;
+	HALF fogS = GET_GLOBAL(f_se.z);
+	HALF fogE = GET_GLOBAL(f_se.w);
+	HALF fogH = fogE - fogS;
+	HALF midS = min( rayS, fogE );
+	HALF midE = min( rayE, fogE );
+	HALF midA = 0.5 * (midS + midE);
+	HALF midH = midE - midS;
+	HALF fogY = ((fogE - midA) * midH) / (fogH * rayH);
+	HALF fogRatio = saturate( (fogY * length( eye ) - GET_GLOBAL(f_se.x)) / (GET_GLOBAL(f_se.y) - GET_GLOBAL(f_se.x)) );
+	fogRatio = fogRatio*fogRatio;
+	HALF3 fogColor = (HALF3)lerp( GET_GLOBAL(f_cc.rgb), GET_GLOBAL(f_fc.rgb), fogRatio );
+	HALF fogAlpha = lerp( GET_GLOBAL(f_cc.a), GET_GLOBAL(f_fc.a), fogRatio );
+	output.fog = HALF4( fogColor, fogRatio*fogAlpha );
+#endif
+
+#ifdef SOFT
+	output.pos = mul( SCALE_BIAS, output.clipSpace );
+	output.pos.w = output.clipSpace.w;
+#endif
+
+SH_END()

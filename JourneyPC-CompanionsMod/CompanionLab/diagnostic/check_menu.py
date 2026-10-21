@@ -8,7 +8,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from inspect_menu import menu_contract, font_contract
 from inspect_build import ROOT, LAB, pe_sections
-from native_map import offset_for
+from native_map import offset_for, runtime_functions
 
 
 def main():
@@ -23,6 +23,9 @@ def main():
     if not expected or data[at:at + len(expected)] != expected:
         raise ValueError("Production QueueLevel startup signature does not match Journey")
     print("Production QueueLevel startup signature matches pinned Journey executable.")
+    at = offset_for(sections, 0x21b19f, 5)
+    if data[at:at + 5] != bytes.fromhex("e8 1c f5 eb ff"):
+        raise ValueError("Native Chapter Select QueueLevel caller changed")
     header = (HERE / "jnet_character_native.h").read_text()
     glow_type = int(re.search(r"#define JNET_CHARACTER_GLOW_VTABLE_RVA (0x[0-9a-f]+)u", header)[1], 16)
     for ctor in (0x17a390, 0x17a412):
@@ -152,18 +155,40 @@ def main():
     patch_end = travel_source.index("\n#endif", patch_start)
     (work / "mepal_code.h").write_text(travel_source[patch_start:patch_end])
     lines = ["static void load_menu_code(unsigned char *image) {"]
-    for rva, length in ((0x1024a0, 0x1fe), (0x1042b5, 0xd1), (0x68b24c, 4), (0xda6c0, 0x14e), (0xd7fc34, 4), (0x1468e0, 0x94)):
+    for rva, length in ((0x372ad0, 0x50), (0x1024a0, 0x1fe), (0x1042b5, 0xd1), (0x68b24c, 4), (0xda6c0, 0x14e), (0xd7fc34, 4), (0x1468e0, 0x94)):
         at = offset_for(sections, rva, length)
         code = ",".join(str(b) for b in data[at:at + length])
         lines.append("{ static const unsigned char code[]={" + code + "};")
         lines.append(f"memcpy(image+{rva},code,sizeof(code));}}")
     lines.append("image[0x104386]=0xc3;}")
     (work / "menu_code.h").write_text("\n".join(lines) + "\n")
+    functions={start:end-start for start,end,_ in runtime_functions(data,sections)}
+    lines=["static void load_environment_code(unsigned char *image) {"]
+    spans=[(0xc5880,0x5e70-0x5880),(0xc6140,0x67d0-0x6140)]
+    spans += [(rva,functions[rva]) for rva in (0xc69b0,0x7a1b0)]
+    spans += [(0x5c1e00,0x200),(0x677870,16),(0x68ae80,0x400),(0x68c000,16),(0x7a20cc,4)]
+    for rva,length in spans:
+        at=offset_for(sections,rva,length)
+        code=",".join(str(b) for b in data[at:at+length])
+        lines.append("{ static const unsigned char code[]={"+code+"};")
+        lines.append(f"memcpy(image+{rva},code,sizeof(code));}}")
+    lines.append("image[0xc84d0]=0xc3;image[0x274d70]=0xc3;}")
+    (work/"environment_code.h").write_text("\n".join(lines)+"\n")
+
     appearance_source=(HERE / "jnet_appearance_live.h").read_text()
     save_start=appearance_source.index("static int jnet_appearance_local_saved(")
     save_end=appearance_source.index("static int jnet_appearance_boot(",save_start)
     (work / "save_poll_code.h").write_text(appearance_source[save_start:save_end])
-    for name in ("test_jnet_save_status", "test_jnet_frame_pacing", "test_jnet_texture_guard", "test_jnet_intro", "test_jnet_character_volume", "test_jnet_character_assets", "test_jnet_character_native", "test_jnet_character", "test_jnet_chat_input", "test_jnet_menu_draw", "test_jnet_menu_live", "test_jnet_menu_model", "test_jnet_lobby_runtime", "test_jnet_steam_probe", "test_jnet_steam_lobby", "test_jnet_rocket", "test_jnet_group_travel", "test_jnet_travel_native", "test_jnet_appearance_live", "test_jnet_freeplay_live"):
+    character_source=(HERE / "jnet_character_live.h").read_text()
+    eye_start=character_source.index("static void (*jnet_character_eye_original)")
+    eye_end=character_source.index("static unsigned char (*jnet_character_jump_original)",eye_start)
+    (work / "character_eye_code.h").write_text(character_source[eye_start:eye_end])
+    restore_start=character_source.index("static int jnet_character_restore_wayfarer(")
+    restore_end=character_source.index("static void jnet_character_fail(",restore_start)
+    body_start=character_source.index("static struct jnet_character_state *jnet_character_creature_for_dude(")
+    body_end=character_source.index("static unsigned char (*jnet_character_touch_original)",body_start)
+    (work / "character_body_code.h").write_text(character_source[restore_start:restore_end]+character_source[body_start:body_end])
+    for name in ("test_jnet_resource_view", "test_jnet_character_body", "test_jnet_character_eye", "test_jnet_save_status", "test_jnet_frame_pacing", "test_jnet_texture_guard", "test_jnet_intro", "test_jnet_character_volume", "test_jnet_character_assets", "test_jnet_character_native", "test_jnet_character", "test_jnet_chat_input", "test_jnet_menu_draw", "test_jnet_menu_live", "test_jnet_menu_model", "test_jnet_lobby_runtime", "test_jnet_steam_probe", "test_jnet_steam_lobby", "test_jnet_rocket", "test_jnet_group_travel", "test_jnet_travel_native", "test_jnet_appearance_live", "test_jnet_freeplay_live"):
         binary = work / name
         subprocess.run(["clang", "-arch", "x86_64", "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
                     "-fsanitize=address,undefined", "-I", str(work), "-I", str(HERE),

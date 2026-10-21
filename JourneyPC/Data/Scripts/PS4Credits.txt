@@ -1,0 +1,881 @@
+
+
+
+
+
+
+
+
+
+
+
+
+$b Annapurna Interactive
+$b Megan Ellison
+
+$b Nathan Gary
+$b Kelsey Hansen
+$b Neale Hemrajani
+$b Jeff Legaspi
+$b Deborah Mars
+$b James Masi
+$b Hector Sanchez
+$b Joshua Sarfaty
+
+$b Conversion Development by Inline Assembly Ltd.
+$b Morten Pedersen
+$b Pete McCarthy
+
+$b Special Thanks
+$b Jenova Chen
+$b thatgamecompany
+$b Jordan Marks
+$b Kees van Dijkhuizen
+$b Everyone at Annapurna 
+$b Everyone at fortyseven communications
+$b Everyone at iam8bit
+$b Shawn Layden
+$b Shuhei Yoshida
+$b Scott Rohde
+$b Shannon Studstill
+$b Chad Cox
+$b Santa Monica Studio
+$b Sony Interactive Entertainment
+$b Tricky Pixels
+$b Enzyme Testing Labs
+$b EDS Wordland Ltd.
+$b Adam Klaff
+$b Matt Nickerson
+$b Sean Jenkin
+$b Claire Moore
+$b Christine McCarthy
+
+$b © 2012-2018 Sony Interactive Entertainment LLC. Journey is a trademark of Sony Interactive Entertainment LLC. Developed by thatgamecompany.
+$b Conversion development by Inline Assembly Ltd. Published by Annapurna Interactive.
+		
+ 					
+					
+					
+$b SONY COMPUTER ENTERTAINMENT AMERICA					
+					
+$b SANTA MONICA STUDIO					
+					
+$b External Development					
+					
+$b Associate Producer					
+$b Eric Fong					
+												
+$b Executive Producer					
+$b Deborah Mars					
+									
+$b Director of Product Development					
+$b Chacko Sonny					
+					
+					
+$b Studio Management					
+					
+$b Studio Business Operations					
+$b Dickson Lee					
+					
+$b Senior Director, Product Development, 
+$b Santa Monica Studio					
+$b Shannon Studstill					
+					
+$b President, Sony Computer Entertainment, Worldwide Studios					
+$b Shuhei Yoshida					
+					
+					
+					
+$b GLOBAL PLATFORM					
+					
+$b Global First Party Quality Assurance (GFPQA)					
+					
+$b QA Operations					
+					
+$b Lead Quality Assurance Tester					
+$b Jim Dunne									
+					
+$b Contingent Game Test Analysts					
+$b Jack Gordon, Marcelino Huerta, Pine Khong, Gummi Li, 
+$b Joseph Long, Nicholas Postulka, Tim Ward 					
+					
+$b Lab Technicians					
+$b Esau Garcia, Greg Hicks									
+					
+$b Contingent Game Test Analysts, TRC Test Team					
+$b Jesse Gallegos, Sean Davis, Joe Mitchell,
+$b Jared Mustartd, Jeffrey McLaurin, Andrew Briggs					
+					
+$b Sr. Compliance Analysts, TRC Test Team					
+$b Brandon Seymour, Matt Jenssen, Michael Yubane					
+					
+$b Automation and Tools Team					
+					
+$b Manager, Advanced Test Team					
+$b Brian Buhr					
+									
+$b Network Test Engineers					
+$b Robby Cheverton, Joshua Kahelin					
+					
+$b Global Release Services					
+					
+$b Sr. Release Manager					
+$b Ronald Pascucci					
+					
+$b Associate Compliance Manager					
+$b Callista Tieu					
+					
+				
+$b GLOBAL TECHNOLOGY					
+					
+$b Audio Team					
+					
+$b Sr. Manager Programming					
+$b Keith Charley					
+					
+				
+					
+$b PD SERVICES GROUP					
+					
+$b PDSG Music 					
+					
+$b Senior Music Editor					
+$b Monty Mudd					
+					
+$b PDSG Sound 					
+					
+$b Senior Sound Designers					
+$b Erik Buensuceso, Chris Jahnkow					
+					
+					
+					
+$b LATIN AMERICA					
+					
+$b Regional Head of Marketing					
+$b Rossanna Schach					
+					
+$b Regional Sr. Manager,
+$b Product and Trade Marketing					
+$b Noboru Yamawaki 										
+					
+$b Product Marketing Manager - Mexico					
+$b Mercedes Soto					
+										
+$b Marketing Analyst - Brazil					
+$b Alessandra Luizello					
+					
+$b Senior Digital Marketing Specialist					
+$b Aaron Alvarez					
+										
+$b Regional Communication Manager					
+$b Ken Balough					
+					
+$b SPECIAL THANKS					
+$b Santa Monica Studio would like to thank the following:					
+$b thatgamecompany, Ariel Angelotti, Allan Becker, Richard Daniels, Brent Gocke, 
+$b Carl Hartenstein, Linda Jo, Aaron Kaufman, Jeffery Le, Jeff Legaspi, Arturo Mora, 
+$b Michael Morishita, Tanya Page, Philip Piliero, Hector Sanchez, Travis Sher, Daniel 
+$b Short, Yvette Silva, Chris Taylor, David Thach, Vinh Tran, Colby Turner, Brian Upton, 
+$b Zach Wood, Greg Yip, Jonathan York, Global Platform, Global Technology, PDSG Service Group, 
+$b PDSG Creative, PDSG Music, PDSG Sound, PDSG Visual Arts, SCEA Brand Marketing and Public Relations, 
+$b SCEA Legal & Business Affairs, SCEA ISD, and the spouses/significant others and families 
+$b of the development team.					
+					
+$b We would like to thank each individual at Sony Computer Entertainment America for their 
+$b contributions, support and dedication to the success of Journey<8482> with special recognition to 
+$b the Executive Management team including:					
+$b Andrew House, Shawn Layden, Jim Bass, Guy Longworth, Scott Rohde, Glenn Nash, Riley R. Russell, 
+$b Phil Rosenberg, Tim Bender, Shuhei Yoshida					
+					
+					
+					
+$b SONY COMPUTER ENTERTAINMENT EUROPE					
+					
+$b International Software Development					
+					
+$b Producer					
+$b Olivier Banal					
+					
+$b Director, International Software
+$b Development and Localisation Services					
+$b Sean Kelly					
+										
+$b Project Manager, Localisation Services					
+$b Kristie Wang					
+					
+$b GFPQA-E Release Management					
+					
+$b Release Manager					
+$b Andy Godden					
+					
+$b GFPQA Business Operations					
+					
+$b Junior Business Analyst					
+$b Sean Lawrence					
+					
+$b Test Operations					
+					
+$b Senior Manager					
+$b Nadine Martin					
+					
+$b Functional Test Lead					
+$b Jonathan Williams					
+					
+$b Functional Tester (Contract)					
+$b Darren Butler					
+					
+$b Localisation Test Lead					
+$b Chris Severs					
+					
+$b Localisation Testers					
+$b Vincente Quezede, Maribel Ruiz, Christoph Neubauer, Matteo Turrino, Szymon Figura, 
+$b Filipe Fortes, Antti Tietavainen, Amanda Tydesjo,  Jan Roger Henden, 
+$b Alexander Lavrenov
+					
+$b Contract Staff Coordinators
+$b Tom Nicholson-Ihara
+
+
+$b Support Services
+
+$b Manager, Support Services
+$b Anthony Gill
+
+$b Translator
+$b Anri Iwasaki
+
+$b Senior Support Operatives
+$b Matthew Adderley, Simon Edwards
+
+$b Associate Manager, Supplier Management
+$b Yolanda Akil
+
+
+$b Central Marketing & PR					
+					
+$b Product Manager					
+$b Kelly-Marie Ridgers					
+					
+$b Copywriter					
+$b John Williams										
+					
+					
+$b Journey <169>2012-2015 Sony Computer Entertainment America LLC. 
+$b Published by Sony Computer Entertainment Europe.
+$b Developed by thatgamecompany.
+$b "Journey" is a trademark of Sony Computer Entertainment Europe. All rights reserved.  
+$b PS4<8482> system development by Tricky Pixels Ltd.					
+					
+					
+					
+$b SONY COMPUTER ENTERTAINMENT JAPAN STUDIO					
+					
+$b Senior Vice President					
+$b Allan Becker					
+					
+$b Associate Producer					
+$b Naoko Iwase					
+					
+$b Global Platform JAPAN FPQA					
+					
+$b Director					
+$b Sachiko Nagasawa					
+					
+$b Associate QA Manager					
+$b Kunihiro Nakajima					
+					
+$b Associate QA Engineers					
+$b Chinatsu Nakama, Osamu Fukuya					
+					
+$b Translators					
+$b Reed Baird, Susma Budhathoki, Aya Nakajima, Ugo Ricard, Marko Bursac, Yuki Tsuji					
+					
+$b Release Management					
+$b Souichirou Masuda, Leaf Morgan,
+$b Ayako Saito					
+					
+$b Japanese Logo Designer					
+$b Sei Kokubu					
+					
+$b SONY COMPUTER ENTERTAINMENT JAPAN					
+					
+$b First Party Publishing Dept.					
+$b Satoshi Satake, Taku Nishijima, 
+$b Hirotaka Fukushima					
+					
+					
+$b FONTWORKS Inc.					
+$b THIS SOFTWARE USES FONTS BY FONTWORKS INC.					
+					
+$b <169>2015 Sony Computer Entertainment America LLC.					
+					
+					
+					
+$b SONY COMPUTER ENTERTAINMENT JAPAN ASIA (ASIA)					
+					
+$b Executive Producer					
+$b Katsuhiko Murase					
+					
+$b Assistant Producers					
+$b Hakuki Lin, Winnie Tang, Chou Shao Chu					
+					
+$b [Traditional Chinese]					
+					
+$b Translators and Testers					
+$b Sai Bunji, Sai Fukuan					
+					
+$b Marketing Managers					
+$b Jacqueline Chiu (SCEH), Ethan Su (SCET), Sakura Wang (SCET)					
+					
+$b Product Managers					
+$b Yoshinori Akiyama (SCEH), Yvonne Chan (SCEH), Stephen Lin (SCET)					
+					
+$b Media Coordinator					
+$b Jessie Chan (SCEH)					
+					
+$b Promotion Coordinators					
+$b CoCo Lau (SCEH), Clive Chan (SCEH), Rika Fung (SCEH), Fran Tsai (SCET)					
+					
+$b Promotion Assistant					
+$b Pin-I Chen (SCET)					
+					
+$b Executive Producers					
+$b Tatsuo Eguchi (SCET), Tetsuya Ando (SCEH)					
+					
+					
+$b [Korea]					
+					
+$b Producer					
+$b Naoki Hara (SCEK)					
+					
+$b Quality Assurance Manager					
+$b Ki-Bong Kim (SCEK)					
+					
+$b First Party Quality Assurance					
+					
+$b Testing Supervisor					
+$b Tae-Min Kim (SCEK)					
+					
+$b Format Quality Assurance					
+					
+$b Testing Supervisor					
+$b Byoung-Joon Kim (SCEK)					
+					
+$b Testers					
+$b Min-Seok Kang (SCEK), Kang-Jae Lee (SCEK) 					
+					
+					
+$b <169>2015 Sony Computer Entertainment America LLC.					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					

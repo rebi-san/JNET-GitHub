@@ -1,0 +1,136 @@
+#include "Migratory.sh"
+// Author: John Edwards
+// Date C: 8-13-2008
+
+#ifndef _IOS64
+
+// Layers.
+D_DECLARE_TEXTURE2D_4(tex0);
+D_DECLARE_TEXTURE2D_4(tex1);
+D_DECLARE_TEXTURE2D_4(tex2);
+D_DECLARE_TEXTURE2D_4(tex3);
+D_DECLARE_TEXTURE2D_4(texAlpha);
+
+// Layers.
+float opacity;
+
+float scaledTime;
+
+#define SOFT
+#ifdef SOFT
+	D_DECLARE_TEXTURE2D_4(depthTexLo);
+	D_DECLARE_TEXTURE2D_4(depthTex);
+	float depthBias;
+	float depthScale;
+#endif
+
+HALF4x4 colorCorrect;
+
+// Stream structs:
+struct v2f
+{
+	float4 clipSpace   VS_ATTR(POSITION);
+	float4 color       VS_ATTR(COLOR0);
+	float3 normal      VS_ATTR(TEXCOORD0);
+	float3 eye         VS_ATTR(TEXCOORD1);
+	float2 uv          VS_ATTR(TEXCOORD2);
+	float4 uv0         VS_ATTR(TEXCOORD3);
+	float4 uv1         VS_ATTR(TEXCOORD4);
+#ifdef SOFT
+	float4 pos         VS_ATTR(TEXCOORD5);
+#endif
+};
+
+struct f2f
+{
+	float4 color : FINAL_COLOR;
+};
+
+#endif
+
+
+inline float2 Distort( sampler2D texAlpha, float2 uv, float sclTime )
+{
+	uv.y *= 0.5;
+	const float kScale = 0.015;
+	float2 uvPush = kScale*tex2D( texAlpha, (uv+float2(0,-0.07*sclTime))*2.0 ).a;
+	uvPush.y = kScale*tex2D( texAlpha, (uv+float2(0.33,-0.08*sclTime))*2.0 ).a;
+	float2 uvPush2 = 0.333*kScale*tex2D( texAlpha, (uv+float2(0,-0.07*sclTime))*10.0 ).a;
+	uvPush2.y = 0.333*kScale*tex2D( texAlpha, (uv+float2(0.33,-0.08*sclTime))*10.0 ).a;
+	return uvPush + uvPush2;
+}
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+
+#ifdef SOFT
+    FS_START(float4,TEX7(2D,tex0, 2D,tex1, 2D,tex2, 2D,tex3, 2D,texAlpha, 2D,depthTexLo, 2D,depthTex),)
+#else
+    FS_START(float4,TEX5(2D,tex0, 2D,tex1, 2D,tex2, 2D,tex3, 2D,texAlpha),)
+#endif
+
+	float3 N = normalize(input.normal);
+	float3 E = normalize(input.eye);
+	float colorInt = 1-dot(N,E);
+	float scatteringAlpha = pow( saturate(1.0-colorInt), 16.0 );
+
+	float edgeFalloff = saturate(1.0 - length( 2*(input.uv - 0.5) ));
+	
+	input.uv.y *= 0.5;
+	
+	float myScaledTime = GET_LOCAL(scaledTime);
+	myScaledTime *= 0.5;
+	
+	float2 uvPush = 0.025*tex2D( texAlpha, input.uv+float2(0,-0.07*myScaledTime) ).a;
+	uvPush.y = 0.025*tex2D( texAlpha, input.uv+float2(0.33,-0.08*myScaledTime) ).a;
+	uvPush = 0;
+
+	float4 col3 = tex2D( tex3, input.uv1.zw+uvPush+Distort(texAlpha, input.uv1.zw,myScaledTime) );
+	float4 col2 = tex2D( tex2, saturate( input.uv1.xy+uvPush+Distort(texAlpha, input.uv1.xy,myScaledTime) ) );
+	float4 col1 = tex2D( tex1, saturate( input.uv0.zw+uvPush+Distort(texAlpha, input.uv0.zw,myScaledTime) ) );
+	float4 col0 = tex2D( tex0, saturate( input.uv0.xy+uvPush+Distort(texAlpha, input.uv0.xy,myScaledTime) ) );
+	float alpha = 1.0 * ((0.333+tex2D( texAlpha, 1.5*input.uv+float2(0,-0.07*myScaledTime) ).a) * (0.333+tex2D( texAlpha, input.uv+float2(0.25,-0.13*myScaledTime) ).a));
+
+	output.rgb = col3.rgb;
+	output.rgb = lerp( output.rgb, col2.rgb, col2.a );
+	output.rgb = lerp( output.rgb, col1.rgb, col1.a );
+	output.rgb = lerp( output.rgb, col0.rgb, col0.a );
+#ifdef _IOS64
+    output.rgb = ToM3x3(GET_LOCAL(colorCorrect)) * output.rgb; // note - inverse ordering, as we upload transposed!
+#else
+	output.rgb = MatrixMul( output.rgb, ToM3x3(GET_LOCAL(colorCorrect)) );
+#endif
+
+	output.a = alpha;
+	output.a *= pow( edgeFalloff, 2.0 );
+	output.a = saturate( output.a + 1.0*pow( edgeFalloff, 4.0 ) );
+	output.a *= GET_LOCAL(opacity)*GET_LOCAL(opacity);
+	output.a *= scatteringAlpha;
+	output *= input.color;
+
+#ifdef SOFT
+ #if defined( LOW_RES )
+	float depth = manualTexDepth2Dproj( depthTexLo, input.pos );
+ #else
+	float depth = manualTexDepth2Dproj( depthTex, input.pos );
+ #endif
+#if defined(D_PLATFORM_GCM)	
+	float pdepth = depthScale / (depth - depthBias);
+ #else
+	float pdepth = ConvertDepth(UG, depth);
+#endif
+	float _distance = pdepth + 0.0 - input.pos.w;
+	output.a *= clamp( 2.0*_distance, 0.f, 1.f );
+
+	// Also fade out when we get too close to the camera.
+	output.a *= saturate( 0.15 * input.pos.z * input.pos.z );
+#endif
+
+	output.rgb *= 3*max( 1.f, 5.0f / length(input.eye) );
+
+SH_END()

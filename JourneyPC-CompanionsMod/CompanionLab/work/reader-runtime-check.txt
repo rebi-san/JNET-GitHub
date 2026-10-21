@@ -1,0 +1,8 @@
+/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/companion-components/test_native_local_read.exe
+exit=0
+10000 fresh 16-byte reads: protected 0.423 ms, compatibility 152.930 ms. Reader microbenchmark only.
+Windows protected-copy self-test passed on private pages.
+Inspection reader: 1000 fresh-value reads / one permission query; inspection resets, cross-region rejection, changed permissions, bounded eviction and invalid ranges passed. Host uses simulated mappings; Windows fault recovery requires runtime.
+
+/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/package-0.90/JC-Diagnostics/Scarfhelper.exe --reader-check
+exit=0

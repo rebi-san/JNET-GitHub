@@ -1,9 +1,13 @@
 #ifndef JNET_CONTROLS_LIVE_H
 #define JNET_CONTROLS_LIVE_H
 #include <xinput.h>
-static int jnet_bindings[3][7]={{'C','B','V','G'},{0},{0}};
-static int jnet_bindings_saved[3][7];
-static unsigned jnet_binding_down[7],jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready;
+#include "jnet_character.h"
+static int jnet_bindings[3][8]={{'C','B','V','G',0,0,0,16},{0},{0,0,0,0,0,0,0,7}};
+static int jnet_bindings_saved[3][8];
+static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][7],jnet_creature_saved[JNET_CHARACTER_COUNT][3][7];
+static unsigned jnet_control_character,jnet_creature_down[7];
+static unsigned jnet_grab_down,jnet_fly_up_down,jnet_fly_down_down,jnet_level_down,jnet_tilt_left_down,jnet_tilt_right_down;
+static unsigned jnet_binding_down[8],jnet_sprint_down,jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready;
 static wchar_t jnet_controls_path[MAX_PATH];
 static uintptr_t (*jnet_menu_xml_original)(const char *);
 static uintptr_t (*jnet_setting_original)(uintptr_t,uintptr_t,uintptr_t);
@@ -14,17 +18,26 @@ static unsigned jnet_saved_lighting;
 static void (*jnet_settings_push)(uintptr_t,const char *);
 static int jnet_settings_dirty(unsigned group) {
     return group==1?jnet_credits!=jnet_saved_credits:group==2?jnet_fps_limit!=jnet_saved_fps:
-        group==3?memcmp(jnet_bindings_saved,jnet_bindings,sizeof(jnet_bindings))!=0:0;
+        group==3?(memcmp(jnet_bindings_saved,jnet_bindings,sizeof(jnet_bindings))!=0 ||
+        memcmp(jnet_creature_saved,jnet_creature_bindings,sizeof(jnet_creature_bindings))!=0):0;
 }
 static int jnet_settings_apply(unsigned group) {
-    int bindings[3][7];memcpy(bindings,group==3?jnet_bindings:jnet_bindings_saved,sizeof(bindings));
+    int bindings[3][8];memcpy(bindings,group==3?jnet_bindings:jnet_bindings_saved,sizeof(bindings));
     unsigned credits=group==1?jnet_credits:jnet_saved_credits;
     LONG fps=group==2?jnet_fps_limit:jnet_saved_fps;
     unsigned lighting=group==4?jnet_daynight_mode:jnet_saved_lighting;
+    if(lighting>2)lighting=0;
     if(lighting>2)return 0;
-    char data[1024];int length=snprintf(data,sizeof(data),"[Settings]\r\nCredits=%u\r\nFPS=%ld\r\nLighting=%u\r\n[Controls]\r\n",credits,(long)fps,lighting);
-    for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action)
+    char data[8192];int length=snprintf(data,sizeof(data),"[Settings]\r\nCredits=%u\r\nFPS=%ld\r\nLighting=%u\r\n[Controls]\r\n",credits,(long)fps,lighting);
+    for(unsigned device=0;device<3;++device)for(unsigned action=0;action<8;++action)
         length+=snprintf(data+length,sizeof(data)-length,"Binding%u%u=%d\r\n",device,action,bindings[device][action]);
+    const int (*creatures)[3][7]=group==3?jnet_creature_bindings:jnet_creature_saved;
+    for(unsigned kind=1;kind<JNET_CHARACTER_COUNT;++kind)if(jnet_character_is_creature(kind))
+        for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action){
+            int added=snprintf(data+length,sizeof(data)-(size_t)length,"Creature%u%u%u=%d\r\n",kind,device,action,creatures[kind][device][action]);
+            if(added<0 || (size_t)added>=sizeof(data)-(size_t)length)return 0;
+            length+=added;
+        }
     wchar_t temporary[MAX_PATH];
     if(!jnet_controls_path[0] || wcslen(jnet_controls_path)+5>=MAX_PATH)return 0;
     swprintf(temporary,MAX_PATH,L"%ls.tmp",jnet_controls_path);
@@ -34,14 +47,21 @@ static int jnet_settings_apply(unsigned group) {
     if(ok)ok=FlushFileBuffers(file);CloseHandle(file);
     if(ok)ok=MoveFileExW(temporary,jnet_controls_path,MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH);
     if(!ok){DeleteFileW(temporary);return 0;}
+    memcpy(jnet_creature_saved,creatures,sizeof(jnet_creature_saved));
     memcpy(jnet_bindings_saved,bindings,sizeof(bindings));jnet_saved_credits=credits;jnet_saved_fps=fps;jnet_saved_lighting=lighting;
     return 1;
 }
+static void (*jnet_quit_to_title)(void);
 static int jnet_settings_action(uintptr_t menu,uintptr_t node) {
     uintptr_t begin=0,end=0;
     if(!jnet_menu_visible_native(menu) || !jnet_menu_read(menu+0xc10,&begin,8) ||
        !jnet_menu_read(menu+0xc18,&end,8))return 0;
+    if(!begin || end<begin || end-begin<0x30 || (end-begin)%0x30)return 0;
     uintptr_t page=end-0x30;
+    if(jnet_menu_string_is(page,"QuitToMainMenu") && jnet_menu_string_is(node,"Yes")){
+        if(jnet_quit_to_title)jnet_quit_to_title();
+        return 0;
+    }
     int prompt=jnet_menu_string_is(page,"Back");
     if(prompt){if(end-begin<0x90)return 0;page-=0x30;}
     unsigned group=jnet_menu_string_is(page,"Audio")?1:jnet_menu_string_is(page,"Graphics")?2:jnet_menu_string_is(page,"Controls")?3:0;
@@ -58,7 +78,8 @@ static int jnet_settings_action(uintptr_t menu,uintptr_t node) {
     if(prompt && jnet_menu_string_is(node,"Revert")){
         if(group==1)jnet_credits=jnet_saved_credits;
         if(group==2)InterlockedExchange(&jnet_fps_limit,jnet_saved_fps);
-        if(group==3)memcpy(jnet_bindings,jnet_bindings_saved,sizeof(jnet_bindings));
+        if(group==3){memcpy(jnet_bindings,jnet_bindings_saved,sizeof(jnet_bindings));
+            memcpy(jnet_creature_bindings,jnet_creature_saved,sizeof(jnet_creature_bindings));}
     }
     return 0;
 }
@@ -68,17 +89,27 @@ static void jnet_controls_initialize(void) {
     wchar_t *slash=wcsrchr(jnet_controls_path,L'\\');
     if(!slash || slash-jnet_controls_path+24>=MAX_PATH){jnet_controls_path[0]=0;return;}
     wcscpy(slash+1,L"JNET-controls.ini");
-    for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action){
+    for(unsigned device=0;device<3;++device)for(unsigned action=0;action<8;++action){
         wchar_t key[24];swprintf(key,24,L"Binding%u%u",device,action);
         unsigned value=GetPrivateProfileIntW(L"Controls",key,jnet_bindings[device][action],jnet_controls_path);
         if(value<=(unsigned)jnet_controls_limit(device))jnet_bindings[device][action]=(int)value;
     }
     wcscpy(slash+1,L"JNET-settings.ini");
-    for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action){
+    for(unsigned device=0;device<3;++device)for(unsigned action=0;action<8;++action){
         wchar_t key[24];swprintf(key,24,L"Binding%u%u",device,action);
         unsigned value=GetPrivateProfileIntW(L"Controls",key,jnet_bindings[device][action],jnet_controls_path);
         if(value<=(unsigned)jnet_controls_limit(device))jnet_bindings[device][action]=(int)value;
     }
+    for(unsigned kind=1;kind<JNET_CHARACTER_COUNT;++kind)if(jnet_character_is_creature(kind)){
+        const int defaults[3][7]={{32,'C','L','Q','E','G',16},{0},{11,12,10,9,14,13,7}};
+        for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action){
+            wchar_t key[32];swprintf(key,32,L"Creature%u%u%u",kind,device,action);
+            int fallback=action==5?jnet_bindings[device][3]:action==6?jnet_bindings[device][7]:defaults[device][action];
+            unsigned value=GetPrivateProfileIntW(L"Controls",key,fallback,jnet_controls_path);
+            jnet_creature_bindings[kind][device][action]=value<=(unsigned)jnet_controls_limit(device)?(int)value:fallback;
+        }
+    }
+    memcpy(jnet_creature_saved,jnet_creature_bindings,sizeof(jnet_creature_saved));
     unsigned lighting=GetPrivateProfileIntW(L"Settings",L"Lighting",0,jnet_controls_path);
     jnet_daynight_mode=jnet_saved_lighting=lighting<=2?lighting:0;
     unsigned credits=GetPrivateProfileIntW(L"Settings",L"Credits",1,jnet_controls_path);
@@ -103,16 +134,55 @@ static uintptr_t jnet_menu_xml(const char *path) {
     return jnet_menu_xml_original(path);
 }
 static uintptr_t jnet_setting(uintptr_t context,uintptr_t out,uintptr_t name) {
-    if(jnet_menu_string_is(name,"%JNETCredits%")){*(uintptr_t *)out=(uintptr_t)&jnet_credits;return out;}
-    if(jnet_menu_string_is(name,"%JNETFPS%")){*(uintptr_t *)out=(uintptr_t)&jnet_fps_limit;return out;}
-    for(unsigned device=0;device<3;++device)for(unsigned action=0;action<7;++action){
-        char key[32];snprintf(key,sizeof(key),"%%JNET_BIND_%u_%u%%",device,action);
-        if(jnet_menu_string_is(name,key)){
+    unsigned char object[32];char key[32];uint64_t length=0,capacity=0;uintptr_t data=0;
+    if(!jnet_menu_read(name,object,sizeof(object)))return jnet_setting_original(context,out,name);
+    memcpy(&length,object+16,8);memcpy(&capacity,object+24,8);
+    if(length>=sizeof(key) || capacity<length)return jnet_setting_original(context,out,name);
+    if(capacity<16){
+        if(length>=16)return jnet_setting_original(context,out,name);
+        memcpy(key,object,(size_t)length);
+    }else{
+        memcpy(&data,object,8);
+        if(!jnet_menu_read(data,key,(size_t)length))return jnet_setting_original(context,out,name);
+    }
+    key[length]=0;
+    if(length==13 && !memcmp(key,"%JNETCredits%",13)){*(uintptr_t *)out=(uintptr_t)&jnet_credits;return out;}
+    if(length==9 && !memcmp(key,"%JNETFPS%",9)){*(uintptr_t *)out=(uintptr_t)&jnet_fps_limit;return out;}
+    if(length==24 && !memcmp(key,"%JNET_CONTROL_CHARACTER%",24)){
+        if(jnet_control_character>4)jnet_control_character=0;
+        *(uintptr_t *)out=(uintptr_t)&jnet_control_character;return out;
+    }
+    if(length==21 && !memcmp(key,"%JNET_CREATURE_",15) && key[16]=='_' && key[18]=='_' && key[20]=='%'){
+        unsigned kind=(unsigned)(key[15]-'0'),device=(unsigned)(key[17]-'0'),action=(unsigned)(key[19]-'0');
+        if(kind<JNET_CHARACTER_COUNT && jnet_character_is_creature(kind) && device<3 && action<7){
+            *(uintptr_t *)out=(uintptr_t)&jnet_creature_bindings[kind==JNET_CHARACTER_FLOW_2?JNET_CHARACTER_FLOW_1:kind][device][action];return out;
+        }
+    }
+    if(length==15 && !memcmp(key,"%JNET_BIND_",11) && key[12]=='_' && key[14]=='%'){
+        unsigned device=(unsigned)(key[11]-'0'),action=(unsigned)(key[13]-'0');
+        if(device<3 && action<8){
             if(jnet_bindings[device][action]<0 || jnet_bindings[device][action]>jnet_controls_limit(device))jnet_bindings[device][action]=0;
             *(uintptr_t *)out=(uintptr_t)&jnet_bindings[device][action];return out;
         }
     }
     return jnet_setting_original(context,out,name);
+}
+static unsigned jnet_controls_playstation_buttons(void) {
+    static const unsigned order[]={12,14,15,13,9,8,10,11,4,5,1,2,0,3,6,7};
+    unsigned buttons=0;
+    for(unsigned slot=0;slot<4;++slot){
+        uintptr_t device=0,type=0,again=0;unsigned char connected=0,state[16];
+        uintptr_t entry=fault_image+0x403e400+8*slot;
+        if(!jnet_menu_read(entry,&device,8) || !device ||
+           !jnet_menu_read(device,&type,8) || type!=fault_image+0x682b78 ||
+           !jnet_menu_read(device+0xc5,&connected,1) || connected!=1 ||
+           !jnet_menu_read(device+0x454,state,sizeof(state)) ||
+           !jnet_menu_read(entry,&again,8) || again!=device)continue;
+        unsigned valid=1;
+        for(unsigned i=0;i<16;++i)if(state[i]>1)valid=0;
+        if(valid)for(unsigned i=0;i<16;++i)if(state[order[i]])buttons|=1u<<i;
+    }
+    return buttons;
 }
 static unsigned jnet_controls_buttons(void) {
     static DWORD (WINAPI *get_state)(DWORD,XINPUT_STATE *);
@@ -127,7 +197,7 @@ static unsigned jnet_controls_buttons(void) {
     static unsigned connected;static uint64_t scan_at;
     uint64_t now=GetTickCount64();unsigned scan=now>=scan_at;
     if(scan)scan_at=now+1000;
-    unsigned buttons=0;
+    unsigned buttons=jnet_controls_playstation_buttons();
     if(get_state)for(unsigned i=0;i<4;++i){
         if(!scan && !(connected&(1u<<i)))continue;
         XINPUT_STATE state={0};
@@ -141,6 +211,14 @@ static unsigned jnet_controls_buttons(void) {
     }
     return buttons;
 }
+static uintptr_t jnet_crouch_controller;
+static unsigned jnet_controls_queuing;
+static void (*jnet_controls_queue_original)(uintptr_t,const char *);
+static void jnet_controls_queue(uintptr_t controller,const char *name) {
+    if(jnet_crouch_active && controller==jnet_crouch_controller && !jnet_controls_queuing &&
+       name && strcmp(name,"Crouch") && strcmp(name,"Crouching"))return;
+    jnet_controls_queue_original(controller,name);
+}
 static int jnet_controls_action(uintptr_t dude,const char *name) {
     uintptr_t controller=dude+0xa390;uint32_t count=0,pending=0;
     if(!jnet_menu_read(controller+0x64a0,&count,4) || !count || count>196 ||
@@ -149,13 +227,15 @@ static int jnet_controls_action(uintptr_t dude,const char *name) {
         if(!own_read(NULL,controller+0x33a0+i*0x40+0x28,candidate,sizeof(candidate)))return 0;
         if(memchr(candidate,0,sizeof(candidate)) && !strcmp(candidate,name)){
             void (*queue)(uintptr_t,const char *)=(void *)(fault_image+0xaea60);
-            queue(controller,name);return 1;
+            jnet_controls_queuing=1;queue(controller,name);jnet_controls_queuing=0;return 1;
         }
     }
     return 0;
 }
 static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
     uintptr_t local=0;unsigned char menu=0;DWORD process=0;
+    jnet_sprint_down=jnet_spotlight_down=0;
+    jnet_fly_up_down=jnet_fly_down_down=jnet_level_down=jnet_tilt_left_down=jnet_tilt_right_down=0;
     if(!jnet_controls_ready)return;
     if(!own_read(NULL,game+0x1e0,&local,8) || local!=barn)return;
     if(jnet_menu_last && !own_read(NULL,jnet_menu_last+0xd68,&menu,1))return;
@@ -163,6 +243,7 @@ static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
     GetWindowThreadProcessId(GetForegroundWindow(),&process);
     static uintptr_t crouch_barn;
     if(crouch_barn!=barn || kind!=0){jnet_crouch_active=0;crouch_barn=barn;}
+    jnet_crouch_controller=barn+0xb0+0xa390;
     if(jnet_crouch_active && !menu && process==GetCurrentProcessId()){
         float axes[2]={0};
         if(own_read(NULL,barn+0x30,axes,sizeof(axes)) && isfinite(axes[0]) && isfinite(axes[1]) &&
@@ -170,16 +251,36 @@ static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
     }
     static unsigned spin_variant;
     unsigned buttons=jnet_controls_buttons();
+    jnet_grab_down=0;
     static const unsigned mouse[]={0,VK_LBUTTON,VK_RBUTTON,VK_MBUTTON,VK_XBUTTON1,VK_XBUTTON2};
-    for(unsigned action=0;action<7;++action){
+    if(jnet_character_is_creature(kind)){
+        if(kind==JNET_CHARACTER_FLOW_2)kind=JNET_CHARACTER_FLOW_1;
+        unsigned held[7]={0};
+        for(unsigned action=0;action<7;++action){
+            int key=jnet_creature_bindings[kind][0][action],m=jnet_creature_bindings[kind][1][action],pad=jnet_creature_bindings[kind][2][action];
+            unsigned down=(key>0 && key<256 && (GetAsyncKeyState(key)&0x8000)) ||
+                (m>0 && m<6 && (GetAsyncKeyState(mouse[m])&0x8000)) ||
+                (pad>0 && pad<=16 && (buttons&(1u<<(pad-1))));
+            held[action]=!menu && process==GetCurrentProcessId() && down;
+            if(action==5)jnet_spotlight_down=held[action] && !jnet_creature_down[action];
+            jnet_creature_down[action]=down;
+        }
+        jnet_fly_up_down=held[0];jnet_fly_down_down=held[1];jnet_level_down=held[2];
+        if(kind==JNET_CHARACTER_WHALE || kind==JNET_CHARACTER_WAR_MACHINE){jnet_tilt_left_down=held[3];jnet_tilt_right_down=held[4];}
+        jnet_grab_down=kind==JNET_CHARACTER_LONGTAIL && held[5];
+        jnet_sprint_down=held[6];
+        return;
+    }
+    for(unsigned action=0;action<8;++action){
         int key=jnet_bindings[0][action],m=jnet_bindings[1][action],pad=jnet_bindings[2][action];
         unsigned down=(key>0 && key<256 && (GetAsyncKeyState(key)&0x8000)) ||
             (m>0 && m<6 && (GetAsyncKeyState(mouse[m])&0x8000)) ||
             (pad>0 && pad<=16 && (buttons&(1u<<(pad-1))));
+        if(action==7)jnet_sprint_down=!menu && process==GetCurrentProcessId() && jnet_character_is_creature(kind) && down;
         if(action==3)jnet_spotlight_down=!menu && process==GetCurrentProcessId() && down && !jnet_binding_down[action];
         if(!menu && process==GetCurrentProcessId() && kind==0){
             static const char *const names[]={"Crouch","SlideJump2","SlideJump1",NULL,"RollF","JNETFlipL","JNETFlipR"};
-            if(action!=3 && down && !jnet_binding_down[action]){
+            if(action<7 && action!=3 && down && !jnet_binding_down[action] && (!jnet_crouch_active || action==0)){
                 const char *name=action==0 && jnet_crouch_active?"CrouchToIdle":
                     action==2?(spin_variant?"JNETSpin3":"SlideJump1"):names[action];
                 int queued=jnet_controls_action(barn+0xb0,name);

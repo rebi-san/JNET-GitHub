@@ -1,0 +1,12 @@
+#define main fixture_main
+#include "test_native_appearance.c"
+#undef main
+static unsigned measured;
+static int counted(void *ctx,uint64_t at,void *out,size_t n) { ++measured; return read_memory(ctx,at,out,n); }
+int main(void) {
+ fixture(); struct jc_appearance_plan p; assert(!jc_appearance_plan_read(counted,NULL,base+0x3000,&p)); printf("definition_reads=%u\n",measured);
+ preparation_fixture(); struct jc_appearance_preparation prep;
+ assert(!jc_appearance_prepare(counted,NULL,&setters,base+0x3000,materials,&prep));
+ struct jc_appearance_borrow b; assert(!jc_appearance_borrow_begin(counted,NULL,base+0x3000,materials[0],materials[2],&b));
+ measured=0; assert(!jc_appearance_borrow_check(counted,NULL,&b)); printf("borrow_reads=%u\n",measured);
+}

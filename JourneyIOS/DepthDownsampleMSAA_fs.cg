@@ -1,0 +1,41 @@
+#include "Migratory.sh"
+
+float4 pixel;
+
+#ifdef __ORBIS__
+MS_Texture2D<float4> texDepth ;
+#else
+Texture2DMS<float4,4> texDepth ;
+#endif
+
+
+
+
+struct v2f
+{
+	float4 position        VS_ATTR(POSITION);
+	float2 uv              VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+#if defined(D_PLATFORM_D3D11) || defined(D_PLATFORM_GNM)
+    float depth            : SV_Depth;    
+#else
+    float depth            : DEPTH;
+#endif
+};
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+void main( in v2f IN, out f2f OUT )
+{
+	// We can downsample correctly ...
+	const float SCALE = 1.0;
+	// ... or we can do it the fast way.  Doesn't seem to look any worse for
+	// how we're using it.
+	OUT.depth = texDepth.Load(int2(IN.uv.xy* float2(  pixel.x,  pixel.y )), (int)0 ).r;    // 
+}
+

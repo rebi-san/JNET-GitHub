@@ -27,14 +27,29 @@ class ControlsTests(unittest.TestCase):
         edited=decode(menu_bytes())
         controls=edited.find('./Menu/Options/Controls')
         for branch,device,count in [('Keyboard',0,256),('Mouse',1,6),('Pad/DualShock',2,17),('Pad/Input',2,17)]:
-            rows=list(controls.find(branch))
-            at=next(i for i,row in enumerate(rows) if row.tag=='Fly')
-            self.assertEqual([row.get('Text') for row in rows[at+1:at+8]],['Crouch','Frontflip','Backflip','SideflipL','SideflipR','Spin','Spotlight'])
-            for i,row in enumerate(rows[at+1:at+8]):
-                self.assertEqual(len(row.get('Options').split(';')),count)
-                self.assertEqual(row.get('Setting'),f'%JNET_BIND_{device}_{[0,4,1,5,6,2,3][i]}%')
-                controls.find(branch).remove(row)
-            controls.find(branch).find('Chime').set('Text','$Strings.CtrlChime')
+            parent=controls.find(branch)
+            selector=parent.find('JNETCharacter')
+            self.assertEqual(selector.get('Options'),'Wayfarer;Longtail;Whale;War Machine;fl0w')
+            self.assertEqual(len(selector),5)
+            self.assertIsNone(selector.find('Character6'))
+            expected=[['Move','Look','Chirp','Fly','Crouch','Frontflip','Backflip','SideflipL','SideflipR','Spin'],
+                      ['Move','Look','Chirp','Fly Up','Fly Down','Level','Grab','Sprint'],
+                      ['Move','Look','Chirp','Fly Up','Fly Down','Level','TiltL','TiltR','Sprint'],
+                      ['Move','Look','Chirp','Fly Up','Fly Down','Level','TiltL','TiltR','Spotlight','Sprint']]
+            for index,group in enumerate(selector):
+                labels=[row.get('Text') for row in group]
+                labels[:2]=['Move','Look']
+                if index==0:labels[3]='Fly'
+                self.assertEqual(labels,expected[index] if index<4 else ['Move','Look','Chirp','Fly Up','Fly Down','Level','Sprint'])
+                self.assertEqual(group.get('Flags'),f'Show.Never;Traverse.IfSelected.{index}')
+                for row in group:
+                    if row.tag.startswith('JNETAction'):self.assertEqual(len(row.get('Options').split(';')),count)
+            parent.remove(selector)
+            original_parent=original.find('./Menu/Options/Controls/'+branch)
+            for index,row in enumerate(original_parent):
+                if row.tag in ('Move','Look','Chime','Fly'):parent.insert(index,ET.fromstring(ET.tostring(row)))
+        for index,row in enumerate(original.find('./Menu/Options/Controls/Pad')):
+            if row.tag in ('Move','Look'):controls.find('Pad').insert(index,ET.fromstring(ET.tostring(row)))
         menu=edited.find('./Menu')
         tags=[row.tag for row in menu]
         at=tags.index('Options')
@@ -50,6 +65,7 @@ class ControlsTests(unittest.TestCase):
             self.assertEqual(parent.find(name).get('Setting'),'%'+name+'%')
             parent.remove(parent.find(name))
         menu.find('Start').set('Text',original.find('./Menu/Start').get('Text'))
+        ET.indent(original);ET.indent(edited)
         self.assertEqual(ET.tostring(original),ET.tostring(edited))
 
     def test_native_entry_guards(self):
@@ -77,8 +93,23 @@ class ControlsTests(unittest.TestCase):
             self.assertIn(event.encode()+b'\0',bank)
         self.assertEqual(sounds.JNTFishShort.soundName,'fish-idle-move-short')
         self.assertEqual(sounds.JNTFishCall.soundName,'fish-come-here')
-        self.assertIsNone(sounds.JNTFlowSnake)
-        self.assertIsNone(sounds.JNTFlowHunter)
+        for alias, event in [('JNTFishShort','fish-idle-move-short'),
+                             ('JNTFishMedium','fish-idle-move-medium'),
+                             ('JNTFishLong','fish-idle-move-long'),
+                             ('JNTFishCall','fish-come-here'),('JNTWhale','HappyWhale')]:
+            self.assertEqual(sounds[alias].soundName,event)
+            self.assertEqual(sounds[alias].bankName,'JNTBio')
+            self.assertGreater(sounds[alias].maxDist,sounds[alias].minDist)
+            self.assertIn(event.encode()+b'\0',
+                          (ROOT/'JourneyPC/Data/Sounds/LvlSfxSummit-SFX.bnk').read_bytes())
+        for prefix in ('Player','Player2'):
+            for call in ('Coo','Chirp','Call','Shout'):
+                self.assertIsNotNone(sounds[prefix+call])
+        for alias,event in [('JNTFlowSnake','FlowSnakeCall'),('JNTFlowHunter','FlowHunterCall')]:
+            self.assertEqual(sounds[alias].soundName,event)
+            self.assertEqual(sounds[alias].bankName,'JNTFlow')
+            self.assertIn(event.encode()+b'\0',
+                          (ROOT/'JourneyPC/Data/Sounds/LvlSfxRuins-SFX.bnk').read_bytes())
         self.assertLessEqual(len(list(sounds.items())),160)
 
     def test_registered_animation_actions(self):
@@ -232,9 +263,60 @@ class ControlsTests(unittest.TestCase):
             subprocess.run(['clang','-std=c11','-fsanitize=address,undefined','-I'+str(folder),str(LAB/'diagnostic/test_jnet_settings.c'),'-o',str(exe)],check=True)
             subprocess.run([str(exe)],check=True)
 
+    def test_setting_lookup_is_bounded(self):
+        source=(LAB/'diagnostic/jnet_controls_live.h').read_text()
+        function=source[source.index('static uintptr_t jnet_setting(uintptr_t'):source.index('static unsigned jnet_controls_playstation_buttons')]
+        with tempfile.TemporaryDirectory(dir=LAB/'work') as temporary:
+            folder=Path(temporary)
+            (folder/'setting_fixture.h').write_text(function)
+            exe=folder/'setting'
+            subprocess.run(['clang','-std=c11','-fsanitize=address,undefined','-I'+str(folder),'-I'+str(LAB/'diagnostic'),str(LAB/'diagnostic/test_jnet_setting.c'),'-o',str(exe)],check=True)
+            subprocess.run([str(exe)],check=True)
+
+    def test_playstation_native_buttons(self):
+        source=(LAB/'diagnostic/jnet_controls_live.h').read_text()
+        function=source[source.index('static unsigned jnet_controls_playstation_buttons'):source.index('static unsigned jnet_controls_buttons(void)')]
+        fixture=r"""
+#include <stdint.h>
+#include <string.h>
+#include <assert.h>
+static uintptr_t fault_image=0x140000000ULL,slots[4];
+static unsigned char devices[4][0x470];
+static int fail_read;
+static int jnet_menu_read(uintptr_t at,void *out,size_t n){
+    if(fail_read)return 0;
+    if(at>=fault_image+0x403e400 && at+n<=fault_image+0x403e420){memcpy(out,(char *)slots+(at-fault_image-0x403e400),n);return 1;}
+    for(unsigned i=0;i<4;++i)if(at>=(uintptr_t)devices[i] && at+n<=(uintptr_t)devices[i]+sizeof(devices[i])){memcpy(out,(void *)at,n);return 1;}
+    return 0;
+}
+"""+function+r"""
+int main(void){
+    unsigned native[]={12,14,15,13,9,8,10,11,4,5,1,2,0,3,6,7};
+    assert(!jnet_controls_playstation_buttons());
+    for(unsigned slot=0;slot<4;++slot){
+        slots[slot]=(uintptr_t)devices[slot];uintptr_t type=fault_image+0x682b78;
+        memcpy(devices[slot],&type,8);devices[slot][0xc5]=1;
+        for(unsigned bit=0;bit<16;++bit){
+            devices[slot][0x454+native[bit]]=1;
+            assert(jnet_controls_playstation_buttons()==(1u<<bit));
+            devices[slot][0x454+native[bit]]=0;
+        }
+        devices[slot][0x455]=1;devices[slot][0xc5]=0;assert(!jnet_controls_playstation_buttons());
+        devices[slot][0xc5]=1;devices[slot][0x455]=2;assert(!jnet_controls_playstation_buttons());
+        devices[slot][0x455]=1;type=0;memcpy(devices[slot],&type,8);assert(!jnet_controls_playstation_buttons());
+        slots[slot]=0;
+    }
+    fail_read=1;assert(!jnet_controls_playstation_buttons());
+}
+"""
+        with tempfile.TemporaryDirectory(dir=LAB/'work') as temporary:
+            folder=Path(temporary);(folder/'pad.c').write_text(fixture);exe=folder/'pad'
+            subprocess.run(['clang','-std=c11','-fsanitize=address,undefined',str(folder/'pad.c'),'-o',str(exe)],check=True)
+            subprocess.run([str(exe)],check=True)
+
     def test_action_queue_and_button_edges(self):
         source=(LAB/'diagnostic/jnet_controls_live.h').read_text()
-        functions=source[source.index('static int jnet_controls_action('):source.rindex('#endif')]
+        functions=source[source.index('static uintptr_t jnet_crouch_controller;'):source.rindex('#endif')]
         with tempfile.TemporaryDirectory(dir=LAB/'work') as temporary:
             folder=Path(temporary)
             (folder/'controls_fixture.h').write_text(functions)

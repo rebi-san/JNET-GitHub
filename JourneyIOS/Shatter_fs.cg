@@ -1,0 +1,16 @@
+struct IN
+{
+	float4 color        VS_ATTR(COLOR0);
+	float2 UV			VS_ATTR(TEXCOORD0);
+};
+
+sampler2D texture;
+
+//----------------------------------------------
+// Shatter fragment shader
+//----------------------------------------------
+float4 main( IN input ) VS_ATTR(COLOR0)
+{
+	float4 aColor1 = tex2D( texture, input.UV);
+	return aColor1;
+}

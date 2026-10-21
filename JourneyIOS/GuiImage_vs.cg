@@ -1,0 +1,64 @@
+#include "Migratory.sh"
+struct a2v
+{
+#if defined(__ORBIS__)
+	float4 position    	VS_ATTR(POSITION);
+#else
+	float3 position     VS_ATTR(POSITION);
+#endif
+	float2 uv           VS_ATTR(TEXCOORD0);
+};
+
+struct v2f
+{
+	float4 position     FS_ATTR(POSITION);
+	float2 uv           FS_ATTR(TEXCOORD0);
+};
+
+#ifndef _IOS64
+
+float Orient;
+float4 CenterPos;
+float Bias;
+
+#endif
+
+//---------------------------------------------
+//   GuiImage Vertex Shader -
+//
+//   Updated to handle rotation
+//
+//----------------------------------------------
+//void main( IN input, out OUT output )
+//{
+
+VS_START()
+
+	float Sin, Cos;
+#ifdef _IOS64
+    Sin = sin(GET_LOCAL(Orient));
+    Cos = cos(GET_LOCAL(Orient));
+#else
+	sincos( GET_LOCAL(Orient), Sin, Cos );  //calculate the angle factors in one go
+#endif
+	
+	float4 myCenterPos = GET_LOCAL(CenterPos);
+
+	input.position.x *= GET_LOCAL(Bias);
+	myCenterPos.x *= GET_LOCAL(Bias);
+
+	float4 Offset;
+	Offset.x = input.position.x - myCenterPos.x;
+	Offset.y = input.position.y - myCenterPos.y;
+
+	float2 newPos;
+	newPos.x = Cos*Offset.x - Sin*Offset.y;
+	newPos.y = Sin*Offset.x + Cos*Offset.y;
+
+	output.position = float4( (newPos.x + myCenterPos.x) / GET_LOCAL(Bias), newPos.y+myCenterPos.y, 0.0f, 1.0f );
+	output.uv = input.uv;
+
+    if(GET_LOCAL(Alpha)==0.f)
+        output.position = float4(0,0,0,1);
+
+SH_END()

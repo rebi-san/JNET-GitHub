@@ -1,0 +1,597 @@
+JNET 0.238 - CHIRP ORIGIN, STARTUP SKIP, TEXTURE GUARD AND AUDIO REPAIR
+
+Cached creature teleports receive unique nonzero event IDs before native startup.
+Zero is the consumed-request sentinel and must not also identify a teleport.
+Meshes stay hidden until the native two-update settling counter reaches zero.
+Successful Apply shows a brief fading Applied label above the button.
+These changes are verified offline; repeated switching needs live validation.
+
+Longtail chirps use its native head marker instead of the hidden Wayfarer.
+Native segment/cloth response, smooth controls and gradual ascent are retained.
+The startup skip shortcut has no visible button.
+Press and release any key, mouse button or controller input twice to skip.
+Held inputs count once; focus loss clears the two-press sequence.
+Graphics has FPS: < 30 / 60 / Default >, default Default for this session.
+Left/right wrap through the choices; mouse or keyboard/controller activation
+also changes the setting. This caps frame presentation; it does not accelerate
+slow frames or override VSync/driver limits. Frame timing needs live validation.
+The decoration texture binder now handles a missing texture object through
+its existing missing-GPU-texture path. Bryan's Tapestry12 record is unchanged.
+
+Use Select .exe... beneath Launch Journet to browse for the supported original
+Journey executable or Journey PC Sound Fix 0.3.1. No renaming or copying is
+required. The selection is saved in JNET-launch.ini beside JNET.exe and used
+on subsequent launches. Select the original game executable to switch back.
+Close Journey before changing the selection. Unsupported files are rejected.
+On Whisky the picker is a Windows file dialog, not native macOS Finder.
+The selected file remains in its location; JNET does not modify it. If moved,
+use Select .exe again. Both choices use the installed game assets and saves.
+Without a saved selection, JNET checks Journey.exe beside JNET.exe, then the
+original game executable. The package contains no sound-fix executable or
+repair payloads. Obtain the optional sound fix separately:
+https://github.com/seele2718/Journey-PC-Sound-Fix
+
+All online participants must use the same JNET build. Offline checks are not
+live audio, rendering or multiplayer validation.
+
+Private native decoration storage isolates creature meshes and the 16 native
+chirp visuals from level scenery capacity. Texture readiness guards defer only
+the affected private mesh. Cleanup follows the native level cleanup sequence.
+Mesh/shader resources reserve three participants; this is not proof of online
+creature replication. Creature appearance replication and autonomous War Machine
+attacks remain unavailable. The existing three-player traveler transport remains.
+All-level transitions, native creature coexistence and live audio require testing.
+
+Historical feature notes follow; the current candidate behavior above takes precedence.
+
+JNET (Journet) 0.199 - INDEPENDENT TRAVEL AND MENU CANDIDATE
+
+0.199 anchors Options, nested settings and confirmation menus at bottom left.
+Chat Off/On now controls messages and connection notices together, default Off.
+Chat uses the native menu font without a panel: 0.2-second fade in, 10 seconds
+of inactivity before a 0.4-second fade out. Create Lobby spacing is updated.
+Audio includes Credits On/Off, default On. Off changes the next credits load:
+the credits song is silent and names/scrolling text are hidden, leaving
+Thank you for playing Journey. Existing loaded credits are unchanged until reload.
+Sliding Off now writes a false flag instead of retaining an earlier On value.
+Go explicitly restarts the selected level even when it is already loaded.
+Arrival synchronization for newly joined guests does not restart the host.
+Online sessions require matching 0.199 builds (updated travel flags/protocol).
+
+0.198 moves native Options to the bottom left, with Windwalls, Sliding and
+Freezing switches at the bottom right. All default On at launch. Windwalls Off
+bypasses the shared BoundaryRailPush update across levels; On restores it.
+Sliding and Freezing use the pinned cheat-table instruction sites. These switches
+need live gameplay verification, including turning them back On after use.
+Custom submenus retain their content during Escape fade-out before resetting.
+Failed offline lobby creation now reports Steam is offline. Successful public and
+private lobbies show the host heading and roster; private rooms show their code.
+
+0.197 aligns the Meet Everywhere controls and reorganizes the private lobby panel.
+Create Lobby offers Notifications and Chat, both Off by default for each new lobby.
+When Chat is On, press T during gameplay, Enter to send, Escape to cancel; messages
+are limited to 120 printable characters. Connection notices appear at bottom right
+when Notifications is On. Both settings apply to everyone in that lobby.
+Online sessions require matching 0.197 builds (updated lobby protocol).
+
+0.196 centers Meet Everywhere over CMATW and improves Appearance row spacing.
+Title-screen Appearance refreshes from the captured native save, preserving edits
+and recovering from character updates before the title handler becomes available.
+
+0.195 restores symbol images, evens Appearance spacing and aligns bottom actions.
+The title Appearance view is populated directly after native save loading. Saved
+is shown after native save completion. Meet Everywhere replaces the MEPAL heading.
+Solo Go is independent of Steam readiness; raw Backspace is consumed during code entry.
+These changes need live title/pause, travel, save and input verification.
+
+0.194 restores Symbol (IDs 0-20) above Character and applies/saves the selected symbol.
+Backspace messages are consumed while editing a lobby code. Startup prefers a newer
+valid local SAVE.BIN over an older Steam copy, using the native save timestamp.
+Build/offline checks do not establish live restart or input behavior.
+
+0.193 tightens Appearance arrow alignment, resets submenu/status state on exit,
+centers Back below CMATW, and preserves code editing with Backspace. Private
+codes are generated on Create. Lobby readiness now uses native level loading
+state rather than extra-traveler initialization. Live testing remains required.
+
+The helper now has Launch Journet, Status above the report, and Force Quit
+Journey. Robe Editor export/import, Preview and Restore Default are disabled
+placeholders. Obsolete experiment buttons have been removed from the helper.
+
+Test B is the default: optional diagnostic scans and observation logs OFF,
+gameplay worker OFF, native movement correction. Essential safety checks and
+fault reports remain enabled. Performance tuning is parked pending testing
+on separate computers; A/B/C did not produce a clear visual improvement.
+
+Use Appearance below New Journey (title) or Chapter Select (pause).
+Apply updates robe and scarf values and requests a native save. Appearance
+tracks loaded and live values. Drain, Grow and Wayfarer are launch defaults.
+Infinite and Locked are session-only. 0.217 restores a visible blend mode for
+playable creature meshes, initializes Whale attachment caches before starting
+their events, and clamps flight targets to the native terrain surface.
+The 0.215 asset isolation and 0.216 matrix format correction are retained.
+These changes are checked offline; visibility, flight and Whale application
+still require live validation.
+War Machine remains unavailable. Skeleton-build checkpoints remain enabled.
+The glyph-release and per-lifecycle checkpoint-budget fixes are retained.
+Force Quit captures thread instruction pointers and candidate Journey return
+addresses before termination. These are stack candidates, not an unwound stack.
+If startup stalls, force quit using JNET, wait for Exit recorder finished, then
+Copy All. If startup completes, test selecting Longtail and Whale in Appearance.
+Build checks do not establish live startup or gameplay success.
+Online follows Appearance, above Options.
+Online contains public lobbies at the left, level selection at the right,
+CMATW with lobby SteamIDs, Join/Create below the list, and Leave below players.
+The cursor is larger and white.
+
+The host, or a player outside a lobby, can select a destination and press Go.
+Each player resumes independently after their own native resources finish loading.
+Guests may join directly from the starting menu in Level_Graveyard; they do not
+need to enter Desert or initialize an extra traveler there first. The host sends
+its destination after transport admission, including when a guest has no state
+snapshot yet. A second guest may arrive while the first is still loading.
+
+Ordinary native level transitions are individual and preserve their original
+arguments. A level mismatch stops remote movement/chirp playback, not lobby
+membership. Companion slot identity is retained while that player remains a
+member; explicit leave/session replacement releases it after safe retirement.
+No invented two-minute vanilla timer is installed. The existing 30-second
+transport silence timeout remains separate from native connection history.
+A local teleport load timeout ends that attempt without evicting other players.
+Normal world-event and cutscene synchronization for three players is not yet
+verified; movement and chirp replication alone do not establish full progression
+parity. Native progression/scripts are not replaced with host-forced teleporting.
+
+ME&PAL-derived encounter patches are validated against this executable.
+Explicit Go to Level_Credits, Level_Matt or Level_Chris enables free play
+for the traveling players. Other destinations disable it; natural Paradise
+to Credits preserves normal credits. There is no manual Play Anywhere toggle.
+Original game assets are unchanged. Native save requests persist outfit, scarf
+length and current level; disk persistence and companion visuals need testing.
+ME&PAL documents existing Matt screensaver and Bryan camera-area crashes.
+This build does not claim to repair those underlying level defects.
+
+All clients need 0.196 (steam-game-5). Old lobby protocols are incompatible.
+Capacity remains three. Invitations and Rocket Deathmatch remain unavailable.
+Native all-level gameplay and the new menu still need live testing.
+
+Next test, using the requested workflow:
+1. Host opens Online from the starting menu and uses Go to travel alone to the
+   desired level. Once loaded, create a public lobby.
+2. Both guests remain at the starting menu, open Online, refresh, select the
+   host's lobby and Join. They should load the host's destination automatically.
+3. The host can keep playing while guests load. Confirm each guest appears,
+   moves and chirps after arriving; copy reports on all three.
+4. Check a guest leaving/rejoining and independent level transitions afterward.
+No Desert/Barrens round trip is a prerequisite. Special-level native guards may
+still refuse activation; report that result rather than treating a queue call
+as proof of successful loading or multiplayer.
+
+Historical diagnostic reference follows. The former A/B/C comparison is
+retained for reference; it is not the next requested test.
+
+0.178 retains the last ended connection per slot until replaced, including RTT
+and delivery timing. Copy All after leaving is supported; restart clears history.
+Lobby timing separates steady admitted gameplay from other phases; bucket counts
+are cumulative for this process, not individual test phases.
+
+Jitter comparison: use the same host for three phases and Copy All while
+connected after each: two players for 60 seconds, three players for 60 seconds,
+then two players again after one guest leaves. Walk, turn, glide and chirp in
+each phase. Note whether your own movement or only companions are jittery.
+Delivery timing reports Steam receipt gaps, local receive-queue residence,
+processing gaps and game-update interval counts. These are not pure wire-jitter
+measurements. Receipt age is -1 if the optional Steam clock binding is absent.
+Native movement correction is preserved; no extra interpolation is added.
+Hosts skip unchanged roster sends but refresh at 100 ms when frames permit;
+new captures/guest state and individual reliable chirps remain immediate.
+
+Public discovery loads once at startup, then only when Refresh is pressed.
+Code lookup and private-room creation still perform their required searches.
+
+1. Open JNET, Prepare & Launch, and enter Desert on both test accounts.
+2. In devishaz's paused Journet menu choose Create, Public, Journey, confirm.
+3. In rebishaz's Public list press Refresh, select devishaz, then Join. Allow up to 30 seconds
+   for entry and P2P admission. Copy All on both while still connected.
+4. Expect Steam lobby state 3, isolation 1, members 2/3, P2P state 3,
+   handshakes 1, and increasing sent/received messages on both sides.
+   A native companion should appear. Walk, turn, jump, glide, chirp and check glow.
+   Copy All includes separate gameplay snapshot, capture and receiver counters.
+   Chirps use individual reliable events; movement uses unreliable snapshots.
+   Timing ages exclude unmeasured network transit. A 33 ms capture target is
+   provisional, not a measured vanilla send interval.
+5. Leave on the guest; verify the host stays in its room. Rejoin once.
+6. Add the third updated account. Host should show members 3/3 and two
+   handshakes; each guest has one host handshake. Full rooms are excluded
+   from Steam's normal search results, so disappearance at capacity is expected.
+   Copy All on all three while connected after walking/jumping/chirping.
+   Compare native/extra traveler SteamIDs, state ages and new-state gaps.
+   Also compare Steam transport poll cost and active update section costs.
+   The roster refreshes on Steam membership notifications, with a 500 ms
+   fallback; room and generation changes invalidate it immediately.
+   Lobby maintenance and gameplay validation share the same roster snapshot.
+   Compare complete lobby + transport time with roster-read timings.
+   Session checks separately report metadata and owner costs. Metadata uses
+   lobby-data notifications with a 2000 ms fallback; membership and ownership
+   retain a 500 ms fallback. Admission checks always validate the session.
+   Steam peer RTT and estimated send queue are sampled once per second.
+   Copy reports while connected; these per-connection peaks reset on replacement.
+   Queue estimates exclude Nagle delay; RTT is not animation delay.
+   Send-gap timing excludes polls without eligible recipients.
+   Test a guest leaving and rejoining, then host departure, as well as motion.
+   Timing includes local frame stalls; it does not measure network latency.
+   Guests now avoid sending unchanged captured states; rejection reasons are
+   counted separately. Do not infer the cause of old aggregate rejections.
+   After guests leave, wait for dust to finish and Copy All on the host again.
+7. Leave all clients. Host creates Private; after collision checking, a
+   generated four-character code appears only in the host's menu. Enter that
+   code above Join on a guest. Private rooms must not appear under Public.
+8. With guests connected, host leaves. Guests should leave the session and
+   report host departure. Copy All includes lobby, transport and guard results.
+
+Isolation: an injected JNET process holds native lobby search/create/join and
+publication calls, plus legacy P2P sends/accepts/reads. Mod rooms start Steam
+Private until their metadata is complete, then use Invisible (searchable but
+not exposed through the friends list). The native level key is a nonnumeric
+Journet marker; the pinned original game searches for an exact decimal level
+ID. Mod searches and entry validation require compatible Journet metadata.
+Modern P2P uses its own port and a room/nonce/Steam-identity handshake.
+
+The native executable contracts and fake-Steam regression tests are offline
+checks, not a claim of live vanilla isolation. A consenting, unmodified control
+client should be included before wider distribution: normal Journey search
+must not select the mod room, and its traffic must not enter a mod session.
+Do not change the control client's original assets or connect to strangers
+for this check. Ordinary installations are not modified by JNET.
+
+If isolation is not 1, create/join remain unavailable. If native ownership is
+not 0, restart Journey. Report the first failure rather than repeatedly clicking.
+Codes are best-effort identifiers, not secrets or guaranteed unique worldwide.
+Ambiguous lookup is refused. No match means no joinable room was found.
+
+The source below preserves historical local gameplay diagnostics. These are
+NOT the procedure for the 0.178 Steam gameplay test; local lobby controls and
+UDP auto-start are disabled in this build. Do not use Connect/Dust to test Steam.
+
+HISTORICAL LOCAL GAMEPLAY NOTES
+
+0.141 live run: all three authenticated, second admissions observed, no recorded
+faults. The reported bubble/symbol delay after reconnect was reproduced: Dust
+reset the sender chirp sequence while receivers retained replay protection.
+0.142 preserves that sequence, and briefly retains a valid chirp received just
+before actor admission. Duplicate/replay and stale-event checks remain active.
+
+Connection changes: immediate challenge replies, session-key derivation only
+when a session changes, 33 ms state send target (frame-limited, no catch-up
+bursts), and a reduced idle chirp capture path (6 protected reads versus 13).
+Status now reports transport last/peak/mean microseconds separately from native
+actor update time. Copy All while connected to capture useful timing data.
+
+Focused retest: chirp several times, Dust, wait for cleanup, Connect again, then
+try the first short and charged chirps as soon as the traveler arrives. Repeat
+on rebishaz and smooviepuffs while devishaz remains connected. Check both bubble
+and symbol without needing to chirp repeatedly to make them return. Keep walking
+and turning on each player. These changes need live gameplay verification.
+
+First test: devishaz and rebishaz only.
+1. With Journey closed in each bottle, open its updated JNET and choose
+   Prepare & Launch. Journey opens automatically; enter Desert, without a vanilla
+   online companion. Wait for Full object retained, then click Connect on both.
+2. Each Status must show its own identity (1 devishaz, 2 rebishaz), the other
+   identity authenticated, and state age below 2000 ms. A missing third peer
+   is expected. Missing configuration is result 120; socket/crypto setup 121;
+   socket send/receive 122; ownership check 123; stopped native receiver 124.
+3. Walk, turn, jump and glide on each session separately. Check the other view
+   matches direction, position, actions, robe/scarf, outfit and glyph. Chirp
+   separately on each player; check the other sees/hears one event.
+4. Click Dust on rebishaz. Its state publishing pauses; devishaz should detect
+   silence after two seconds and use normal meditation/dust departure. Wait
+   for cleanup, then click Connect on rebishaz. Both views should reconnect.
+5. Copy All from both helpers. If either reports a fault or incorrect movement,
+   stop here and supply those reports before the three-session test.
+
+Then add smooviepuffs (identity 3) with the same setup. Move and chirp each
+player independently. Dust/reconnect one session while the other two remain
+connected. Capture all three Status reports. Close Journey normally afterward.
+
+Connection setup is provisioned per bottle in session-peers.bin beside JNET.dll.
+It contains pairwise secrets; do not share it or include it in reports. Fixed
+loopback UDP ports are 43841-43843. The peers exchange HMAC-SHA256 challenges,
+derive session keys from both fresh nonces, and reject wrong identities, builds,
+keys and replayed sequences. Identity is the provisioned bottle participant,
+not a verified Steam account. No encryption, LAN or Internet transport is enabled.
+Each remote slot drains before replacement; there is no scripted movement,
+scripted chirp or timed seven-cycle stop in Connect mode. Same-chapter Desert
+is the first test scope; chapter changes pause the connection and require fresh
+sessions for this milestone. Shared triggers and full three-player gameplay
+remain unvalidated. Build/fixture success is not live gameplay validation.
+
+Historical local diagnostic notes follow (Local 3 remains --local-three):
+
+ACTIVE TRAVELER - JNET 0.140 candidate (0.121 rendering baseline)
+
+0.140 waits for the first authenticated UDP state before admitting each peer.
+The diagnostic deliberately delays that first packet by 250 ms; no starting
+state is published during the wait. The decoded sender snapshot supplies the
+starting position, motion and appearance. Placement offsets now belong to the
+diagnostic sender; the native recipient no longer subtracts an offset.
+Real incoming states are not passed through the neutral scripted-peer builder.
+Run Local 3, move and chirp near the companions, and check arrivals, scarf growth,
+recharge and independent replacements. Wait for overall complete and both 7/7,
+then chapter select and Copy All. This is still a localhost test; external
+membership, Internet connections and exact remote animation remain unverified.
+
+0.139 removes the diagnostic peers' inherited host movement/animation state at
+admission. The shared sender constructor takes explicit spawn position, chapter,
+body/chirp calibration and appearance; it does not copy the host's transient
+state, movement axes, lean or action flags. Real accepted sender states remain
+intact; the receiver does not force online players into idle.
+Run Local 3 while walking, turning and jumping as companions arrive. Check that
+neither briefly adopts your pose, and that scarf growth and received UDP chirps
+still work. Wait for overall complete and both 7/7, then chapter select and
+Copy All. This remains the local authenticated state/chirp socket test for the
+online path; Internet membership and remote-player animation are not yet tested.
+
+0.138 Local 3 also sends chirps through authenticated UDP. Each event is sent
+twice deliberately; the shared inbox accepts it once, verifies the current
+identity/generation/chapter, and feeds the existing native bubble, symbol, sound
+and recharge path. Events cannot refresh a silent state feed, and pending events
+are discarded on departure/replacement or if they wait over half a second.
+Run Local 3 near the arrival point. Watch both companions chirp and recharge nearby
+travelers, then dust and reconnect. Wait for Local 3 overall: complete and both
+7/7 counters before chapter select and Copy All. Admission and motion are still
+scripted locally; this is not an Internet session or an animation-sync test.
+
+0.137 Local 3 sends the two scripted state feeds over real, nonblocking UDP
+sockets bound only to 127.0.0.1. The shared packet codec validates the build,
+HMAC-SHA256 tag, numeric state, identity, generation and sequence before the
+existing actor receiver accepts a state. Each slot closes its own sockets on
+feed timeout/departure and opens fresh endpoints and a fresh key on replacement.
+Admission is still locally scripted; chirps are still generated locally.
+This is socket integration on one machine, not an Internet multiplayer session.
+The circular motion still tests position delivery rather than walking animation.
+Select Local 3, stay nearby, and wait for Local 3 overall: complete with BOTH
+counters at 7/7 before chapter select and Copy All. The window heading now uses
+that overall result instead of the faster slot's Repeat complete message.
+
+0.136 Local 3 feeds two independent scripted peers through the shared numeric
+actor-state receiver. Stay near the admission point to watch them: they no longer
+follow your controls. Each supplies its own outfit, symbol, scarf length, motion
+and periodic chirps. The source deliberately loses, duplicates and reorders state
+updates, then goes silent; a two-second timeout starts the normal dust departure.
+Each slot reconnects after its own cleanup. Wait for Local 3 overall: complete
+and BOTH clean-cycle counters at 7/7. Repeat complete alone refers to the extra
+slot and may occur earlier. Then chapter select and Copy All.
+This is an in-process transport-input test, not a socket connection or Internet
+multiplayer. It tests the shared receiver and actor/event adapters before adding
+an authenticated network membership adapter. Existing native/extra slot limits
+still apply. Runtime movement and effects need visual verification.
+
+0.135 runs each Local 3 slot independently: the extra companion stays active for
+15 seconds and the native companion for 11 seconds. Each cycles all seven outfits
+and rejoins after its own cleanup, without waiting for the other slot. Wait for
+Local 3 overall: complete, with both clean-cycle counters at 7/7, before finishing.
+The shared arrival reset clears only scarf charge/length smoothing on each native
+companion admission; it preserves the existing native emitter, sound and geometry
+state. The extra actor keeps its separate scarf-growth state. A stopped growth
+emitter no longer attempts a second stop after chapter resources have changed.
+Build/isolated checks do not establish visible growth or online transport.
+
+0.134 makes Local 3 cycle both companions through all seven outfits, with the
+right companion starting at red tier 3 and wrapping through the other outfits.
+The left companion departs first, then the right; the next pair waits for both.
+Repeat complete now includes seven native departures, instead of finishing while
+the native companion is still connected. Check Native clean cycles: 7/7 too.
+Chapter interruption stops the local feed without requesting a second departure
+from an already-retired extra actor. Native dust uses its raw ownership gates;
+the visibility gate may close during dust and is not evidence of an invalid actor.
+These paths passed isolated checks; chapter-select gameplay still needs testing.
+
+0.133 adds shared companion chirp-event delivery with identity/sequence checks
+and native-peer bubble/symbol routing. Local 3 supplies diagnostic events through
+that shared path; online transport is still pending. Extra traveler admissions
+now grow their scarf from zero using Journey's CapeGrow emitter and loop, with
+one level-owned emitter reused across admissions and stopped on departure.
+Check short and charged chirps from both companions, and scarf growth/sparkles
+on each extra traveler arrival. Isolated native-code checks passed; visible
+particles, audio and three-player gameplay still require the local trial.
+
+0.132 keeps the native simulated companion active between frames and publishes
+its movement every frame. Local 3 ends with its native meditation/dust sequence
+and a two-second fade hold. Wait for Local 3 state 4 as well as Repeat complete.
+Chirp charging now tests extra-to-native and native-to-extra recipients with
+Journey's bubble intersection routine, independent timers, native recharge flags
+and charge-dependent glow. Self and environmental chirps are excluded.
+These changes require visual gameplay verification; they are not online transport.
+
+0.131 bounds the inline sand-effect writer before its three-record batches can
+exceed the six-effect budget. The isolated original-code test reproduces the
+0.130 fault pointer values and verifies untouched memory beyond that budget.
+Excess sand contributions are dropped. The user observed three visible travelers
+and seven clean extra-actor outfit cycles in 0.131, with movement/interaction gaps.
+The default report client width now matches one scarf-banner tile.
+
+0.130 adds Local 3: a local feed for the native companion, alongside the extra
+traveler. The native companion uses an opposite-color tier-3 outfit and its own
+symbol, while the extra runs Outfits 7. Both follow offset local input; this is
+not online play. Start without a native online companion. A detected connection
+stops simulated publication. Dust cancels the repeats and requests native departure.
+Use Prepare & Launch, Continue into Desert, wait for Full object retained, then
+Local 3. Verify three visible travelers, body/robe colors, symbols, chirps and
+cloth behavior while the extra departs and is replaced. After 7/7 and both
+companions have departed, Copy All and use chapter select. Native simulation is
+one run per game session. Counters establish scheduling, not visual correctness.
+0.129 remains the user-confirmed 7/7 local outfit/lifecycle checkpoint.
+For this diagnostic, wait until Continue enters Desert. The menu's chapter-select
+scene is not retained across the destination level load. General level admission
+and automatic reconstruction after transitions remain future work.
+Outfits 7 runs red tiers 0-3 then white tiers 1-3. Scarf length and charge follow
+local input. Repeat 10 remains available; 0.124 completed 10/10 clean cycles.
+Both repeat tests run 15 seconds active, meditation/dust, complete retirement,
+and a two-second pause before the next admission. Dust cancels further repeats.
+Failures or emergency fallback prevent further admissions. Three-player
+gameplay interactions remain under test. Status is read-only; completion appears above
+the report. Selecting report text pauses live refresh until selection is cleared.
+
+Purpose: exercise one additional fully initialized native traveler, including
+native input, animation, body/symbol submission and independently owned cloth.
+This is a sixty-second LOCAL diagnostic. It is not three independently connected
+players. The 0.115 visual test confirmed the body/cowl, animations, robe/scarf,
+glow, charge effects and chirp bubbles, including diving and chapter cleanup.
+The six-entry sand-effect capacity guard remains enabled.
+0.122 live testing confirmed normal meditation/dust and successful second admission,
+but Journey exited during chirping/jumping after that replacement. The fault
+matches the sand renderer reading a seventh shader name from a six-name table.
+0.123 enforces that renderer capacity for every caller of the two affected queues;
+the previous guard depended on a live actor and its owner thread. An original-code
+fixture reproduces the invalid position-valued name with seven entries, then
+verifies the guarded six-entry path. The live source of the bypass and stability
+after this correction still need confirmation. Overflow sand contributions are
+dropped; the departure animation, actor appearance and glyph routing are unchanged.
+0.122 adds native ReadyToMed -> Med -> dust departure, with looping sound and
+emitter shutdown. Existing particles/chirps drain before the slot becomes vacant.
+Abrupt Leave skips the animation; a 60-second departure timeout uses that same
+cleanup path. Ownership failures quarantine the slot instead of recycling it.
+Active Traveler can reuse the retired actor and resident rendering resources in
+the same level with a new generation and symbol. No replacement is admitted while
+old effects, cloth workers, command consumers or GPU leases remain outstanding.
+Native-code and production-adapter fixtures passed repeated replacement cycles;
+visible departure, actual resource stability and three-player coexistence still
+need validation in Journey. Install and test this candidate in devishaz only.
+0.120 confirmed a persistent pool-range rejection of floating-symbol commits.
+The guard was limited to 64 slots. Journey declares ScatteringSoft with 136 slots and
+ScatteringSoftNoDepth with 32. 0.121 allows the initialized glyph to rebind to
+these named, type-checked pools with their exact capacities. Exclusive slot
+ownership, writable-buffer isolation and stable snapshots remain required.
+Other geometry callers retain their 64-slot limit. Regression checks cover the
+136-slot transition, rejected unknown resources, aliases and changed snapshots.
+Floating ownership lines now report the current slot count. Floating-symbol
+visibility must still be confirmed in Journey; standalone checks are not visual
+validation. The closer two-unit placement and working chest symbol are retained.
+0.118 corrected the production numeric writer range for the new chirp-size field.
+The regression check now drives activation through that production writer.
+The diagnostic world-X placement offset remains halved from 4 to 2 units for
+closer visual inspection. It also publishes the diagnostic sample's two numeric
+chirp-size inputs before the native display pass. The previous path omitted them;
+a zero size multiplier reproduces non-finite glyph geometry in the native-code
+fixture. Floating-symbol visibility remains unconfirmed: the next live test must
+establish whether this omission caused the invisible symbol in 0.116.
+Floating-glyph log lines include size inputs, transform validity and model pose.
+0.116 routes the extra actor's latest diagnostic chirp through Journey's native
+floating-symbol display pass using that actor's own glyph. Native event IDs,
+participant generation, game thread and independent materials are checked before
+routing. The two built-in player flags and their glyphs remain unchanged.
+The native display pass supplies the previously missing alpha parameter and
+camera-facing transform. Existing chirps finish fading after actor retirement.
+Chest and floating symbol visibility still require a live visual check.
+Saved chirp-glyph routing and glyph material lines report the new path.
+Body texture references remain retained until native material destruction.
+The existing cloth readiness, colour, glow and chirp-delivery fixes are retained.
+The 0.104 memory-write and 0.105 worker-comparison fixes are retained.
+Stages: 100 ownership/pending, 101 worker fence/counters, 102 stock counter commit,
+103 native finish, 104 private unmap, 105 render registration.
+Registration detail: 1 arguments/owner, 2 frame, 3 buffer, 4 allocation, 5 existing
+owner, 6 TLS, 7 capacity. 256+16*role identifies a stock model; 512+16*draw a
+private model; 768+16*draw a queue append. Model subcodes: 1 range, 2 bindings,
+3 geometry, 4 batch count, 5 batch table, 6 duplicate, 7 prior owner, 8 textures.
+If Journey freezes, click Force Close Journey in JNET. This terminates
+only the attached game process (E04A4302). Leave JNET open until it says
+Exit report ready, then Copy All. The report includes the last captured status
+and matching exit/probe/fault log tails. The full logs remain beside the helper.
+The completed 0.98 dormant test does not need repeating on its own.
+
+1. With Journey closed, open JNET and choose Prepare & Launch.
+2. Journey launches automatically; enter Desert and keep the helper open.
+3. Wait for "Full object retained", then choose Outfits 7 once.
+4. Return to gameplay. Walk, jump/glide, and make short/charged chirps. Each
+   traveler stays active for 15 seconds, then meditates and turns to dust.
+   The next traveler joins automatically after cleanup and a two-second pause.
+   Expect several minutes for all seven outfits; stay in Desert throughout.
+5. Check that each new traveler has a different symbol from the previous one,
+   its robe tier/color changes, its cloth and chirps work, and no old footsteps, sounds or particles persist.
+   Watch for worsening responsiveness across cycles.
+6. Status reports "Repeat test: complete. Clean cycles: 7/7. Result: 0."
+   Peer phase/result should be 0 / 0, meaning the slot is vacant and reusable.
+   Choose Copy All and send the report with any visual/performance observations.
+7. Dust cancels remaining cycles and gives the current traveler a normal departure.
+   Active Traveler remains available for a single manual sixty-second test.
+8. After copying the report, quit normally with the helper open. Copy All again
+   if the exit report contains new cleanup information. A failed/quarantined
+   repeat test requires a fresh Journey session; do not keep admitting travelers.
+
+If initialization declines, do not try other modes in that process. Copy the
+report and restart Journey. If quarantined, resources are retained instead of
+being freed while ownership is uncertain; do not retry inside that process.
+There is no preparation portal round trip. Chapter select tests resource
+teardown only; use Active Traveler after phase 0 for same-level replacement.
+
+The helper emphasizes Setup / Active Traveler / Dust / Repeat 10 / Outfits 7 / Status. Native
+Lifecycle is for a separate fresh-process reference recording, not this test.
+Legacy room/ghost commands do not use the new full native actor protocol.
+Original game files remain unchanged; startup capacities change only in memory.
+Five Remote robe/scarf instances mean one stock plus four frame materials,
+not five admitted players.
+
+Still unverified in Journey: departure and same-level replacement.
+Still unfinished: independent full-state peer admission/transport, symmetric
+three-player contact/recharge, shared triggers,
+chapter synchronization and additional world-cloth lighting contributions.
+Native code still has two world-light sources; the extra update preserves the
+stock Remote source. A successful local diagnostic does not establish these
+multiplayer behaviors. Higher player counts remain unvalidated.
+
+README maps the current code and game files. RESEARCH records pinned native
+addresses and the distinction between static, fixture and game-tested evidence.
+
+0.154 readability: all menu labels and arrows use full white foreground, with a lighter per-glyph shadow capped at 0.20 pixels. The user confirmed the 0.153 text menu stable. Image rendering is re-enabled with explicit drawing-state preservation instead of context-state switching. Mouse polling stays disabled while the image path is tested. Copy All includes image stages and failing HRESULT.
+
+0.153 recovery: image rendering and mouse arrow polling are suspended after the 0.152 title-menu crash. Text layout remains for title/pause verification. Copy All now includes menu checkpoints and saved JNET messages. Apply and host travel remain unavailable.
+
+0.155: lobby headers have individual, evenly spaced positions; Join/Leave sits below the lobby list. Image shaders use separate sources and an explicit four-corner vertex buffer. Shader compilation and creation have separate checkpoints; compiler errors are saved in the runtime log. Arrow input remains suspended pending visible image validation.
+
+0.156: replaces the shader lerp intrinsic rejected by the 0.155 runtime compiler with explicit arithmetic. Preview arrows are enabled and enlarged. Normal/Infinite scarf mode is a separate draft selection below scarf length; it does not apply infinite energy to gameplay yet. Full-white text now has a stronger per-glyph shadow limited to 0.75 pixels.
+
+0.157: shader class counts are queried before retrieving instances and validated before drawing. Empty class lists restore with NULL/zero. Render targets use the simple restore call when no UAVs are saved. Runtime checkpoints identify individual restoration calls. The 0.156 crash occurred after entering restoration; the exact call remains unconfirmed.
+
+0.158: image fitting now uses actual render-target dimensions and each atlas image aspect ratio. Preview bounds, captions and centered arrows are arranged together. Scarf cropping preserves strip proportions. The user confirmed 0.157 previews and arrows working visually.
+
+0.159: local Desert lobby milestone. Enter Desert in each configured bottle. Create a public Journey lobby to list it; guests select the row and Join. Private lobbies are unlisted; enter the same password and Join without selecting a row. Passwords accept ASCII letters, digits, space, hyphen, underscore and period (32 characters). Click access/mode to change them in Create. Rocket Deathmatch is visible but rejected as unimplemented. Leave and wait for native departure before joining again. Internet discovery, level travel and gameplay appearance Apply remain unavailable.
+
+0.178 SAME-MAC COMPARISON
+Historical 0.178 settings (0.179 defaults instead match B):
+expensive scans ON, observation logs ON, gameplay worker OFF, native motion.
+Use JNET-network.ini beside JNET.dll; restart Journey after each setting change.
+
+[Diagnostics]
+Scans=1
+ObservationLogs=1
+[Transport]
+Worker=0
+[Motion]
+SmoothMs=0
+
+A: Defaults above on all three clients.
+B: Set Scans=0 and ObservationLogs=0 on all three; keep Worker=0/SmoothMs=0.
+C: Keep diagnostics off and set Worker=1 on all three; keep SmoothMs=0.
+Keep devishaz host, the same guest join order, route and graphics for A/B/C.
+Play for two minutes, try short and charged chirps, then Copy All on every
+client while all three remain connected. Test departure after copying.
+Repeat a promising result once. Then reverse guest join order and confirm
+which SteamID occupies the Extra traveler slot in the report.
+
+Scans=0 skips only the periodic extra-traveler visibility/material/glyph/pose
+inspection. ObservationLogs=0 suppresses the known verbose visibility,
+appearance-actor, glyph and floating-glyph log categories. It does not suppress
+all logging. Safety validation, fault reporting, other lifecycle/error logs,
+helper refreshes and essential counters stay enabled. Reported scan duration
+includes the scan's observation log writes and is not a whole-frame time.
+
+After those comparisons, optional SmoothMs=80 on devishaz alone enables bounded
+position blending. Other values use native correction. The blend adds up to
+80 ms per target transition and bypasses first poses, lease changes, gaps
+>=250 ms, discrete state changes and offsets over 1 world unit. The bound is
+experimental, not a measured native snap threshold. No extrapolation is used.
+Worker=0 uses callback-only service; Worker=1 enables background service.
+The report displays the effective settings. No config file is required for A.
+
+0.224 charge variants: native PlayerCoo/Chirp/Call/Shout classify the existing charge thresholds. Longtail maps these to FishIdleMoveShort / FishIdleMoveMedium / FishComeHere / FishIdleMoveLong. Whale maps the first two to HappyWhale and the charged two to ClothGuardianShout. These sound events exist in SoundEffectData; assigning them to charge tiers is JNET behavior, not an assertion that native creatures use player charge input. War Machine remains Guardian_OutOfSnowVO at every charge. Wire sound kinds 5-11 preserve these choices.

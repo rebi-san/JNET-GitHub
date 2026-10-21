@@ -1,0 +1,47 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState DepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+float4 skyColors[5];
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+	float3 eye         VS_ATTR(TEXCOORD1);
+};
+
+struct f2f
+{
+	float4 color : FINAL_COLOR;
+};
+
+#endif
+
+
+
+
+FS_START(float4,,)
+
+	half3 E = (half3)normalize(input.eye);
+	float y = saturate(E.y);
+
+	float4 bot =
+		(y > GET_LOCAL(skyColors[3].a)) ? GET_LOCAL(skyColors[3]) :
+			((y > GET_LOCAL(skyColors[2].a)) ? GET_LOCAL(skyColors[2]) :
+				((y > GET_LOCAL(skyColors[1].a)) ? GET_LOCAL(skyColors[1]) : GET_LOCAL(skyColors[0])));
+	float4 top =
+		(y > GET_LOCAL(skyColors[3].a)) ? GET_LOCAL(skyColors[4]) :
+			((y > GET_LOCAL(skyColors[2].a)) ? GET_LOCAL(skyColors[3]) :
+				((y > GET_LOCAL(skyColors[1].a)) ? GET_LOCAL(skyColors[2]) : GET_LOCAL(skyColors[1])));
+
+	float t = (y - bot.a) / (top.a - bot.a);
+	output.rgb = (float3) lerp(bot, top, t); //t > 0.5 ? top : bot;
+	output.a = 1.0f;
+
+SH_END()
+

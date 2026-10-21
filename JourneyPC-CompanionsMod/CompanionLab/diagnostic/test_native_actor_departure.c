@@ -26,7 +26,7 @@ static char *ABI copy_name(char *dst,const char *src,size_t n) {return strncpy(d
 #define JC_CHIRP_SLOTS 16
 typedef int32_t LONG;
 struct jc_environment_probe {uint64_t peer,generation;unsigned pins,quarantined,produced;};
-struct jc_cloth_live_material {uint64_t image,peer,generation;unsigned role,ready,quarantined,pins,atlas_outfit;void *atlas_holders;};
+struct jc_cloth_live_material {uint64_t image,peer,generation;unsigned role,ready,quarantined,pins,atlas_outfit;void *atlas_holders;struct {unsigned pins;} atlas_snapshots[6];};
 struct traveler_live_storage {
     struct {
         struct {unsigned pins,mapped;} buffers[JC_CLOTH_BUFFERS];
@@ -88,7 +88,7 @@ static int jc_cloth_live_graphics_leave(void *backend,struct jc_cloth_graphics_t
     assert(backend==&traveler_live->backend && graphics_locked && t->held);graphics_locked=t->held=0;return 1;
 }
 static int jc_cloth_live_material_destroy(int (*read)(void *,uint64_t,void *,size_t),void *ctx,struct jc_cloth_live_material *m) {
-    (void)read;(void)ctx;assert(!m->pins && retired && graphics_locked && m->ready);
+    (void)read;(void)ctx;assert(!m->pins && graphics_locked && m->ready);
     memset(m,0,sizeof(*m));++atlas_releases;return 0;
 }
 static int jc_cloth_live_material_create(int (*read)(void *,uint64_t,void *,size_t),void *ctx,uint64_t image,
@@ -170,6 +170,16 @@ static void lifecycle_cases(const struct jc_actor_identity *id) {
         storage.materials[0][0].atlas_outfit=(cycle+1)%7;
         storage.materials[0][0].atlas_holders=&storage;
         unsigned released=atlas_releases;
+        retired=0;
+        storage.materials[0][0].pins=1;
+        assert(traveler_live_material_rebuild(&storage.materials[0][0])==JC_FRAME_OWNERSHIP);
+        storage.materials[0][0].pins=0;storage.materials[0][0].atlas_snapshots[0].pins=1;
+        assert(traveler_live_material_rebuild(&storage.materials[0][0])==JC_FRAME_OWNERSHIP);
+        storage.materials[0][0].atlas_snapshots[0].pins=0;
+        assert(!traveler_live_material_rebuild(&storage.materials[0][0]));
+        assert(atlas_releases==released+1 && !storage.materials[0][0].atlas_holders);
+        retired=1;storage.materials[0][0].atlas_holders=&storage;
+        storage.materials[0][0].atlas_outfit=(cycle+1)%7;released=atlas_releases;
         storage.materials[0][0].pins=1;
         assert(traveler_peer_replace(current.peer+1,current.generation+1)==JC_ACTOR_QUARANTINED);
         storage.materials[0][0].pins=0;storage.backend.buffers[0].mapped=1;

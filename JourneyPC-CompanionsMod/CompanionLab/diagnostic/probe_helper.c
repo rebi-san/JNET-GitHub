@@ -136,7 +136,7 @@ static int append_menu_report(HANDLE process,uintptr_t base,wchar_t *text,size_t
         L"Lobby state: 1 waiting; 2 ready; 3 joined; -1 binding failure. Operations: 1 browser; 2 code availability; 3 code lookup; 4 create; 5 join; 6 code collision recheck.\r\n"
         L"P2P state: 1 listening/connecting; 2 connected; 3 handshake and messages; -1 binding; -2 listen; -3 connect; -4 callback registration. Fresh validated Desert state automatically feeds native travelers.\r\n"
         L"Isolation 1 requires native search/create/join/publication and legacy P2P guards. Live vanilla isolation still needs verification.\r\n"
-        L"Discovery: completed %ld; returned %ld; rejected %ld; first rejection %ld (1 mod marker, 2 protocol, 3 capacity, 4 status, 5 mode/level, 6 visibility, 7 advertised host, 8 nonce).\r\n"
+        L"Discovery: completed %ld; returned %ld; rejected %ld; first rejection %ld (1 mod marker, 2 protocol, 3 capacity, 4 status, 5 mode/level, 6 visibility, 7 advertised host, 8 nonce, 9 build mismatch).\r\n"
         L"Steam session detail: %hs\r\n",
         (long)lobby[0],(long)lobby[1],(long)lobby[2],(long)lobby[3],(long)lobby[4],(long)lobby[5],(long)lobby[6],(long)lobby[7],(long)lobby[8],
         (long)lobby[9],(long)lobby[10],(long)lobby[11],(long)lobby[12],(long)lobby[13],(long)lobby[14],(long)lobby[15],(long)lobby[16],(long)lobby[17],(long)lobby[18],(long)lobby[19],lobby_text);
@@ -812,14 +812,14 @@ static void append_exit_text(const wchar_t *value) {
     if (count>JC_REPORT_CAP-1-used) count=JC_REPORT_CAP-1-used;
     wmemcpy(report_target+used,value,count);report_target[used+count]=0;
 }
-static void append_memory_tail(const struct jnet_memory_log *log,const wchar_t *label,size_t limit) {
+static void append_memory_tail(struct jnet_memory_log *log,const wchar_t *label,size_t limit) {
     char bytes[6001];wchar_t decoded[6001];
     if(limit>6000)limit=6000;
     size_t got=jnet_log_tail(log,bytes,limit+1);
     if(!MultiByteToWideChar(CP_UTF8,0,bytes,-1,decoded,6001))return;
     append_exit_text(L"\r\n\r\n");append_exit_text(label);append_exit_text(L"\r\n");
     append_exit_text(got?decoded:L"No entries recorded.");
-    if(log && atomic_load(&log->dropped))append_exit_text(L"\r\nMemory buffer limit reached; some entries omitted.");
+    if(log && atomic_load(&log->dropped))append_exit_text(L"\r\nRecent entries retained; older or busy entries omitted.");
 }
 static void append_session_memory(void) {
     append_memory_tail(&exit_log,L"EXIT RECORDER",2000);
@@ -842,17 +842,17 @@ static int session_write(HANDLE file,const char *text,size_t bytes) {
     DWORD written=0;
     return bytes<=MAXDWORD && WriteFile(file,text,(DWORD)bytes,&written,NULL) && written==bytes;
 }
-static int session_write_log(HANDLE file,const char *label,const struct jnet_memory_log *log) {
+static int session_write_log(HANDLE file,const char *label,struct jnet_memory_log *log) {
     if(!session_write(file,label,strlen(label)))return 0;
     if(!log)return session_write(file,"Unavailable.\r\n",14);
-    uint32_t count=atomic_load(&log->count);if(count>JNET_LOG_ROWS)count=JNET_LOG_ROWS;
-    for(uint32_t i=0;i<count;++i){
-        size_t n=atomic_load_explicit(&log->rows[i].length,memory_order_acquire);
-        if(n>JNET_LOG_BYTES)return 0;
-        if(n && !session_write(file,log->rows[i].text,n))return 0;
+    uint32_t count=atomic_load(&log->count),start=count>JNET_LOG_ROWS?count-JNET_LOG_ROWS:0;
+    char bytes[JNET_LOG_BYTES];
+    for(uint32_t i=start;i<count;++i){
+        size_t n=jnet_log_read_row(log,i,bytes);
+        if(n && !session_write(file,bytes,n))return 0;
     }
     if(atomic_load(&log->dropped)){
-        const char note[]="\r\nMemory buffer limit reached; some entries omitted.\r\n";
+        const char note[]="\r\nRecent entries retained; older or busy entries omitted.\r\n";
         if(!session_write(file,note,sizeof(note)-1))return 0;
     }
     return 1;

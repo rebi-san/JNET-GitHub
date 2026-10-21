@@ -1,0 +1,178 @@
+#include "Migratory.sh"
+// Notes:  Heat distortion!
+//
+// Author: John Edwards
+// Date C: 3-16-2011
+
+
+#ifndef _IOS64
+
+// Heat distortion params.
+#ifdef D_PLATFORM_GCM
+float4 heatOffsets[ 8 ];
+#else
+float4 heatOffsets0;
+float4 heatOffsets1;
+float4 heatOffsets2;
+float4 heatOffsets3;
+float4 heatOffsets4;
+float4 heatOffsets5;
+float4 heatOffsets6;
+float4 heatOffsets7;
+#endif
+
+float heatScale;
+
+float4 heatTapScalar;
+
+D_DECLARE_TEXTURE2D_4(tex);
+#ifdef D_PLATFORM_GXM
+ D_DECLARE_TEXTURE2D_4(heat);
+#else
+ D_DECLARE_TEXTURE3D_4(heat);
+#endif
+D_DECLARE_TEXTURE2D_4(heatMask);
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+	HALF3  heatPointer VS_ATTR(TEXCOORD1);
+};
+
+struct f2f
+{
+	float4 color       : FINAL_COLOR;
+};
+
+
+#endif
+
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+FS_START(float4,
+    TEX3(
+        2D, tex,
+        3D, heat,
+        2D, heatMask),)
+
+    half heatIntensity = tex2D( heatMask, input.uv ).r;
+
+	output = tex2D(tex, input.uv);
+
+	float nSamples = 1.f;
+	float3 heatUv;
+	float2 heatTap,heatOff,uv;
+
+#ifdef D_PLATFORM_GXM
+
+#define HEAT_DISTORT(idx)															\
+	heatUv = normalize( (float3)input.heatPointer ) + GET_LOCAL(heatOffsets##idx.xyz);					\
+	heatTap = 0.75 * (2.0 * tex2D( heat, 2.0 * heatUv.xy ).ra - 1);		\
+	heatOff = heatTap * GET_LOCAL(heatScale) * saturate( heatIntensity );						\
+	uv = input.uv + heatOff;															\
+	output += tex2D( tex, uv );								\
+
+#elif !defined(_IOS64)
+
+#define HEAT_DISTORT(idx, scalar)															\
+	heatUv = normalize( (float3)input.heatPointer ) + GET_LOCAL(heatOffsets##idx.xyz);					\
+	heatTap = scalar * (2.0 * tex3D( heat, 2.0 * heatUv ).rg - 1);		\
+	heatOff = heatTap * GET_LOCAL(heatScale) * saturate( heatIntensity );						\
+	uv = input.uv + heatOff;															\
+	if((uv.x==saturate(uv.x))&&(uv.y==saturate(uv.y)))	\
+	{ \
+		output += tex2D( tex, uv );										\
+		nSamples += 1.f; \
+	}
+
+#endif
+
+    int rounds = floor(GET_LOCAL(heatTapScalar.z));
+    float2 step = GET_LOCAL(heatTapScalar.xy)*GET_LOCAL(heatTapScalar.w);
+    float2 curr = step;
+
+#ifdef _IOS64
+    int2 xy = int2(input.position.x, input.position.y);
+    int base = (xy.x ^ xy.y)&3;
+
+    float4 heatOfs[4];
+
+    if(base==0)
+    {
+        heatOfs[0] = GET_LOCAL(heatOffsets0);
+        heatOfs[1] = GET_LOCAL(heatOffsets2);
+        heatOfs[2] = GET_LOCAL(heatOffsets4);
+        heatOfs[3] = GET_LOCAL(heatOffsets6);
+    }
+    else if(base==1)
+    {
+        heatOfs[0] = GET_LOCAL(heatOffsets0);
+        heatOfs[1] = GET_LOCAL(heatOffsets2);
+        heatOfs[2] = GET_LOCAL(heatOffsets5);
+        heatOfs[3] = GET_LOCAL(heatOffsets7);
+    }
+    else if(base==2)
+    {
+        heatOfs[0] = GET_LOCAL(heatOffsets1);
+        heatOfs[1] = GET_LOCAL(heatOffsets3);
+        heatOfs[2] = GET_LOCAL(heatOffsets4);
+        heatOfs[3] = GET_LOCAL(heatOffsets6);
+    }
+    else
+    {
+        heatOfs[0] = GET_LOCAL(heatOffsets1);
+        heatOfs[1] = GET_LOCAL(heatOffsets3);
+        heatOfs[2] = GET_LOCAL(heatOffsets5);
+        heatOfs[3] = GET_LOCAL(heatOffsets7);
+    }
+
+    for(int x=0; x<rounds; ++x)
+    {
+        for(int s=0; s<4; ++s)
+        {
+            heatUv = normalize( (float3)input.heatPointer.xyz ) + heatOfs[s].xyz;
+            heatTap = curr * (2.0 * tex3D( heat, 2.0 * heatUv ).ra - 1);
+            heatOff = heatTap * GET_LOCAL(heatScale) * saturate( heatIntensity );
+            uv = input.uv + heatOff;
+            if((uv.x==saturate(uv.x))&&(uv.y==saturate(uv.y)))
+            {
+                output += tex2D( tex, uv );
+                nSamples += 1.f;
+            }
+        }
+
+        curr += step;
+    }
+#else
+
+    for(int x=0; x<rounds; ++x)
+    {
+        HEAT_DISTORT( 0, curr )
+        HEAT_DISTORT( 1, curr )
+        HEAT_DISTORT( 2, curr )
+        HEAT_DISTORT( 3, curr )
+        HEAT_DISTORT( 4, curr )
+        HEAT_DISTORT( 5, curr )
+        HEAT_DISTORT( 6, curr )
+        HEAT_DISTORT( 7, curr )
+
+        curr += step;
+    }
+#endif
+
+
+
+
+
+	output /= nSamples;
+
+SH_END()
+

@@ -34,6 +34,10 @@ static void traveler_local_interrupt(void) {
 }
 static void traveler_local_level_initialized(uintptr_t dude) {
     if(!traveler_context() || dude!=traveler_barn+0x146f0)return;
+    char line[192];
+    snprintf(line,sizeof(line),"[JNET] native receiver initialized: previous=%u barn=%llx owned=%llx",
+        traveler_local_state,(unsigned long long)traveler_barn,(unsigned long long)traveler_local_owned_barn);
+    message(line);
     traveler_stream_close(1);
     traveler_local_state=0;traveler_local_completed=0;traveler_local_frames=0;
     traveler_local_departed=traveler_local_sent=traveler_local_dust_finished=0;
@@ -49,7 +53,11 @@ static int traveler_local_offline(void) {
     else if(!match)traveler_local_guard=3;
     else if(!own_read(NULL,match+0x11db4,&connected,1))traveler_local_guard=4;
     else if(connected)traveler_local_guard=5;
-    if(traveler_local_guard)traveler_local_owned_barn=0;
+    if(traveler_local_guard && traveler_local_owned_barn){
+        char line[128];snprintf(line,sizeof(line),"[JNET] retained native ownership revoked: guard=%u barn=%llx",
+            traveler_local_guard,(unsigned long long)traveler_local_owned_barn);message(line);
+        traveler_local_owned_barn=0;
+    }
     return !traveler_local_guard;
 }
 #ifdef JC_NETWORK_UDP
@@ -117,7 +125,7 @@ static void traveler_local_before_input(uintptr_t barn,uintptr_t game) {
             if(traveler_network.paused || !p->connection.sequence || now<p->connection.last_seen ||
                 now-p->connection.last_seen>=2000 || p->sample.chapter!=traveler_network.chapter)continue;
             if(slot==1 && (traveler_local_state==0 || traveler_local_state==4))traveler_local_state=1;
-            if(slot==0 && (!traveler_actor || traveler_peer_vacant()) &&
+            if(slot==0 && JNETTraveler[0]==3 && (!traveler_actor || traveler_peer_vacant()) &&
                 (JNETActorTrial[0]==0 || JNETActorTrial[0]==3) && !traveler_actor_trial_join_pending)
                 traveler_peer_restart_requested=1;
         }
@@ -173,36 +181,6 @@ static void traveler_local_before_input(uintptr_t barn,uintptr_t game) {
                 traveler_local_completed,traveler_admission_storage_matches((uintptr_t)GetModuleHandleW(NULL)));
             message(line);traveler_local_fail(5);return;
         }
-        unsigned retained=traveler_network_active && traveler_local_owned_barn==barn &&
-            layout.remote_gate && layout.gates[0]==1 && !layout.gates[1] && !layout.gates[2] &&
-            !layout.blocked && layout.local_chapter==layout.remote_chapter;
-        if(!retained && (layout.remote_gate || layout.gates[0] || (layout.gates[2] && traveler_local_completed) || (layout.blocked && !traveler_local_completed))){
-            static uint64_t last_wait;
-            static uintptr_t last_barn;
-            static unsigned previous[8];
-            unsigned snapshot[8]={(unsigned)layout.remote_gate,layout.gates[0],layout.gates[1],layout.gates[2],
-                layout.blocked,layout.local_chapter,layout.remote_chapter,traveler_local_completed};
-            uint64_t now=GetTickCount64();
-            if(JNETActor[17]!=5 || last_barn!=barn || memcmp(previous,snapshot,sizeof(snapshot)) ||
-                now<last_wait || now-last_wait>=5000){
-                unsigned reasons=(layout.remote_gate?1u:0u) | (layout.gates[0]?2u:0u) |
-                    (layout.gates[2] && traveler_local_completed?4u:0u) |
-                    (layout.blocked && !traveler_local_completed?8u:0u);
-                char line[480];
-#ifdef JC_NETWORK_UDP
-                long network_state=JNETNetwork[0],network_result=JNETNetwork[2];
-                unsigned paused=traveler_network.paused;
-#else
-                long network_state=0,network_result=0;unsigned paused=0;
-#endif
-                snprintf(line,sizeof(line),"[JNET] native admission waiting: reasons=%u gate=%u flags=%u/%u/%u blocked=%u chapters=%u/%u completed=%u receiver=%u samples=%llu network=%ld/%ld paused=%u game=%llx barn=%llx; reasons: 1 remote gate, 2 a2, 4 a4 after departure, 8 blocked before departure; no native state overwritten",
-                    reasons,snapshot[0],snapshot[1],snapshot[2],snapshot[3],snapshot[4],snapshot[5],snapshot[6],snapshot[7],
-                    traveler_local_state,(unsigned long long)traveler_local_frames,network_state,network_result,
-                    paused,(unsigned long long)game,(unsigned long long)barn);
-                message(line);last_wait=now;last_barn=barn;memcpy(previous,snapshot,sizeof(snapshot));
-            }
-            traveler_local_report(5);return;
-        }
         if(!traveler_stream_waiting[1]) {
             uint32_t symbol;memcpy(&symbol,sender.state.bytes+0x64,4);
             traveler_local_outfit=(traveler_local_completed+3)%7;
@@ -215,12 +193,55 @@ static void traveler_local_before_input(uintptr_t barn,uintptr_t game) {
             }
         }
     }
+    if(first) {
+        unsigned retained=traveler_network_active && traveler_local_owned_barn==barn &&
+            layout.gates[0]==1 && !layout.gates[1] && !layout.gates[2] &&
+            !layout.blocked && sender.chapter==layout.local_chapter &&
+            (traveler_stream_enabled || layout.local_chapter==layout.remote_chapter);
+        if(!retained && (layout.remote_gate || layout.gates[0] || (layout.gates[2] && traveler_local_completed) || (layout.blocked && !traveler_local_completed))){
+            static uint64_t last_wait;
+            static uintptr_t last_barn;
+            static unsigned previous[8];
+            unsigned snapshot[8]={(unsigned)layout.remote_gate,layout.gates[0],layout.gates[1],layout.gates[2],
+                layout.blocked,layout.local_chapter,layout.remote_chapter,traveler_local_completed};
+            uint64_t now=GetTickCount64();
+            if(JNETActor[17]!=5 || last_barn!=barn || memcmp(previous,snapshot,sizeof(snapshot)) ||
+                now<last_wait || now-last_wait>=5000){
+                unsigned reasons=(layout.remote_gate?1u:0u) | (layout.gates[0]?2u:0u) |
+                    (layout.gates[2] && traveler_local_completed?4u:0u) |
+                    (layout.blocked && !traveler_local_completed?8u:0u);
+                char line[560];
+#ifdef JC_NETWORK_UDP
+                long network_state=JNETNetwork[0],network_result=JNETNetwork[2];
+                unsigned paused=traveler_network.paused;
+#else
+                long network_state=0,network_result=0;unsigned paused=0;
+#endif
+                snprintf(line,sizeof(line),"[JNET] native admission waiting: reasons=%u gate=%u flags=%u/%u/%u blocked=%u chapters=%u/%u completed=%u receiver=%u samples=%llu network=%ld/%ld paused=%u game=%llx barn=%llx owned=%llx captured_chapter=%u stream=%u; reasons: 1 remote gate, 2 a2, 4 a4 after departure, 8 blocked before departure; no native state overwritten",
+                    reasons,snapshot[0],snapshot[1],snapshot[2],snapshot[3],snapshot[4],snapshot[5],snapshot[6],snapshot[7],
+                    traveler_local_state,(unsigned long long)traveler_local_frames,network_state,network_result,
+                    paused,(unsigned long long)game,(unsigned long long)barn,
+                    (unsigned long long)traveler_local_owned_barn,sender.chapter,traveler_stream_enabled);
+                message(line);last_wait=now;last_barn=barn;memcpy(previous,snapshot,sizeof(snapshot));
+            }
+            traveler_local_report(5);return;
+        }
+    }
     if(traveler_stream_enabled) {
         code=traveler_stream_sample(1,first,UINT64_C(0x4e4154495645),traveler_local_completed+1,
             traveler_local_outfit,traveler_local_symbol,&sender);
         if(code==JC_STREAM_HELD)return;
         if(code==JC_STREAM_TIMEOUT){if(first)traveler_local_fail(30+code);else traveler_local_stop();return;}
         if(code){traveler_local_fail(30+code);return;}
+    }
+    if(traveler_network_active && sender.chapter!=layout.local_chapter){
+        static uint64_t last_chapter_wait;
+        uint64_t now=GetTickCount64();
+        if(JNETActor[17]!=5 || now<last_chapter_wait || now-last_chapter_wait>=5000){
+            char line[160];snprintf(line,sizeof(line),"[JNET] native admission waiting for current-chapter sample: local=%u incoming=%u stored=%u",
+                layout.local_chapter,sender.chapter,layout.remote_chapter);message(line);last_chapter_wait=now;
+        }
+        traveler_local_report(5);return;
     }
     if(!traveler_stream_enabled)jc_receiver_store(sender.state.bytes,jc_receiver_float(sender.state.bytes)-3.f);
     else {

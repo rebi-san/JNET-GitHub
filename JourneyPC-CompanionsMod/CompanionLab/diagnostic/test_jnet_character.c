@@ -21,14 +21,21 @@ int main(void) {
     assert(near(jnet_character_speed(JNET_CHARACTER_LONGTAIL),10.8f));
     assert(near(jnet_character_speed(JNET_CHARACTER_FLOW_1),10.8f));
     assert(near(jnet_character_speed(JNET_CHARACTER_FLOW_2),10.8f));
-    assert(near(jnet_character_speed(JNET_CHARACTER_WHALE),6.9f));
-    assert(near(jnet_character_speed(JNET_CHARACTER_WAR_MACHINE),6.9f));
+    assert(near(jnet_character_speed(JNET_CHARACTER_WHALE),8.28f));
+    assert(near(jnet_character_speed(JNET_CHARACTER_WAR_MACHINE),8.28f));
+    for(unsigned kind=0;kind<JNET_CHARACTER_COUNT;++kind){
+        float base=jnet_character_speed(kind);
+        assert(near(jnet_character_move_speed(kind,0),base));
+        assert(near(jnet_character_move_speed(kind,1),base*(jnet_character_is_creature(kind)?2.f:1.f)));
+    }
     for(unsigned kind=0;kind<=JNET_CHARACTER_COUNT;++kind)
         for(unsigned charge=0;charge<=5;++charge)
             assert(jnet_character_large_chirp(kind,charge)==
                 (charge==4 && (kind==JNET_CHARACTER_WHALE || kind==JNET_CHARACTER_WAR_MACHINE)));
     float camera=0;
     assert(jnet_character_camera_distance(JNET_CHARACTER_LONGTAIL,8,&camera) && near(camera,10));
+    assert(jnet_character_camera_distance(JNET_CHARACTER_FLOW_1,8,&camera) && near(camera,10));
+    assert(jnet_character_camera_distance(JNET_CHARACTER_FLOW_2,8,&camera) && near(camera,10));
     assert(jnet_character_camera_distance(JNET_CHARACTER_WHALE,8,&camera) && near(camera,40));
     assert(jnet_character_camera_distance(JNET_CHARACTER_WAR_MACHINE,8,&camera) && near(camera,40));
     assert(!jnet_character_camera_distance(JNET_CHARACTER_WAYFARER,8,&camera));
@@ -115,6 +122,29 @@ int main(void) {
     assert(requested.direction[1]>.999f);
     assert(jnet_character_smooth(filtered,&requested,.016f,0) && !requested.strength);
     requested.direction[0]=NAN;assert(!jnet_character_smooth(filtered,&requested,.016f,1));
+    struct jnet_character_control flight={.kind=JNET_CHARACTER_WHALE};
+    struct jnet_character_input flight_input={.camera_forward={0,.8f,.6f},.camera_right={1,0,0},.enabled=1,.forward=1,.level=1};
+    struct jnet_character_intent flight_intent;
+    assert(jnet_character_control_step(&flight,&flight_input,&flight_intent));
+    assert(near(flight_intent.direction[1],0) && near(flight_intent.direction[2],1));
+    flight_input.forward=0;flight_input.fly=1;
+    assert(jnet_character_control_step(&flight,&flight_input,&flight_intent));
+    float up_motion[3]={0},down_motion[3]={0};
+    assert(jnet_character_smooth(up_motion,&flight_intent,.016f,1));
+    flight_input.fly=0;flight_input.fly_down=1;
+    assert(jnet_character_control_step(&flight,&flight_input,&flight_intent));
+    assert(jnet_character_smooth(down_motion,&flight_intent,.016f,1));
+    assert(near(up_motion[1],-down_motion[1]));
+    struct jnet_character_pose banked={.rotation={0,0,0,1}};
+    flight_intent=(struct jnet_character_intent){.roll=1.57079632679f};
+    for(unsigned i=0;i<240;++i){
+        assert(jnet_character_motion_step(&banked,&flight_intent,10,.016f,&next));banked=next;
+    }
+    assert(near(banked.position[0],0) && near(banked.position[1],0));
+    assert(fabsf(banked.rotation[2]-.70710678f)<.001f);
+    flight_intent.roll=0;
+    for(unsigned i=0;i<240;++i){assert(jnet_character_motion_step(&banked,&flight_intent,10,.016f,&next));banked=next;}
+    assert(fabsf(banked.rotation[2])<.001f);
     char path[256];
     assert(jnet_character_bank_path("C:/Journey/Data/Sounds/JNTBioSummit-SFX.bnk",path,sizeof(path)));
     assert(!strcmp(path,"C:/Journey/Data/Sounds/LvlSfxSummit-SFX.bnk"));
@@ -127,8 +157,8 @@ int main(void) {
         assert(jnet_character_chirp_variant(1,i,1)!=jnet_character_chirp_variant(1,i+1,1));
         assert(jnet_character_chirp_variant(2,i,4)!=jnet_character_chirp_variant(2,i+1,4));
         assert(jnet_character_chirp_variant(3,i,4)==18);
-        assert(jnet_character_chirp_variant(5,i,4)==0);
-        assert(jnet_character_chirp_variant(6,i,1)==0);
+        assert(jnet_character_chirp_variant(5,i,4)==21+i%2);
+        assert(jnet_character_chirp_variant(6,i,1)==21+i%2);
     }
     puts("Character control intent: camera ascent/dive, neutral hover request, diagonal speed, spotlight edges and invalid input passed. Native creature playback not exercised.");
 }

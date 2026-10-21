@@ -10,7 +10,7 @@
 static uint64_t jnet_menu_selected_room,jnet_menu_selected_host;
 static unsigned jnet_menu_create,jnet_menu_private,jnet_menu_password_focus;
 static char jnet_menu_password[33];
-static unsigned jnet_menu_chat,jnet_menu_cmatw=1,jnet_menu_daynight,jnet_menu_paradise;
+static unsigned jnet_menu_chat,jnet_menu_cmatw=1,jnet_menu_daynight;
 static struct jnet_appearance_edit jnet_menu_edit;
 static unsigned jnet_menu_level,jnet_menu_page,jnet_menu_closing;
 static uintptr_t jnet_menu_last;
@@ -32,9 +32,9 @@ static uint64_t jnet_appearance_applied_at;
 static float jnet_appearance_arrow=.22f;
 static float jnet_variant_arrow=.12f;
 static const float jnet_level_left=.33f,jnet_level_right=.87f;
-static const float jnet_appearance_rows[]={.58f,.36f,.14f,-.08f,-.30f,-.52f};
+static const float jnet_appearance_rows[]={.58f,.36f,.14f,-.08f,-.30f,-.52f,-.68f};
 static const float jnet_character_column=0.f;
-static const float jnet_character_toggle_rows[]={-.53f,-.67f,-.81f};
+static const float jnet_character_toggle_rows[]={-.25f,-.39f,-.53f,-.67f,-.81f};
 static void jnet_menu_reset_page(void) {
     jnet_menu_page=0;jnet_menu_create=0;jnet_menu_password_focus=0;jnet_menu_closing=0;
     jnet_appearance_status[0]=0;jnet_appearance_applied_at=0;jnet_menu_key_active=0;jnet_menu_key_click=0;
@@ -65,12 +65,18 @@ static volatile LONG jnet_fps_limit;
 static int jnet_menu_visible_audio(uintptr_t menu);
 static float jnet_menu_native_height;
 static unsigned char jnet_menu_native_path[32];
+static uintptr_t (*jnet_menu_pop_original)(uintptr_t,uintptr_t);
+static unsigned jnet_menu_input_blocked;
+static uint64_t jnet_menu_input_block_frame;
+static void jnet_menu_block_activation(void) {
+    jnet_menu_input_blocked=1;jnet_menu_input_block_frame=(uint64_t)JNETFrames;
+}
 #if defined(_WIN32) && JNET_MENU_IMAGE_PREVIEW
 #include "jnet_menu_images.h"
 #if JNET_MENU_IMAGE_INPUT
-static uintptr_t (*jnet_menu_pop_original)(uintptr_t,uintptr_t);
 static uintptr_t jnet_menu_pop(uintptr_t menu,uintptr_t count) {
     if(jnet_menu_password_focus)return 0;
+    jnet_menu_block_activation();
     if(jnet_menu_page){jnet_menu_reset_page();return 0;}
     return jnet_menu_pop_original(menu,count);
 }
@@ -137,8 +143,8 @@ static void jnet_menu_controls(uintptr_t menu) {
             return;
         }
         int direction=fabsf(x-jnet_character_column-jnet_appearance_arrow)<.065f?1:(fabsf(x-jnet_character_column+jnet_appearance_arrow)<.065f?-1:0);
-        const unsigned selectors[]={JNET_SELECT_ROBE,JNET_SELECT_SCARF,JNET_SELECT_SCARF_MODE,JNET_SELECT_SCARF_GROW,JNET_SELECT_SYMBOL,JNET_SELECT_CHARACTER};
-        for(unsigned i=0;i<6;++i)if(direction && fabsf(y-jnet_appearance_rows[i])<.09f){
+        const unsigned selectors[]={JNET_SELECT_ROBE,JNET_SELECT_SCARF,JNET_SELECT_SCARF_MODE,JNET_SELECT_SCARF_GROW,JNET_SELECT_SYMBOL,JNET_SELECT_CHARACTER,JNET_SELECT_VARIANT};
+        for(unsigned i=0;i<jnet_appearance_row_count(jnet_menu_edit.draft.character);++i)if(direction && fabsf(y-jnet_appearance_rows[i])<.09f){
             if(jnet_menu_edit.awaiting)jnet_appearance_complete(&jnet_menu_edit,0);
             jnet_appearance_step(&jnet_menu_edit,selectors[i],direction,JNET_SCARF_MAX);
             jnet_appearance_status[0]=0;
@@ -148,6 +154,11 @@ static void jnet_menu_controls(uintptr_t menu) {
             if(fabsf(y-jnet_character_toggle_rows[0])<.065f)jnet_windwalls=!jnet_windwalls;
             if(fabsf(y-jnet_character_toggle_rows[1])<.065f)jnet_sliding=!jnet_sliding;
             if(fabsf(y-jnet_character_toggle_rows[2])<.065f)jnet_freezing=!jnet_freezing;
+            if(fabsf(y-jnet_character_toggle_rows[3])<.065f){
+                jnet_blackness=!jnet_blackness;
+                jnet_appearance_status[0]=0;
+            }
+            if(fabsf(y-jnet_character_toggle_rows[4])<.065f)jnet_fog=!jnet_fog;
         }
         return;
     }
@@ -182,14 +193,15 @@ static void jnet_menu_controls(uintptr_t menu) {
     int direction=fabsf(x-jnet_level_right)<.06f?1:(fabsf(x-jnet_level_left)<.06f?-1:0);
     int variant_direction=fabsf(x-(.60f+jnet_variant_arrow))<.045f?1:(fabsf(x-(.60f-jnet_variant_arrow))<.045f?-1:0);
     if(variant_direction && y>.17f && y<.29f && (jnet_daynight_supported(jnet_menu_level) || jnet_menu_level==7) && (!view.room || view.self==view.host)){
-        if(jnet_menu_level==7)jnet_menu_paradise=!jnet_menu_paradise;
-        else jnet_menu_daynight=(jnet_menu_daynight+(variant_direction>0?1:2))%3;return;
+        unsigned count=jnet_daynight_variants(jnet_menu_level);
+        jnet_menu_daynight=(jnet_menu_daynight+(variant_direction>0?1:count-1))%count;return;
     }
     if(direction && y>.38f && y<.58f && (!view.room || view.self==view.host)) {
         jnet_menu_level=jnet_menu_level_step(jnet_menu_level,direction);
+        if(jnet_menu_daynight>=jnet_daynight_variants(jnet_menu_level))jnet_menu_daynight=0;
     }
     if(x>.45f && x<.75f && y>.05f && y<.17f && (!view.room || view.self==view.host)) {
-        struct jnet_lobby_action action={.kind=6,.level=jnet_menu_level,.lighting=jnet_menu_daynight,.paradise=jnet_menu_level==7 && jnet_menu_paradise};jnet_lobby_submit(&action);
+        struct jnet_lobby_action action={.kind=6,.level=jnet_menu_level,.lighting=jnet_menu_level==7 && jnet_menu_daynight==3?0:jnet_menu_daynight,.paradise=jnet_menu_level==7 && jnet_menu_daynight==3};jnet_lobby_submit(&action);
     }
 
 }
@@ -219,8 +231,8 @@ static int jnet_menu_string_is(uintptr_t object,const char *expected) {
     if(!jnet_menu_read(object,value,sizeof(value)))return 0;
     memcpy(&length,value+16,8);memcpy(&capacity,value+24,8);
     size_t wanted=strlen(expected);
-    if(length!=wanted || length>15 || capacity<length)return 0;
-    if(capacity<16)return !memcmp(value,expected,wanted);
+    if(length!=wanted || length>sizeof(value) || capacity<length)return 0;
+    if(capacity<16)return length<16 && !memcmp(value,expected,wanted);
     memcpy(&data,value,8);
     return jnet_menu_read(data,value,wanted) && !memcmp(value,expected,wanted);
 }
@@ -254,18 +266,37 @@ static int jnet_menu_pressed(uintptr_t menu,unsigned offset) {
 }
 static void (*jnet_original_menu_input)(uintptr_t,uintptr_t);
 static void jnet_menu_input(uintptr_t menu,uintptr_t rows) {
+    unsigned char mouse[2]={0},accept_state[2]={0},back_state[2]={0};
+    jnet_menu_read(menu+0xd40,mouse,2);jnet_menu_read(menu+0xd10,accept_state,2);
+    jnet_menu_read(menu+0xc98,back_state,2);
+    if(jnet_menu_input_blocked && (uint64_t)JNETFrames>jnet_menu_input_block_frame &&
+       !mouse[0] && !mouse[1] && !accept_state[0] && !accept_state[1] &&
+       !back_state[0] && !back_state[1])
+        jnet_menu_input_blocked=0;
+    if(jnet_menu_pressed(menu,0xd28) && jnet_menu_visible_native(menu)){
+        uintptr_t begin=0,end=0;float speed=0;
+        if(jnet_menu_read(menu+0xc10,&begin,8) && jnet_menu_read(menu+0xc18,&end,8) &&
+           begin && end>=begin+0x60 && end-begin<=0x300 && (end-begin)%0x30==0 &&
+           jnet_menu_string_is(begin,"Root") && jnet_menu_read(menu+0xd74,&speed,4) && isfinite(speed) && speed>0){
+            uintptr_t depth=(end-begin)/0x30;
+            if(depth>2)jnet_menu_pop_original(menu,depth-2);
+            jnet_menu_reset_page();jnet_menu_closing=1;jnet_menu_block_activation();
+            speed=-speed;memcpy((void *)(menu+0xd70),&speed,4);
+            return;
+        }
+    }
     int root=jnet_menu_visible_root(menu),audio=jnet_menu_visible_audio(menu);
     if((!root && !audio) || jnet_menu_closing){jnet_original_menu_input(menu,rows);return;}
     int up=jnet_menu_pressed(menu,0xcb0),down=jnet_menu_pressed(menu,0xcc8);
     int left=jnet_menu_pressed(menu,0xce0),right=jnet_menu_pressed(menu,0xcf8);
     int accept=jnet_menu_pressed(menu,0xd10),back=jnet_menu_pressed(menu,0xc98);
     if(jnet_menu_page){
-        if(back && !jnet_menu_password_focus){jnet_menu_reset_page();return;}
+        if(back && !jnet_menu_password_focus){jnet_menu_reset_page();jnet_menu_block_activation();return;}
         struct jnet_lobby_view view;jnet_lobby_snapshot(&view);
         float points[32][2];unsigned count=0;
         if(jnet_menu_page==1){
-            for(unsigned i=0;i<6;++i){points[count][0]=jnet_character_column+jnet_appearance_arrow;points[count++][1]=jnet_appearance_rows[i];}
-            for(unsigned i=0;i<3;++i){points[count][0]=.90f;points[count++][1]=jnet_character_toggle_rows[i];}
+            for(unsigned i=0;i<jnet_appearance_row_count(jnet_menu_edit.draft.character);++i){points[count][0]=jnet_character_column+jnet_appearance_arrow;points[count++][1]=jnet_appearance_rows[i];}
+            for(unsigned i=0;i<5;++i){points[count][0]=.90f;points[count++][1]=jnet_character_toggle_rows[i];}
             points[count][0]=0;points[count++][1]=-.89f;
         } else if(jnet_menu_create){
             const float y[]={.09f,-.25f,-.44f,-.70f,-.70f};
@@ -297,8 +328,8 @@ static void jnet_menu_input(uintptr_t menu,uintptr_t rows) {
             float best=10;
             for(unsigned i=0;i<count;++i){
                 float center=points[i][0],half=.18f;
-                if(jnet_menu_page==1 && i<6){center=jnet_character_column;half=jnet_appearance_arrow+.08f;}
-                else if(jnet_menu_page==1 && i<9){center=.72f;half=.26f;}
+                if(jnet_menu_page==1 && i<jnet_appearance_row_count(jnet_menu_edit.draft.character)){center=jnet_character_column;half=jnet_appearance_arrow+.08f;}
+                else if(jnet_menu_page==1 && i<count-1){center=.72f;half=.26f;}
                 else if(jnet_menu_create && points[i][1]>-.60f){center=-.27f;half=.57f;}
                 else if(jnet_menu_page==2 && !jnet_menu_create && center==-.50f){half=.42f;}
                 else if(jnet_menu_page==2 && !jnet_menu_create && points[i][1]==.48f){center=.60f;half=.38f;}
@@ -315,7 +346,7 @@ static void jnet_menu_input(uintptr_t menu,uintptr_t rows) {
             if(up || down || left || right || accept)jnet_menu_key_active=1;
             if(up)jnet_menu_key_row=(jnet_menu_key_row+count-1)%count;
             if(down)jnet_menu_key_row=(jnet_menu_key_row+1)%count;
-            int selector=jnet_menu_page==1?jnet_menu_key_row<9:
+            int selector=jnet_menu_page==1?jnet_menu_key_row<count-1:
                 (!jnet_menu_create && (points[jnet_menu_key_row][1]==.48f || points[jnet_menu_key_row][1]==.23f));
             if(accept || (selector && (left || right)))jnet_menu_key_click=1;
             if(jnet_menu_key_active){jnet_menu_key_x=points[jnet_menu_key_row][0];jnet_menu_key_y=points[jnet_menu_key_row][1];
@@ -323,8 +354,8 @@ static void jnet_menu_input(uintptr_t menu,uintptr_t rows) {
                     for(unsigned i=0;i<view.count;++i)if(jnet_menu_key_y==.49f-i*.14f){
                         jnet_menu_selected_room=view.rows[i].room;jnet_menu_selected_host=view.rows[i].host;
                     }
-                if(left && jnet_menu_page==1 && jnet_menu_key_row<6)jnet_menu_key_x=jnet_character_column-jnet_appearance_arrow;
-                else if(left && jnet_menu_page==1 && jnet_menu_key_row<9)jnet_menu_key_x=.70f;
+                if(left && jnet_menu_page==1 && jnet_menu_key_row<jnet_appearance_row_count(jnet_menu_edit.draft.character))jnet_menu_key_x=jnet_character_column-jnet_appearance_arrow;
+                else if(left && jnet_menu_page==1 && jnet_menu_key_row<count-1)jnet_menu_key_x=.70f;
                 else if(left && jnet_menu_page==2 && jnet_menu_key_y==.48f)jnet_menu_key_x=jnet_level_left;
                 else if(left && jnet_menu_page==2 && jnet_menu_key_y==.23f)jnet_menu_key_x=.60f-jnet_variant_arrow;
             }
@@ -336,6 +367,7 @@ static void jnet_menu_input(uintptr_t menu,uintptr_t rows) {
 static int (*jnet_menu_settings_action)(uintptr_t,uintptr_t);
 static unsigned char (*jnet_original_menu_action)(uintptr_t,uintptr_t);
 static unsigned char jnet_menu_action(uintptr_t menu,uintptr_t node) {
+    if(jnet_menu_input_blocked || jnet_menu_closing)return 1;
     if(jnet_menu_settings_action && jnet_menu_settings_action(menu,node))return 1;
     unsigned page=jnet_menu_string_is(node,"JNETCharacter")?1:jnet_menu_string_is(node,"JNETWorld")?2:0;
     if(page && jnet_menu_visible_root(menu)){
@@ -344,7 +376,10 @@ static unsigned char jnet_menu_action(uintptr_t menu,uintptr_t node) {
         if(page==2)jnet_menu_level=jnet_current_level<12?jnet_current_level:2;
         return 1;
     }
-    return jnet_original_menu_action(menu,node);
+    unsigned back=jnet_menu_string_is(node,"Back");
+    unsigned char result=jnet_original_menu_action(menu,node);
+    if(back)jnet_menu_block_activation();
+    return result;
 }
 static int jnet_menu_corner(uintptr_t menu,uintptr_t caller,float *x,float *y) {
     uint32_t width,height;float padding,size,geometry[4];
@@ -515,7 +550,7 @@ static int jnet_menu_draw_live(uintptr_t menu) {
 
     } else if(jnet_menu_page==1) {
         const char *labels[]={"Robe",NULL,jnet_menu_edit.draft.infinite_scarf?"Infinite":"Drain",
-            jnet_menu_edit.draft.locked_scarf?"Locked":"Grow",NULL,jnet_character_name(jnet_menu_edit.draft.character)};
+            jnet_menu_edit.draft.locked_scarf?"Locked":"Grow",NULL,(jnet_character_is_flow(jnet_menu_edit.draft.character)?"fl0w":jnet_character_name(jnet_menu_edit.draft.character)),jnet_menu_edit.draft.character==JNET_CHARACTER_WAR_MACHINE?(jnet_menu_edit.draft.variant==2?"Snow":jnet_menu_edit.draft.variant==1?"Sand":"Stone"):(jnet_character_is_flow(jnet_menu_edit.draft.character)?(jnet_menu_edit.draft.character==JNET_CHARACTER_FLOW_1?"Rogue":"Hunter"):(jnet_menu_edit.draft.variant?"White":"Red"))};
         snprintf(text,sizeof(text),"Scarf Length %u",jnet_menu_edit.draft.scarf_segments);
         float widest=.30f;
         const char *width_labels[]={"Scarf Length 30","Rocket Deathmatch","Infinite","Locked"};
@@ -524,26 +559,26 @@ static int jnet_menu_draw_live(uintptr_t menu) {
             widest=fmaxf(widest,fminf(.65f,advance*scale/aspect));
         }
         jnet_appearance_arrow=widest*.5f+.055f;
-        for(unsigned i=0;i<6;++i){float y=jnet_appearance_rows[i];JNET_CENTER("<",jnet_character_column-jnet_appearance_arrow,y,.10f);JNET_CENTER(">",jnet_character_column+jnet_appearance_arrow,y,.10f);
+        for(unsigned i=0;i<jnet_appearance_row_count(jnet_menu_edit.draft.character);++i){float y=jnet_appearance_rows[i];JNET_CENTER("<",jnet_character_column-jnet_appearance_arrow,y,.10f);JNET_CENTER(">",jnet_character_column+jnet_appearance_arrow,y,.10f);
             
             if(i!=0 && i!=4)JNET_CENTER(labels[i]?labels[i]:text,jnet_character_column,y,.65f);}
         JNET_CENTER("Robe",jnet_character_column,.77f,.5f);
-        const char *toggle_labels[]={"Windwalls","Sliding","Freezing"};
-        const unsigned toggle_values[]={jnet_windwalls,jnet_sliding,jnet_freezing};
-        for(unsigned i=0;i<3;++i){float y=jnet_character_toggle_rows[i];
+        const char *toggle_labels[]={"Windwalls","Sliding","Freezing","Blackness","Fog"};
+        const unsigned toggle_values[]={jnet_windwalls,jnet_sliding,jnet_freezing,jnet_blackness,jnet_fog};
+        for(unsigned i=0;i<5;++i){float y=jnet_character_toggle_rows[i];
             JNET_INLINE(toggle_labels[i],.49f,y,i==0?.34f:.32f);
             JNET_INLINE("<",.70f,y,.08f);JNET_INLINE(toggle_values[i]?"On":"Off",.80f,y,.14f);JNET_INLINE(">",.90f,y,.08f);
         }
-        if(jnet_options_failed)JNET_CENTER("Option unavailable",.64f,-.40f,.62f);
+        if(jnet_options_failed)JNET_CENTER("Option unavailable",.64f,-.12f,.62f);
         JNET_CENTER("Apply",0,-.89f,.5f);
         if(jnet_appearance_applied_at && !jnet_appearance_status[0]){
             uint64_t elapsed=GetTickCount64()-jnet_appearance_applied_at;
             float alpha=elapsed<200?(float)elapsed/200.f:elapsed<1200?1.f:
                 elapsed<1800?(1800.f-(float)elapsed)/600.f:0.f;
-            if(alpha>0 && !jnet_menu_centered(quads,&count,"Applied",0,-.78f,scale,
+            if(alpha>0 && !jnet_menu_centered(quads,&count,"Applied",-.64f,-.78f,scale,
                 .5f*aspect,((uint32_t)(alpha*255.f)<<24)|0x00ffffff))return 3;
         }
-        JNET_CENTER(jnet_appearance_status,-.1f,-.73f,.80f);
+        JNET_CENTER(jnet_appearance_status,-.64f,-.73f,.65f);
     } else {
         if(jnet_menu_create) {
             if(!jnet_menu_line(quads,&count,"Create Lobby",-.84f*aspect,.34f,scale*1.35f,1.1f*aspect,0xffffffff))return 3;
@@ -567,15 +602,13 @@ static int jnet_menu_draw_live(uintptr_t menu) {
             JNET_CENTER(jnet_menu_level==9?"Level 09":jnet_level_names[jnet_menu_level],.60f,.75f,.64f);
             if(!view.room || view.self==view.host){JNET_CENTER("<",jnet_level_left,.48f,.1f);JNET_CENTER(">",jnet_level_right,.48f,.1f);JNET_CENTER("Go",.60f,.11f,.3f);}
             if(jnet_daynight_supported(jnet_menu_level) || jnet_menu_level==7){
-                const char *alternate=jnet_menu_level<2?"Night":jnet_menu_level==3?"Dawn":"Dusk";
-                const char *labels[]={jnet_menu_level==7?"Normal":"Day",jnet_menu_level==7?"Cutscene":alternate,"Cycle"};
                 float widest=0;
-                for(unsigned n=0;n<3;++n){float advance=0;
-                    for(const char *c=labels[n];*c;++c)advance+=jnet_menu_font.glyphs[(unsigned char)*c-32].advance;
+                for(unsigned n=0;n<jnet_daynight_variants(jnet_menu_level);++n){float advance=0;
+                    for(const char *c=jnet_daynight_label(jnet_menu_level,n);*c;++c)advance+=jnet_menu_font.glyphs[(unsigned char)*c-32].advance;
                     widest=fmaxf(widest,fminf(.4f,advance*scale/aspect));
                 }
                 jnet_variant_arrow=widest*.5f+.045f;
-                JNET_CENTER(jnet_menu_level==7?labels[jnet_menu_paradise?1:0]:labels[jnet_menu_daynight],.60f,.23f,.4f);
+                JNET_CENTER(jnet_daynight_label(jnet_menu_level,jnet_menu_daynight),.60f,.23f,.4f);
                 if(!view.room || view.self==view.host){JNET_CENTER("<",.60f-jnet_variant_arrow,.23f,.1f);JNET_CENTER(">",.60f+jnet_variant_arrow,.23f,.1f);}
             }
             if(view.room){

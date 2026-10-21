@@ -1,0 +1,108 @@
+{
+  "version": "0.61",
+  "game_runtime_tested": false,
+  "installed": false,
+  "checks": {
+    "companion_session": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    },
+    "native_appearance": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    },
+    "native_geometry_pool": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    },
+    "native_initialized_lifetime": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    },
+    "companion_pose": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    },
+    "native_render_queue": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    },
+    "diagnostic_checkpoint": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    },
+    "native_local_read": {
+      "host_asan_ubsan": "passed",
+      "windows_x64_build": "passed",
+      "windows_runtime": "not run"
+    }
+  },
+  "notes": [
+    "Fixture results collected across this run; only changed or uncompleted fixtures were rerun.",
+    "Pose host fixture passed with localhost sandbox approval.",
+    "UBSAN halt_on_error exposed and fixed pointer-arithmetic UB in the isolated local-reader fixture; that reader remains excluded from helper/DLL."
+  ],
+  "sources": {
+    "build_diagnostic.py": "705bcda8c76163ecf12f369e17797e5a4ff588f6c0749fa02c4647d916c4109c",
+    "check_companion_components.py": "3d419da64fc3483e3bbaed6cefb02f1326e89bc042efeff34aedfa846ca3df77",
+    "companion_pose.h": "01521ce8f35b0b593007870c87d7290dcf68db8f840933fac838bcc0efc57b9a",
+    "companion_session.h": "20c311bef0d7ef9fc88aa2942e9d2c4e10c189658986ade6dd629236f4d7f59d",
+    "diagnostic_checkpoint.h": "623f0cd2a996a15a75e0f8a81a6147fd11ec66ccb60a9516bbbbc7958efd6caf",
+    "native_allocation.h": "3b01ad6011ada2c88bd3e73e5b41a521cc15f8ab7ff4bc86634abbaf0b9faf08",
+    "native_animation_storage.h": "e9978524d247929733a452b10d15777ab99c15f2f249ded01949cf857e5bc85e",
+    "native_appearance.h": "8bae65fccf29c8a144cdf5009a8e5336b58a3391ba4ee79907b10aeffb586539",
+    "native_clone_pool.h": "381268cb1c34fcc05de7eb7d60d9202f982eb8927dc70dbad389938f05c60119",
+    "native_geometry_pool.h": "bbf1bf66dfe405192f1da37515bb2040088f0422df98e7b1b683a2fa96141602",
+    "native_idle_pose.h": "0a5ee17f00edc5d76af4140c6e64362eaa31c05b280a558a59a4cfb59d962f75",
+    "native_initialized_lifetime.h": "5d75ffd6e88d51547f37255ccaacf30635f0d88f9f14eb63f3e65847113f6519",
+    "native_layout.h": "0373a7fcb8703c4e760fe1f2f73ada7f1c0a1188d6214fead8c6899b956bd9d3",
+    "native_lifetime.h": "a5efec822dbae67ac1b815f495825fa61bf40936a09978bea76f570bddc203fc",
+    "native_local_read.h": "c1f627f97a78fa913b88dac539100335de6bdb5938db4cb2370804ffbb42c680",
+    "native_material_ready.h": "71c10d1b30db0471ca25d52d735b45ee693c94409a5f5ea8d78ec975fa0cd1a8",
+    "native_mesh_callbacks.h": "23c924cf9b48c484e2a8101e01a5c3f7e494a209e17f80b78d10de54e1d283e0",
+    "native_mesh_guard.h": "24bb7c73ced695401546091e219eb8a4f7d1256b0ecf9e6e32c787421c0a65e2",
+    "native_mesh_rehearsal.h": "ed2c7991e2c8b9accc91d9360326892826494c5e69a585050991c85e35bacdad",
+    "native_pose_storage.h": "f282a59d15e99ef9a7232dcb63a33e9dd977aacf25ca55bba2d2a4aa67e77ca2",
+    "native_pose_writes.h": "f7e271fe00549936a36d4b3037ca63dbd5e2d649f7ea03f02033e70ee0afd1a4",
+    "native_render_queue.h": "a25046a35db37c748b029c3b101dd8a4c694cccfc53f3a41a6d733718c5a51fb",
+    "native_resources.h": "d100869cf9cf846f0ed1eb32b85f305ec557f711d34f2cb0296074f61dcf6b78",
+    "native_shader_inputs.h": "189bb27eeba82892e9acf040ba6052d50fd6828b416aea1668f19ff68345f20c",
+    "native_spawn_preflight.h": "9553b65128c447688e993058832e8aa2c62ad4d278b93f9a02f6893c179184a8",
+    "native_trial_shader.h": "3870a4f1e439c543bd45005197af7dba69ff254e5354acf8957c66009ec5a215",
+    "platform.h": "d89a2b4644b0f0a5586f0932c9ddffe10121ec663dbddf690caffd8d05c84d91",
+    "pose_link.h": "9245a61c20158fd7ff2ea94b8d0ed5d81bab1ce1b7d31e89575107023e5801fd",
+    "probe_dll.c": "d949d4959940d4adebb5abed46107f0ecd80f8233c45f6fc291a61cb4ace061c",
+    "probe_helper.c": "099e53b80c0b92354ba0f308ad5ec09fc59cf34a8dde00a877037b1ced546b00",
+    "remote_pe.h": "16fad675a451c7e587cdbcbceae4637ed04d99d66f52911cd786ba1808410f28",
+    "test_companion_pose.c": "e38299a67469bb477a11f3b8816e3b20314f79f4ec46e9fc0078f8bef07a211e",
+    "test_companion_session.c": "8213b6842d768552581487161c437745913ae675088afb0963eb2daf6d208d1f",
+    "test_diagnostic_checkpoint.c": "a0ee1737b9f79b501df65c9340e11d54416ad6846f9eb323498db2b38aaaa8e5",
+    "test_native_allocation.c": "48c80cd39a332f4680d3406ddbd976cca6a86066a38ce891a7a556788143550b",
+    "test_native_animation_storage.c": "ff04e4f55eddea26732120a85442c44ebf759bfa27e13a293c5ef16158fc2ba3",
+    "test_native_appearance.c": "ab52ede6dacaa52aaa6876321268aa3ab02abc98a2004137ab64778684011391",
+    "test_native_clone_pool.c": "6e06fdf1a7ec21c116b1b8a69434b59e40737c651a0caba9c45b394dd4ae75a0",
+    "test_native_geometry_pool.c": "8850c356be7fa650718502395f97fe15a8ac5b5be00bef094b70790bc4428132",
+    "test_native_idle_pose.c": "5572835fc570c0d3c7b21994e8af0ccedc9d73d0fe1ec7179080a3aae7e49c97",
+    "test_native_initialized_lifetime.c": "1e8f12d7123c98639b5263d5c03a7d3c7467a705d9018d20f2333110b3b260d8",
+    "test_native_layout.c": "6811ecb9548d02dcf431ed1dd288706eb97cbc651988fef69390d44215fee42b",
+    "test_native_local_read.c": "fb05e90477bd4819c6f0e3ae62bfd1d15d44c03c6e4b1fa86232e23e0a8a9b1b",
+    "test_native_material_ready.c": "ec85d553fcb16d5fd8b39898064fbe65e924bd4393997e04a081ff91a60aa325",
+    "test_native_mesh_callbacks.c": "4edf762e80a8ad819b357d3326fac3fe9e60f2d40c1fa13070d4479bc2816079",
+    "test_native_mesh_guard.c": "4ae27e7c7e5b2bdba795599484f79eff1e70228df8231e5774417ea79d1604c2",
+    "test_native_mesh_rehearsal.c": "fc4091fbd99d417b79df6fa3f5f534dc7c056f485cec5de498f389f7f6dd8775",
+    "test_native_pose_storage.c": "d85295934696b129ae7d0586cbda733936de35364d8cea8f6408df48a7957e43",
+    "test_native_pose_writes.c": "8c030d157ff7ae4c5ea5cc62ab4222aa1312a697fe2e463f6fddfd5f5bcac8fa",
+    "test_native_render_queue.c": "466b924d64a2496dbb03bd4d8b6bea2dddcb1a3a9484b459818973817eec6fe3",
+    "test_native_resources.c": "51ae8469968fe3b5734425b883b8a1b502a1fa4d2bad69cb73fed29b05188202",
+    "test_native_shader_inputs.c": "02bfb56b8ffdf86c482508354f6f02e97f9ac885af2ae37972e109708f6aaa66",
+    "test_native_spawn_preflight.c": "94994fdaad46f4665bb368a99cc33e52a6e65652659d8845749c08b515b75dd9",
+    "test_remote_pe.c": "edafe732b4a3deda76f0f0c6449683fa6025d252be8884cdfce111c6216e21ac"
+  }
+}

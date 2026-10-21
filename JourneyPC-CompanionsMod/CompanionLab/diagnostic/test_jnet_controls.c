@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include "jnet_character.h"
 typedef unsigned DWORD;
 #define VK_LBUTTON 1
 #define VK_RBUTTON 2
@@ -12,9 +13,11 @@ typedef unsigned DWORD;
 static unsigned char actor_storage[0x14700],game[0x200],menu[0xe00];
 static unsigned char *actor=actor_storage+0xb0;
 static uintptr_t fault_image,jnet_menu_last;
-static int jnet_bindings[3][7]={{'C','B','V','G'},{0},{0}};
-static unsigned jnet_binding_down[7],jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready=1;
+static int jnet_bindings[3][8]={{'C','B','V','G'},{0},{0}};
+static unsigned jnet_binding_down[8],jnet_sprint_down,jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready=1;
 static unsigned jnet_chat_focus;
+static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][7];
+static unsigned jnet_creature_down[7],jnet_grab_down,jnet_fly_up_down,jnet_fly_down_down,jnet_level_down,jnet_tilt_left_down,jnet_tilt_right_down;
 static unsigned keys[256],buttons,foreground=1,calls;
 static char last[32];
 static int jnet_menu_read(uintptr_t at,void *out,size_t n){memcpy(out,(void *)at,n);return 1;}
@@ -52,8 +55,13 @@ int main(void){
     move=0;memcpy(actor-0xb0+0x30,&move,4);
     keys['C']=1;tick(0);assert(jnet_crouch_active);
     keys['C']=0;tick(0);assert(jnet_crouch_active);
+    jnet_controls_queue_original=queue;
+    unsigned protected_calls=calls;
+    jnet_controls_queue((uintptr_t)actor+0xa390,"LandHard");
+    jnet_controls_queue((uintptr_t)actor+0xa390,"SlideJump2");
+    assert(calls==protected_calls && jnet_crouch_active);
     keys['C']=1;tick(0);assert(!jnet_crouch_active);keys['C']=0;tick(0);
-    keys['G']=1;tick(2);assert(jnet_spotlight_down);menu[0xd68]=1;tick(2);assert(!jnet_spotlight_down);
+    jnet_creature_bindings[2][0][5]='G';keys['G']=1;tick(2);assert(jnet_spotlight_down);menu[0xd68]=1;tick(2);assert(!jnet_spotlight_down);
     menu[0xd68]=0;foreground=2;keys['V']=1;unsigned before=calls;tick(0);assert(calls==before);
     foreground=1;tick(0);assert(calls==before);keys['V']=0;tick(0);keys['V']=1;tick(0);assert(!strcmp(last,"SlideJump1"));
     keys['V']=0;tick(0);keys['V']=1;tick(0);assert(!strcmp(last,"JNETSpin3"));
@@ -69,6 +77,36 @@ int main(void){
         tick(0);assert(calls==before+1);
         memset(keys,0,sizeof(keys));buttons=0;tick(0);
     }
+    memset(jnet_bindings,0,sizeof(jnet_bindings));
+    before=calls;
+    for(unsigned device=0;device<3;++device){
+        for(unsigned kind=0;kind<JNET_CHARACTER_COUNT;++kind)jnet_creature_bindings[kind][device][6]=device==0?'F':device==1?5:16;
+        for(unsigned kind=0;kind<JNET_CHARACTER_COUNT;++kind){
+            keys['F']=keys[VK_XBUTTON2]=0;buttons=0;tick(kind);assert(!jnet_sprint_down);
+            if(device==0)keys['F']=1;else if(device==1)keys[VK_XBUTTON2]=1;else buttons=1u<<15;
+            tick(kind);assert(jnet_sprint_down==(unsigned)jnet_character_is_creature(kind));
+            tick(kind);assert(jnet_sprint_down==(unsigned)jnet_character_is_creature(kind));
+            menu[0xd68]=1;tick(kind);assert(!jnet_sprint_down);menu[0xd68]=0;
+            foreground=2;tick(kind);assert(!jnet_sprint_down);foreground=1;
+        }
+        for(unsigned kind=0;kind<JNET_CHARACTER_COUNT;++kind)jnet_creature_bindings[kind][device][6]=0;
+    }
+    assert(calls==before);
+    memset(keys,0,sizeof(keys));buttons=0;
+    jnet_creature_bindings[JNET_CHARACTER_WHALE][0][1]='D';
+    jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]='L';
+    jnet_creature_bindings[JNET_CHARACTER_WHALE][0][3]='Q';
+    keys['D']=keys['L']=keys['Q']=1;tick(JNET_CHARACTER_WHALE);
+    assert(jnet_fly_down_down && jnet_level_down && jnet_tilt_left_down && !jnet_tilt_right_down);
+    tick(JNET_CHARACTER_LONGTAIL);
+    assert(!jnet_fly_down_down && !jnet_level_down && !jnet_tilt_left_down);
     before=calls;jnet_controls_ready=0;keys['C']=1;tick(0);assert(calls==before);
+    memset(keys,0,sizeof(keys));buttons=0;
+    jnet_controls_ready=1;
+    jnet_creature_bindings[JNET_CHARACTER_LONGTAIL][0][5]='G';keys['G']=1;
+    tick(JNET_CHARACTER_LONGTAIL);assert(jnet_grab_down);tick(JNET_CHARACTER_LONGTAIL);assert(jnet_grab_down);
+    keys['G']=0;tick(JNET_CHARACTER_LONGTAIL);assert(!jnet_grab_down);
+    keys['G']=1;menu[0xd68]=1;tick(JNET_CHARACTER_LONGTAIL);assert(!jnet_grab_down);
+    menu[0xd68]=0;tick(JNET_CHARACTER_WHALE);assert(!jnet_grab_down);
     puts("Controls: queue bounds, missing actions, key edges, sticky crouch, movement cancel, second-press cancel, pause, focus, creature gating, mouse and trigger bindings passed.");
 }

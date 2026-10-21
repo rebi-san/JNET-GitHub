@@ -76,6 +76,7 @@ static inline int jc_scarf_growth_stop(jc_layout_reader read,jc_actor_writer wri
 static inline int jc_scarf_growth_step(jc_layout_reader read,jc_actor_writer write,void *ctx,
         struct jc_scarf_growth *g,float delta) {
     if(!isfinite(delta) || delta< -1 || delta>1 || !jc_scarf_growth_check(read,ctx,g))return 0;
+    if(delta<=jc_actor_scalar(g->image,0x68afd8))return jc_scarf_growth_stop(read,write,ctx,g);
     float vectors[8];uint64_t handle;memcpy(&handle,g->native+0x18,8);
     if((uint32_t)handle!=UINT32_MAX && (uint32_t)handle>=512)return 0;
     if(!read(ctx,g->actor+0x2290,vectors,16) || !read(ctx,g->actor+0x14270,vectors+4,16))return 0;

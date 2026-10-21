@@ -1,0 +1,103 @@
+{
+  "exe_sha256": "16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f",
+  "references": [
+    {
+      "site": "0x1026e0",
+      "target": "0x5de5a8",
+      "text": "MenuSystem.xml"
+    },
+    {
+      "site": "0x102872",
+      "target": "0x5de680",
+      "text": "Root.Config.Text"
+    },
+    {
+      "site": "0x102991",
+      "target": "0x5de540",
+      "text": "FontSize"
+    },
+    {
+      "site": "0x102ebd",
+      "target": "0x5de6b0",
+      "text": "Root.Config.Font.Name"
+    },
+    {
+      "site": "0x10335b",
+      "target": "0x5de7b0",
+      "text": "Root.Config.Font.Definitions"
+    },
+    {
+      "site": "0x1033ee",
+      "target": "0x5de780",
+      "text": "font.chars"
+    },
+    {
+      "site": "0x10342d",
+      "target": "0x5de790",
+      "text": "font.common.scaleW"
+    },
+    {
+      "site": "0x1034b5",
+      "target": "0x5de7e0",
+      "text": "font.common.scaleH"
+    },
+    {
+      "site": "0x103828",
+      "target": "0x5de810",
+      "text": "xadvance"
+    },
+    {
+      "site": "0x103895",
+      "target": "0x5de7f8",
+      "text": "xoffset"
+    },
+    {
+      "site": "0x1038fc",
+      "target": "0x5de7d8",
+      "text": "yoffset"
+    }
+  ],
+  "font_asset": {
+    "sha256": "dcb7b3d7c75e09dcc474ced11a156afe08cbed7766ad1ab5942880accd58463b",
+    "face": "DFEyeglass-CondensedBold1024",
+    "line_height": 94,
+    "atlas": [
+      2048,
+      2048
+    ],
+    "pages": {
+      "0": "font2_0.dds"
+    },
+    "glyph_count": 926,
+    "declared_glyph_count": 915,
+    "labels_supported": [
+      "Continue",
+      "Settings",
+      "Quit to Title",
+      "Quit to Desktop",
+      "JNET",
+      "Host",
+      "Mode",
+      "Level",
+      "Players",
+      "Public",
+      "Private",
+      "Apply",
+      "Join",
+      "Leave",
+      "Copy Invite",
+      "Password",
+      "Journey",
+      "Rocket Death Match"
+    ]
+  },
+  "menu_initializer": "0x1026a0",
+  "font_parser": "0x103340",
+  "runtime_verified": false,
+  "unresolved": [
+    "Decoded PC MenuSystem font selection",
+    "Text draw ABI and lifetime",
+    "Pause input focus and timing",
+    "Live font resource identity"
+  ]
+}

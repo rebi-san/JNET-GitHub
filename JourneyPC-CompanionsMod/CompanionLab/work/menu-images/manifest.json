@@ -1,0 +1,426 @@
+{
+  "entries": [
+    {
+      "name": "Chapter Select",
+      "rect": [
+        0,
+        0,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:30"
+    },
+    {
+      "name": "Broken Bridge",
+      "rect": [
+        256,
+        0,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:47"
+    },
+    {
+      "name": "Pink Desert",
+      "rect": [
+        512,
+        0,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:35"
+    },
+    {
+      "name": "Sunken City",
+      "rect": [
+        768,
+        0,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:46"
+    },
+    {
+      "name": "Underground",
+      "rect": [
+        0,
+        128,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:49"
+    },
+    {
+      "name": "Tower",
+      "rect": [
+        256,
+        128,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:28"
+    },
+    {
+      "name": "Snow",
+      "rect": [
+        512,
+        128,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:43"
+    },
+    {
+      "name": "Paradise",
+      "rect": [
+        768,
+        128,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:45"
+    },
+    {
+      "name": "Credits",
+      "rect": [
+        0,
+        256,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:52"
+    },
+    {
+      "name": "Level Bryan",
+      "rect": [
+        256,
+        256,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:37"
+    },
+    {
+      "name": "Level Matt",
+      "rect": [
+        512,
+        256,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:29"
+    },
+    {
+      "name": "Level Chris",
+      "rect": [
+        768,
+        256,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:36"
+    },
+    {
+      "name": "Red 0",
+      "rect": [
+        0,
+        384,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:38:cloth half"
+    },
+    {
+      "name": "Red 1",
+      "rect": [
+        256,
+        384,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:33:cloth half"
+    },
+    {
+      "name": "Red 2",
+      "rect": [
+        512,
+        384,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:39:cloth half"
+    },
+    {
+      "name": "Red 3",
+      "rect": [
+        768,
+        384,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:34:cloth half"
+    },
+    {
+      "name": "White 1",
+      "rect": [
+        0,
+        512,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:44:cloth half"
+    },
+    {
+      "name": "White 2",
+      "rect": [
+        256,
+        512,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:51:cloth half"
+    },
+    {
+      "name": "White 3",
+      "rect": [
+        512,
+        512,
+        256,
+        128
+      ],
+      "source": "sharedassets0.assets:41:cloth half"
+    },
+    {
+      "name": "Symbol 0",
+      "rect": [
+        0,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 1",
+      "rect": [
+        32,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 2",
+      "rect": [
+        64,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 3",
+      "rect": [
+        96,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 4",
+      "rect": [
+        128,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 5",
+      "rect": [
+        160,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 6",
+      "rect": [
+        192,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 7",
+      "rect": [
+        224,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 8",
+      "rect": [
+        256,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 9",
+      "rect": [
+        288,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 10",
+      "rect": [
+        320,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 11",
+      "rect": [
+        352,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 12",
+      "rect": [
+        384,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 13",
+      "rect": [
+        416,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 14",
+      "rect": [
+        448,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 15",
+      "rect": [
+        480,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 16",
+      "rect": [
+        512,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 17",
+      "rect": [
+        544,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 18",
+      "rect": [
+        576,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 19",
+      "rect": [
+        608,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Symbol 20",
+      "rect": [
+        640,
+        640,
+        32,
+        32
+      ],
+      "source": "sharedassets0.assets:53:bottom-first 8-column atlas"
+    },
+    {
+      "name": "Red scarf",
+      "rect": [
+        0,
+        688,
+        1024,
+        49
+      ],
+      "source": "sharedassets0.assets:40"
+    },
+    {
+      "name": "White scarf",
+      "rect": [
+        0,
+        752,
+        1024,
+        40
+      ],
+      "source": "JourneyPC/Data/Textures/Bin/ClothPlayerScarfFilledClothPlayerScarfFilled.dds:white strip"
+    }
+  ],
+  "sha256": "ef9236102a3196c0c8bb8bfa29c3a7db49da3c2308508e2d7829c4b2645eac48",
+  "source_sha256": "6ffdd39389ac217f8aa24a4657f2c0f4e3931b669b65923046d3c384082a63c7"
+}

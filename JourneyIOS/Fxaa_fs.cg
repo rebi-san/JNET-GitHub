@@ -1,0 +1,73 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+#ifdef D_PLATFORM_GXM
+    #define FXAA_PC 1
+    #define FXAA_GLSL_120 1
+    #define FXAA_QUALITY__PRESET 29
+#else
+    #define FXAA_PC 1
+    #define FXAA_HLSL_4 1
+    #define FXAA_QUALITY__PRESET 29
+#endif
+#include "Fxaa3_11.h"
+
+
+
+D_DECLARE_TEXTURE2D_4(texColor);
+
+
+struct v2f
+{
+	float4 position VS_ATTR(POSITION);
+	float2 uv       VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+	float4 color : FINAL_COLOR;
+};
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+FS_START(float4,TEX1(2D, texColor),)
+
+	float2 pos = input.uv;
+
+#ifdef _IOS64
+
+    output = tex2D(texColor, pos);
+
+#else
+	
+#ifdef D_PLATFORM_GXM	
+	float2 invViewportSize = float2(1.0f/720,1.0f/408);
+	float4 rslt = FxaaPixelShader(pos,0, texColor, texColor, texColor, invViewportSize.xy, 0,0,0, 0.25f,0.1f,0.0833f, 0,0,0,0 );
+	OUT.color = rslt;
+#else
+	FxaaTex tex = { texColor.sm, texColor.tx };
+	float2 invViewportSize;
+#ifdef _IOS64
+    invViewportSize.x = texColor.tx.get_width();
+    invViewportSize.y = texColor.tx.get_height();
+#else
+	texColor.GetDimensions(invViewportSize.x,invViewportSize.y);
+#endif
+	invViewportSize.x = 1.0f / invViewportSize.x;
+	invViewportSize.y = 1.0f / invViewportSize.y;
+	float4 rslt = FxaaPixelShader(pos,0, tex, tex, tex, invViewportSize.xy, 0,0,0, 0.25f,0.1f,0.0833f, 0,0,0,0 );
+	output = rslt;
+	
+#endif
+
+#endif
+
+SH_END()

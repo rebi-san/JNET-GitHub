@@ -1,0 +1,28 @@
+JourneyCompanions diagnostics uses MinHook 1.3.4, by Tsuda Kageyu and
+contributors, including its bundled HDE disassembler. The complete bundled
+license notices are reproduced in LICENSE-MINHOOK.txt.
+Upstream: https://github.com/TsudaKageyu/minhook/tree/v1.3.4
+
+Lua API signatures, the GameUpdate hook signature and the Game-to-Lua-state
+offset were derived from the supplied journey_detour-main source, particularly
+journey_detour_v4/game.h and game.cpp. Its provided MIT notice is preserved
+verbatim in LICENSE-JOURNEY-DETOUR.txt, including its placeholder attribution.
+No authorship identity or upstream release provenance has been invented.
+This diagnostic does not include that tool's Steam SDK binaries, graphics
+overlay, console, allocator replacement or matchmaking modifications.
+
+Built with the Zig 0.13.0 cross-compiler and its bundled Windows toolchain.
+Compiler tools are not included in this package. The helper and DLL import
+Windows system libraries; MinHook is compiled into the DLL.
+Zig compiler-runtime and MinGW runtime notices are included in LICENSE-ZIG.txt
+and LICENSE-MINGW.txt.
+Compiler source/distribution: https://ziglang.org/download/0.13.0/release-notes.html
+
+No original Journey executable, proprietary assets or extracted game scripts
+are included. The Lua probe is original project code.
+
+ME&PAL (Meet Everywhere & Play All Levels) v2.0.1 native behavior reference:
+Alazar88, Rebi, Paleologos and Yupa_Miralda. The workspace CT/readme provided
+the encounter and credits-control instruction sites. JNET adds its own
+authenticated group-travel protocol and uses native QueueLevel, not the
+trainer executable or broad resource-name replacement hotkeys.

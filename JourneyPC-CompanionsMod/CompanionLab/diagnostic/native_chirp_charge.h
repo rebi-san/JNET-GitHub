@@ -6,7 +6,28 @@
 #else
 #define JC_CHARGE_ABI
 #endif
-struct jc_chirp_charge {float remaining[3];uint64_t generation;unsigned hits[3];};
+struct jc_chirp_charge {float remaining[3],touch_elapsed;uint64_t generation;unsigned hits[3];};
+static inline int jc_charge_touch(const float a[3],const float b[3],float temperature) {
+    if(!isfinite(temperature) || temperature<0 || temperature>1)return 0;
+    float distance=0;
+    for(unsigned i=0;i<3;++i) {
+        if(!isfinite(a[i]) || !isfinite(b[i]))return 0;
+        float d=a[i]-b[i];distance+=d*d;
+    }
+    float radius=.75f-.65f*temperature;
+    return distance<=radius*radius;
+}
+static inline int jc_charge_refill(jc_layout_reader read,void *ctx,uint64_t image,uint64_t game,
+        uint64_t actor,unsigned amount) {
+    uint32_t scarf[2];uint64_t sounds=0;unsigned char audible;
+    if(!amount)return 1;
+    if(!read(ctx,actor+0x68,scarf,sizeof(scarf)) || scarf[0]>scarf[1] || scarf[1]>4096 ||
+        !read(ctx,actor+0x201d,&audible,1) || audible>1 ||
+        !read(ctx,game+0x150,&sounds,8) || !sounds)return 0;
+    if(scarf[0]==scarf[1])return 1;
+    ((void (JC_CHARGE_ABI *)(uint64_t,unsigned,uint64_t))(uintptr_t)(image+0xab830))(actor,amount,sounds);
+    return 1;
+}
 static inline int jc_chirp_charge_hit(uintptr_t image,const unsigned char pool[0x718],
         const unsigned owners[16],unsigned recipient,const float position[4],float dt) {
     uint32_t count;memcpy(&count,pool+0x710,4);

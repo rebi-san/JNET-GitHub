@@ -56,7 +56,9 @@ int main(void) {
     traveler_actor=&runtime;put(game,0x1b8,(uintptr_t)pool);put(actor,0x2240,(uintptr_t)glyph);
     struct jc_chirp_bridge bridge={.barn=(uintptr_t)pool,.slot=0,.counter=17};
     uint32_t counter=17;memcpy(pool+0x50,&counter,4);pool[0x68]=1;
-    traveler_chirp_glyph_mark(&bridge);original_glyph_update=mock;
+    traveler_chirp_glyph_mark(&bridge);traveler_chirp_audio_mark(&bridge);
+    assert(traveler_chirp_audio[0].event==(uintptr_t)pool+0x10 && traveler_chirp_audio[0].counter==17);
+    original_glyph_update=mock;
     for(unsigned test=0;test<8;++test) {
         alias=test==1;owner=test==2?12:11;counter=test==3?18:17;
         memcpy(pool+0x50,&counter,4);pool[0x4d]=test==4;pool[0x68]=test==5?0:1;

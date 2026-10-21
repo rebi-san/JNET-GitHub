@@ -1,0 +1,21 @@
+Controls: queue bounds, missing actions, key edges, sticky crouch, movement cancel, second-press cancel, pause, focus, creature gating, mouse and trigger bindings passed.
+.....Assertion failed: (result==(uintptr_t)&out && out==expected && !fallbacks), function check, file test_jnet_setting.c, line 21.
+EJNET settings: clean Back, dirty prompt, isolated Apply, Revert, failed atomic save and original-action passthrough passed.
+....
+======================================================================
+ERROR: test_setting_lookup_is_bounded (test_controls.ControlsTests.test_setting_lookup_is_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/test_controls.py", line 274, in test_setting_lookup_is_bounded
+    subprocess.run([str(exe)],check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/tmpl_otblm3/setting']' died with <Signals.SIGABRT: 6>.
+
+----------------------------------------------------------------------
+Ran 10 tests in 6.439s
+
+FAILED (errors=1)
+Lua 5.3 setup 8192-byte bucket peak: repeated compilation 100, cached 0

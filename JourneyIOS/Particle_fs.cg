@@ -1,0 +1,61 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+D_DECLARE_TEXTURE2D_4(textureAtlas);
+
+
+#define ourBlendState Alpha_BlendState
+#define ourDepthStencilState DepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+struct v2f
+{
+	float4 clipSpace VS_ATTR(POSITION);
+	float4 color     VS_ATTR(COLOR0);
+	float3 uv        VS_ATTR(TEXCOORD0);
+#if FOG
+	HALF4  fog       VS_ATTR(TEXCOORD1);
+#endif
+};
+
+struct f2f
+{
+	float4 color     : FINAL_COLOR;
+};
+
+#endif
+
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+FS_START(float4,TEX1(2D, textureAtlas),)
+
+
+	float intensity = input.uv.z;
+    float2 uv = input.uv.xy;
+	float4 texColor = tex2D( textureAtlas, uv );
+	//add texture color and vertex color together		
+	float3 A = input.color.rgb;
+	float3 B = texColor.rgb;
+	output.rgb = intensity * 2*A*B;
+	output.a = texColor.a;
+
+#if FOG
+	output.color.rgb = lerp( output.color.rgb, input.fog.rgb, input.fog.a );
+#endif
+
+#ifdef PREPASS
+	output.color.rgb = 1;
+#endif
+
+#ifdef ALPHATESTENABLE
+	DiscardLE(output.a, 0.5f);
+#endif
+
+SH_END()
+

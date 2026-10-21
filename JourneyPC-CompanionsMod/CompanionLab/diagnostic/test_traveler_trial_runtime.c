@@ -6,7 +6,14 @@
 #undef __declspec
 #endif
 #define __declspec(x)
+#ifdef _WIN32
+#undef _WIN32
+#define JC_FIXTURE_WINDOWS 1
+#endif
 #include "jnet_session_log.h"
+#ifdef JC_FIXTURE_WINDOWS
+#define _WIN32 1
+#endif
 static struct jnet_session_logs logs,*session_logs=&logs;
 #include "native_allocation.h"
 #include "native_mesh_callbacks.h"
@@ -18,6 +25,7 @@ typedef uint64_t ULONGLONG;
 static const uintptr_t image=0x100000;
 static unsigned char game[0x300],players[0x28dd0],manager[0x20],callback_manager[0x80040],decorations[0x434020],match[0x11dc0];
 static unsigned char entries[3][0x200];
+static uint64_t ready_slots[2][4];
 static uint64_t node[5],original_node[5],resource_node[3],context_node[3],callback_type=0x99990000;
 static int subscriptions=1;
 static uint64_t geometry_source[3],geometry_payload[50],geometry_rows[24];
@@ -63,6 +71,7 @@ static int boundary_checkpoint(const char *s) {
     if(checkpoint_count>=JC_CHECKPOINT_LIMIT)return 0;
     ++checkpoint_count;return log_ok;
 }
+static void message(const char *s) {(void)s;}
 static void flight_mark(LONG p,LONG b) { (void)p;(void)b; }
 static int jc_render_level(jc_layout_reader r,void *c,uint64_t g,int *out) { (void)r;(void)c;(void)g;*out=level;return 0; }
 static int jc_three_clone_check(jc_layout_reader r,void *c,uint64_t i,const uint64_t m[3],int *d) {
@@ -86,7 +95,11 @@ static void initialized(uint64_t d,unsigned index,unsigned glyph) {
     put(d+0x1f0,(uintptr_t)geometry_source);put(d+0x210,(uintptr_t)&geometry_rows[index*6]);
     geometry_rows[index*6]=geometry_rows[index*6+1]=d+0x210;
     types(d);put(d+0x6d8,(uintptr_t)entries[index]);put(d+0x6e0,4);
-    if (index!=2) put(d+0xa620,d+0x160);
+    if (index!=2) {
+        put(d+0xa620,d+0x160);
+        ready_slots[index][2]=(uintptr_t)ready_slots[index];ready_slots[index][3]=(uintptr_t)entries[index];
+        put(d+0x190,(uintptr_t)ready_slots[index]);
+    }
     put(d+0x2240,(uintptr_t)decorations+0x10+glyph*0x10d0);
     for (unsigned i=0;i<14;++i) put(d+0x1780+i*8,index*100+i);
 }
@@ -99,7 +112,7 @@ static void trial_prepare(uintptr_t base,uint64_t d,uint64_t m) {
 }
 static uintptr_t fake_init(uintptr_t d,uintptr_t m,uintptr_t e,uintptr_t u,uintptr_t lua,uintptr_t random,uintptr_t name,uintptr_t sound,uintptr_t dec,uintptr_t remote) {
     assert(m==(uintptr_t)manager && e==0x500000 && u==0x1234 && lua==0x600000 && random==0x700000);
-    assert(name==image+0x5dffa0 && sound==0x800000 && dec==(uintptr_t)decorations && (unsigned char)remote==1);
+    assert(name==image+0x5dffa0 && sound==0x800000 && dec==(uintptr_t)decorations && ((unsigned char)remote==1 || d==(uintptr_t)players+0xb0));
     if (d!=(uintptr_t)allocated) return 0x3456;
     uint64_t link;memcpy(&link,allocated+0xa620,8);
     assert(prepares==1 && link==d+0x160); /* Reproduces the native prerequisite; initializer does not supply it. */
@@ -148,7 +161,9 @@ static int traveler_body_release(uint64_t actor) {
 }
 #include "traveler_trial_runtime.h"
 static void reset(void) {
+    memset(traveler_waiting_init,0,sizeof(traveler_waiting_init));
     free(allocated);allocated=NULL;traveler_object=0;
+    traveler_fresh_game=traveler_fresh_barn=0;
     memset(&traveler_glyph_init,0,sizeof(traveler_glyph_init));glyph_begins=glyph_ends=glyph_releases=0;
     memset((void *)JNETTraveler,0,sizeof(JNETTraveler));memset(game,0,sizeof(game));memset(players,0,sizeof(players));
     memset(manager,0,sizeof(manager));memset(callback_manager,0,sizeof(callback_manager));memset(JNETMesh,0,sizeof(JNETMesh));
@@ -175,6 +190,16 @@ static void invoke(void) {
         image+0x5dffa0,0x800000,(uintptr_t)decorations,0x12340001)==0x3456);
 }
 int main(void) {
+    reset();JNETTraveler[19]=1;
+    ready_slots[0][3]=ready_slots[1][3]=0;
+    invoke();assert(JNETTraveler[0]==1 && !creates && !initializes && traveler_waiting_init[0]);
+    traveler_pending_initialize();assert(!creates && !initializes);
+    ready_slots[0][3]=(uintptr_t)entries[0];ready_slots[1][3]=(uintptr_t)entries[1];
+    traveler_pending_initialize();assert(JNETTraveler[0]==3 && creates==1 && initializes==1 && !traveler_waiting_init[0]);
+    traveler_cleanup((uintptr_t)players+0xb0,0x800000);assert(JNETTraveler[0]==4);
+    reset();JNETTraveler[19]=1;ready_slots[0][3]=0;invoke();
+    traveler_cleanup((uintptr_t)players+0xb0,0x800000);
+    assert(!traveler_waiting_init[0] && !creates && JNETTraveler[19]==1 && JNETTraveler[0]==0);
     reset();
     traveler_barn=(uintptr_t)players;
     traveler_admission_initialized((uintptr_t)players+0x146f0);
@@ -231,6 +256,28 @@ int main(void) {
             traveler_cleanup((uintptr_t)players+0xb0,0x800000);assert(JNETTraveler[0]==4);
         }
     }
+    for(unsigned connected=0;connected<2;++connected) {
+        reset();players[0xa3]=players[0xa4]=1;match[0x11db4]=connected;
+        full_init_observer((uintptr_t)players+0xb0,(uintptr_t)manager,0x500000,0x1234,0x600000,0x700000,
+            image+0x5dffa0,0x800000,(uintptr_t)decorations,0);
+        JNETTraveler[19]=1;invoke();
+        assert(!traveler_fresh_game && !traveler_fresh_barn);
+        if(connected)assert(JNETTraveler[0]==-1 && JNETTraveler[15]==24 && !creates);
+        else {
+            assert(JNETTraveler[0]==3 && creates==1 && players[0xa3]==1 && players[0xa4]==1);
+            traveler_cleanup((uintptr_t)players+0xb0,0x800000);
+            assert(JNETTraveler[0]==4 && deletes==1);
+        }
+    }
+    reset();players[0xa4]=1;
+    full_init_observer((uintptr_t)players+0xb0,(uintptr_t)manager,0x500000,0x1234,0x600000,0x700000,
+        image+0x5dffa0,0x800000,(uintptr_t)decorations,0);
+    traveler_cleanup((uintptr_t)players+0xb0,0x800000);
+    JNETTraveler[19]=1;invoke();assert(JNETTraveler[15]==23 && !creates);
+    reset();players[0xa4]=1;
+    full_init_observer((uintptr_t)players+0xb0,(uintptr_t)manager,0x500000,0x1234,0x600000,0x700000,
+        image+0x5dffa0,0x800000,(uintptr_t)decorations,0);
+    ++traveler_fresh_thread;JNETTraveler[19]=1;invoke();assert(JNETTraveler[15]==23 && !creates);
     /* A preflight change after arming is checked again before the factory call. */
     reset();traveler_arm((uintptr_t)game);players[0xa2]=1;invoke();
     assert(JNETTraveler[15]==23 && JNETTraveler[1]==2 && !creates);

@@ -1,0 +1,137 @@
+[
+  {
+    "file": "Journey.exe",
+    "match": true,
+    "sha256": "16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f"
+  },
+  {
+    "file": "fmod64.dll",
+    "match": true,
+    "sha256": "8e5ec483da986ced5bb229426cf21746824f12123e1a34388083a48ca52f9943"
+  },
+  {
+    "file": "Data/Sounds/SharSfxShared-SFX.bnk",
+    "match": true,
+    "sha256": "b2bca841ffe7a69ccf2b5ccb360bb8d3045b5e292ac4cb9f49939def46fd8b6b"
+  },
+  {
+    "file": "Data/Sounds/SharSfxShared-SFX.bnk.streams",
+    "match": true,
+    "sha256": "a35fccdcbbbba8560148a1ee4cdd246be6c76a8b050b9680927eb5067c4d31e3"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxGraveyard-SFX.bnk",
+    "match": true,
+    "sha256": "9ebfb1bdb00a09769c8ea5e62765a88b72cd283a16e43b4799f2084c8a2b57f7"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxGraveyard-SFX.bnk.streams",
+    "match": true,
+    "sha256": "68b74ca7e643a170cbda7b4d527a5cfcbff489b5645904af1fde4cd50793004c"
+  },
+  {
+    "file": "Data/Sounds/LvlMusGraveyard-MUS.bnk",
+    "match": true,
+    "sha256": "4d9b5425ff017de53716a773aad99695cba02bcfcd9fde4c9ee0bad43d54919a"
+  },
+  {
+    "file": "Data/Sounds/LvlMusGraveyard-MUS.bnk.streams",
+    "match": true,
+    "sha256": "b21c3a640a9032caa24c44c14d7278e7d4db23ff1a79958ccfdbf272508162f5"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxSummit-SFX.bnk",
+    "match": true,
+    "sha256": "5df10d29091ad60dbe8e36cb0ff97676a9d39b1d01f0bf5fc6dc545126defea0"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxSummit-SFX.bnk.streams",
+    "match": true,
+    "sha256": "136bcbd049c7e500b0a9d49883aca99240b0949de904621b50067d8d6d09bca1"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxCave-SFX.bnk",
+    "match": true,
+    "sha256": "982de793b09280ff84f45aa020ef7c47881b3c82844b1de40a224a3ede7c2916"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxCave-SFX.bnk.streams",
+    "match": true,
+    "sha256": "2a20c2f1c687d5a11357161097cdeb13cad6d05061f0d276b0e11c2059bf83ea"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxRuins-SFX.bnk",
+    "match": true,
+    "sha256": "85cfb4143b1305b6c05321aaf46a7c955b84af504884286dc7b28002f649db65"
+  },
+  {
+    "file": "Data/Sounds/LvlSfxRuins-SFX.bnk.streams",
+    "match": true,
+    "sha256": "02222c3670007fb48dcfaec3589347b40c3525c6f1c75c14902367c990bd2809"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-A3-L2-lp.ogg",
+    "match": true,
+    "sha256": "dfa1f1de63bce211f5ac596859ea9e723f52c02fc91634bfe12b7c11857d9fad"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-A1-L1-lp.ogg",
+    "match": true,
+    "sha256": "be5cc9c0249fcb790be0c7f89f09c5a7ac4f9777c712693105879f713926443c"
+  },
+  {
+    "file": "Data/Sounds/Streams/Graveyard-AncestorPaintingSeq.ogg",
+    "match": true,
+    "sha256": "ef8546f0f0dfe0f26cd2a3336343e6efab64a5a50b2ab885491055ceb0f79845"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-A2-L2-lp.ogg",
+    "match": true,
+    "sha256": "e113603b9e4a38f2f496c0da7f1eaa7f7b196c8d7e8cf3b6b08d3306f6d5bf39"
+  },
+  {
+    "file": "Data/Sounds/Streams/Graveyard-PlayerIntoAncestorSpace.ogg",
+    "match": true,
+    "sha256": "1fb3e82b004af1c6564b2a4b124678e8ad776a2e10c1c5da8750099c970b159e"
+  },
+  {
+    "file": "Data/Sounds/Streams/Graveyard-Intro-AmbientQuad.ogg",
+    "match": true,
+    "sha256": "c5df9dfd428a7cc956cf6924ee7b84422ce349e149ee8f49fb07092705f45113"
+  },
+  {
+    "file": "Data/Sounds/Streams/Graveyard-AncestorGateOpen.ogg",
+    "match": true,
+    "sha256": "49ad871b17be0ba6dbfa7adb3fea0ad1e12045f1907357f604c5954c6a333c60"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-A3-L3-lp.ogg",
+    "match": true,
+    "sha256": "443968728618f1f13b7342f25deadef0457f168a04bee255e2ce4e5231bd93d8"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-A1-L2-lp.ogg",
+    "match": true,
+    "sha256": "6b7ed5e33bb02e7f93b44a86162cef70cbf19d6c14d598c8a821c5da101454cf"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-TEASE2.ogg",
+    "match": true,
+    "sha256": "529cc1ebb0bbc1342eed11dc7f5908baa2f534239d11e3050bc31df05eb3ad89"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-TEASE1.ogg",
+    "match": true,
+    "sha256": "9f393dd61eb35281eb9d267679545ab6ef60805d1b66e6cd44ce6f025056efc4"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-A3-L1-lp.ogg",
+    "match": true,
+    "sha256": "a3f33b7b1888f4a683b226dd6b6b808155c68274011180edd72e2b64605be3c1"
+  },
+  {
+    "file": "Data/Sounds/Streams/Journey-score-Graveyard-v3a-A2-L1-lp.ogg",
+    "match": true,
+    "sha256": "8361c412431e9d5c316ca238c80bec93dec444f1f74bb3e6451f24e904e633f5"
+  }
+]

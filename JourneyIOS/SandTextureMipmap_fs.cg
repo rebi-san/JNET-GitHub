@@ -1,0 +1,61 @@
+
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+D_DECLARE_TEXTURE2D_4(tex);
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+    half4 color        : FINAL_COLOR;
+};
+
+float sandTextureMipmapSampleLevel;
+float sandTextureMipmapBoost;
+float sandTextureNegHack;				// this is to emulate the (assumed) bug in the PS3 SPU code, which effectively clamps if positive, and wraps if negative
+
+
+#endif
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+FS_START(float4,
+    TEX1(
+        2D, tex),)
+
+#ifdef _IOS64
+    float2 uvCoord = input.uv;
+    float lod = GET_LOCAL(sandTextureMipmapSampleLevel);
+    half srcSample = (half)tex.tx.sample(tex.sm, uvCoord, level(lod)).r;
+#else
+	half srcSample = (half)tex2D(tex,input.uv,GET_LOCAL(sandTextureMipmapSampleLevel)).r;
+#endif
+
+	// focus on 0
+	srcSample -= 0.5;			//	[-0.5..0.5]
+
+	// modify sample value
+	srcSample *= GET_LOCAL(sandTextureMipmapBoost);
+
+	if(srcSample<0)
+	{
+		srcSample += GET_LOCAL(sandTextureNegHack);
+	}
+
+	// convert back to 0..1
+	srcSample = saturate(srcSample+0.5f);	//	[-0.5..1.5] and clamp (assuming x2)
+
+	output = srcSample;
+
+SH_END()
+
+

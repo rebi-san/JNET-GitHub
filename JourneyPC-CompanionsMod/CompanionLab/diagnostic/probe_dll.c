@@ -329,6 +329,8 @@ done:
     if (algorithm) BCryptCloseAlgorithmProvider(algorithm,0);
     return ok;
 }
+#include "jnet_sound_banks.h"
+#include "native_chirp_audio.h"
 static int (*original_loadbuffer)(lua_State *, const char *, size_t, const char *, const char *);
 static int startup_load_observer(lua_State *state, const char *buffer, size_t size,
                                  const char *name, const char *mode) {
@@ -353,6 +355,12 @@ static int startup_load_observer(lua_State *state, const char *buffer, size_t si
             memcpy(copy+prefix+JC_STARTUP_SIZE,jc_character_startup,sizeof(jc_character_startup)-1);
         } else valid=0;
         valid=valid && startup_hash_bytes(copy,JC_STARTUP_CANDIDATE_SIZE,hash) && !memcmp(hash,jc_startup_candidate_hash,32);
+        if(valid && !jnet_sound_banks_prepare(image)){
+            valid=0;message("[JNET] sound-bank expansion declined; private resource preload withheld");
+        }
+        if(valid && !jc_chirp_audio_prepare(image)){
+            valid=0;message("[JNET] remote chirp audio preparation declined; startup resource candidate withheld");
+        }
         if (!valid) {
             if (copy) HeapFree(GetProcessHeap(),0,copy);
             copy=NULL;
@@ -2499,9 +2507,21 @@ static int cloth_actor_numeric_appearance(uint64_t peer,uint64_t generation,uint
             &cloth_actor_scarf,timer);
     if (step) return cloth_actor_appearance_status(JC_FRAME_MATERIAL,8,(unsigned)step);
     if(traveler_growth_active()) {
-        if(!jc_scarf_growth_prepare(own_read,NULL,image,traveler_game,traveler_object,&cloth_actor_growth) ||
-            !jc_scarf_growth_step(own_read,cloth_actor_growth_write,NULL,&cloth_actor_growth,growth))
-            return cloth_actor_appearance_status(JC_FRAME_MATERIAL,10,0);
+        if(!jc_scarf_growth_prepare(own_read,NULL,image,traveler_game,traveler_object,&cloth_actor_growth))
+            return cloth_actor_appearance_status(JC_FRAME_MATERIAL,10,2);
+        if(!jc_scarf_growth_step(own_read,cloth_actor_growth_write,NULL,&cloth_actor_growth,growth)) {
+            uint64_t handle=0;float vectors[8]={0};
+            memcpy(&handle,cloth_actor_growth.native+0x18,8);
+            int position=own_read(NULL,traveler_object+0x2290,vectors,16);
+            int direction=own_read(NULL,traveler_object+0x14270,vectors+4,16);
+            char line[512];
+            snprintf(line,sizeof(line),"[JC] scarf growth failed delta=%g owner=%d handle=%llu read=%d/%d vectors=%g,%g,%g,%g/%g,%g,%g,%g",
+                growth,jc_scarf_growth_check(own_read,NULL,&cloth_actor_growth),
+                (unsigned long long)handle,position,direction,
+                vectors[0],vectors[1],vectors[2],vectors[3],vectors[4],vectors[5],vectors[6],vectors[7]);
+            message(line);
+            return cloth_actor_appearance_status(JC_FRAME_MATERIAL,10,3);
+        }
     } else if(!cloth_actor_growth_stop())return cloth_actor_appearance_status(JC_FRAME_MATERIAL,10,1);
     ((void (*)(uintptr_t,uintptr_t,float,float,float))(image+0x217a70))
         (0,traveler_object,hsv[0],hsv[1],hsv[2]);
@@ -2532,6 +2552,7 @@ static int cloth_actor_scope_begin(uint64_t peer,uint64_t generation) {
     InterlockedExchange(&cloth_appearance_enabled,1);
     ReleaseSRWLockExclusive(&cloth_appearance_lock);return JC_FRAME_OK;
 }
+static int traveler_live_material_rebuild(struct jc_cloth_live_material *m);
 __declspec(dllexport) int JNETClothApplyAnimatedAppearance(uint64_t peer,uint64_t generation,
         const uint32_t sender_appearance[4]) {
     struct jc_cloth_live *s=active_cloth_backend;
@@ -2560,6 +2581,8 @@ __declspec(dllexport) int JNETClothApplyAnimatedAppearance(uint64_t peer,uint64_
         !own_read(NULL,traveler_game+0x28,&manager,8) || !manager ||
         !jc_cloth_atlas_names(sender_appearance[2],atlas_names)) return cloth_actor_appearance_status(JC_FRAME_OWNERSHIP,25,0);
     for (unsigned i=0;i<2;++i) {
+        if(selected[i]->atlas_holders && selected[i]->atlas_outfit!=sender_appearance[2] &&
+            traveler_live_material_rebuild(selected[i]))return cloth_actor_appearance_status(JC_FRAME_MATERIAL,26,1+i);
         source[i]=barn+0x666ee8+(4+i)*0x630;
         target[i]=(uintptr_t)selected[i]->subscriber+0x88;
         if (jc_cloth_storage_read(own_read,NULL,source[i],stock+i) ||
@@ -3345,6 +3368,7 @@ static void jnet_online_before_input(uintptr_t game) {
     jnet_online_input_frame=JNETFrames;jnet_sg_game_phase(game,1);
 }
 static void jnet_online_game_tick(uintptr_t game) {
+    traveler_pending_initialize();
     jnet_menu_escape();
     jnet_options_apply();
     jnet_travel_game(game);
@@ -3608,7 +3632,7 @@ static void allocation_trial(uintptr_t game, int retain) {
     }
     for (size_t i=0;i<sizeof(jc_targets)/sizeof(jc_targets[0]);++i) {
         const struct jc_target *t=jc_targets+i;
-        if (t->rva==JC_RVA_TextureNullGuard || t->rva==JC_RVA_IntroUpdate || t->rva==JC_RVA_CharacterBank || t->rva==JC_RVA_CharacterMeshUpdate || t->rva==JC_RVA_CharacterShoutInit || t->rva==JC_RVA_CharacterDecorationUpdate || t->rva==JC_RVA_CharacterDecorationDraw || t->rva==JC_RVA_CharacterDecorationCleanup || t->rva==JC_RVA_CharacterInteract || t->rva==JC_RVA_CharacterBodyInput || t->rva==JC_RVA_ChestSymbol || t->rva==JC_RVA_DudeClothAppearance || t->rva==JC_RVA_NativeShout || t->rva==JC_RVA_CharacterEye || t->rva==JC_RVA_CharacterJump || t->rva==JC_RVA_CharacterCamera || t->rva==JC_RVA_CreatureReset || t->rva==JC_RVA_SavePoll || t->rva==JC_RVA_SaveLoad || t->rva==JC_RVA_MenuInput || t->rva==JC_RVA_MenuPop || t->rva==JC_RVA_MenuFrame || t->rva==JC_RVA_ScriptExecute || t->rva==JC_RVA_MenuPresent || t->rva==JC_RVA_MenuNodes || t->rva==JC_RVA_MenuBuild || t->rva==JC_RVA_SandInline || t->rva==JC_RVA_SandAppend || t->rva==JC_RVA_SandConsume || t->rva==JC_RVA_DudeFullInit || t->rva==JC_RVA_luaL_loadbufferx || t->rva==JC_RVA_GameUpdate || t->rva==JC_RVA_DudeCleanup || t->rva==JC_RVA_DudeResourceInit || t->rva==JC_RVA_MeshRegister || t->rva==JC_RVA_GeometryBuild || t->rva==JC_RVA_TravelerSubmit || t->rva==JC_RVA_RenderConsume || t->rva==JC_RVA_GeometryDispatch || t->rva==JC_RVA_CommandBuild || t->rva==JC_RVA_RenderFlush || t->rva==JC_RVA_RenderHandoff || t->rva==JC_RVA_BaseFlush || t->rva==JC_RVA_BaseHandoff || t->rva==JC_RVA_CommandExecute || t->rva==JC_RVA_ClothUpdate || t->rva==JC_RVA_ClothFinish || t->rva==JC_RVA_PlayerUpdate || t->rva==JC_RVA_ActorInput || t->rva==JC_RVA_ActorFinish || t->rva==JC_RVA_ClothRender || t->rva==JC_RVA_AsyncGeometryDispatch || t->rva==JC_RVA_ClothDependency || t->rva==JC_RVA_MaterialCommit || t->rva==JC_RVA_MaterialSamplerInit) continue; /* Our own detour is expected. */
+        if (t->rva==JC_RVA_EnvironmentCopy || t->rva==JC_RVA_EnvironmentUpdate || t->rva==JC_RVA_TextureNullGuard || t->rva==JC_RVA_IntroUpdate || t->rva==JC_RVA_CharacterBank || t->rva==JC_RVA_CharacterMeshUpdate || t->rva==JC_RVA_CharacterShoutInit || t->rva==JC_RVA_CharacterDecorationUpdate || t->rva==JC_RVA_CharacterDecorationDraw || t->rva==JC_RVA_CharacterDecorationCleanup || t->rva==JC_RVA_CharacterInteract || t->rva==JC_RVA_CharacterBodyInput || t->rva==JC_RVA_ChestSymbol || t->rva==JC_RVA_DudeClothAppearance || t->rva==JC_RVA_NativeShout || t->rva==JC_RVA_CharacterEye || t->rva==JC_RVA_CharacterAttack || t->rva==JC_RVA_CharacterAttackHandler || t->rva==JC_RVA_CharacterJump || t->rva==JC_RVA_CharacterCamera || t->rva==JC_RVA_CreatureReset || t->rva==JC_RVA_SavePoll || t->rva==JC_RVA_SaveLoad || t->rva==JC_RVA_MenuInput || t->rva==JC_RVA_MenuPop || t->rva==JC_RVA_MenuFrame || t->rva==JC_RVA_ScriptExecute || t->rva==JC_RVA_MenuPresent || t->rva==JC_RVA_MenuNodes || t->rva==JC_RVA_MenuBuild || t->rva==JC_RVA_SandInline || t->rva==JC_RVA_SandAppend || t->rva==JC_RVA_SandConsume || t->rva==JC_RVA_DudeFullInit || t->rva==JC_RVA_luaL_loadbufferx || t->rva==JC_RVA_GameUpdate || t->rva==JC_RVA_DudeCleanup || t->rva==JC_RVA_DudeResourceInit || t->rva==JC_RVA_MeshRegister || t->rva==JC_RVA_GeometryBuild || t->rva==JC_RVA_TravelerSubmit || t->rva==JC_RVA_RenderConsume || t->rva==JC_RVA_GeometryDispatch || t->rva==JC_RVA_CommandBuild || t->rva==JC_RVA_RenderFlush || t->rva==JC_RVA_RenderHandoff || t->rva==JC_RVA_BaseFlush || t->rva==JC_RVA_BaseHandoff || t->rva==JC_RVA_CommandExecute || t->rva==JC_RVA_ClothUpdate || t->rva==JC_RVA_ClothFinish || t->rva==JC_RVA_PlayerUpdate || t->rva==JC_RVA_ActorInput || t->rva==JC_RVA_ActorFinish || t->rva==JC_RVA_ClothRender || t->rva==JC_RVA_AsyncGeometryDispatch || t->rva==JC_RVA_ClothDependency || t->rva==JC_RVA_MaterialCommit || t->rva==JC_RVA_MaterialSamplerInit) continue; /* Our own detour is expected. */
         unsigned char bytes[16];
         if (!own_read(NULL,(uint64_t)(uintptr_t)(image+t->rva),bytes,16) || memcmp(bytes,t->prologue,16)) {
             InterlockedExchange(&JNETTrial,-1);
@@ -4941,6 +4965,10 @@ static DWORD WINAPI initialize(void *unused) {
             MH_RemoveHook(MH_ALL_HOOKS); MH_Uninitialize(); goto hook_failed;
         }
     }
+    if(MH_CreateHook(image+JC_RVA_EnvironmentCopy,(void *)jnet_environment_copy,(void **)&jnet_environment_copy_original)!=MH_OK ||
+       MH_CreateHook(image+JC_RVA_EnvironmentUpdate,(void *)jnet_environment_update,(void **)&jnet_environment_update_original)!=MH_OK){
+        MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
+    }
     jnet_controls_initialize();
     static const unsigned char controls_xml_entry[]={0x48,0x89,0x5c,0x24,0x18,0x56,0x48,0x81,0xec,0x30,0x01,0x00,0x00,0x48,0x8b,0xd9};
     static const unsigned char controls_setting_entry[]={0x48,0x89,0x5c,0x24,0x08,0x48,0x89,0x6c,0x24,0x10,0x48,0x89,0x74,0x24,0x18,0x57};
@@ -4952,6 +4980,7 @@ static DWORD WINAPI initialize(void *unused) {
        !jc_readable(image+0x2ecf60,16) || memcmp(image+0x2ecf60,controls_xml_entry,16) ||
        !jc_readable(image+0x1084f0,16) || memcmp(image+0x1084f0,controls_setting_entry,16) ||
        !jc_readable(image+0xaea60,16) || memcmp(image+0xaea60,controls_action_entry,16) ||
+       MH_CreateHook(image+0xaea60,(void *)jnet_controls_queue,(void **)&jnet_controls_queue_original)!=MH_OK ||
        MH_CreateHook(image+0x2ecf60,(void *)jnet_menu_xml,(void **)&jnet_menu_xml_original)!=MH_OK ||
        MH_CreateHook(image+0x1084f0,(void *)jnet_setting,(void **)&jnet_setting_original)!=MH_OK ||
        MH_CreateHook(image+0x101e30,(void *)jnet_menu_action,(void **)&jnet_original_menu_action)!=MH_OK){
@@ -5048,7 +5077,8 @@ static DWORD WINAPI initialize(void *unused) {
     }
     jnet_texture_missing=image+0x9e3de;
     if (JC_NATIVE_CHARACTERS_ENABLED &&
-        (MH_CreateHook(image+JC_RVA_TextureNullGuard,(void *)jnet_texture_guard,&jnet_texture_original)!=MH_OK ||
+        (MH_CreateHook(image+JC_RVA_ResourceView,(void *)jnet_resource_view_guard,&jnet_resource_view_original)!=MH_OK ||
+         MH_CreateHook(image+JC_RVA_TextureNullGuard,(void *)jnet_texture_guard,&jnet_texture_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterMeshUpdate,(void *)jnet_character_mesh_update,(void **)&jnet_character_mesh_update_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterShoutInit,(void *)jnet_character_shout_init,(void **)&jnet_character_shout_init_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterDecorationUpdate,(void *)jnet_character_decoration_update,(void **)&jnet_character_decoration_update_original)!=MH_OK ||
@@ -5070,6 +5100,11 @@ static DWORD WINAPI initialize(void *unused) {
     }
     if (JC_NATIVE_CHARACTERS_ENABLED && MH_CreateHook(image+JC_RVA_CharacterEye,
         (void *)jnet_character_eye,(void **)&jnet_character_eye_original)!=MH_OK) {
+        MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
+    }
+    if (JC_NATIVE_CHARACTERS_ENABLED &&
+        (MH_CreateHook(image+JC_RVA_CharacterAttack,(void *)jnet_character_attack,(void **)&jnet_character_attack_original)!=MH_OK ||
+         MH_CreateHook(image+JC_RVA_CharacterAttackHandler,(void *)jnet_character_attack_handler,(void **)&jnet_character_attack_handler_original)!=MH_OK)) {
         MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
     }
     if (JC_NATIVE_CHARACTERS_ENABLED && MH_CreateHook(image+JC_RVA_CharacterJump,
@@ -5145,6 +5180,7 @@ static DWORD WINAPI initialize(void *unused) {
     jnet_rocket_receive=jnet_rocket_message;jnet_rocket_poll=jnet_rocket_poll_live;
     jnet_chat_receive=jnet_chat_message;jnet_chat_poll=jnet_chat_lobby;
     jnet_member_view=jnet_travel_members_view;jnet_travel_session_reset=jnet_travel_reset;
+    jnet_quit_to_title=jnet_travel_quit_to_title;
     jnet_sl_roster=jnet_sn_roster;jnet_sl_transport_poll=jnet_sn_tick;jnet_sl_transport_reset=jnet_sn_reset;
     traveler_online_before_input=jnet_online_before_input;
     if(JC_NATIVE_CHARACTERS_ENABLED){

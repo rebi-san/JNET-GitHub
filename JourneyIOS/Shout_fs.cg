@@ -1,0 +1,104 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+#ifndef D_PREPASS_ENABLED
+
+	// Authour: John Edwards
+	// Date C: 6-21-2007
+
+	////#ifdef SOFT
+	 ////#ifdef LOW_RES
+		D_DECLARE_TEXTURE2D_4(depthTexLo);
+	 ////#else
+		D_DECLARE_TEXTURE2D_4(depthTex);
+	 ////#endif
+		float depthBias;
+		float depthScale;
+		float depthExtra;
+	////#endif
+
+#endif//D_PREPASS_ENABLED
+
+
+
+
+// Stream structs:
+struct v2f
+{
+	float4 position   VS_ATTR(POSITION);
+	HALF4  color      VS_ATTR(COLOR0);
+	HALF3  locPos     VS_ATTR(TEXCOORD0);
+	HALF3  normal     VS_ATTR(TEXCOORD1);
+	HALF3  eye        VS_ATTR(TEXCOORD2);
+#ifdef SOFT
+	float4 pos        VS_ATTR(TEXCOORD3);
+#endif
+};
+
+struct f2f
+{
+	float4 color      : FINAL_COLOR;
+};
+
+#endif
+
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+FS_START(float4,
+    TEX2(
+        2D, depthTexLo,
+        2D, depthTex),)
+
+	HALF3 N = normalize( input.normal );
+    HALF3 E = normalize( input.eye );
+
+	HALF intersectDist = dot( 2.0 * input.locPos, E );
+	HALF3 backPos = input.locPos - E * intersectDist;
+	HALF3 Nb = normalize( backPos );
+
+	HALF frontInt = 1.0 - dot( N, E );
+	HALF backInt = 1.0 - dot( Nb, E );
+
+	HALF frontDepthMult = 1.0;
+	HALF backDepthMult = 1.0;
+#ifdef SOFT
+ #if defined( LOW_RES )
+	float depth = manualTexDepth2Dproj( depthTexLo, input.pos );
+ #else
+	float depth = manualTexDepth2Dproj( depthTex, input.pos );
+ #endif
+ #if defined(D_PLATFORM_GCM)
+	float pdepth = depthScale / ( depth - depthBias  );
+ #else
+	float pdepth = ConvertDepth(UG, depth);
+ #endif	
+
+	frontDepthMult = saturate( ( pdepth - input.pos.w + GET_LOCAL(depthExtra) ) );
+	backDepthMult = saturate( ( pdepth - input.pos.w + GET_LOCAL(depthExtra) - intersectDist ) );
+#endif
+
+	HALF frontCloseMult = saturate( 0.5 * (input.pos.w - 1.0) );
+	HALF backCloseMult = saturate( 0.5 * (input.pos.w - 1.0 + intersectDist) );
+
+	float res = frontInt*frontDepthMult*frontCloseMult + backInt*backDepthMult*backCloseMult;;
+
+	output = (float4)input.color;
+	output.a *= res;
+
+//	output.color = 1;
+
+///output.color.a = 1;
+///output.color.r = frontCloseMult;//frontDepthMult;
+///output.color.g = backCloseMult;//backDepthMult;
+///output.color.b = res;
+
+#ifdef ALPHATESTENABLE
+	clip(output.color.a-(1.0/255.0));
+#endif
+
+SH_END()

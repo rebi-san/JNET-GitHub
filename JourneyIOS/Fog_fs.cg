@@ -1,0 +1,183 @@
+#include "Migratory.sh"
+// Notes:  Post process fog.
+//
+// Author: John Edwards
+// Date C: 7-21-2010
+
+// From Phyre.
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+
+#ifndef _IOS64
+
+// Fog vars.
+float4 f_se;
+float4 f_cc, f_fc;
+
+#ifdef CROSSFADE
+ float f_crossfade;
+ float4 f_crossfade_se;
+ float4 f_crossfade_cc, f_crossfade_fc;
+#endif
+
+// For converting from Z buffer value to linear depth.
+float depthBias;
+float depthScale;
+
+// DoF params.
+float nearOffset;
+float nearScale;
+float farOffset;
+float farScale;
+
+D_DECLARE_TEXTURE2D_4(colorTex);
+
+#ifdef MSAA
+
+Texture2DMS<float4> depthTexMSAA;
+
+#else
+
+D_DECLARE_TEXTURE2D_4(depthTex);
+
+#endif
+
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+	float3 projPointer VS_ATTR(TEXCOORD1);
+};
+
+struct f2f
+{
+	float4 color       : FINAL_COLOR;
+};
+
+#endif
+
+//----------------------------------------------
+// Helper functions
+//----------------------------------------------
+inline half4 ComputeFog( PASS_UG float3 camSpace, float4 f_se, half4 f_cc, half4 f_fc )
+{
+	float3 pos = GET_GLOBAL(eyePositionWS.xyz) - camSpace;
+	float rayS = min( GET_GLOBAL(eyePositionWS.y), pos.y );
+	float rayE = max( GET_GLOBAL(eyePositionWS.y), pos.y ) + 0.5; // Prevent div by 0.
+	float rayH = rayE - rayS;
+	float fogS = f_se.z;
+	float fogE = f_se.w;
+	float fogH = fogE - fogS;
+	float midS = min( rayS, fogE );
+	float midE = min( rayE, fogE );
+	float midA = 0.5 * (midS + midE);
+	float midH = midE - midS;
+	float fogY = ((fogE - midA) * midH) / (fogH * rayH);
+	float fogRatio = saturate( (fogY * length( camSpace ) - f_se.x) / (f_se.y - f_se.x) );
+	fogRatio *= fogRatio;
+	half3 fogColor = lerp( f_cc.rgb, f_fc.rgb, (half)fogRatio );
+	half fogAlpha = lerp( f_cc.a, f_fc.a, fogRatio );
+	return half4( fogColor, fogAlpha * fogRatio );
+}
+
+#define myTexDepth2D( depthTex,  uv )	  tex2D( depthTex, uv ).r;
+
+inline float ComputeDofIntensity( PASS_UL float z )
+{
+	return
+		- saturate( (GET_LOCAL(nearOffset) - z) * GET_LOCAL(nearScale) )
+		+ saturate( (z - GET_LOCAL(farOffset)) * GET_LOCAL(farScale) );
+}
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+struct f2f
+{
+    float4 color  FS_ATTR(HW_COLOR0);
+#ifdef FOG_SEPARATE_ALPHA
+    float4 alpha  FS_ATTR(HW_COLOR1);
+#endif
+};
+
+
+FS_START(f2f,
+    TEX2(
+        2D, colorTex,
+        2D, depthTex),)
+
+	float4 colorTap = tex2D( colorTex, input.uv );
+
+#ifdef MSAA
+	uint2 dim;
+	uint sampleCount;
+
+	depthTexMSAA.GetDimensions(dim.x, dim.y, sampleCount);
+
+	half4 fog = half4(0, 0, 0, 0);
+	float2 uvCoord = IN.uv * float2(dim);
+	float dofIntensity = 0;
+
+	for (uint i = 0; i < sampleCount; ++i)
+	{
+		float depthTap = depthTexMSAA.Load(uvCoord, i).r;
+		float zVal = ConvertDepth(depthTap);
+		float3 camSpace = zVal * IN.projPointer;
+		half4 fogSample = ComputeFog( camSpace, f_se, f_cc, f_fc );
+	#ifdef CROSSFADE
+		half4 fog2 = ComputeFog( camSpace, f_crossfade_se, f_crossfade_cc, f_crossfade_fc );
+		fogSample = lerp( fogSample, fog2, (half)f_crossfade );
+	#endif
+
+		fog += fogSample;
+		dofIntensity += ComputeDofIntensity( zVal );
+	}
+
+	fog *= (1.f / float(sampleCount));
+	dofIntensity *= (1.f / float(sampleCount));
+
+#else
+
+	float depthTap = myTexDepth2D( depthTex, input.uv );
+#if defined(D_PLATFORM_GCM)	
+  float zVal = depthScale / (depthTap - depthBias);
+ #else
+	float zVal = ConvertDepth(UG, depthTap);
+#endif
+
+	float3 camSpace = zVal * input.projPointer;
+
+	half4 fog = ComputeFog( UG, camSpace, GET_GLOBAL(f_se), (half4)GET_GLOBAL(f_cc), (half4)GET_GLOBAL(f_fc) );
+
+#ifdef CROSSFADE
+	half4 fog2 = ComputeFog( UG, camSpace, GET_LOCAL(f_crossfade_se), (half4)GET_LOCAL(f_crossfade_cc), (half4)GET_LOCAL(f_crossfade_fc) );
+	fog = lerp( fog, fog2, (half)GET_LOCAL(f_crossfade) );
+#endif
+
+	float dofIntensity = ComputeDofIntensity( UL, zVal );
+
+#endif
+
+
+
+	output.color.rgb = lerp( colorTap.rgb, (float3)fog.rgb, fog.a );
+
+	// Compute DoF intensity.
+	output.color.a = dofIntensity;
+	//OUT.color.rgb = OUT.color.a;
+
+#ifdef FOG_SEPARATE_ALPHA
+    output.alpha = dofIntensity;
+#endif
+
+
+SH_END()
+
+

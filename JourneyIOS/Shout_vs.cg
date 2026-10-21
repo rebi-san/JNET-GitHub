@@ -1,0 +1,61 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+#ifndef D_PREPASS_ENABLED
+
+	float alpha;
+	float opacity;
+
+#endif//D_PREPASS_ENABLED
+
+
+#endif
+
+
+
+
+struct a2v
+{
+	float4 position     VS_ATTR(POSITION);
+	float4 normal       VS_ATTR(NORMAL);
+	float4 color		VS_ATTR(COLOR0);
+};
+
+struct v2f
+{
+	float4 position    FS_ATTR(POSITION);
+	HALF4  color       FS_ATTR(COLOR0);
+	HALF3  locPos      FS_ATTR(TEXCOORD0);
+	HALF3  normal      FS_ATTR(TEXCOORD1);
+	HALF3  eye         FS_ATTR(TEXCOORD2);
+#ifdef SOFT
+	float4 pos         FS_ATTR(TEXCOORD3);
+#endif
+};
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+VS_START()
+
+	output.position = MatrixMul( GET_LOCAL(modelViewProj), float4(input.position.xyz,1.0f) );
+#if defined(D_PLATFORM_D3D11) || defined(_IOS64)
+	output.position.z = 0.001 * output.position.w; // Push Z to render in front of everything.
+#else
+	output.position.z = -0.999 * output.position.w; // Push Z to render in front of everything.
+#endif
+	output.locPos = (HALF3)MatrixMul( ToM3x3(GET_LOCAL(model)), input.position.xyz );
+	output.normal = (HALF3)input.normal.xyz;
+	output.eye = (HALF3)(GET_LOCAL(eyePositionOS.xyz) - input.position.xyz);
+	output.color = (HALF4)(input.color * GET_LOCAL(alpha)); // Shouts long ago were tuned to have alpha affect color as well ...
+	output.color.a *= GET_LOCAL(opacity);
+
+#ifdef SOFT
+	output.pos = mul( SCALE_BIAS,output.position );
+	output.pos.w = output.position.w;
+#endif
+
+SH_END()
+

@@ -591,9 +591,7 @@ static inline int jc_body_appearance_prepare(jc_layout_reader read,void *ctx,
     if(!jc_layout_field(read,ctx,definition,0x720,rows,sizeof(rows)))return JC_LAYOUT_READ;
     for(unsigned t=0;t<4;++t) {
         unsigned i=textures[t],matches=0;
-        if(!(before[0].found&(1u<<i)) || !(before[2].found&(1u<<i)) ||
-            before[0].textures[i].owner!=plan.entries[i].owner ||
-            before[0].textures[i].handle!=plan.entries[i].handle)return JC_LAYOUT_CHANGED;
+        if(!(before[0].found&(1u<<i)) || !(before[2].found&(1u<<i)))return JC_LAYOUT_CHANGED;
         for(unsigned r=0;r<13;++r) {
             const unsigned char *row=rows+128*r;uint64_t resource=0,payload=0;
             if(!memchr(row+0x20,0,20))return JC_LAYOUT_RANGE;

@@ -1,0 +1,13 @@
+{
+  "journey_sha256": "16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f",
+  "game_runtime_tested": false,
+  "native_numeric_code_executed": true,
+  "native_actor_dispatcher_executed": true,
+  "actor_update_intercepted": true,
+  "output": "Native actor dispatcher: 16 gate combinations; exact actor/vector/clock and fifth-byte arguments verified; actor update intercepted, no gameplay\nOriginal PC receiver: 3009 native calls; 1440 differential frames; 6 snaps, 1434 blend/gated frames; 64 full actor/controller projection cases; independent peers and replacement passed.",
+  "sources": {
+    "native_receiver.h": "3865543f4485c770bba80f08927de04c038c066a846afeab7991c6de027a2ee0",
+    "test_native_receiver_engine.c": "c0a12c70dccc468bcc931dfe0bf098aaf8d17104b9e5904751c837e010268ac2",
+    "check_native_receiver.py": "5a13cc4a7958b55fa0825e42a2ead49fd045229c7d5b17f5990af7ec42f918e9"
+  }
+}

@@ -1,0 +1,63 @@
+#include "Migratory.sh"
+// Notes:  A small kernel blur that does a max instead of a blend.
+//         This is used to "pull out" the near DoF intensities
+//         a la Modern Warfare.
+//
+// Author: John Edwards
+// Date C: 3-21-2011
+
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+#ifndef _IOS64
+
+struct v2f
+{
+	float4 position        VS_ATTR(POSITION);
+	float2 uv              VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+    float4 color           : FINAL_COLOR;
+};
+
+float4 pixelSize;
+
+D_DECLARE_TEXTURE2D_4(tex);
+
+#endif
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( v2f IN, out f2f OUT )
+//{
+
+FS_START(float4,
+    TEX1(
+        2D, tex),)
+
+	const float2 kOffsets[9] =
+	{ float2( 0.0, 0.0 )
+	, float2( 1.0, 0.0 )
+	, float2(-1.0, 0.0 )
+	, float2( 0.0, 1.0 )
+	, float2( 0.0,-1.0 )
+	, float2( 1.0, 1.0 )
+	, float2(-1.0, 1.0 )
+	, float2(-1.0,-1.0 )
+	, float2( 1.0,-1.0 )
+	};
+
+	output.a = 0;
+	for( int i = 0; i < 9; i++ )
+	{
+		float2 uv = input.uv + kOffsets[ i ] * GET_LOCAL(pixelSize.xy);
+		output.a = max( output.a, tex2D( tex, uv ).a );
+	}
+
+SH_END()

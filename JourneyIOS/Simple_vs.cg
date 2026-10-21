@@ -1,0 +1,21 @@
+#include "Migratory.sh"
+
+struct a2v
+{
+#if defined(__ORBIS__)
+	float4 Position VS_ATTR(POSITION);
+#else
+	float3 Position VS_ATTR(POSITION);
+#endif
+};
+
+struct v2f
+{
+	float4 position FS_ATTR(POSITION);
+};
+
+
+VS_START()
+    output.position = MatrixMul( GET_LOCAL(modelViewProj), float4(input.Position.xyz, 1.0f) );
+
+SH_END()

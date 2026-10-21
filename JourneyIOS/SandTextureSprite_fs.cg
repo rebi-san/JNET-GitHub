@@ -1,0 +1,70 @@
+
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+struct v2f
+{
+	float4	position		VS_ATTR(POSITION);
+	float2	srcUv			VS_ATTR(TEXCOORD0);
+	float2	alphaUv			VS_ATTR(TEXCOORD1);
+#ifdef PERFTEST
+	float2	totalToss		VS_ATTR(TEXCOORD2);
+	float4 color			VS_ATTR(TEXCOORD3);
+#endif
+};
+
+struct f2f
+{
+    half4	color			: FINAL_COLOR;
+};
+
+
+D_DECLARE_TEXTURE2D_4(srcTexture);
+D_DECLARE_TEXTURE2D_4(alphaTexture);
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+FS_START(float4,
+    TEX2(
+        2D, srcTexture,
+        2D, alphaTexture),)
+
+    float srcSample = tex2D(srcTexture,input.srcUv).r;
+	float alphaSample = tex2D(alphaTexture,input.alphaUv).r;
+
+#ifdef PERFTEST
+
+	srcSample = frac(srcSample + input.color.r);
+
+	float2 tuv0 = float2(input.srcUv.y, input.alphaUv.x);
+	float2 tuv1 = float2(input.alphaUv.y, input.srcUv.x);
+
+	float srcSample2 = tex2D(srcTexture,tuv0).r;
+	float alphaSample2 = tex2D(alphaTexture,tuv1).r;
+
+
+	for(int x=0; x<8; ++x)
+	{
+		srcSample += srcSample2;
+		alphaSample += alphaSample2;
+
+		srcSample += srcSample * alphaSample;
+		alphaSample += pow(1.f+(float)abs(srcSample*alphaSample), 4.58f);
+
+		srcSample += input.totalToss.y;
+		alphaSample -= input.totalToss.x;
+
+		srcSample = frac(srcSample);
+		alphaSample = frac(alphaSample);
+	}
+#endif
+
+	output.rgb = srcSample;
+	output.a = alphaSample;
+
+SH_END()

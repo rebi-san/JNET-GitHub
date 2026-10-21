@@ -7,6 +7,77 @@
 
 typedef int (*jnet_character_read)(void *,uint64_t,void *,size_t);
 typedef int (*jnet_character_write)(void *,uint64_t,const void *,size_t);
+static inline int jnet_character_attack_locked(jnet_character_read read,void *ctx,
+        uint64_t image,uint64_t event,uint64_t creature) {
+    if(!event)return 0;
+    uint64_t type=0,owner=0;unsigned char state[2]={0};uint32_t phase=0;
+    if(!read || !read(ctx,event,&type,8) || type!=image+0x66ce70 ||
+       !read(ctx,event+0x48,&owner,8) || owner!=creature ||
+       !read(ctx,event+8,state,2))return -1;
+    if(!state[1])return 0;
+    if(!read(ctx,event+0xac,&phase,4) || phase>2)return -1;
+    return state[1] && (state[0] || phase<2);
+}
+static inline int jnet_character_attack_targets(jnet_character_read read,jnet_character_write write,
+        void *ctx,uint64_t event,const uint64_t actors[3],int enabled) {
+    uint64_t clump=0,items=0,count=0,markers[3];
+    if(!read || !write || !event || !actors ||
+       !read(ctx,event+0x60,&clump,8) || !clump ||
+       !read(ctx,clump+8,&items,8) || !items ||
+       !read(ctx,clump+0x10,&count,8) || count!=3 ||
+       !read(ctx,items,markers,sizeof(markers)))return 0;
+    for(unsigned i=0;i<3;++i){
+        float position[3];unsigned char active=0;
+        if(!markers[i])return 0;
+        if(enabled && actors[i] && read(ctx,actors[i]+0x10,position,sizeof(position))){
+            active=1;
+            for(unsigned axis=0;axis<3;++axis)if(!isfinite(position[axis]))active=0;
+        }
+        if(!write(ctx,markers[i]+0x40,&active,1) ||
+           (active && !write(ctx,markers[i]+0x10,position,sizeof(position))))return 0;
+    }
+    return 1;
+}
+static inline int jnet_character_attack_ready(jnet_character_read read,void *ctx,
+        uint64_t image,uint64_t event,uint64_t handler,uint64_t creature,uint64_t eye) {
+    uint64_t type=0,value=0,clump=0,items=0,count=0;
+    if(!handler || !eye || jnet_character_attack_locked(read,ctx,image,event,creature)<0 ||
+       !read(ctx,handler,&type,8) || type!=image+0x66cfe8 ||
+       !read(ctx,handler+0x48,&value,8) || value!=creature ||
+       !read(ctx,event+0x58,&value,8) || value!=eye ||
+       !read(ctx,eye,&type,8) || type!=image+0x672158 ||
+       !read(ctx,handler+0x50,&clump,8) || !clump ||
+       !read(ctx,clump+8,&items,8) || !items ||
+       !read(ctx,clump+0x10,&count,8) || count!=1 ||
+       !read(ctx,items,&value,8) || value!=event)return 0;
+    for(unsigned i=0;i<2;++i){
+        uint64_t rail=0,points=0;uint32_t n=0;float positions[16];
+        if(!read(ctx,event+0x88+8*i,&rail,8) || !rail ||
+           !read(ctx,rail+8,&points,8) || !points ||
+           !read(ctx,rail+0x10,&n,4) || n!=(i?4u:2u) ||
+           !read(ctx,points,positions,16*n))return 0;
+        for(unsigned j=0;j<4*n;++j)if(!isfinite(positions[j]))return 0;
+    }
+    return 1;
+}
+static inline int jnet_character_ride_glow(jnet_character_read read,jnet_character_write write,
+        void *ctx,uint64_t dude,const float before[3]) {
+    float after[3],glow[2];
+    if(!read || !write || !dude || !before || !read(ctx,dude+0x10,after,sizeof(after)) ||
+       !read(ctx,dude+0x1448,glow,4) || !read(ctx,dude+0x1450,glow+1,4))return 0;
+    int moved=0;
+    for(unsigned i=0;i<3;++i){
+        if(!isfinite(before[i]) || !isfinite(after[i]))return 0;
+        moved|=before[i]!=after[i];
+    }
+    for(unsigned i=0;i<2;++i)if(!isfinite(glow[i]))return 0;
+    if(!moved)return 1;
+    for(unsigned i=0;i<2;++i){
+        float value=fmaxf(glow[i],1.f);
+        if(!write(ctx,dude+0x1448+8*i,&value,4))return 0;
+    }
+    return 1;
+}
 static inline int jnet_character_ride_ready(jnet_character_read read,void *ctx,
         uint64_t image,uint64_t event,uint64_t creature,int prepared) {
     uint64_t type=0,clump=0,items=0,count=0,value=0,path=0,points=0,storage=0;
@@ -56,6 +127,21 @@ static inline int jnet_character_glow_ready(jnet_character_read read,void *ctx,
     if(!prepared)return storage==0;
     unsigned char state[32*64];
     return storage && !(storage&15) && read(ctx,storage,state,32*meshes);
+}
+static inline int jnet_character_color_ready(jnet_character_read read,void *ctx,
+        uint64_t image,uint64_t event,uint64_t first_mesh,unsigned meshes,int prepared) {
+    uint64_t type=0,clump=0,items=0,count=0,mesh=0,storage=0;
+    if(!read || !event || !first_mesh || !meshes || meshes>64 ||
+       !read(ctx,event,&type,8) || type!=image+0x65bca8 ||
+       !read(ctx,event+0x48,&clump,8) || !clump ||
+       !read(ctx,clump+0x10,&count,8) || count!=meshes ||
+       !read(ctx,clump+8,&items,8) || !items ||
+       !read(ctx,event+0x80,&storage,8))return 0;
+    for(unsigned i=0;i<meshes;++i)
+        if(!read(ctx,items+8*i,&mesh,8) || mesh!=first_mesh+(uint64_t)i*0x10d0)return 0;
+    if(!prepared)return storage==0;
+    unsigned char state[28*64];
+    return storage && !(storage&3) && read(ctx,storage,state,28*meshes);
 }
 static inline int jnet_character_ride_reset(jnet_character_read read,jnet_character_write write,
         void *ctx,uint64_t image,uint64_t event) {

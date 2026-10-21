@@ -4,6 +4,8 @@
 #include <string.h>
 #include <wchar.h>
 #include <stdlib.h>
+#include "jnet_character.h"
+static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][7],jnet_creature_saved[JNET_CHARACTER_COUNT][3][7];
 typedef int32_t LONG;
 typedef unsigned DWORD;
 typedef int HANDLE;
@@ -16,11 +18,11 @@ typedef int HANDLE;
 #define MOVEFILE_WRITE_THROUGH 2
 #define MB_OK 0
 #define MB_ICONERROR 0
-static int jnet_bindings[3][7]={{67,66,86,71},{0},{0}},jnet_bindings_saved[3][7];
+static int jnet_bindings[3][8]={{67,66,86,71},{0},{0}},jnet_bindings_saved[3][8];
 static unsigned jnet_credits=1,pushed,errors,writes,jnet_daynight_mode;
 static LONG jnet_fps_limit;
 static wchar_t jnet_controls_path[MAX_PATH]=L"JNET-settings.ini";
-static char disk[1024],pending[1024];
+static char disk[8192],pending[8192];
 static int fail;
 static unsigned char menu[0xe00],path[0x180];
 static HANDLE CreateFileW(const wchar_t *p,int a,int b,void *c,int d,int e,void *f){return 1;}
@@ -52,7 +54,14 @@ static void page(const char *name,int prompt){
     memcpy(menu+0xc10,&begin,8);memcpy(menu+0xc18,&end,8);
 }
 static int act(const char *name){return jnet_settings_action((uintptr_t)menu,(uintptr_t)name);}
+static unsigned title_quits;
+static void quit_title(void){++title_quits;}
 int main(void){
+    jnet_quit_to_title=quit_title;
+    page("QuitToMainMenu",0);assert(!act("No") && !title_quits);
+    assert(!act("Yes") && title_quits==1);
+    page("QuitToDesktop",0);assert(!act("Yes") && title_quits==1);
+    page("ChapterSelect",0);assert(!act("Yes") && title_quits==1);
     memcpy(jnet_bindings_saved,jnet_bindings,sizeof(jnet_bindings));jnet_settings_push=push;
     page("Audio",0);assert(!act("Back") && !writes && !pushed);
     jnet_credits=0;assert(act("Back") && pushed==1 && !writes);
@@ -61,17 +70,24 @@ int main(void){
     assert(!act("Apply") && !jnet_settings_dirty(1) && jnet_settings_dirty(2) && jnet_settings_dirty(3));
     assert(strstr(disk,"Credits=0") && strstr(disk,"FPS=0") && strstr(disk,"Binding00=67"));
     page("Graphics",0);assert(act("Back"));page("Graphics",1);
-    fail=1;char before[1024];strcpy(before,disk);assert(act("Apply") && errors==1 && jnet_settings_dirty(2) && !strcmp(before,disk));
+    fail=1;char before[8192];strcpy(before,disk);assert(act("Apply") && errors==1 && jnet_settings_dirty(2) && !strcmp(before,disk));
     assert(!act("Revert") && jnet_fps_limit==0);fail=0;jnet_fps_limit=1;assert(!act("Apply") && strstr(disk,"FPS=1"));
     page("Controls",0);assert(act("Back"));page("Controls",1);assert(!act("Revert") && jnet_bindings[0][0]==67);
-    jnet_bindings[0][4]=70;jnet_bindings[1][5]=2;jnet_bindings[2][6]=12;
+    jnet_bindings[0][4]=70;jnet_bindings[1][5]=2;jnet_bindings[2][6]=12;jnet_bindings[0][7]=16;jnet_bindings[2][7]=7;
     assert(!act("Revert") && !jnet_bindings[0][4] && !jnet_bindings[1][5] && !jnet_bindings[2][6]);
-    jnet_bindings[0][4]=70;jnet_bindings[1][5]=2;jnet_bindings[2][6]=12;
+    jnet_bindings[0][4]=70;jnet_bindings[1][5]=2;jnet_bindings[2][6]=12;jnet_bindings[0][7]=16;jnet_bindings[2][7]=7;
+    jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]=76;
     jnet_bindings[0][0]=88;assert(!act("Apply") && strstr(disk,"Binding00=88") && !jnet_settings_dirty(3));
+    assert(strstr(disk,"Creature302=76"));
     page("Keyboard",0);assert(!act("Back"));
     memset(jnet_bindings,0,sizeof(jnet_bindings));jnet_credits=1;jnet_fps_limit=0;
     jnet_controls_initialize();
+    assert(jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]==76);
+    jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]=80;
+    assert(jnet_settings_dirty(3));page("Controls",1);assert(!act("Revert"));
+    assert(jnet_creature_bindings[JNET_CHARACTER_WHALE][0][2]==76);
     assert(jnet_bindings[0][4]==70 && jnet_bindings[1][5]==2 && jnet_bindings[2][6]==12);
+    assert(jnet_bindings[0][7]==16 && jnet_bindings[2][7]==7);
     assert(jnet_bindings[0][1]==66 && jnet_bindings[0][2]==86 && jnet_bindings[0][3]==71);
     assert(jnet_bindings[0][0]==88 && jnet_credits==0 && jnet_fps_limit==1);
     assert(!jnet_settings_dirty(1) && !jnet_settings_dirty(2) && !jnet_settings_dirty(3));

@@ -356,7 +356,9 @@ static inline int jc_actor_publish_numeric(jc_layout_reader read,jc_actor_writer
     memcpy(work->after,work->before,sizeof(work->after));
     struct jc_actor_input input_before=*input;
     struct jc_receiver_frame native_frame={.dt=clocks[0],.native_gate_a4=input->inactive};
-    memcpy(native_frame.current.bytes,work->before+0x10,JC_RECEIVER_STATE_BYTES);
+    jc_receiver_store(work->after+0x1c,0);
+    jc_receiver_store(work->after+0x2c,0);
+    memcpy(native_frame.current.bytes,work->after+0x10,JC_RECEIVER_STATE_BYTES);
     memcpy(&native_frame.chirp_cooldown,work->before+0x1468,4);
     native_frame.interaction_delay=jc_receiver_float(receiver->image+0x28da0);
     struct jc_receiver_output evaluated={0};

@@ -1,0 +1,254 @@
+#define GLOBAL_LEAN_AND_MEAN
+#include "Migratory.sh"
+
+
+#ifndef _IOS64
+
+float4		eyePositionWS		: eyePositionWS	;
+#ifdef SKINNING_ENABLED
+float4x4	viewprojection		: viewprojection	;
+#else
+float4x4	model				: model				;
+float4x4	modelIT				: modelit			;	
+#endif
+float4x4	modelViewProj		: modelviewproj		;
+float4x4	modelI				: modeli			;
+
+#ifndef D_PREPASS_ENABLED
+
+	// Notes:  Base shader for decoration meshes.
+	//
+	// Author: John Edwards
+	// Date C: 4-23-2010
+
+	// From Phyre:
+	// Env params:
+	HALF4 l_d;
+	#if defined( SNOW_TOP ) || defined( SAND_TOP ) || defined( SAND_SIDE ) || defined( SNOW_FULL ) || defined( SAND_FULL )
+	 HALF4 wind;
+	#endif
+	// Snow params
+	#ifdef SNOW_TOP
+	 HALF snowBias;
+	#endif
+	#ifdef FOG
+	 HALF4 f_se;
+	 HALF4 f_cc, f_fc;
+	#endif
+
+	#ifdef UV_OFFSET
+	 float4 uvOffset;
+	#endif
+	#ifdef CHAMELEON
+	 #ifndef CHAM_NORM
+	  float4 chamDir;
+	 #endif
+	#endif
+
+#endif//D_PREPASS_ENABLED
+
+
+#endif
+
+
+
+
+
+#ifdef SKINNING_ENABLED
+
+struct a2v
+{
+#ifdef __ORBIS__
+	float4	SkinnableVertex VS_ATTR(POSITION);
+#else
+	float3	SkinnableVertex VS_ATTR(POSITION);
+#endif
+	float3	SkinnableNormal VS_ATTR(NORMAL);
+	float4	uv0 VS_ATTR(TEXCOORD0);
+	float4	uv1 VS_ATTR(TEXCOORD1);
+	float4	color VS_ATTR(COLOR0);
+#if defined(D_PLATFORM_GXM)
+	int4	SkinIndices VS_ATTR(BLENDINDICES);
+#else
+	int4	SkinIndices VS_ATTR(BLENDINDICES);
+#endif
+	float4	SkinWeights			VS_ATTR(BLENDWEIGHT);
+};
+
+struct a2v_noSkin
+#else
+struct a2v
+#endif
+{
+#ifdef __ORBIS__
+	float4 position VS_ATTR(POSITION);
+#else
+	float3 position VS_ATTR(POSITION);
+#endif
+#ifdef HALVES_ENABLED
+    HALF4  normal   VS_ATTR(NORMAL);
+#else
+	HALF3  normal   VS_ATTR(NORMAL);
+#endif
+	HALF4  color    VS_ATTR(COLOR0);
+	float4 uv0      VS_ATTR(TEXCOORD0);
+	float4 uv1      VS_ATTR(TEXCOORD1);
+};
+
+
+#ifdef SKINNING_ENABLED
+a2v_noSkin ProcessSkInput(PASS_UL a2v skIn)
+{
+#ifdef _IOS64
+    float3x4    transformMatrix = GenerateBoneMatrix(UL.skinMatrices,  skIn.SkinIndices,skIn.SkinWeights);
+#else
+    float4x4    transformMatrix = GenerateBoneMatrix(UL.skinMatrices,  skIn.SkinIndices,skIn.SkinWeights);
+#endif
+
+	a2v_noSkin ret;
+
+	ret.position = SkinTransform(transformMatrix, float4(skIn.SkinnableVertex.xyz, 1)).xyz;//  MatrixMul(transformMatrix,float4(skIn.SkinnableVertex.xyz,1)).xyz;
+#ifdef __ORBIS__
+	ret.Position.w = 1;
+#endif
+#ifdef _IOS64
+    ret.normal.xyz = (HALF3)MatrixMul(ToM3x3(transformMatrix), skIn.SkinnableNormal);
+#else
+    ret.normal = MatrixMul((float3x3)transformMatrix, skIn.SkinnableNormal);
+#endif
+	ret.color = (HALF4)skIn.color;
+	ret.uv0 = skIn.uv0;
+	ret.uv1 = skIn.uv1;
+
+	return ret;
+}
+#endif//SKINNING_ENABLED
+
+
+
+struct v2f
+{
+	float4 position FS_ATTR(POSITION);
+	HALF4  color    FS_ATTR(COLOR0);
+	float4 uv0		FS_ATTR(TEXCOORD0);
+	float4 uv1		FS_ATTR(TEXCOORD1);
+	float4 locCham  FS_ATTR(TEXCOORD2); // xyz == loc, w == chamBase
+	HALF4  normalFr FS_ATTR(TEXCOORD3); // xyz == normal, w == sand fresnel
+#if defined( SNOW_TOP ) || defined( SAND_TOP ) || defined( SAND_SIDE ) || defined( SNOW_FULL ) || defined( SAND_FULL )
+	HALF3  sandVars FS_ATTR(TEXCOORD4); // x == windRatio, y == bleed, z == noiseFade
+#endif
+#ifdef FOG
+	HALF4  fog      FS_ATTR(TEXCOORD5); // rgb == color, a == intensity
+#endif
+};
+
+//--------------------------------------------
+// Program entry
+//--------------------------------------------
+
+/*
+void main(
+#ifdef SKINNING_ENABLED
+	in a2v IN_VAL,
+#else
+	in a2v IN,
+#endif
+	out v2f OUT)
+{
+*/
+
+VS_START()
+
+#ifdef SKINNING_ENABLED
+	a2v_noSkin IN = ProcessSkInput(UL, input);
+	float3 worldPos = MatrixMul( GET_LOCAL(model), float4(IN.position.xyz,1)).xyz;
+	output.position = MatrixMul( GET_LOCAL(modelViewProj), float4(IN.position.xyz,1.0f) );
+	half3 worldNorm = (half3)normalize( MatrixMul( ToM3x3(GET_LOCAL(model)), (float3)IN.normal.xyz ) );
+#else
+	float3 worldPos = MatrixMul( GET_LOCAL(model), float4(input.position.xyz,1.0f) ).xyz;
+	output.position = MatrixMul( GET_LOCAL(modelViewProj), float4(input.position.xyz,1.0f) );
+	half3 worldNorm = (half3)normalize( MatrixMul( ToM3x3(GET_LOCAL(modelIT)), (float3)input.normal.xyz ) );
+#endif
+
+	output.color.rgb = (HALF3)input.color.rgb;
+	output.color.a = input.color.a;
+	output.uv0 = input.uv0;
+	output.uv1 = input.uv1;
+#ifdef UV_OFFSET
+	output.uv0 += GET_LOCAL(uvOffset.xyxy);
+	output.uv1 += GET_LOCAL(uvOffset.xyxy);
+#endif
+	output.locCham.xyz = worldPos;
+#ifdef CHAMELEON
+ #ifdef UV_CHAM
+  #ifdef CHAM_NORM
+	output.locCham.w = input.uv1.w;
+  #else
+	output.locCham.w = dot( GET_LOCAL(chamDir.xy), input.uv1.zw );
+  #endif
+ #else
+	
+#ifdef SKINNING_ENABLED
+	output.locCham.w = dot( GET_LOCAL(chamDir.xyz), float4(IN.position.xyz,1.0f).xyz );
+#else
+	output.locCham.w = dot( GET_LOCAL(chamDir.xyz), input.position.xyz );
+#endif
+
+ #endif
+#endif
+	output.normalFr.xyz = (HALF3)worldNorm;
+	output.normalFr.w = 0;
+
+#ifdef SAND_DETAIL
+	// Calculate Fresnel.
+	half3 Ln = (half3)normalize( GET_GLOBAL(l_d.xyz) );
+	half3 Vn = (half3)normalize( GET_GLOBAL(eyePositionWS.xyz) - worldPos );
+	half3 Hn = (half3)normalize( Vn + Ln );
+	float base = saturate( 1.0 - dot( Vn, Hn ) );
+	float exponential = pow( base, 5.0 );
+	float F0spec = 0.01; // Skin is 0.028;
+	float fresnelSpec = exponential + F0spec * (1.0 - exponential);
+	output.normalFr.w = fresnelSpec;
+#endif
+
+#if defined( SNOW_TOP ) || defined( SAND_TOP ) || defined( SAND_SIDE ) || defined( SNOW_FULL ) || defined( SAND_FULL )
+  #ifdef SNOW_TOP
+	half windRatio = saturate( worldNorm.y ) + GET_LOCAL(snowBias);
+	half bleed = 0.03;
+  #else
+    half windForce = min( (length( GET_LOCAL(wind.xyz) ) - 10) / 70, 1.0 );
+	//half windRatio = saturate( dot( worldNorm, normalize( wind.xyz ) + half3( 0, 0.65, 0 ) ) );
+	half windRatio = saturate( worldNorm.y )*.65;
+	half bleed = lerp( 0.5, 0.05, windForce );
+  #endif
+	half depth = length( GET_GLOBAL(eyePositionWS.xyz) - worldPos );
+	half noiseFade = saturate( 1.5 - depth * 0.02 );
+
+	output.sandVars = HALF3( windRatio, bleed, noiseFade );
+#endif
+
+#ifdef FOG
+	float3 pos = MatrixMul( model, float4(input.Position.xyz,1.0f) ).xyz;
+	float3 eye = eyePositionWS - pos;
+
+	half rayS = min( eyePositionWS.y, pos.y );
+	half rayE = max( eyePositionWS.y, pos.y ) + 0.5; // Prevent div by 0.
+	half rayH = rayE - rayS;
+	half fogS = f_se.z;
+	half fogE = f_se.w;
+	half fogH = fogE - fogS;
+	half midS = min( rayS, fogE );
+	half midE = min( rayE, fogE );
+	half midA = 0.5 * (midS + midE);
+	half midH = midE - midS;
+	half fogY = ((fogE - midA) * midH) / (fogH * rayH);
+	half fogRatio = saturate( (fogY * length( eye ) - f_se.x) / (f_se.y - f_se.x) );
+	fogRatio *= fogRatio;
+	half3 fogColor = lerp( f_cc.rgb, f_fc.rgb, fogRatio );
+	half fogAlpha = lerp( f_cc.a, f_fc.a, fogRatio );
+	output.fog = half4( fogColor, fogRatio*fogAlpha );
+#endif
+
+SH_END()
+
+

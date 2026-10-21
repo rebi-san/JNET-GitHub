@@ -2,7 +2,7 @@
 #define JNET_STEAM_LOBBY_H
 #include "jnet_lobby_bridge.h"
 #define JNET_STEAM_CAPACITY 3
-#define JNET_STEAM_PROTOCOL "steam-game-16"
+#define JNET_STEAM_PROTOCOL "steam-game-19"
 #define JNET_NATIVE_LEVEL "journet:steam-game-7"
 __declspec(dllexport) volatile LONG JNETSteamLobby[58];
 __declspec(dllexport) char JNETSteamLobbyText[128];
@@ -113,20 +113,24 @@ static uint64_t jnet_sl_decimal(const char *s) {
 }
 static unsigned jnet_sl_lighting(uint64_t room) {
     const char *mode=jnet_sl_api.data(jnet_sl_api.mm,room,"journet.lighting");
-    if(mode && mode[0]>='0' && mode[0]<='2' && !mode[1])return (unsigned)(mode[0]-'0');
+    if(mode && mode[0]>='0' && mode[0]<='3' && !mode[1])return (unsigned)(mode[0]-'0');
     return jnet_sl_equal(room,"journet.daynight","1")?2:0;
 }
 static void jnet_sl_travel(const struct jnet_lobby_action *action) {
-    if(action->lighting>2 || action->paradise>1 || (action->paradise && action->level!=7))return;
-    unsigned previous=jnet_paradise_cutscene;
+    if(action->lighting>3 || (action->lighting==3 && action->level!=2 && action->level!=3) ||
+       action->paradise>1 || (action->paradise && action->level!=7))return;
+    unsigned previous=jnet_paradise_cutscene,lighting=jnet_daynight_mode,elapsed=jnet_daynight_elapsed;
     jnet_paradise_cutscene=action->level==7 && action->paradise;
-    if(jnet_travel_request(action->level)){
-        if(jnet_daynight_supported(action->level))jnet_daynight_mode=action->lighting;
-    } else jnet_paradise_cutscene=previous;
+    jnet_daynight_mode=jnet_daynight_supported(action->level)?action->lighting:0;
+    if(lighting!=2 || jnet_daynight_mode!=2)jnet_daynight_elapsed=0;
+    if(!jnet_travel_request(action->level)){
+        jnet_paradise_cutscene=previous;jnet_daynight_mode=lighting;jnet_daynight_elapsed=elapsed;
+    }
 }
 static int jnet_sl_metadata_check(uint64_t room,uint64_t expected,const char *nonce) {
     if(!jnet_sl_equal(room,"level",JNET_NATIVE_LEVEL) || !jnet_sl_equal(room,"journet.mod","journet"))return 1;
     if(!jnet_sl_equal(room,"journet.protocol",JNET_STEAM_PROTOCOL))return 2;
+    if(!jnet_sl_equal(room,"journet.build",JC_BUILD_ID_HEX))return 9;
     if(!jnet_sl_equal(room,"journet.capacity","3") || jnet_sl_api.limit(jnet_sl_api.mm,room)!=JNET_STEAM_CAPACITY)return 3;
     if(!jnet_sl_equal(room,"journet.status","ready"))return 4;
     if(!jnet_sl_equal(room,"journet.mode","journey") || !jnet_sl_equal(room,"journet.level","All"))return 5;
@@ -216,8 +220,8 @@ static void jnet_sl_join(uint64_t room,uint64_t host) {
 static int jnet_sl_publish(void) {
     char host[24];snprintf(host,sizeof(host),"%llu",(unsigned long long)jnet_sl.identity);
     if(!jnet_sl_joinable(jnet_sl.room,0) || !jnet_sl_type(jnet_sl.room,0))return 0;
-    const char *keys[]={"level","journet.mod","journet.protocol","journet.visibility","journet.code","journet.host","journet.nonce","journet.capacity","journet.mode","journet.level","journet.status","journet.chat","journet.cmatw"};
-    const char *values[]={JNET_NATIVE_LEVEL,"journet",JNET_STEAM_PROTOCOL,jnet_sl.access?"code_only":"public",jnet_sl.access?jnet_sl.code:"",host,jnet_sl.nonce,"3","journey","All",jnet_sl.access?"checking":"ready",jnet_sl.chat?"1":"0",jnet_sl.cmatw?"1":"0"};
+    const char *keys[]={"level","journet.mod","journet.protocol","journet.visibility","journet.code","journet.host","journet.nonce","journet.capacity","journet.mode","journet.level","journet.status","journet.chat","journet.cmatw","journet.build"};
+    const char *values[]={JNET_NATIVE_LEVEL,"journet",JNET_STEAM_PROTOCOL,jnet_sl.access?"code_only":"public",jnet_sl.access?jnet_sl.code:"",host,jnet_sl.nonce,"3","journey","All",jnet_sl.access?"checking":"ready",jnet_sl.chat?"1":"0",jnet_sl.cmatw?"1":"0",JC_BUILD_ID_HEX};
     for(unsigned i=0;i<sizeof(keys)/sizeof(keys[0]);++i)if(!jnet_sl_api.set_data(jnet_sl_api.mm,jnet_sl.room,keys[i],values[i]))return 0;
     return jnet_sl_type(jnet_sl.room,3) && jnet_sl_joinable(jnet_sl.room,1);
 }
@@ -264,13 +268,24 @@ static void jnet_sl_poll_result(void) {
             jnet_sl.count=0;InterlockedIncrement(&JNETSteamLobby[16]);JNETSteamLobby[17]=(LONG)result.matches;JNETSteamLobby[18]=JNETSteamLobby[19]=0;
             for(unsigned i=0;i<count;++i){uint64_t room=jnet_sl_api.by_index(jnet_sl_api.mm,(int)i);
                 int reason=jnet_sl_metadata_result(room,0);if(!reason && !jnet_sl_equal(room,"journet.visibility","public"))reason=6;
-                if(reason){++JNETSteamLobby[18];if(!JNETSteamLobby[19])JNETSteamLobby[19]=reason;continue;}
+                if(reason){
+                    if(reason==2 || reason==9){char detail[256];
+                        const char *key=reason==2?"journet.protocol":"journet.build";
+                        snprintf(detail,sizeof(detail),"[JNET] lobby %llu rejected: %s expected=%.64s received=%.64s",
+                            (unsigned long long)room,key,reason==2?JNET_STEAM_PROTOCOL:JC_BUILD_ID_HEX,jnet_sl_api.data(jnet_sl_api.mm,room,key));
+                        message(detail);
+                    }
+                    ++JNETSteamLobby[18];if(!JNETSteamLobby[19])JNETSteamLobby[19]=reason;continue;}
                 unsigned at=jnet_sl.count++;jnet_sl.rows[at]=(struct jnet_lobby_row){room,jnet_sl_decimal(jnet_sl_api.data(jnet_sl_api.mm,room,"journet.host")),(unsigned)jnet_sl_api.members(jnet_sl_api.mm,room),0};
                 if(jnet_sl_equal(room,"journet.cmatw","0"))snprintf(jnet_sl.names[at],33,"Random's Lobby");
                 else jnet_sl_name(jnet_sl.names[at],jnet_sl.rows[at].host);
             }
             if(jnet_sl.page*3>=jnet_sl.count)jnet_sl.page=0;
-            if(!jnet_sl.room)jnet_sl_status("Steam public lobby browser ready");
+            if(!jnet_sl.room){
+                if(!jnet_sl.count && JNETSteamLobby[19]==9)jnet_sl_status("Lobby build mismatch - use the same JNET package");
+                else if(!jnet_sl.count && JNETSteamLobby[19]==2)jnet_sl_status("Lobby protocol mismatch - update both players");
+                else jnet_sl_status("Steam public lobby browser ready");
+            }
         } else if(kind==2 || kind==6) {
             unsigned collisions=0;
             for(unsigned i=0;i<count;++i)if(jnet_sl_api.by_index(jnet_sl_api.mm,(int)i)!=jnet_sl.room)++collisions;
@@ -393,7 +408,7 @@ publish:
         else if(jnet_sl.host==jnet_sl.identity){
             unsigned wanted=jnet_daynight_mode;jnet_daynight_host=~0u;
             if((published_room!=jnet_sl.room || published_daynight!=wanted) &&
-               jnet_sl_api.set_data(jnet_sl_api.mm,jnet_sl.room,"journet.lighting",wanted==2?"2":wanted==1?"1":"0") &&
+               jnet_sl_api.set_data(jnet_sl_api.mm,jnet_sl.room,"journet.lighting",wanted==3?"3":wanted==2?"2":wanted==1?"1":"0") &&
                jnet_sl_api.set_data(jnet_sl_api.mm,jnet_sl.room,"journet.daynight",wanted==2?"1":"0")){
                 published_room=jnet_sl.room;published_daynight=wanted;
             }

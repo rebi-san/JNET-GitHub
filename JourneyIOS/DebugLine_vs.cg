@@ -1,0 +1,32 @@
+#include "Migratory.sh"
+// Set automatically by PSSG.
+
+struct a2v
+{
+#if defined(__ORBIS__)
+	float4 Position VS_ATTR(POSITION);
+#else
+	float3 Position VS_ATTR(POSITION);
+#endif
+	float4 Color VS_ATTR(COLOR0);
+};
+
+struct v2f
+{
+	float4 ClipSpace FS_ATTR(POSITION);
+	float4 Color     FS_ATTR(COLOR0);
+};
+
+//void main( in a2v input, out v2f output )
+//{
+
+VS_START()
+
+	// Transform point into clipSpace
+	output.ClipSpace = MatrixMul(GET_LOCAL(modelViewProj), float4(input.Position.xyz,1));
+
+	// Just pass along color and position directly.
+	output.Color = input.Color;
+
+SH_END()
+

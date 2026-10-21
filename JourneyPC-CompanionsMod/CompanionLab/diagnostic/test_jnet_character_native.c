@@ -383,6 +383,24 @@ static void test_glow_preparation(void) {
     }
 
 }
+static void test_color_preparation(void) {
+    struct visual_fixture f={0};uint64_t event=0x100,mesh=0x3000,value;
+    const uint64_t addresses[]={event,event+0x48,0x2010,0x2008,0x2100};
+    const uint64_t values[]={image+0x65bca8,0x2000,1,0x2100,mesh};
+    for(unsigned i=0;i<5;++i)memcpy(f.bytes+addresses[i],&values[i],8);
+    assert(jnet_character_color_ready(visual_read,&f,image,event,mesh,1,0));
+    assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh,1,1));
+    value=0x2400;memcpy(f.bytes+event+0x80,&value,8);
+    assert(jnet_character_color_ready(visual_read,&f,image,event,mesh,1,1));
+    assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh,1,0));
+    assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh,2,1));
+    assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh+16,1,1));
+    f.denied=value;assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh,1,1));
+    f.denied=0;value=0x2401;memcpy(f.bytes+event+0x80,&value,8);
+    assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh,1,1));
+    value=image+0x664168;memcpy(f.bytes+event,&value,8);
+    assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh,1,1));
+}
 static void test_ride_preparation(void) {
     struct visual_fixture f={0};uint64_t event=0x100,creature=0x1000,value;
     const uint64_t addresses[]={event,creature,event+0x68,0x2010,0x2008,0x2100,creature+0xe8,0x2208};
@@ -402,8 +420,73 @@ static void test_ride_preparation(void) {
     strengths[1]=NAN;memcpy(f.bytes+event+0x70,strengths,12);
     assert(!jnet_character_ride_ready(visual_read,&f,image,event,creature,1));
 }
+static void test_attack_state_and_targets(void) {
+    struct visual_fixture f={0};uint64_t event=0x100,creature=0x1000;
+    const uint64_t addresses[]={event,event+0x48,event+0x60,0x2008,0x2010,0x2100,0x2108,0x2110};
+    const uint64_t values[]={image+0x66ce70,creature,0x2000,0x2100,3,0x3000,0x3100,0x3200};
+    for(unsigned i=0;i<8;++i)memcpy(f.bytes+addresses[i],&values[i],8);
+    uint32_t phase=2;memcpy(f.bytes+event+0xac,&phase,4);
+    assert(jnet_character_attack_locked(visual_read,&f,image,0,creature)==0);
+    assert(jnet_character_attack_locked(visual_read,&f,image,event,creature)==0);
+    f.bytes[event+8]=f.bytes[event+9]=1;
+    assert(jnet_character_attack_locked(visual_read,&f,image,event,creature)==1);
+    f.bytes[event+8]=0;
+    for(phase=0;phase<3;++phase){
+        memcpy(f.bytes+event+0xac,&phase,4);
+        assert(jnet_character_attack_locked(visual_read,&f,image,event,creature)==(phase<2));
+    }
+    memcpy(f.bytes+event+0xac,&phase,4);
+    assert(jnet_character_attack_locked(visual_read,&f,image,event,creature)==-1);
+    phase=0;memcpy(f.bytes+event+0xac,&phase,4);f.bytes[event+9]=0;
+    assert(jnet_character_attack_locked(visual_read,&f,image,event,creature)==0);
+    assert(jnet_character_attack_locked(visual_read,&f,image,event,creature+16)==-1);
+    f.denied=event+0xac;
+    assert(jnet_character_attack_locked(visual_read,&f,image,event,creature)==0);
+    f.bytes[event+9]=1;
+    assert(jnet_character_attack_locked(visual_read,&f,image,event,creature)==-1);f.denied=0;
+    uint64_t actors[3]={0x4000,0x4100,0};float position[3]={5,6,7};
+    memcpy(f.bytes+actors[0]+0x10,position,sizeof(position));
+    memcpy(f.bytes+actors[1]+0x10,position,sizeof(position));
+    assert(jnet_character_attack_targets(visual_read,visual_write,&f,event,actors,1));
+    assert(f.bytes[0x3040] && f.bytes[0x3140] && !f.bytes[0x3240]);
+    assert(!memcmp(f.bytes+0x3010,position,sizeof(position)));
+    position[1]=NAN;memcpy(f.bytes+actors[1]+0x10,position,sizeof(position));
+    assert(jnet_character_attack_targets(visual_read,visual_write,&f,event,actors,1));
+    assert(f.bytes[0x3040] && !f.bytes[0x3140]);
+    assert(jnet_character_attack_targets(visual_read,visual_write,&f,event,actors,0));
+    assert(!f.bytes[0x3040] && !f.bytes[0x3140]);
+    f.denied=0x3040;
+    assert(!jnet_character_attack_targets(visual_read,visual_write,&f,event,actors,1));f.denied=0;
+    uint64_t handler=0x5000,eye=0x5100;
+    const uint64_t ready_addresses[]={handler,handler+0x48,handler+0x50,event+0x58,eye,0x5208,0x5210,0x5300,event+0x88,event+0x90,0x5408,0x5508};
+    const uint64_t ready_values[]={image+0x66cfe8,creature,0x5200,eye,image+0x672158,0x5300,1,event,0x5400,0x5500,0x5600,0x5700};
+    for(unsigned i=0;i<12;++i)memcpy(f.bytes+ready_addresses[i],&ready_values[i],8);
+    uint32_t n=2;memcpy(f.bytes+0x5410,&n,4);n=4;memcpy(f.bytes+0x5510,&n,4);
+    assert(jnet_character_attack_ready(visual_read,&f,image,event,handler,creature,eye));
+    assert(!jnet_character_attack_ready(visual_read,&f,image,event,handler,creature,eye+16));
+    n=3;memcpy(f.bytes+0x5510,&n,4);
+    assert(!jnet_character_attack_ready(visual_read,&f,image,event,handler,creature,eye));
+    n=4;memcpy(f.bytes+0x5510,&n,4);float invalid=NAN;memcpy(f.bytes+0x5700,&invalid,4);
+    assert(!jnet_character_attack_ready(visual_read,&f,image,event,handler,creature,eye));
+}
 int main(void) {
-    test_ride_preparation();test_cloth_ride_preparation();test_glow_preparation();
+    test_attack_state_and_targets();
+    {
+        struct visual_fixture f={0};uint64_t dude=0x100;
+        float before[3]={1,2,3},after[3]={1,2.1f,3},value=0;
+        memcpy(f.bytes+dude+0x10,before,sizeof(before));
+        assert(jnet_character_ride_glow(visual_read,visual_write,&f,dude,before));
+        memcpy(&value,f.bytes+dude+0x1448,4);assert(value==0);
+        memcpy(f.bytes+dude+0x10,after,sizeof(after));
+        assert(jnet_character_ride_glow(visual_read,visual_write,&f,dude,before));
+        memcpy(&value,f.bytes+dude+0x1448,4);assert(value==1);
+        memcpy(&value,f.bytes+dude+0x1450,4);assert(value==1);
+        after[1]=NAN;memcpy(f.bytes+dude+0x10,after,sizeof(after));
+        assert(!jnet_character_ride_glow(visual_read,visual_write,&f,dude,before));
+        f.denied=dude+0x10;
+        assert(!jnet_character_ride_glow(visual_read,visual_write,&f,dude,before));
+    }
+    test_ride_preparation();test_cloth_ride_preparation();test_glow_preparation();test_color_preparation();
     test_animation_preparation();
     test_vortex_and_teleport();
     test_teleport_reuse();

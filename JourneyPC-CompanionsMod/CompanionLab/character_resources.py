@@ -295,6 +295,21 @@ def relocate_assembly(assembly, position):
     return result
 
 
+def war_machine_coating():
+    graph = creature_graph('Level_Mountain', '13e0f73fb982aabf7c445b73ead4ffb3')
+    profiles = {}
+    for row in graph.values():
+        if row['kind'] != 'Decoration' or row['Shader'] != 'MeshSnowTopSide':
+            continue
+        params = sorted(copy.deepcopy(row['ShaderParams']), key=lambda p: p['ParamName'])
+        if row['Mesh'] in profiles and profiles[row['Mesh']] != params:
+            raise ValueError('Conflicting Mountain coating parameters')
+        profiles[row['Mesh']] = params
+    if set(profiles) != {'P_MechBodyCombined', 'P_MechHead', 'P_MechTail', 'P_GuardianWingL', 'P_GuardianWingR'}:
+        raise ValueError('Incomplete native Mountain coating')
+    return profiles
+
+
 def character_resources(image, participants=1):
     from startup_resources import extract_persistent
     persistent = extract_persistent(image)
@@ -310,8 +325,13 @@ def character_resources(image, participants=1):
         for row in character_assembly(character)['objects'].values():
             if row['kind'] == 'Decoration':
                 for kind in counts:
-                    counts[kind][row[kind]] += participants
+                    counts[kind][row[kind]] += participants * (3 if character == 'War Machine' else 1)
                 textures.update(param['ParamVal'] for param in row['ShaderParams'] if param['ParamType'] == 'texture')
+    coating = war_machine_coating()
+    counts['Shader']['MeshSnowTopSide'] = participants * 2 * sum(row['kind'] == 'Decoration' and row['Mesh'] in coating
+        for row in character_assembly('War Machine')['objects'].values())
+    for params in coating.values():
+        textures.update(p['ParamVal'] for p in params if p['ParamType'] == 'texture')
     selected = {}
     for kind, needs in counts.items():
         for name, capacity in sorted(needs.items()):
@@ -382,9 +402,41 @@ def wayfarer_resource_script():
                             for name, clip in WAYFARER_ACTION_CLIPS.items())).encode("ascii")
 
 
+CHARACTER_SOUND_BANKS = (('JNTBio', 'Summit-SFX.bank'), ('JNTMech', 'Cave-SFX.bank'), ('JNTFlow', 'Ruins-SFX.bank'))
+
+
+def character_sound_bank_script(image, banks=CHARACTER_SOUND_BANKS):
+    from startup_resources import extract_persistent
+    from inspect_build import pe_sections
+    from native_map import offset_for
+    persistent = extract_persistent(image)
+    sections = pe_sections(image)
+    at = offset_for(sections, 0x2b77fc, 3)
+    if image[at:at+3] != bytes.fromhex('83f805'):
+        raise ValueError('Unrecognized native sound-bank capacity')
+    pattern = rb'resource\s+"ScreamBank"\s+"([^"\r\n]+)"'
+    shared = re.findall(pattern, persistent)
+    chunks = {}
+    for match in re.finditer(pattern, image):
+        start = image.rfind(b'\0', 0, match.start()) + 1
+        end = image.find(b'\0', match.end())
+        if end < 0: raise ValueError('Unterminated sound-bank resource script')
+        chunks[start] = re.findall(pattern, image[start:end])
+    levels = [names for names in chunks.values() if names != shared]
+    if shared != [b'SharSfx'] or len(levels) != 12 or any(names != [b'LvlSfx', b'LvlMus'] for names in levels):
+        raise ValueError('Unrecognized stock sound-bank allocation')
+    header = (LAB / 'diagnostic/jnet_sound_banks.h').read_text()
+    capacity = int(re.search(r'^#define JNET_SOUND_BANK_CAPACITY (\d+)u$', header, re.M)[1])
+    if len({name for name, _ in banks}) != len(banks) or len(shared) + 2 * max(map(len, levels)) + len(banks) > capacity:
+        raise ValueError('Native sound-bank capacity exceeded')
+    return ''.join('resource "ScreamBank" ' + lua_literal(name) + ' { source=' + lua_literal(source) + ' }\n'
+                   for name, source in banks)
+
+
 def character_resource_script(image, participants=1):
+    banks = character_sound_bank_script(image)
     resources = character_resources(image, participants)
-    return ('\nresource "ScreamBank" "JNTBio" { source="Summit-SFX.bank" }\nresource "ScreamBank" "JNTMech" { source="Cave-SFX.bank" }\n' + '\n'.join('resource ' + lua_literal(kind) + ' ' +
+    return ('\n' + banks + '\n'.join('resource ' + lua_literal(kind) + ' ' +
             lua_literal(character_resource_name(kind, name)) + ' ' + lua_literal(desc)
             for (kind, name), desc in sorted(resources.items(), key=lambda item:
                 (('Texture', 'Shader', 'MeshAnimation', 'Mesh').index(item[0][0]), item[0][1])) if kind != 'Texture') + '\n').encode('ascii')
@@ -529,8 +581,11 @@ def character_visual_assembly(character, resources, include_eye=True):
             elif row['kind'] == 'Trigger' and any(key not in graph for key in members(row.get('Vars', {}))):
                 del graph[name]
                 changed = True
+    coating = war_machine_coating() if character == 'War Machine' else {}
     for row in graph.values():
         if row['kind'] == 'Decoration':
+            if row['Mesh'] in coating:
+                row['CoatingParams'] = copy.deepcopy(coating[row['Mesh']])
             for kind in ('Mesh', 'Shader'):
                 if (kind, row[kind]) not in resources:
                     raise ValueError('Missing private character resource')
@@ -547,6 +602,11 @@ def character_visual_assembly(character, resources, include_eye=True):
         for ref in members(row.get('Vars', {})):
             if ref not in graph:
                 raise ValueError(f'Unresolved playable character dependency {ref}')
+    if character == 'War Machine' and include_eye:
+        attack = copy.deepcopy(records('Level_Cave', 'Trigger')['2389a4b7121071ad6f198b19e2398a7a']['Vars'])
+        assembly['attack'] = {key: attack[key] for key in ('angryDuration', 'attackSpeed', 'attackTargLerp', 'angrySpeed')}
+        assembly['attack']['rails'] = [copy.deepcopy(records('Level_Cave', 'Rail')[attack[key]['ref']])
+                                       for key in ('attackRail', 'attackRailRecover')]
     assembly['objects'] = graph
     return assembly
 
@@ -567,7 +627,8 @@ def character_runtime_header(image):
         counts = Counter(row['kind'] for row in rows)
         wrappers = sum(isinstance(value, (dict, list))
                        for row in rows for value in row.get('Vars', {}).values())
-        budget = (counts['Decoration'], counts['Marker'], counts['Clump'] + wrappers + 2, counts['Trigger'] + 2)
+        attack = int('attack' in assembly)
+        budget = (counts['Decoration'], counts['Marker'] + 3 * attack, counts['Clump'] + wrappers + 2 + 2 * attack, counts['Trigger'] + 2 + attack + (character == 'Longtail'))
         prefix = 'jnet_character_' + str(index)
         source = 'return ' + lua_literal(assembly)
         lines += ['static const char ' + prefix + '_source[] = ' + json.dumps(source) + ';',

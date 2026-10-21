@@ -1,0 +1,82 @@
+{
+  "version": "0.74",
+  "samples": 114,
+  "base_codes": {
+    "0": 114
+  },
+  "transitions": [
+    {
+      "ms": 268,
+      "connected": 0,
+      "gate": 0,
+      "gates": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "travelers": [
+    {
+      "role": "local",
+      "symbols_zero_based": {
+        "0": 114
+      },
+      "clips_checked": 160,
+      "old_range_rejections": [
+        {
+          "ms": 17269,
+          "name": "Glide",
+          "frame": 0.009118199,
+          "duration": -1,
+          "clock": 0.009118199,
+          "range": [
+            0.04166667,
+            1
+          ],
+          "same_update": true
+        }
+      ],
+      "corrected_clock_rejections": [],
+      "sitting_samples": [],
+      "first_target_dissolve_ms": null,
+      "first_render_dissolve_ms": null,
+      "emitter_samples": 0,
+      "first_emitter_ms": null
+    },
+    {
+      "role": "native_remote",
+      "symbols_zero_based": {
+        "0": 114
+      },
+      "clips_checked": 116,
+      "old_range_rejections": [],
+      "corrected_clock_rejections": [],
+      "sitting_samples": [],
+      "first_target_dissolve_ms": null,
+      "first_render_dissolve_ms": null,
+      "emitter_samples": 0,
+      "first_emitter_ms": null
+    }
+  ],
+  "read_ms_mean": 5.649122807017544,
+  "read_ms_peak": 30,
+  "cloth_codes": {
+    "0": 29
+  },
+  "local_shout": {
+    "samples": 22,
+    "first_ms": 5018,
+    "last_ms": 22019
+  },
+  "remote_shout": {
+    "samples": 0,
+    "first_ms": null,
+    "last_ms": null
+  },
+  "ended": true,
+  "recorder_error": 0,
+  "interpretation": "Sampled observations; transition times bound first observation, not exact event time. A disconnected embedded traveler may still animate. No account identity or visual validation inferred.",
+  "file": "jc-connection-20261009-160916-1580.jsonl",
+  "sha256": "02a3abb60f57c466a786cd27d37a11129d0971e110c5cdc768f01205861acd43"
+}

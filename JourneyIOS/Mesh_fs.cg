@@ -1,0 +1,508 @@
+#define GLOBAL_LEAN_AND_MEAN
+#include "Migratory.sh"
+// Notes:  Base shader for decoration meshes.
+//
+// Author: John Edwards
+// Date C: 4-23-2010
+
+#ifndef _IOS64
+
+#ifndef D_PREPASS_ENABLED
+
+#if defined(D_PLATFORM_GCM)
+	#pragma regcount 12
+#endif
+
+	// LOD params:
+	#ifdef D_PLATFORM_GXM
+	 D_DECLARE_TEXTURE2D_4(noise3dSmallTex);
+	#else
+	 D_DECLARE_TEXTURE3D_4(noise3dSmallTex);
+	#endif
+	#if defined( SNOW_FULL ) || defined( SAND_FULL )
+	 D_DECLARE_TEXTURE2D_4(noiseSandTex);
+	 #if defined( SNOW_FULL )
+	 HALF4 lumpGrainMult;
+	 #endif
+	#endif
+
+	// Env params
+	HALF4 l_c, l_s;
+	#ifndef PHYRE3X_ENABLED
+	HALF4 l_d;
+	#endif
+	HALF opacity;
+	HALF velvetInt, velvetRatio;
+
+	// Level of detail slider
+	HALF lod;
+
+	// For color correcting incoming textures.
+	HALF4x4 colorCorrect;
+
+	// Albedo textures
+	D_DECLARE_TEXTURE2D_4(texColor);
+	D_DECLARE_TEXTURE2D_4(texDetail);
+	D_DECLARE_TEXTURE2D_4(texRamp);
+
+	// Ambient occlusion texture
+	D_DECLARE_TEXTURE2D_4(texAo);
+
+	// Sand and shadow edges are filtered through this texture
+	D_DECLARE_TEXTURE2D_4(texEdgeMask);
+
+	// Sand params
+	D_DECLARE_TEXTURE2D_4(sandFastTexture);
+	D_DECLARE_TEXTURE_CUBE_4(sandLoIrrCube);
+	#ifdef SAND_FANCY
+	 D_DECLARE_TEXTURE_CUBE_4(sandHiIrrCube);
+	#endif
+	float4 sandBias;
+	float4 sandScale;
+	D_DECLARE_TEXTURE2D_4(heightTexture);
+	float4 heightBiasUv;
+	float4 heightScaleUv;
+	float heightBiasY;
+	D_DECLARE_TEXTURE2D_4(duneTexture);
+	D_DECLARE_TEXTURE2D_4(duneColorTexture);
+
+	#ifdef SAND_SIDE
+	 HALF duneHeightOff;
+	#endif
+
+	#if defined( SNOW_FULL ) || defined( SAND_FULL )
+	 HALF sparkleHint;
+	#endif
+
+	// AO
+	HALF4 aoStepBiasInt;
+
+	// For dynamic AO
+	float4 localDudePos;
+	float4 remoteDudePos;
+
+	#ifdef SPECULAR
+	 HALF4 specular; // x == intensity, y == gloss, z == F0
+	#endif
+
+	HALF4 uvMlt; // x == color, y == ao, 
+
+	// Chameleon effect texture swapping effect
+	#ifdef CHAMELEON
+	 D_DECLARE_TEXTURE2D_4(texCham);
+	 D_DECLARE_TEXTURE2D_4(texChamMask);
+	 HALF4 chamColor;
+	 HALF4 chamEdgeColor;
+	 HALF chamLevel;
+ 
+	 #ifdef CHAM_NORM
+	  HALF chamScale;
+	  HALF chamIsAlphaTest;
+	 #endif
+	#endif
+
+	// Hacked Shadow
+	HALF inShadow;
+
+#endif//D_PREPASS_ENABLED
+
+
+
+
+// Streams:
+struct v2f
+{
+	float4 position VS_ATTR(POSITION);
+	HALF4  color    VS_ATTR(COLOR0);
+	HALF4  uv0      VS_ATTR(TEXCOORD0);
+	HALF4  uv1      VS_ATTR(TEXCOORD1);
+	float4 locCham  VS_ATTR(TEXCOORD2); // xyz == loc, w == chamBase
+	HALF4  normalFr VS_ATTR(TEXCOORD3); // xyz == normal, w == sand fresnel
+#if defined( SNOW_TOP ) || defined( SAND_TOP ) || defined( SAND_SIDE ) || defined( SNOW_FULL ) || defined( SAND_FULL )
+	HALF3  sandVars VS_ATTR(TEXCOORD4); // x == windRatio, y == bleed, z == noiseFade
+#endif
+#ifdef FOG
+	HALF4  fog      VS_ATTR(TEXCOORD5); // rgb == color, a == intensity
+#endif
+};
+
+struct f2f
+{
+#if !defined( ALPHA )
+	NATIVECOLOR REGFORMAT
+#endif
+	HALF4 color    : FINAL_COLOR;
+};
+
+
+#endif
+
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+/*
+#if !defined( ALPHA )
+NATIVECOLOR
+#endif
+void main( in v2f IN, out f2f OUT )
+{
+*/
+
+
+#ifdef CHAMELEON
+
+
+/*
+
+[static] << argBuffer
+3D,noise3dSmallTex
+2D,texColor
+2D,texDetail
+2D,texRamp
+2D,texAo
+2D,texEdgeMask
+2D,duneTexture
+2D,texCham
+2D,texChamMask
+2D,noiseSandTex
+
+3D,noise3dSmallTex,2D,texColor,2D,texDetail,2D,texRamp,2D,texAo,2D,texEdgeMask,2D,duneTexture,2D,texCham,2D,texChamMask,2D,noiseSandTex
+
+[dynamic]
+2D,sandFastTexture
+CUBE,sandLoIrrCube
+2D,heightTexture
+2D,duneColorTexture
+CUBE,sandHiIrrCube
+
+2D,sandFastTexture,CUBE,sandLoIrrCube,2D,heightTexture,2D,duneColorTexture,CUBE,sandHiIrrCube
+
+FS_START(float4,
+    TEX10_STATIC(3D,noise3dSmallTex,2D,texColor,2D,texDetail,2D,texRamp,2D,texAo,2D,texEdgeMask,2D,duneTexture,2D,texCham,2D,texChamMask,2D,noiseSandTex),
+    TEX5_DYNAMIC(2D,sandFastTexture,CUBE,sandLoIrrCube,2D,heightTexture,2D,duneColorTexture,CUBE,sandHiIrrCube))
+
+*/
+
+#if 0
+FS_START(float4,TEX15(3D,noise3dSmallTex, 2D,texColor, 2D,texDetail, 2D,texRamp, 2D,texAo, 2D,texEdgeMask, 2D,sandFastTexture, CUBE,sandLoIrrCube, 2D,heightTexture, 2D,duneTexture, 2D,duneColorTexture, 2D,texCham, 2D,texChamMask, CUBE,sandHiIrrCube, 2D,noiseSandTex),)
+#else
+FS_START(float4,
+    TEX10(3D,noise3dSmallTex,2D,texColor,2D,texDetail,2D,texRamp,2D,texAo,2D,texEdgeMask,2D,duneTexture,2D,texCham,2D,texChamMask,2D,noiseSandTex),
+    TEX5(2D,sandFastTexture,CUBE,sandLoIrrCube,2D,heightTexture,2D,duneColorTexture,CUBE,sandHiIrrCube))
+#endif
+
+
+#else
+
+
+/*
+
+3D,noise3dSmallTex, 2D,texColor, 2D,texDetail, 2D,texRamp, 2D,texAo, 2D,texEdgeMask, 2D,duneTexture, 2D,noiseSandTex
+2D,sandFastTexture, CUBE,sandLoIrrCube, 2D,heightTexture, 2D,duneColorTexture, CUBE,sandHiIrrCube
+
+*/
+
+#if 0
+FS_START(float4,TEX13(3D,noise3dSmallTex, 2D,texColor, 2D,texDetail, 2D,texRamp, 2D,texAo, 2D,texEdgeMask, 2D,sandFastTexture, CUBE,sandLoIrrCube, 2D,heightTexture, 2D,duneTexture, 2D,duneColorTexture, CUBE,sandHiIrrCube, 2D,noiseSandTex),)
+#else
+FS_START(float4,
+    TEX8(3D,noise3dSmallTex, 2D,texColor, 2D,texDetail, 2D,texRamp, 2D,texAo, 2D,texEdgeMask, 2D,duneTexture, 2D,noiseSandTex),
+    TEX5(2D,sandFastTexture, CUBE,sandLoIrrCube, 2D,heightTexture, 2D,duneColorTexture, CUBE,sandHiIrrCube))
+#endif
+
+#endif
+
+#define LOD_BIAS     , GET_GLOBAL(lodBias)
+
+	output = (float4)input.color;
+
+	// Load a noise texture, which is useful for many things
+	float3 noiseUv = 0.125 * input.locCham.xyz;
+    half2 noiseTap = (half2)tex3D( noise3dSmallTex, noiseUv ).ra; (void)noiseTap;
+
+	// Load albedo textures
+//	half3 colorTap = input.color.rgb * D_H3_SAMPLE_WRAP_ANISO_SRGBTEXTURE( texColor, input.uv0.xy * uvMlt.x ).rgb;
+	half3 colorTap = (half3)(input.color.rgb * (HALF3)tex2D(texColor, input.uv0.xy * GET_LOCAL(uvMlt.x)  LOD_BIAS).rgb);
+
+#ifdef _IOS64
+    float3x3 m33 = ToM3x3(GET_LOCAL(colorCorrect));
+    float3 ct = (float3)colorTap;
+    float3 v = m33 * ct; // note - iOS transposes the matrices by default, so we apply in reverse order
+    colorTap = (half3)v;
+#else
+	colorTap = MatrixMul( (float3)colorTap, ToM3x3(GET_LOCAL(colorCorrect)) );
+#endif
+
+//	half alphaTap = input.color.a * D_H4_SAMPLE_WRAP_TEXTURE( texColor, input.uv0.xy * uvMlt.x ).a;
+	half alphaTap = input.color.a * tex2D(texColor, input.uv0.xy * GET_LOCAL(uvMlt.x)  LOD_BIAS).a;//D_H4_SAMPLE_WRAP_TEXTURE
+
+	// AO textures are super low res, so we wonkify the UVs and posterize to add detail.
+	float2 aoUv = (float2)input.uv0.zw;
+	half aoTap = tex2D( texAo, aoUv  LOD_BIAS ).g;
+	aoTap = saturate( aoTap + GET_LOCAL(aoStepBiasInt.y) + GET_LOCAL(aoStepBiasInt.z) + 0.5 );
+
+//	half3 detailTap = D_H3_SAMPLE_WRAP_ANISO_SRGBTEXTURE( texDetail, input.uv1.xy * uvMlt.z );
+	half3 detailTap = (half3)tex2D(texDetail, input.uv1.xy * GET_LOCAL(uvMlt.z)  LOD_BIAS).rgb;
+
+//	half3 rampTap = D_H3_SAMPLE_WRAP_ANISO_SRGBTEXTURE( texRamp, input.uv1.zw * uvMlt.z );
+	half3 rampTap = (half3)tex2D(texRamp, input.uv1.zw * GET_LOCAL(uvMlt.z)  LOD_BIAS).rgb;
+
+	// Load the edge detail texture (used for transitioning between light/shadow, sand/clear, etc.)
+	half edgeDetail = 0.25;
+#ifdef EDGE_DETAIL
+	half edgeDetailTap = (half)(tex2D( texEdgeMask, input.uv0.zw * GET_LOCAL(uvMlt.y) * 7 ).r * tex2D( texEdgeMask, input.uv0.zw * GET_LOCAL(uvMlt.y) * 3  LOD_BIAS ).r);
+	#ifdef SNOW_TOP
+		edgeDetailTap *= 0.5*(tex2D( texEdgeMask, input.uv0.zw * GET_LOCAL(uvMlt.y) * 0.3  LOD_BIAS ).r+1);
+		//edgeDetailTap *= D_H1_SAMPLE_WRAP_TEXTURE( texEdgeMask, input.uv0.zw * uvMlt.y * 19 );
+	#endif
+	edgeDetail = edgeDetailTap;
+#endif
+
+	// Swap out the color tap for the cham texture, if necessary.
+#ifdef CHAMELEON
+	half3 chamTap = (half3)(input.color.rgb * (HALF3)tex2D( texCham, input.uv0.xy * GET_LOCAL(uvMlt.x)  LOD_BIAS ).rgb);
+	half chamAlphaTap = input.color.a * tex2D( texCham, input.uv0.xy * GET_LOCAL(uvMlt.x)  LOD_BIAS ).a;
+	half chamMaskTap = tex2D( texChamMask, input.uv0.xy * GET_LOCAL(uvMlt.z)  LOD_BIAS ).a;
+	half myChamLevel=GET_LOCAL(chamLevel);
+ #ifdef CHAM_NORM
+	myChamLevel = myChamLevel * (1.0 - (0.48 - 0.13 * GET_LOCAL(chamScale)) * GET_LOCAL(chamIsAlphaTest))
+		+ (0.25 - 0.02 * GET_LOCAL(chamScale)) * GET_LOCAL(chamIsAlphaTest);
+ 	half chamBase = myChamLevel - input.locCham.w;
+	half chamScaledMaskTap = GET_LOCAL(chamScale) * (chamMaskTap - myChamLevel);
+	half chamUnscaledAmount = chamBase + myChamLevel - chamScaledMaskTap;
+	half chamAmount = saturate( (chamUnscaledAmount - 0.5) / GET_LOCAL(chamScale) + 0.5 );
+ #else
+	half chamAmount = saturate( myChamLevel - input.locCham.w - chamMaskTap );
+ #endif
+
+	colorTap = lerp( colorTap, chamTap, chamAmount );
+	alphaTap = lerp( alphaTap, chamAlphaTap, chamAmount );
+
+	// Multiply in the chameleon colors.
+	colorTap *= lerp( half3(1,1,1), (half3)GET_LOCAL(chamColor.xyz), chamAmount );
+	colorTap = lerp( colorTap, (half3)GET_LOCAL(chamEdgeColor.xyz), pow( 1 - 2 * abs( chamAmount - 0.5 ), 6 ) );
+#endif
+
+	// Calculate basic lighting
+	half3 normal = (half3)normalize( input.normalFr.xyz );
+#if defined( SNOW_FULL ) || defined( SAND_FULL )
+	half sandFade = input.sandVars.z;
+	half3 sandNormal = (half3)(2.0 * (tex2D( noiseSandTex, input.uv0.zw * GET_LOCAL(uvMlt.y) * 5.0  LOD_BIAS ).rgb - 0.5));
+ #if defined( SNOW_FULL )
+	half3 lumpNormal = 2.0 * (noiseTap.xxy - 0.5);
+	normal = normalize( 4.0 * (normal + sandFade * lumpGrainMult.x*lumpNormal) + sandFade * lumpGrainMult.y*sandNormal );
+ #else
+	normal = normalize( 25.0 * normal + sandFade * sandNormal );
+ #endif
+#endif
+	half3 eye = (half3)( GET_GLOBAL(eyePositionWS.xyz) - input.locCham.xyz);
+	half3 _view = normalize( eye );
+	half3 light = (half3)normalize( GET_GLOBAL(l_d.xyz) );
+    half3 halfAngle = normalize( _view + light ); (void)halfAngle;
+#ifdef SHADOW_MAP
+  half3 albedo = colorTap * detailTap;
+#else
+	half3 albedo = colorTap * detailTap * rampTap;
+#endif
+	half3 ambientColor = (half3)texCUBE( sandLoIrrCube, normal ).rgb;
+	half3 diffuseColor = (half3)GET_GLOBAL(l_c.rgb);
+    half3 specularColor = (half3)GET_GLOBAL(l_s.rgb); (void)specularColor;
+
+#ifdef SAND_FULL
+	half lightIntensity = texCUBE( sandLoIrrCube, normal ).a;
+#else
+	half lightIntensity = dot( normal, light );
+#endif
+#ifdef SHADOW_MAP
+    lightIntensity = min( half(rampTap.r-0.25), lightIntensity );
+#endif
+#if !defined( SNOW_FULL ) && !defined( SAND_FULL )
+	// Filter the light through the edge detail texture to give it a hard jagged border
+	half lightMask = 1.5 * edgeDetail - 0.25;
+	lightIntensity = saturate( (lightIntensity + lightMask) * 20 );
+#endif
+
+	half diffuseIntensity = saturate( lightIntensity - GET_LOCAL(inShadow) );
+
+	half specularIntensity = 0;
+#ifdef SPECULAR
+	half specMult = GET_LOCAL(specular.x);
+	half specGlossMult = GET_LOCAL(specular.y) + 0.001;
+	half F0 = GET_LOCAL(specular.z); // usually 0.025
+
+	specularIntensity = saturate( lightIntensity - saturate( GET_LOCAL(inShadow) ) );
+
+	// Calculate Fresnel.
+	half fresnelT = pow( saturate( 1.0 - dot( _view, halfAngle ) ), 5.0 );
+	half fresnel = F0 * (1.0 - fresnelT) + fresnelT;
+
+	half gloss = specGlossMult;
+	half specPow = pow( 256.h, gloss ) - 1.0;
+
+	specularIntensity *= fresnel * specMult * (specPow + 8.0)/25.0 * pow( saturate( dot( normal, halfAngle ) ), specPow );
+#endif
+
+	// Generate a mask that represents a layer of sand that settled on the mesh
+    half sandIntensity = 0.0; (void)sandIntensity;
+#if defined( SNOW_TOP ) || defined( SAND_TOP )
+	half windRatio = input.sandVars.x;
+	half bleed = input.sandVars.y;
+	sandIntensity = saturate( (windRatio - edgeDetail) / bleed );
+#endif
+#if defined( SAND_FULL )
+	sandIntensity = 1.0;
+#endif
+
+	// Generate another mask that represents the sand piling up on the side of the mesh.
+    half sideIntensity = 0;	 (void)sideIntensity;
+#if defined( SAND_SIDE )
+	float2 heightUV = (float2( input.locCham.x, input.locCham.z ) + GET_LOCAL(heightBiasUv.xy)) * GET_LOCAL(heightScaleUv.xy);
+	half heightTap = tex2D( heightTexture, heightUV  LOD_BIAS ).r;
+	float duneHeight = GET_LOCAL(heightBiasY) + (float)GET_LOCAL(duneHeightOff) + (float)heightTap;
+	half blendThreshold = 2.22 * (duneHeight - input.locCham.y);
+	sideIntensity = saturate( blendThreshold - edgeDetail * 2.666 );
+	sideIntensity *= sideIntensity;
+#endif
+
+#if defined( SNOW_TOP ) || defined( SAND_TOP ) || defined( SAND_SIDE )
+	// Calculate sand values.
+	half3 Vn = _view;
+	half3 Nn = (half3)normalize( input.normalFr.xyz );
+
+	// Read the sand grain texture.
+	half sandNoise = 0;
+#if defined( SAND_DETAIL )
+	float2 sandUV = (float2)((float2)input.uv0.zw * GET_LOCAL(uvMlt.y) * 5 + GET_LOCAL(sandBias.xy) * GET_LOCAL(sandScale.xy));
+	sandNoise = 2.0 * (tex2D( sandFastTexture, sandUV  LOD_BIAS ) - 0.5).r;
+	//sandNoise = 2.0 * (sandFastTexture.SampleLevel(PointWrapAnisoSampler, sandUV, 0.0 ).x - 0.5);
+	//sandNoise *= lod;
+#endif
+
+	// Load the dune color.
+	const float terrainScale = 0.5;
+	float2 duneUv = float2( 1 - (terrainScale * input.locCham.x + 0.5) / 256, (terrainScale * input.locCham.z + 0.5) / 512 );
+	half3 duneTap = (half3)tex2D(duneTexture, duneUv  LOD_BIAS).rgb;//D_H3_SAMPLE_SRGBTEXTURE( duneTexture, duneUv );
+	//duneTap = pow(duneTap,2.2f);
+
+	// Load the pre-lit dune color and velvet.
+    float2 litUV = (float2( input.locCham.x, input.locCham.z ) + GET_LOCAL(heightBiasUv.xy));
+    litUV *= GET_LOCAL(heightScaleUv.xy);
+    litUV += GET_LOCAL(heightOffsetUv.xy);
+	half4 litTap = (half4)tex2D( duneColorTexture, litUV  LOD_BIAS );
+	half3 litColor = 4.0 * litTap.rgb * litTap.rgb;
+
+    //output.rgb = float3( litColor.rgb );
+
+    half velvDune = litTap.a;
+	half velvMesh = saturate( 1.12 - saturate( dot( Vn, 4.0 * Nn ) ) );
+	velvDune *= 0.333 * sandNoise;
+	velvMesh *= 0.333 + 0.333 * sandNoise;
+#if defined( SNOW_TOP )
+	velvMesh = 0.0;
+#endif
+
+#if 1 // TO TEST DUNE LIT UV
+    half3 duneColor = (1.0 + velvMesh) * duneTap; (void)duneColor;
+    half3 duneLitColor = (1.0 + velvDune) * litColor; (void)duneLitColor;
+
+	// There are certain cases where it's better to calculate the dune
+	// shader, instead of loading from a texture.
+ #ifdef SAND_FANCY
+ {
+	half3 colorShadowTapAlpha = tex2D(duneTexture, duneUv  LOD_BIAS).a;
+	half3 _duneColor = (half3)tex2D(duneTexture, duneUv  LOD_BIAS).rgb;//D_H4_SAMPLE_SRGBTEXTURE( duneTexture, duneUv ).rgb;
+	half shadow = (half)saturate( 10 * (colorShadowTapAlpha.r - 0.25) );
+
+	half nx = 0;
+	half nz = 0;
+#if defined( SAND_DETAIL )
+	nx = 2.0 * (tex2D( sandFastTexture, sandUV + float2(0.125, 0.000)  LOD_BIAS ).r - 0.5);
+	nz = 2.0 * (tex2D( sandFastTexture, sandUV + float2(0.000, 0.125)  LOD_BIAS ).r - 0.5);
+#endif
+
+	half3 _Nn = half3( 0.0, 1.0, 0.0 );
+	half3 Nnt = 25.0 * _Nn + half3( nx, 0, nz );
+	half3 Nnv =  4.0 * _Nn + half3( nx, 0, nz );
+
+	half4 lightCubeTap = (half4)texCUBE( sandHiIrrCube, Nnt );
+	half diffuseInt = lightCubeTap.a;
+	half3 fillColor = lightCubeTap.rgb;
+
+	half velv = saturate( 1 - (saturate( dot( Vn, Nnv ) ) - 0.12) );
+	_duneColor *= 1 + 0.333 * velv;
+
+	half diffuseMult = shadow * diffuseInt;
+
+	duneLitColor = _duneColor * (half3(GET_GLOBAL(l_c.rgb)) * diffuseMult + fillColor);
+ }
+ #endif
+
+#endif // TO TEST DUNE LIT UV
+
+#endif
+
+#if 1 // TO TEST DUNE LIT UV
+	// Calculate snow/sand specular.
+#if defined( SNOW_FULL ) || defined( SAND_FULL )
+	half3 Nns = normalize( 2.0 * normal + sandFade * sandNormal );
+	half specLight = pow( saturate( dot( halfAngle, Nns ) ), (half)GET_GLOBAL(l_s.w) );
+	half spec = sandFade * input.normalFr.w * specLight;
+	half velv = GET_GLOBAL(velvetInt) * pow( 1 - saturate( dot( _view, normalize(Nns+0.25*_view) ) ), (half)GET_GLOBAL(velvetRatio) );
+	specularIntensity = sandIntensity * (1.0 + GET_LOCAL(sparkleHint)) * min( saturate( lightIntensity ), diffuseIntensity ) * (spec + velv);
+#endif
+
+	// Perform lighting and sand blending.
+#if defined( SNOW_TOP ) || defined( SAND_TOP )
+	// The actual surface color is a combination of base material and sand.
+	albedo = lerp( albedo, duneColor, sandIntensity );
+#endif
+
+	// We have a weird hack where we fold AO into albedo instead of just multiplying it by the ambient lighting
+	albedo = lerp( albedo * aoTap, albedo, saturate( diffuseIntensity - 0.65 ) );
+
+	// Apply texturing and lighting	
+	output.rgb = float3(albedo * (diffuseIntensity * diffuseColor + ambientColor));
+
+#ifdef SAND_SIDE
+	// Sand accumulated on the side of the mesh completely covers up all other lighting.
+	output.rgb = lerp( output.rgb, (float3)duneLitColor, (float)sideIntensity );
+#endif
+
+	output.rgb += float3(albedo * (half3)GET_GLOBAL(l_s.rgb) * specularIntensity);
+
+#ifdef FOG
+	output.rgb = lerp( output.color.rgb, input.fog.rgb, input.fog.a );
+#endif
+#endif // TO TEST DUNE LIT UV
+
+	output.a = alphaTap;
+
+#if defined( ALPHA )
+	output.a *= GET_LOCAL(opacity);
+	// Fading at extreme angles tends to look better for objects using this shader.
+	output.a *= saturate( 16.0 * saturate( dot( _view, normal ) ) );
+#else
+ #if 1 || defined( DITHER_OUT )
+	// If we end up not using the noise tex for anything else, we can switch to this slightly faster function.
+	//half fade = dot( frac( input.locCham.xyz ), float3( 1.0/3.0 ) );
+	output.a = (GET_LOCAL(opacity) >= noiseTap.r) ? output.a : 0;
+ #endif
+	//output.color.rgb = aoTap;
+ #if defined( PREPASS )
+	output.color.rgb = 1;
+ #else
+	// If this pixel isn't alphaed out, encode the amount of direct light hitting it in the alpha channel.
+	output.a = output.a > 0.5 ? 1.0 + aoTap : output.a;
+ #endif
+#endif
+#ifdef ALPHATESTENABLE
+	DiscardLE(output.a, 0.5f);
+#endif
+#ifdef ALPHATESTENABLE1
+	DiscardLE(output.a, (1.0/255.0));
+#endif
+
+SH_END()

@@ -1,0 +1,146 @@
+#include "Migratory.sh"
+// Notes:  Composites the reduced resolution bloom and motion blur/DoF
+//         render targets with the full res unblurred image.  Then performs
+//         tonemapping and gamma correction.
+//
+// Author: John Edwards
+// Date C: 5-31-2010
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+#ifndef _IOS64
+
+HALF sharpMult;
+HALF bloomMult;
+HALF dofIntMult;
+
+#ifdef MSAA
+
+Texture2DMS<float4> texSharpMSAA;
+D_DECLARE_TEXTURE2D_4(texSharpAlphaMSAA);
+
+#else
+
+D_DECLARE_TEXTURE2D_4(texSharp);
+D_DECLARE_TEXTURE2D_4(texSharpAlpha);
+
+#endif
+
+D_DECLARE_TEXTURE2D_4(texBloom);
+D_DECLARE_TEXTURE2D_4(texBlur);
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+	HALF4 color : FINAL_COLOR;
+};
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+#ifdef MSAA
+
+  #ifdef FOG_SEPARATE_ALPHA
+
+FS_START(HALF4,
+    TEX4(
+        2D, texSharpMSAA,
+        2D, texSharpAlphaMSAA,
+        2D, texBloom,
+        2D, texBlur))
+
+  #else
+
+FS_START(HALF4,
+    TEX4(
+        2D, texSharpMSAA,
+        2D, texBloom,
+        2D, texBlur))
+
+  #endif
+
+
+	uint2 dim;
+	uint sampleCount;
+
+#ifdef _IOS64
+    dim.x = texSharpMSAA.tx.get_width();
+    dim.y = texSharpMSAA.tx.get_height();
+    sampleCount = texSharpMSAA.tx.get_num_samples(); //!MP! i dont think this is the same thing.
+#else
+	texSharpMSAA.GetDimensions(dim.x, dim.y, sampleCount);
+#endif
+
+
+	float4 result = 0;
+	float2 uvCoord = input.uv * float2(dim);
+
+
+	for (uint i = 0; i < sampleCount; ++i)
+	{
+#ifdef _IOS64
+        result += texSharpMSAA.tx.read(uvCoord, i);
+#else
+		result += texSharpMSAA.Load(uvCoord, i);
+#endif
+	}
+
+	HALF4 sharpTap = (result / float(sampleCount));
+#else
+
+  #ifdef FOG_SEPARATE_ALPHA
+FS_START(HALF4,
+    TEX4(
+        2D, texSharp,
+        2D, texSharpAlpha,
+        2D, texBloom,
+        2D, texBlur),)
+  #else
+FS_START(HALF4,
+    TEX3(
+        2D, texSharp,
+        2D, texBloom,
+        2D, texBlur),)
+  #endif
+
+
+	HALF4 sharpTap = (HALF4)tex2D( texSharp, input.uv );
+  #ifdef FOG_SEPARATE_ALPHA
+    sharpTap.a = (HALF)tex2D( texSharpAlpha, input.uv ).r;
+  #endif
+
+#endif
+	HALF3 bloomTap = (HALF3)tex2D( texBloom, input.uv ).rgb;
+	HALF4 blurTap = (HALF4)tex2D( texBlur, input.uv );
+
+	// The amount to blend in the blurred image is stored in the blurred
+	// image's alpha channel.  The far DoF is stored in the hi res image to reduce aliasing.
+	float blurriness = max( float(saturate( GET_LOCAL(dofIntMult) * sharpTap.a) ), float(blurTap.a) );
+	output.rgb = lerp( sharpTap.rgb, blurTap.rgb, (half)blurriness );
+
+	// Mix in bloom.
+	output.rgb = GET_LOCAL(sharpMult) * output.rgb + GET_LOCAL(bloomMult) * bloomTap;
+
+	// Choose between filmic and linear color correction.
+	HALF3 x = clamp( output.rgb - 0.004, 0.0, 64.0 );
+	HALF3 filmicColor = (x * (6.2 * x + 0.5)) / (x * (6.2 * x + 1.7) + 0.06);
+	//HALF3 linearColor = pow( output.rgb, 0.45 );
+	output.rgb = (HALF3)filmicColor;
+	//OUT.color.rgb = linearColor;
+
+	output.a = 1;
+
+SH_END()

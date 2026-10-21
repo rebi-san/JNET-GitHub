@@ -207,9 +207,10 @@ static void traveler_live_drain(void *context,const struct jc_actor_identity *id
         traveler_live->backend.frames.closing=1;
     }
 }
-static int traveler_live_material_reset(struct jc_cloth_live_material *m) {
-    if(!traveler_live || !traveler_actor || !traveler_live_retired(NULL,&traveler_actor->identity) ||
+static int traveler_live_material_rebuild(struct jc_cloth_live_material *m) {
+    if(!traveler_live || !traveler_actor || !traveler_live_identity(&traveler_actor->identity) ||
         !m || m->pins || !m->ready || m->quarantined)return JC_FRAME_OWNERSHIP;
+    for(unsigned i=0;i<6;++i)if(m->atlas_snapshots[i].pins)return JC_FRAME_OWNERSHIP;
     uint64_t barn=0,manager=0,image=m->image,peer=m->peer,generation=m->generation;
     unsigned role=m->role;
     if(!own_read(NULL,traveler_game+0x108,&barn,8) || !barn ||
@@ -223,6 +224,10 @@ static int traveler_live_material_reset(struct jc_cloth_live_material *m) {
     char line[160];snprintf(line,sizeof(line),"[JC] retired cloth material rebuilt role=%u generation=%llu result=%d",
         role,(unsigned long long)generation,code);message(line);
     return code;
+}
+static int traveler_live_material_reset(struct jc_cloth_live_material *m) {
+    if(!traveler_actor || !traveler_live_retired(NULL,&traveler_actor->identity))return JC_FRAME_OWNERSHIP;
+    return traveler_live_material_rebuild(m);
 }
 static int traveler_live_workers(void *context,uint64_t generation) {
     (void)context;
@@ -240,7 +245,11 @@ static void traveler_live_release_borrowed_texture(void *context,uint64_t textur
 __declspec(dllexport) int JNETActorPrepare(uint64_t peer,uint64_t generation) {
     if(traveler_live || traveler_actor)return traveler_peer_replace(peer,generation);
     if (!peer || !generation || traveler_live || traveler_actor || active_cloth_backend ||
-        JNETTraveler[0]!=3 || !traveler_context()) return JC_ACTOR_RUNTIME_ARGUMENT;
+        JNETTraveler[0]!=3 || !traveler_context()) {
+        char line[240];snprintf(line,sizeof(line),"[JNET] extra traveler admission declined stage=prepare peer=%u generation=%u backend=%u lifecycle=%ld/%ld/%ld context=%u",
+            peer!=0,generation!=0,active_cloth_backend!=NULL,(long)JNETTraveler[0],(long)JNETTraveler[1],(long)JNETTraveler[2],traveler_context()!=0);
+        message(line);return JC_ACTOR_RUNTIME_ARGUMENT;
+    }
     uint64_t image=(uintptr_t)GetModuleHandleW(NULL),context=0,barn=0,manager=0;
     if (!own_read(NULL,image+JC_D3D_CONTEXT_SLOT_RVA,&context,8) || !context ||
         !own_read(NULL,traveler_game+0x108,&barn,8) || !barn ||

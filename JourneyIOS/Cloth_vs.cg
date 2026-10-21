@@ -1,0 +1,276 @@
+#define GLOBAL_LEAN_AND_MEAN
+#include "Migratory.sh"
+
+#ifndef _IOS64
+float4		eyePositionWS		: eyePositionWS	;
+#ifdef SKINNING_ENABLED
+float4x4	viewprojection		: viewprojection	;
+#else
+float4x4	model				: model				;
+float4x4	modelIT				: modelit			;	
+float4x4	modelViewProj		: modelviewproj		;
+#endif
+
+
+#if defined(D_PLATFORM_GXM)
+#undef SAND
+#endif
+
+#ifndef D_PREPASS_ENABLED
+
+	// Set automatically by PSSG.
+
+	// Global env params:
+	HALF4 l_d;
+
+	// Type specific:
+	#if defined( DUDE ) || defined( SCARF )
+	 float4x4 dudeInvTorso;
+	#endif
+
+	#ifndef TOOL 
+	 #ifdef DUDE
+	  #ifdef DECORATION
+	   #define SAND_SPHERE_COUNT 14
+	  #else
+	   #define SAND_SPHERE_COUNT 7
+	  #endif
+
+	  float4 sandSpheres[SAND_SPHERE_COUNT];
+	  //float sandInts[SAND_SPHERE_COUNT];
+
+	  //!MP! hnnngh, float arrays are not properly supported on pc
+	  float4 sandInts[SAND_SPHERE_COUNT];
+	 #endif
+	#endif
+
+#endif//D_PREPASS_ENABLED
+
+#endif
+
+
+
+
+#ifdef SKINNING_ENABLED
+
+struct a2v
+{
+#if defined(__ORBIS__)
+	float4	SkinnableVertex VS_ATTR(POSITION);
+#else
+	float3	SkinnableVertex VS_ATTR(POSITION);
+#endif
+	float3	SkinnableNormal VS_ATTR(NORMAL);
+	float2	uv VS_ATTR(TEXCOORD0);
+	float4	extraF32 VS_ATTR(TEXCOORD1);
+	float4	extraU8  VS_ATTR(TEXCOORD2);
+	float4	extra2U8 VS_ATTR(TEXCOORD3);
+	float4	color VS_ATTR(COLOR0);
+	float4	SkinWeights VS_ATTR(BLENDWEIGHT);
+#if defined(D_PLATFORM_GXM)
+	float4	SkinIndices VS_ATTR(BLENDINDICES);
+#else
+	int4	SkinIndices VS_ATTR(BLENDINDICES);
+#endif
+};
+
+struct a2v_noSkin
+#else
+struct a2v
+#endif
+{
+#if defined(__ORBIS__)
+	float4 position VS_ATTR(POSITION);
+#else
+	float3 position VS_ATTR(POSITION);
+#endif
+	float3 normal   VS_ATTR(NORMAL);
+	float2 uv       VS_ATTR(TEXCOORD0);
+	float4 extraF32 VS_ATTR(TEXCOORD1);
+	float4 extraU8  VS_ATTR(TEXCOORD2);
+	float4 extra2U8 VS_ATTR(TEXCOORD3);
+	float4 color    VS_ATTR(COLOR0);
+};
+
+#ifdef SKINNING_ENABLED
+a2v_noSkin ProcessSkInput(PASS_UL a2v skIn)
+{
+#ifdef _IOS64
+	float3x4	transformMatrix = GenerateBoneMatrix(UL.skinMatrices,  skIn.SkinIndices,skIn.SkinWeights);
+#else
+    float4x4    transformMatrix = GenerateBoneMatrix(UL.skinMatrices,  skIn.SkinIndices,skIn.SkinWeights);
+#endif
+
+	a2v_noSkin ret;
+
+    ret.position = SkinTransform(transformMatrix, float4(skIn.SkinnableVertex.xyz, 1)).xyz;//  MatrixMul(transformMatrix,float4(skIn.SkinnableVertex.xyz,1)).xyz;
+#if defined(__ORBIS__)
+	ret.position.w = 1;
+#endif
+#ifdef _IOS64
+    ret.normal = MatrixMul(ToM3x3(transformMatrix), skIn.SkinnableNormal);
+#else
+	ret.normal = MatrixMul((float3x3)transformMatrix, skIn.SkinnableNormal);
+#endif
+	ret.uv = skIn.uv;
+	ret.extraF32 = skIn.extraF32;
+	ret.extraU8 = skIn.extraU8;
+	ret.extra2U8 = skIn.extra2U8;
+	ret.color = skIn.color;
+
+	return ret;
+}
+#endif//SKINNING_ENABLED
+
+
+struct vs_v2f
+{
+	float4 position FS_ATTR(POSITION);
+	HALF4 color    FS_ATTR(COLOR0);
+	float3 normal   FS_ATTR(TEXCOORD0);
+	HALF4 uv       FS_ATTR(TEXCOORD1);
+	float4 worldPos FS_ATTR(TEXCOORD2);
+	float4 eye      FS_ATTR(TEXCOORD3);
+	HALF4 extra    FS_ATTR(TEXCOORD4); 
+	HALF4 extra2   FS_ATTR(TEXCOORD5);
+	HALF4 extra3   FS_ATTR(TEXCOORD6);
+	HALF4 extra4   FS_ATTR(COLOR1);
+	HALF3  fresSsL  FS_ATTR(TEXCOORD7);
+};
+
+#define v2f vs_v2f
+
+
+VS_START()
+
+
+#ifdef SKINNING_ENABLED
+	a2v_noSkin IN = ProcessSkInput(UL, input);
+	output.position = MatrixMul( GET_LOCAL(modelViewProj), float4( IN.position.xyz, 1 ) );
+	output.worldPos = MatrixMul( GET_LOCAL(model), float4( IN.position.xyz, 1 ));
+	output.normal = normalize( MatrixMul( ToM3x3(GET_LOCAL(model)), IN.normal ) );
+#else
+	output.position = MatrixMul( GET_LOCAL(modelViewProj), float4( input.position.xyz, 1 ) );
+	output.worldPos = MatrixMul( GET_LOCAL(model), float4( input.position.xyz, 1 ) );
+	output.normal = normalize( MatrixMul( ToM3x3(GET_LOCAL(modelIT)), input.normal ) );
+#endif
+	output.uv.xy = (HALF2)input.uv;
+	output.eye = float4( GET_GLOBAL(eyePositionWS.xyz) - output.worldPos.xyz, output.worldPos.y );
+
+	// Calculate the fresnel term of specular.
+	HALF3 Ln = (HALF3)normalize( GET_GLOBAL(l_d.xyz) );
+	HALF3 Vn = (HALF3)normalize( output.eye.xyz );
+	HALF3 Hn = (HALF3)normalize( Vn + Ln );
+	HALF F0 = 0.005;
+	HALF fresnel = lerp( F0, (HALF)1.0, (HALF)powsafe( saturate( 1.0 - dot( Vn, Hn ) ), 5.0 ) );
+	output.fresSsL.x = fresnel;
+	// The dude's body occludes light on the scarf and cape.
+	HALF ssOcc = 1.0;
+#if defined( DUDE ) || defined( SCARF )
+	HALF3 torsoPos = (HALF3)MatrixMul( GET_LOCAL(dudeInvTorso), float4( output.worldPos.xyz, 1.0 ) ).xyz;
+	HALF3 torsoNorm = normalize( HALF3( 1, 3, 3 ) * torsoPos );
+ #if defined( DECORATION )
+	ssOcc = 0.0;
+ #else
+	HALF3 torsoEye = (HALF3) normalize( MatrixMul( ToM3x3(GET_LOCAL(dudeInvTorso)), output.eye.xyz ) );
+	ssOcc = 1.0 - saturate( dot( torsoEye, torsoNorm ) );
+	ssOcc *= saturate( 0.1 - 0.1 * torsoPos.x );
+	ssOcc = max( ssOcc, (HALF)saturate( 0.1 * length( torsoPos ) - 0.333 ) );
+	// We actually bump up the occlusion on the cape a little, 'cause it looks cooler.
+  #if defined( DUDE )
+	ssOcc *= 3.0;
+  #endif
+
+ #endif
+	// Project dude normals onto a vertical elipsoid.
+	HALF3 torsoLight = (HALF3)normalize( MatrixMul( ToM3x3(GET_LOCAL(dudeInvTorso)), GET_GLOBAL(l_d.xyz) ) );
+	HALF slight = 0.5 * (1.0 + sin( 0.5 * 3.1415926 * dot( torsoLight, torsoNorm ) ));	
+	output.fresSsL.z = slight;
+#else
+	output.fresSsL.z = 0;
+#endif
+	output.fresSsL.y = ssOcc;
+
+	// Extract effect 'channels' from the compressed data in IN.extraU8[0] and convert back into usable values
+	float MAX_CHANNELS = 4.0;
+	int compressed = (int)floor( 255.1 * input.extraU8.x );
+
+	int topBits = compressed / 16;
+	int botBits = D_UINT_MOD(compressed,16);
+
+	int invis = D_UINT_MOD(topBits,4);
+	int iFrom = invis / 2;
+	int iTo = D_UINT_MOD(invis,2);
+
+	int chamDir = topBits / 4;
+	int chamDirUp = D_UINT_MOD(chamDir,2);
+	int chamDirRight = chamDir / 2;
+
+	int u0 = botBits / 4;
+	int u1 = D_UINT_MOD(botBits,4);
+
+	// List all of the inputs for readibility, so we can tie them to the outputs easily	
+	float abBlend = input.extraF32[0]; // glow blend
+	float uvBlend = input.extraF32[1]; // cham blend
+	float vOffset = input.extraF32[2];
+	float scarfMeter = input.extraF32[3];
+
+    HALF compressedVals = input.extraU8[0]; (void)compressedVals;
+	HALF chamEdgeMult = input.extraU8[1];
+	HALF vMin = input.extraU8[2];
+	HALF vMax = input.extraU8[3];
+
+	HALF uScaleMult = input.extra2U8[0];
+	HALF vScaleMult = input.extra2U8[1];
+	int iextra = (int)floor( 255.1 * input.extra2U8[2] );
+	HALF innerSpec = D_UINT_MOD(iextra,2) ? 1.0 : 0.0;
+	HALF frozen = D_UINT_MOD((iextra / 2),2) ? 1.0 : 0.0;
+	HALF dirty = input.extra2U8[3] * 2.f;
+
+	// For the dude mesh we use a special system for calculating dirtiness.
+#ifndef TOOL
+ #if defined( DUDE )
+	float sand = 0;
+	float weight = 0;
+
+	for( int i = 0; i < SAND_SPHERE_COUNT; i++ )
+	{
+		float3 toSphere = GET_LOCAL(sandSpheres[i].xyz) - output.worldPos.xyz;
+		float dist = length( toSphere );
+		float t = dist / GET_LOCAL(sandSpheres[i].w);
+		float w = saturate( 1.0 - t * t );
+		weight += w;
+		sand += w * GET_LOCAL(sandInts[i].x);
+	}
+	sand /= weight + 0.000001;
+
+  #if defined( DECORATION )
+	dirty = sand;
+  #else
+	dirty = lerp( dirty, (HALF)sand, saturate( weight ) );
+  #endif
+ #endif
+#else
+	dirty = 0;
+#endif
+
+	HALF hueShift = input.color[0];
+	HALF saturation = input.color[1];
+	HALF value = input.color[2];
+	HALF alpha = input.color[3];
+
+	output.uv[2] = (float)u0 / MAX_CHANNELS;
+	output.uv[3] = (float)u1 / MAX_CHANNELS;
+	output.extra = HALF4( abBlend, uvBlend, vOffset, scarfMeter );
+	output.extra2 = HALF4( vMin, vMax, uScaleMult, vScaleMult );
+	output.extra3 = HALF4( (float)iFrom, (float)iTo, (float)chamDirUp, (float)chamDirRight );
+	output.extra4 = HALF4( chamEdgeMult, innerSpec, frozen, dirty );
+	output.color = HALF4( hueShift, saturation, value, alpha );
+
+#ifdef DECORATION
+	output.uv.zw = HALF2( 0.0, 0.0 );	
+#endif
+
+
+
+SH_END()

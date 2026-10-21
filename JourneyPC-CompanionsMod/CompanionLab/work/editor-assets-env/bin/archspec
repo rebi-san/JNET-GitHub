@@ -1,0 +1,6 @@
+#!/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/editor-assets-env/bin/python
+import sys
+from archspec.cli import main
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(main())

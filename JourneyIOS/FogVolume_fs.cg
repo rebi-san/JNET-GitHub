@@ -1,0 +1,75 @@
+#include "Migratory.sh"
+// Notes:  Accumulates the amount of space inside of volumes.
+//
+//         Designed to be rendered to a floating point target.
+//
+// Author: John Edwards
+// Date C: 6-2-2010
+
+#ifndef _IOS64
+
+float4x4 modelViewProjI;
+
+D_DECLARE_TEXTURE2D_4(texDepth);
+
+struct f2f
+{
+	HALF4 color    : FINAL_COLOR;
+};
+
+#endif
+
+
+#undef v2f
+
+// Streams:
+struct v2f
+{
+    float4 position    VS_ATTR(POSITION);
+    float4 uv          VS_ATTR(TEXCOORD0);
+    float4 clip        VS_ATTR(TEXCOORD1);
+    float3 world       VS_ATTR(TEXCOORD2);
+    #if defined(D_PLATFORM_D3D11) || defined(D_PLATFORM_GNM)
+        bool isFrontFace   : SV_IsFrontFace;
+    #elif defined(_IOS64)
+        bool faceVal [[front_facing]];
+    #else
+        float  faceVal     : FACE;
+    #endif
+};
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+FS_START(float4, TEX1(2D, texDepth),)
+
+#if defined(D_PLATFORM_D3D11) || defined(D_PLATFORM_GNM)
+	float face = input.isFrontFace ? -1.f : 1.f;
+#else
+	float face = input.faceVal ? -1.f : 1.f;
+#endif
+
+	float depthTap = manualTexDepth2Dproj( texDepth, input.uv );
+#if defined(D_PLATFORM_GCM)
+	float4 depthClip = float4( input.clip.x, input.clip.y, (2*depthTap-1) * IN.clip.w, IN.clip.w );
+#else
+	//float4 depthClip = float4( IN.clip.x, input.clip.y, (2*depthTap-1) * IN.clip.w, IN.clip.w );
+	float4 depthClip = float4( input.clip.x, input.clip.y, depthTap, 1.f );
+#endif
+	float4 depthWorld4d = MatrixMul( GET_LOCAL(modelViewProjI), depthClip );
+	float3 depthWorld = depthWorld4d.xyz / depthWorld4d.w;
+
+	float worldDist = length( input.world - GET_GLOBAL(eyePositionWS.xyz) );
+	float depthWorldDist = length( depthWorld - GET_GLOBAL(eyePositionWS.xyz) );
+	float dist = min( worldDist, depthWorldDist );
+
+	output.rgb = (-face * dist) / 225.0;
+	output.a = 0;
+
+SH_END()
+

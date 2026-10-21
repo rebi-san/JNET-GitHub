@@ -27,9 +27,11 @@ static int jnet_rocket_mode(uintptr_t game,int enabled) {
 }
 static int jnet_character_apply(uintptr_t game,uintptr_t barn,unsigned kind) {
     if(kind>=JNET_CHARACTER_COUNT)return 0;
+    struct jnet_character_state *instance=&jnet_character_instances[0];
+    if(jnet_character_attack_locked(own_read,NULL,fault_image,instance->attack_event,instance->binding.creature)!=0)return 0;
     unsigned previous=jnet_menu_edit.applied.character;
     if(!jnet_rocket_mode(game,kind==JNET_CHARACTER_ROCKET))return 0;
-    if(jnet_character_switch_native(game,barn,kind==JNET_CHARACTER_ROCKET?0:kind))return 1;
+    if(jnet_character_switch_native(game,barn,kind==JNET_CHARACTER_ROCKET?0:kind,kind==JNET_CHARACTER_ROCKET?0:jnet_menu_edit.pending.variant))return 1;
     jnet_rocket_mode(game,previous==JNET_CHARACTER_ROCKET);return 0;
 }
 static void jnet_rocket_update(uintptr_t module,uintptr_t game) {

@@ -1,0 +1,36 @@
+#include "Migratory.sh"
+// Notes:  Manual clear designed to be ued on floating point targets.
+//
+// Author: John Edwards
+// Date C: 5-21-2010
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+#ifndef _IOS64
+
+float4 clearColor;
+
+struct v2f
+{
+	float4 position VS_ATTR(POSITION);
+	float2 uv       VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+    float4 color    : FINAL_COLOR;
+};
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+FS_START(float4,,)
+
+	output = GET_LOCAL(clearColor);
+
+SH_END()

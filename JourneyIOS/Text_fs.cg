@@ -1,0 +1,184 @@
+#include "Migratory.sh"
+// Notes:  Mainly a pass through, but we fiddle with the alpha in a way that
+// sharpens it.
+//
+// Author: John Edwards
+// Date C: 5-12-2008
+
+#define ourBlendState Alpha_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+#ifndef _IOS64
+
+D_DECLARE_TEXTURE2D_4(tex);
+#ifdef MANUAL_DEPTH_TEST
+ D_DECLARE_TEXTURE2D_4(depthTexLo);
+ float depthBias;
+ float depthScale;
+ float depthExtra;
+#endif
+
+#ifdef MENUSYSTEM
+D_DECLARE_TEXTURE2D_4(overlay);
+#endif
+
+struct IN
+{
+	float4 position    VS_ATTR(POSITION);
+	float4 color       VS_ATTR(COLOR0);
+#ifdef MENUSYSTEM
+	float3 uv          VS_ATTR(TEXCOORD0);
+#elif defined(MANUAL_DEPTH_TEST)
+	float4 uv          VS_ATTR(TEXCOORD0);
+	float4 pos         VS_ATTR(TEXCOORD1);
+#else
+	float2 uv          VS_ATTR(TEXCOORD0);
+#endif
+};
+
+struct OUT
+{
+    float4 color       : FINAL_COLOR;
+};
+
+#endif
+
+
+
+#ifdef _IOS64
+
+
+
+#define ddx dfdx
+#define ddy dfdy
+
+
+
+#ifdef MANUAL_DEPTH_TEST
+    #define SHARPEN 0.4999
+#else
+    #define SHARPEN 0.3
+#endif
+
+#ifdef MENUSYSTEM
+
+inline float4 _sample( sampler2D tex, sampler2D overlay, float2 uv, float blend)
+{
+    float4 tap = tex2D( tex, uv );
+
+    tap.a = saturate( (tap.a - SHARPEN) / (1.0 - 2.0 * SHARPEN) );
+
+    //float4 tap2 = overlay.SampleLevel(LinearClampSampler, uv, 0);
+
+    float4 tap2 = tex2D(overlay, uv);
+
+    //float4 tap2 = D_SAMPLE_TEXTURE( overlay, uv );
+    tap = lerp(tap, tap2, blend);
+
+    return tap;
+}
+
+
+#else
+
+#define _sample( uv)   saturate( (tex2D( tex, uv ).a - SHARPEN) / (1.0 - 2.0 * SHARPEN) );
+
+#endif
+
+
+#else
+
+
+#ifdef MENUSYSTEM
+float4 _sample( float2 uv, float blend)
+#else
+float _sample( float2 uv)
+#endif
+{
+#ifdef MANUAL_DEPTH_TEST
+	const float SHARPEN = 0.4999;
+#else 
+	const float SHARPEN = 0.3;
+#endif
+
+	float4 tap = tex2D( tex, uv );
+
+#ifdef MENUSYSTEM
+	tap.a = saturate( (tap.a - SHARPEN) / (1.0 - 2.0 * SHARPEN) );
+
+	float4 tap2 = overlay.SampleLevel(LinearClampSampler, uv, 0);
+	//float4 tap2 = D_SAMPLE_TEXTURE( overlay, uv );
+	tap = lerp(tap, tap2, blend);
+#endif
+
+#ifdef MENUSYSTEM
+	return tap;
+#else
+	return saturate( (tap.a - SHARPEN) / (1.0 - 2.0 * SHARPEN) );
+#endif
+}
+
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( IN input, out OUT output )
+//{
+
+FS_START(float4,
+    TEX3(
+        2D, tex,
+        2D, depthTexLo,
+        2D, overlay),)
+
+#ifdef IOSMENU
+    output = tex2D(tex, input.uv.xy) * input.color;
+    return output;
+#endif
+
+#ifdef MENUSYSTEM
+	float4 accum = float4(0,0,0,0);
+	float2 uvCoord = input.uv.xy;
+
+	#define WHICH_TO_SAMPLE , input.uv.z
+    #define FIRST_PARAM tex, overlay,
+#else
+	float accum = 0.0;
+	float2 uvCoord = input.uv.xy;
+
+	#define WHICH_TO_SAMPLE
+    #define FIRST_PARAM
+#endif
+
+#ifdef MULTISAMPLE
+	float2 d = float2( ddx( input.uv.xy ).x, ddy( input.uv.xy ).y );
+	accum += _sample( FIRST_PARAM  uvCoord + d * float2( -3.0/8.0,  1.0/8.0 ) WHICH_TO_SAMPLE );
+	accum += _sample( FIRST_PARAM  uvCoord + d * float2(  1.0/8.0,  3.0/8.0 ) WHICH_TO_SAMPLE );
+	accum += _sample( FIRST_PARAM  uvCoord + d * float2(  3.0/8.0, -1.0/8.0 ) WHICH_TO_SAMPLE );
+	accum += _sample( FIRST_PARAM  uvCoord + d * float2( -1.0/8.0, -3.0/8.0 ) WHICH_TO_SAMPLE );
+	accum /= 4.0;
+#else
+	accum = _sample( uvCoord WHICH_TO_SAMPLE );
+#endif
+
+#ifdef MENUSYSTEM
+	float3 fontColor = input.color.rgb;
+	float3 overlayColor = input.color.rgb*accum.rgb;
+	output.rgb = lerp(fontColor, overlayColor, input.uv.z);
+	output.a = input.color.a * accum.a;
+#else
+	output = float4( input.color.rgb, input.color.a * accum );
+#endif
+
+#ifdef MANUAL_DEPTH_TEST
+	float depth = manualTexDepth2Dproj( depthTexLo, input.pos );
+
+	float pdepth = depthScale / ( depth - depthBias );
+	output.a *= saturate( pdepth - input.uv.w + depthExtra );
+#endif
+
+SH_END()
+

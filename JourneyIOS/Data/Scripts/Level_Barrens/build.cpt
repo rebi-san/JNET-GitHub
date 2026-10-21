@@ -1,0 +1,14 @@
+<CompostBuild>
+	<Inputs>
+		<Hull>BoundaryHullInstances.lua</Hull>
+		<Hull>CameraHullInstances.lua</Hull>
+		<Hull>HullInstances.lua</Hull>
+		<Hull>PhysicalHullInstances.lua</Hull>
+		<Hull>RegionHullInstances.lua</Hull>
+		<Hull>WindHullInstances.lua</Hull>
+		<Decoration>DecorationMeshInstances.lua</Decoration>
+	</Inputs>
+	<Targets>
+		<Extension>bin</Extension>
+	</Targets>
+</CompostBuild>

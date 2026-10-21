@@ -1,0 +1,20 @@
+{
+  "fixture": "work/companion-components/test_native_cloth_material_live.exe",
+  "sha256": "d727957109eac668d5a000f3eba6050a4dbeea2bdde01e1b0449b9c262eec60b",
+  "arguments": [
+    "--d3d"
+  ],
+  "whisky_runtime": "passed",
+  "driver": "hardware",
+  "feature_level": "0xb000",
+  "stage": 6,
+  "checks": [
+    "private atlas survives original update and release",
+    "private vertex and index buffers Map/Unmap readback",
+    "GPU EVENT retirement",
+    "snapshot pin prevents premature destruction"
+  ],
+  "journey_launched": false,
+  "installed": false,
+  "native_graphics_mutex_executed": false
+}

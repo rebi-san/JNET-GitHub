@@ -1,0 +1,67 @@
+#include "Migratory.sh"
+// Notes:  A somewhat flexible shader that can pass through or do a viewproj
+//         transform depending on the least significant bit of the alpha
+//         channel.
+//
+// Author: John Edwards
+// Date C: 4-5-2008
+
+struct a2v
+{
+#if defined(__ORBIS__)
+	float4 position    VS_ATTR(POSITION);
+#else
+	float3 position    VS_ATTR(POSITION);
+#endif
+#ifdef MENUSYSTEM
+	float3 uv          VS_ATTR(TEXCOORD0);
+#else
+	float2 uv          VS_ATTR(TEXCOORD0);
+#endif
+	float4 color       VS_ATTR(COLOR0);
+};
+
+struct v2f
+{
+	float4 position    FS_ATTR(POSITION);
+	float4 color       FS_ATTR(COLOR0);
+#ifdef MENUSYSTEM
+	float3 uv          FS_ATTR(TEXCOORD0);
+#elif defined(MANUAL_DEPTH_TEST)
+	float4 uv          FS_ATTR(TEXCOORD0);
+	float4 pos         FS_ATTR(TEXCOORD1);
+#else
+	float2 uv          FS_ATTR(TEXCOORD0);
+#endif
+};
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( IN input, out OUT output )
+//{
+
+VS_START()
+
+#ifdef MENUSYSTEM
+	output.position = float4(input.position.xyz,1);
+
+    output.uv = input.uv;
+#else
+	float4 projected = MatrixMul( GET_GLOBAL(viewprojection), float4( input.position.xyz, 1 ) );
+	output.position = D_INT_MOD(255.1 * input.color.a,2) == 0 ? float4(input.position.xyz,1) : projected;
+
+    output.uv.xy = input.uv;
+#endif
+
+    output.color = input.color;
+
+#ifdef MANUAL_DEPTH_TEST
+	output.uv.zw = float2(output.position.z,1);
+
+	output.pos = mul( SCALE_BIAS, output.position );
+	output.pos.w = output.position.w;
+#endif
+
+SH_END()
+

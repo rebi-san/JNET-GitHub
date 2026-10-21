@@ -1,0 +1,235 @@
+#include "Migratory.sh"
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+
+// Notes:  Takes the color buffer and per pixel motion buffer for
+//         a scene and performs motion and depth of field blurs.  This is
+//         intended to produce a reduced resoltion buffer, so the output alpha
+//         channel contains the amount the scene is getting blurred, allowing
+//         you to composite only the blurred part of the resulting image into
+//         the original full resolution color buffer.
+//
+//         To calculate DoF and prevent haloing, it's requared that the DoF
+//         intensity is stored in the alpha channel of the color on a scale
+//         from 0 to 1.
+//
+// Author: John Edwards
+// Date C: 11-16-2009
+
+// Increasing the register count reduces texture pipeline stalls in texture-heavy shaders.
+
+#if defined(D_PLATFORM_GCM)
+#pragma regcount 13
+#endif
+
+#if defined( DOF1 ) || defined( DOF2 )
+ #define DOF
+#endif
+
+#if !defined(D_PLATFORM_GCM)
+#undef MOTION_BLUR
+#endif
+
+
+#ifndef _IOS64
+
+// Separate LOD params for motion blur and DoF.
+float mbLod;
+float dofLod;
+float dofIntMult;
+
+// Noise params.
+float4 noiseUvMult;
+
+D_DECLARE_TEXTURE2D_4(tex);
+D_DECLARE_TEXTURE2D_4(near);
+D_DECLARE_TEXTURE2D_4(motion);
+D_DECLARE_TEXTURE2D_4(noise);
+
+struct v2f
+{
+	float4 position    VS_ATTR(POSITION);
+	float2 uv          VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+	float4 color       : FINAL_COLOR;
+};
+
+#endif
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+FS_START(float4,
+    TEX4(
+        2D, tex,
+        2D, near,
+        2D, motion,
+        2D, noise),)
+
+#ifdef DOF1
+	// This is a small circle:
+	//
+	//    * *
+	//  *     *
+	//  *     *
+	//    * *
+	//
+	// Randomized to improve the look when motion blurred.
+	const int kSamples = 8;
+	const float2 kOffsets[8] =
+	{ float2( -0.5, -1.5 ) / float2( 16, 9 )
+	, float2(  1.5, -0.5 ) / float2( 16, 9 )
+	, float2(  0.5,  1.5 ) / float2( 16, 9 )
+	, float2( -1.5, -0.5 ) / float2( 16, 9 )
+	, float2( -0.5,  1.5 ) / float2( 16, 9 )
+	, float2( -1.5,  0.5 ) / float2( 16, 9 )
+	, float2(  1.5,  0.5 ) / float2( 16, 9 )
+	, float2(  0.5, -1.5 ) / float2( 16, 9 )
+	};
+#endif
+
+#ifdef DOF2
+	// This is an octagon hexagon sample pattern:
+	//
+	//      * * * *
+	//    * * * * * *
+	//  * * * * * * * *
+	//  * * * * * * * *
+	//  * * * * * * * *
+	//    * * * * * *
+	//      * * * *
+	//
+	// Randomized to improve the look when motion blurred.
+	const int kSamples = 44;
+	const float2 kOffsets[44] =
+	{ float2( -2.5,  1.0 ) / float2( 16, 9 )
+	, float2(  0.5, -3.0 ) / float2( 16, 9 )
+	, float2( -1.5,  0.0 ) / float2( 16, 9 )
+	, float2( -0.5,  3.0 ) / float2( 16, 9 )
+	, float2(  0.5,  1.0 ) / float2( 16, 9 )
+	, float2(  1.5, -3.0 ) / float2( 16, 9 )
+	, float2( -0.5,  1.0 ) / float2( 16, 9 )
+	, float2(  2.5,  2.0 ) / float2( 16, 9 )
+	, float2(  0.5, -1.0 ) / float2( 16, 9 )
+	, float2(  1.5,  1.0 ) / float2( 16, 9 )
+	, float2(  1.5, -1.0 ) / float2( 16, 9 )
+	, float2(  2.5, -1.0 ) / float2( 16, 9 )
+	, float2( -0.5, -1.0 ) / float2( 16, 9 )
+	, float2( -3.5, -1.0 ) / float2( 16, 9 )
+	, float2( -3.5,  1.0 ) / float2( 16, 9 )
+	, float2(  3.5,  1.0 ) / float2( 16, 9 )
+	, float2(  0.5,  0.0 ) / float2( 16, 9 )
+	, float2( -0.5,  0.0 ) / float2( 16, 9 )
+	, float2(  1.5,  0.0 ) / float2( 16, 9 )
+	, float2(  2.5, -2.0 ) / float2( 16, 9 )
+	, float2( -2.5,  0.0 ) / float2( 16, 9 )
+	, float2( -0.5, -3.0 ) / float2( 16, 9 )
+	, float2( -2.5, -2.0 ) / float2( 16, 9 )
+	, float2( -1.5, -1.0 ) / float2( 16, 9 )
+	, float2( -1.5, -3.0 ) / float2( 16, 9 )
+	, float2(  3.5,  0.0 ) / float2( 16, 9 )
+	, float2(  0.5, -2.0 ) / float2( 16, 9 )
+	, float2( -2.5, -1.0 ) / float2( 16, 9 )
+	, float2( -1.5,  1.0 ) / float2( 16, 9 )
+	, float2( -3.5,  0.0 ) / float2( 16, 9 )
+	, float2(  1.5,  2.0 ) / float2( 16, 9 )
+	, float2(  2.5,  0.0 ) / float2( 16, 9 )
+	, float2( -1.5, -2.0 ) / float2( 16, 9 )
+	, float2(  2.5,  1.0 ) / float2( 16, 9 )
+	, float2( -2.5,  2.0 ) / float2( 16, 9 )
+	, float2( -0.5,  2.0 ) / float2( 16, 9 )
+	, float2(  1.5,  3.0 ) / float2( 16, 9 )
+	, float2(  3.5, -1.0 ) / float2( 16, 9 )
+	, float2( -1.5,  2.0 ) / float2( 16, 9 )
+	, float2(  0.5,  3.0 ) / float2( 16, 9 )
+	, float2( -1.5,  3.0 ) / float2( 16, 9 )
+	, float2(  0.5,  2.0 ) / float2( 16, 9 )
+	, float2( -0.5, -2.0 ) / float2( 16, 9 )
+	, float2(  1.5, -2.0 ) / float2( 16, 9 )
+	};
+#endif
+
+#if defined( MOTION_BLUR ) && !defined( DOF )
+	const int kSamples = 8;
+#elif !defined( MOTION_BLUR ) && !defined( DOF )
+	const int kSamples = 1;
+#endif
+
+	half dofIntensity = 0;
+#ifdef DOF
+	half dofTap = GET_LOCAL(dofLod) * saturate( (tex2D( tex, input.uv ).a - 0.25) / 0.75 ); // Compensate for the baseline alpha stored in all pixels.
+	half dofBlurRad = dofTap * 0.03;
+	dofIntensity = saturate( GET_LOCAL(dofIntMult) * tex2D( near, input.uv ).a );
+#endif
+
+	half motionIntensity = 0;
+#ifdef MOTION_BLUR
+	half4 motionTap = mbLod * D_SAMPLE_TEXTURE( motion, IN.uv );
+	half2 vel = half2( motionTap.w, motionTap.x );
+	motionIntensity = saturate( 2000.0 * length( vel ) - 0.5 );
+	vel *= 8.0 / (float)kSamples;
+
+	half noiseTap = D_SAMPLE_WRAP_TEXTURE( noise, IN.uv * noiseUvMult.xy ).r;
+	IN.uv -= vel * (0.5 * noiseTap);
+#endif
+
+	float4 accum = 0; // rgb = accumulated color, a = accumulated weight
+
+#ifdef _IOS64
+    // between two neighbouring pixels, they cover the entire range.
+    // only half each, though. 44 samples per invocation is excessive.
+
+    int2 xy = int2(input.position.x, input.position.y);
+    int base = (xy.x + xy.y)&1;
+    int step = 2;
+
+    if(step>kSamples)
+    {
+        base = 0;
+        step = 1;
+    }
+
+
+    for ( int i = base-kSamples / 2; i < (kSamples + 1) / 2; i+=step )
+#else
+	for ( int i = -kSamples / 2; i < (kSamples + 1) / 2; i++ )
+#endif
+	{
+		float2 uv = input.uv;
+
+#ifdef MOTION_BLUR
+		// Perturb the UV based on motion blur ...
+		uv -= vel * (float)i;
+#endif
+
+#ifdef DOF
+		// ... and depth of field ...
+        int idx = i + kSamples / 2;
+		uv += dofBlurRad * kOffsets[ idx ];
+#endif
+
+		// The UV has been sufficiently transformed, and we're ready to tap.
+		float4 blurTap = tex2D( tex, uv );
+
+		// We expect the color buffer to have been premultiplied by the weight,
+		// so we can accumulate both color and sample weight in a single command.
+		accum += blurTap;
+	}
+	output.rgb = accum.rgb / accum.a;
+
+	// Figure out how much of each of our effects we're using.
+	output.a = max( motionIntensity, dofIntensity );
+
+SH_END()
+

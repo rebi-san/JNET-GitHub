@@ -174,6 +174,8 @@ static void publication_cases(unsigned char *barn) {
         struct jc_actor_sender sender={.body_scale=1.25f,.chirp_shape={.5f,1.2f},.glow_targets={.5f,1.f,.75f},
             .state=incoming,.axes={0.3f,0.2f,0,0},.direction={0,0,1,0}};
         assert(!jc_actor_receive(receiver,&input,&sender,id.peer,id.generation,1,0));
+        jc_receiver_store(actor+0x1c,1001863.19f);
+        jc_receiver_store(actor+0x2c,NAN);
         memcpy(saved,receiver,sizeof(*saved));memcpy(before,actor,sizeof(before));
         struct jc_actor_input original_input=input;
         assert(jc_actor_receive(receiver,&input,&sender,id.peer,id.generation,1,0)==JC_RECEIVER_REPLAY);
@@ -275,7 +277,7 @@ typedef long LONG;
 typedef void *PVOID;
 typedef size_t SIZE_T;
 #define HEAP_ZERO_MEMORY 8
-static LONG JNETTraveler[1],JNETFrames;
+static LONG JNETTraveler[3],JNETFrames;
 static uint64_t traveler_object,traveler_game,traveler_barn;
 static struct {int pending,failed;} cloth_chapter;
 struct mock_cloth_backend {struct {int closing;} frames;};
@@ -287,6 +289,7 @@ static LONG InterlockedIncrement(volatile LONG *p) {return ++*p;}
 static LONG InterlockedCompareExchange(volatile LONG *p,LONG value,LONG expected) {LONG old=*p;if(old==expected)*p=value;return old;}
 static void *InterlockedExchangePointer(PVOID volatile *p,void *v) {void *old=*p;*p=v;return old;}
 static void *InterlockedCompareExchangePointer(PVOID volatile *p,void *v,void *expected) {void *old=*p;if(old==expected)*p=v;return old;}
+static unsigned traveler_thread=11;
 static unsigned GetCurrentThreadId(void) {return 11;}
 static uint64_t mock_ticks=1000;
 static uint64_t GetTickCount64(void) {return mock_ticks;}

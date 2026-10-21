@@ -1,0 +1,879 @@
+{
+  "version": "0.303",
+  "automatic_diagnostic_logs": false,
+  "session_report_export": true,
+  "meet_everywhere_always": true,
+  "portable_windows_package": true,
+  "game_sha256": "16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f",
+  "optional_sound_fix_sha256": "0a73c2fb3a2e5b33f6c38082b966160cd54882fac9efbe09c3ea8dde6fc037ca",
+  "sound_fix_version": "0.3.1",
+  "optional_drop_in_executable": true,
+  "build_id": "1dbdbc676a0eeb26ddeb13202d635200fcd4ba8f68f8599d9d40ca20dc1c342a",
+  "runtime_verified": false,
+  "three_player_supported": false,
+  "local_diagnostic_only": false,
+  "steam_lobby_transport_test": true,
+  "gameplay_over_steam": true,
+  "group_travel_candidate": true,
+  "all_levels_runtime_verified": false,
+  "native_character_candidates": [
+    "Longtail",
+    "Whale",
+    "War Machine",
+    "fl0w 1",
+    "fl0w 2"
+  ],
+  "native_character_preload": true,
+  "native_character_asset_mapping": false,
+  "native_character_resident_textures": true,
+  "character_asset_load_trace": true,
+  "native_character_animation_bundles": false,
+  "native_character_animation_loose_files": true,
+  "isolated_animation_probe": false,
+  "private_animation_asset_namespace": true,
+  "private_mesh_asset_namespace": true,
+  "character_skeleton_stage_trace": true,
+  "character_animation_stage_trace": true,
+  "native_characters_runtime_verified": false,
+  "war_machine_available": true,
+  "war_machine_attacks": true,
+  "war_machine_attacks_runtime_verified": false,
+  "war_machine_attack_controls_locked": true,
+  "war_machine_attack_targets": "confirmed_wayfarer_only",
+  "war_machine_spotlight": true,
+  "creature_camera_candidate": true,
+  "war_machine_resources_packaged": true,
+  "character_visibility_snapshots": true,
+  "creature_appearance_replication": true,
+  "rocket_character": true,
+  "rocket_relay_participants": 3,
+  "rocket_runtime_verified": false,
+  "character_resource_participants": 3,
+  "private_character_decoration_pool": true,
+  "native_chirps_in_private_pool": true,
+  "creature_jump_ascent": true,
+  "spotlight_input": "interact/sit",
+  "creature_flight_audio_muted": false,
+  "creature_body_physics_bypassed": true,
+  "creature_motion_smoothed": true,
+  "creature_speed": {
+    "Longtail": 10.8,
+    "Whale": 8.28,
+    "War Machine": 8.28,
+    "fl0w 1": 10.8,
+    "fl0w 2": 10.8
+  },
+  "fog_toggle": true,
+  "blackness_menu": true,
+  "blackness_cutoff_implemented": true,
+  "blackness_runtime_verified": false,
+  "menu_option_wrap": true,
+  "intro_skip_visible": false,
+  "creature_vortex_decay": true,
+  "creature_cached_teleport_completion": true,
+  "creature_cached_resume_before_teleport_wait": true,
+  "intro_skip_any_input_twice": true,
+  "fps_choices": [
+    30,
+    60,
+    "Default"
+  ],
+  "intro_mapped_loading_input": true,
+  "longtail_chirp_head": true,
+  "missing_texture_null_guard": true,
+  "bryan_tapestry_diagnostic": true,
+  "bryan_texture_replaced": false,
+  "creature_private_sound_banks": [
+    "Summit",
+    "Cave",
+    "Ruins"
+  ],
+  "native_sound_bank_capacity": 8,
+  "remote_chirp_sound_names_preserved": true,
+  "graphics_device_loss_report": true,
+  "startup_changes": [
+    {
+      "resource": "BlendNinja",
+      "buffer_offset": 800,
+      "rva": 57864688,
+      "before": 2,
+      "after": 4
+    },
+    {
+      "resource": "MeshDudeRemote",
+      "buffer_offset": 2323,
+      "rva": 57866211,
+      "before": 2,
+      "after": 4
+    },
+    {
+      "resource": "MeshDudeRemoteFrozen",
+      "buffer_offset": 2907,
+      "rva": 57866795,
+      "before": 2,
+      "after": 4
+    },
+    {
+      "resource": "ClothRemote",
+      "buffer_offset": 10619,
+      "rva": 57874507,
+      "before": 1,
+      "after": 5
+    },
+    {
+      "resource": "ClothRemoteScarf",
+      "buffer_offset": 10862,
+      "rva": 57874750,
+      "before": 1,
+      "after": 5
+    }
+  ],
+  "compiler": "Zig 0.13.0 x86_64-windows-gnu",
+  "minhook": "1.3.4",
+  "dll_imports": [
+    "WINMM.dll",
+    "bcrypt.dll",
+    "WS2_32.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-private-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-utility-l1-1-0.dll",
+    "KERNEL32.dll",
+    "USER32.dll",
+    "api-ms-win-crt-environment-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll"
+  ],
+  "helper_imports": [
+    "bcrypt.dll",
+    "USER32.dll",
+    "GDI32.dll",
+    "comdlg32.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-private-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "KERNEL32.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-environment-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll"
+  ],
+  "exports": {
+    "JNETActor": 4023072,
+    "JNETActorActivate": 31792,
+    "JNETActorPrepare": 43472,
+    "JNETActorReceive": 39968,
+    "JNETActorStop": 40352,
+    "JNETActorTrial": 4023024,
+    "JNETActorTrialStart": 40992,
+    "JNETActorTrialStop": 40656,
+    "JNETAnimation": 3969904,
+    "JNETAppearance": 3969712,
+    "JNETBodies": 4021408,
+    "JNETBuildId": 914832,
+    "JNETBuilder": 4021024,
+    "JNETCallbacks": 3969056,
+    "JNETClothAdoptMappedPass": 56912,
+    "JNETClothApplyAnimatedAppearance": 9072,
+    "JNETClothBindNativeMaps": 55696,
+    "JNETClothInitialize": 5664,
+    "JNETClothPublish": 50960,
+    "JNETClothStageStockBatch": 52336,
+    "JNETCommand": 4020856,
+    "JNETCommit": 3970028,
+    "JNETCompanionFeatures": 4021120,
+    "JNETControl": 5568,
+    "JNETDual": 4021600,
+    "JNETEvaluation": 3970400,
+    "JNETFlight": 4021072,
+    "JNETFrames": 4020868,
+    "JNETGame": 4021056,
+    "JNETGeometry": 3970048,
+    "JNETIdle": 3969872,
+    "JNETInitialize": 67456,
+    "JNETLifecycle": 4025104,
+    "JNETLifetime": 4020876,
+    "JNETLink": 3970096,
+    "JNETLinkConfig": 4021360,
+    "JNETMaterial": 4020920,
+    "JNETMenu": 4550176,
+    "JNETMesh": 4020896,
+    "JNETMeshLife": 3969104,
+    "JNETMotion": 3970160,
+    "JNETNativeOutputs": 4021952,
+    "JNETNativePlayback": 4021760,
+    "JNETNetwork": 4550256,
+    "JNETObservation": 4020860,
+    "JNETPeerLifecycle": 4550384,
+    "JNETPerformance": 3970272,
+    "JNETPhase": 4020864,
+    "JNETPool": 3969024,
+    "JNETPose": 3970016,
+    "JNETPoseWrites": 3969984,
+    "JNETReaderCheck": 76208,
+    "JNETRender": 4020928,
+    "JNETResource": 4020880,
+    "JNETRoom": 4021280,
+    "JNETSkeleton": 4021632,
+    "JNETStartup": 4020832,
+    "JNETStatus": 4020852,
+    "JNETSteam": 4549568,
+    "JNETSteamGame": 4552176,
+    "JNETSteamLobby": 4550448,
+    "JNETSteamLobbyText": 4550688,
+    "JNETSteamP2P": 4550816,
+    "JNETSteamP2PText": 4552048,
+    "JNETSteamServiceText": 4549664,
+    "JNETTraveler": 3970560,
+    "JNETTrial": 4020872
+  },
+  "source_entry_points": {
+    "GameUpdate": {
+      "file_offset": 893248,
+      "rva": 896320
+    },
+    "lua_gettop": {
+      "file_offset": 3252928,
+      "rva": 3256000
+    },
+    "lua_settop": {
+      "file_offset": 3252960,
+      "rva": 3256032
+    },
+    "luaL_loadbufferx": {
+      "file_offset": 3266064,
+      "rva": 3269136
+    },
+    "lua_pcallk": {
+      "file_offset": 3258320,
+      "rva": 3261392
+    },
+    "lua_tolstring": {
+      "file_offset": 3254192,
+      "rva": 3257264
+    },
+    "lua_pushcclosure": {
+      "file_offset": 3255584,
+      "rva": 3258656
+    },
+    "EnvironmentCopy": {
+      "rva": 809088,
+      "file_offset": 806016
+    },
+    "EnvironmentUpdate": {
+      "rva": 813488,
+      "file_offset": 810416
+    },
+    "CharacterMeshUpdate": {
+      "rva": 645840,
+      "file_offset": 642768
+    },
+    "CharacterShoutInit": {
+      "rva": 1308352,
+      "file_offset": 1305280
+    },
+    "CharacterDecorationUpdate": {
+      "rva": 652784,
+      "file_offset": 649712
+    },
+    "CharacterDecorationDraw": {
+      "rva": 653344,
+      "file_offset": 650272
+    },
+    "CharacterDecorationCleanup": {
+      "rva": 649760,
+      "file_offset": 646688
+    },
+    "CharacterInteract": {
+      "rva": 2199120,
+      "file_offset": 2196048
+    },
+    "IntroUpdate": {
+      "rva": 1324176,
+      "file_offset": 1321104
+    },
+    "TextureNullGuard": {
+      "rva": 648104,
+      "file_offset": 645032
+    },
+    "ResourceView": {
+      "rva": 3615440,
+      "file_offset": 3612368
+    },
+    "CharacterBank": {
+      "rva": 2919200,
+      "file_offset": 2916128
+    },
+    "CharacterBodyInput": {
+      "rva": 677024,
+      "file_offset": 673952
+    },
+    "CharacterLinkEmitter": {
+      "rva": 2346864,
+      "file_offset": 2343792
+    },
+    "CharacterWhaleRide": {
+      "rva": 1846352,
+      "file_offset": 1843280
+    },
+    "CharacterClothTouch": {
+      "rva": 1545776,
+      "file_offset": 1542704
+    },
+    "CharacterClothRide": {
+      "rva": 2314768,
+      "file_offset": 2311696
+    },
+    "CharacterEye": {
+      "rva": 1856480,
+      "file_offset": 1853408
+    },
+    "CharacterAttack": {
+      "rva": 1673872,
+      "file_offset": 1670800
+    },
+    "CharacterAttackHandler": {
+      "rva": 1683920,
+      "file_offset": 1680848
+    },
+    "CharacterJump": {
+      "rva": 632976,
+      "file_offset": 629904
+    },
+    "CharacterCamera": {
+      "rva": 2288992,
+      "file_offset": 2285920
+    },
+    "CharacterSkeletonBuild": {
+      "rva": 2966832,
+      "file_offset": 2963760
+    },
+    "CharacterAnimationLoad": {
+      "rva": 2640176,
+      "file_offset": 2637104
+    },
+    "CharacterAnimationFinish": {
+      "rva": 2641216,
+      "file_offset": 2638144
+    },
+    "CharacterAssetLoad": {
+      "rva": 2950672,
+      "file_offset": 2947600
+    },
+    "CreatureReset": {
+      "rva": 636960,
+      "file_offset": 633888
+    },
+    "MenuInput": {
+      "rva": 1072848,
+      "file_offset": 1069776
+    },
+    "MenuPop": {
+      "rva": 1080752,
+      "file_offset": 1077680
+    },
+    "MenuFrame": {
+      "rva": 2206320,
+      "file_offset": 2203248
+    },
+    "MenuPresent": {
+      "rva": 3593008,
+      "file_offset": 3589936
+    },
+    "MenuBuild": {
+      "rva": 1071168,
+      "file_offset": 1068096
+    },
+    "MenuNodes": {
+      "rva": 1067120,
+      "file_offset": 1064048
+    },
+    "MenuAppend": {
+      "rva": 1057952,
+      "file_offset": 1054880
+    },
+    "MenuFrameDrawSite": {
+      "rva": 2206817,
+      "file_offset": 2203745
+    },
+    "MenuMap": {
+      "rva": 2522384,
+      "file_offset": 2519312
+    },
+    "MenuMapImpl": {
+      "rva": 3431904,
+      "file_offset": 3428832
+    },
+    "MenuFinish": {
+      "rva": 1057552,
+      "file_offset": 1054480
+    },
+    "ClothRender": {
+      "rva": 567200,
+      "file_offset": 564128
+    },
+    "ActorInput": {
+      "rva": 1146928,
+      "file_offset": 1143856
+    },
+    "ActorFinish": {
+      "rva": 1150448,
+      "file_offset": 1147376
+    },
+    "ActorNativeInput": {
+      "rva": 677024,
+      "file_offset": 673952
+    },
+    "ActorNativeFinish": {
+      "rva": 695584,
+      "file_offset": 692512
+    },
+    "AsyncGeometryDispatch": {
+      "rva": 3481696,
+      "file_offset": 3478624
+    },
+    "GraphicsMutex": {
+      "rva": 788544,
+      "file_offset": 785472
+    },
+    "GraphicsEnter": {
+      "rva": 3623808,
+      "file_offset": 3620736
+    },
+    "GraphicsLeave": {
+      "rva": 3623936,
+      "file_offset": 3620864
+    },
+    "NativeThread": {
+      "rva": 3457008,
+      "file_offset": 3453936
+    },
+    "TextureSamplerCreate": {
+      "rva": 3550640,
+      "file_offset": 3547568
+    },
+    "EnvironmentRefRelease": {
+      "rva": 584112,
+      "file_offset": 581040
+    },
+    "ClothDependency": {
+      "rva": 582160,
+      "file_offset": 579088
+    },
+    "ClothUpdate": {
+      "rva": 563712,
+      "file_offset": 560640
+    },
+    "ClothFinish": {
+      "rva": 566176,
+      "file_offset": 563104
+    },
+    "MeshClothDefinition": {
+      "rva": 2494624,
+      "file_offset": 2491552
+    },
+    "DudeClothInit": {
+      "rva": 2384432,
+      "file_offset": 2381360
+    },
+    "DudeClothAttach": {
+      "rva": 2385008,
+      "file_offset": 2381936
+    },
+    "DudeClothCollide": {
+      "rva": 2387264,
+      "file_offset": 2384192
+    },
+    "DudeClothAppearance": {
+      "rva": 693360,
+      "file_offset": 690288
+    },
+    "ClothRelease": {
+      "rva": 555136,
+      "file_offset": 552064
+    },
+    "NativeShout": {
+      "rva": 1309616,
+      "file_offset": 1306544
+    },
+    "EvalSubmit": {
+      "rva": 3649232,
+      "file_offset": 3646160
+    },
+    "EvalWait": {
+      "rva": 3649968,
+      "file_offset": 3646896
+    },
+    "EvalWorker": {
+      "rva": 3646832,
+      "file_offset": 3643760
+    },
+    "EvalRootWrite": {
+      "rva": 3759376,
+      "file_offset": 3756304
+    },
+    "EvalSamplerPrepare": {
+      "rva": 3768384,
+      "file_offset": 3765312
+    },
+    "EvalSamplerCompute": {
+      "rva": 3765744,
+      "file_offset": 3762672
+    },
+    "EvalNormalPrepare": {
+      "rva": 3730048,
+      "file_offset": 3726976
+    },
+    "EvalAddPrepare": {
+      "rva": 3740288,
+      "file_offset": 3737216
+    },
+    "EvalBlendCompute": {
+      "rva": 3734448,
+      "file_offset": 3731376
+    },
+    "EvalNormalBlend": {
+      "rva": 3730720,
+      "file_offset": 3727648
+    },
+    "EvalAddBlend": {
+      "rva": 3740960,
+      "file_offset": 3737888
+    },
+    "EvalClock": {
+      "rva": 2489008,
+      "file_offset": 2485936
+    },
+    "EvalNormalFlags": {
+      "rva": 3729744,
+      "file_offset": 3726672
+    },
+    "EvalAddFlags": {
+      "rva": 3739952,
+      "file_offset": 3736880
+    },
+    "EvalLeafFlags": {
+      "rva": 4167792,
+      "file_offset": 4164720
+    },
+    "EvalInactivePolicy": {
+      "rva": 4167760,
+      "file_offset": 4164688
+    },
+    "EvalSingleSubmit": {
+      "rva": 4265856,
+      "file_offset": 4262784
+    },
+    "EvalThreadedSubmit": {
+      "rva": 4268064,
+      "file_offset": 4264992
+    },
+    "EvalThreadedImmediate": {
+      "rva": 4268096,
+      "file_offset": 4265024
+    },
+    "EvalSingleFlush": {
+      "rva": 4265936,
+      "file_offset": 4262864
+    },
+    "EvalSingleWait": {
+      "rva": 4265952,
+      "file_offset": 4262880
+    },
+    "EvalThreadedFlush": {
+      "rva": 4268128,
+      "file_offset": 4265056
+    },
+    "EvalThreadedWait": {
+      "rva": 4268336,
+      "file_offset": 4265264
+    },
+    "EvalTempAlloc": {
+      "rva": 4055616,
+      "file_offset": 4052544
+    },
+    "EvalTempReserve": {
+      "rva": 4055648,
+      "file_offset": 4052576
+    },
+    "EvalScheduler": {
+      "rva": 3786864,
+      "file_offset": 3783792
+    },
+    "RemoteReceive": {
+      "rva": 620448,
+      "file_offset": 617376
+    },
+    "RemoteApply": {
+      "rva": 1148720,
+      "file_offset": 1145648
+    },
+    "PlayerUpdate": {
+      "rva": 1148560,
+      "file_offset": 1145488
+    },
+    "DudeUpdate": {
+      "rva": 680784,
+      "file_offset": 677712
+    },
+    "DudeSimulation": {
+      "rva": 2403200,
+      "file_offset": 2400128
+    },
+    "PlayerAppearance": {
+      "rva": 2193344,
+      "file_offset": 2190272
+    },
+    "ClothAppearance": {
+      "rva": 2408464,
+      "file_offset": 2405392
+    },
+    "ChestSymbol": {
+      "rva": 691568,
+      "file_offset": 688496
+    },
+    "ChirpSymbol": {
+      "rva": 690480,
+      "file_offset": 687408
+    },
+    "PlayerShout": {
+      "rva": 2417296,
+      "file_offset": 2414224
+    },
+    "ShoutUpdate": {
+      "rva": 1304240,
+      "file_offset": 1301168
+    },
+    "RemoteDeparture": {
+      "rva": 2423408,
+      "file_offset": 2420336
+    },
+    "SandInline": {
+      "rva": 2383376,
+      "file_offset": 2380304
+    },
+    "SandInlineResume": {
+      "rva": 2384165,
+      "file_offset": 2381093
+    },
+    "SandAppend": {
+      "rva": 1110176,
+      "file_offset": 1107104
+    },
+    "SandConsume": {
+      "rva": 1106784,
+      "file_offset": 1103712
+    },
+    "DudePrepare": {
+      "rva": 667328,
+      "file_offset": 664256
+    },
+    "DudeFullInit": {
+      "rva": 668352,
+      "file_offset": 665280
+    },
+    "DudeFactory": {
+      "rva": 703696,
+      "file_offset": 700624
+    },
+    "DudeDelete": {
+      "rva": 664688,
+      "file_offset": 661616
+    },
+    "DudeConstructor": {
+      "rva": 663168,
+      "file_offset": 660096
+    },
+    "DudeDestructor": {
+      "rva": 664752,
+      "file_offset": 661680
+    },
+    "DudeCleanup": {
+      "rva": 671712,
+      "file_offset": 668640
+    },
+    "DudeResourceInit": {
+      "rva": 674400,
+      "file_offset": 671328
+    },
+    "ResourceAttach": {
+      "rva": 2935296,
+      "file_offset": 2932224
+    },
+    "MeshInit": {
+      "rva": 2503056,
+      "file_offset": 2499984
+    },
+    "MeshCleanup": {
+      "rva": 2502800,
+      "file_offset": 2499728
+    },
+    "MeshRegister": {
+      "rva": 2501376,
+      "file_offset": 2498304
+    },
+    "PropertyClear": {
+      "rva": 2568192,
+      "file_offset": 2565120
+    },
+    "CloneReference": {
+      "rva": 595280,
+      "file_offset": 592208
+    },
+    "PropertyAssign": {
+      "rva": 2565504,
+      "file_offset": 2562432
+    },
+    "ReferenceRelease": {
+      "rva": 596000,
+      "file_offset": 592928
+    },
+    "GeometryBind": {
+      "rva": 2516000,
+      "file_offset": 2512928
+    },
+    "GeometryBuild": {
+      "rva": 2560208,
+      "file_offset": 2557136
+    },
+    "MaterialCommit": {
+      "rva": 2575728,
+      "file_offset": 2572656
+    },
+    "MaterialSamplerInit": {
+      "rva": 2565504,
+      "file_offset": 2562432
+    },
+    "MeshUpdate": {
+      "rva": 2505376,
+      "file_offset": 2502304
+    },
+    "AnimationSubmit": {
+      "rva": 2500224,
+      "file_offset": 2497152
+    },
+    "AnimationFinish": {
+      "rva": 2500816,
+      "file_offset": 2497744
+    },
+    "TravelerSubmit": {
+      "rva": 1144720,
+      "file_offset": 1141648
+    },
+    "RenderConsume": {
+      "rva": 2954944,
+      "file_offset": 2951872
+    },
+    "RenderCull": {
+      "rva": 2954384,
+      "file_offset": 2951312
+    },
+    "GeometryDispatch": {
+      "rva": 3468928,
+      "file_offset": 3465856
+    },
+    "CommandBuild": {
+      "rva": 3467664,
+      "file_offset": 3464592
+    },
+    "RenderFlush": {
+      "rva": 3485152,
+      "file_offset": 3482080
+    },
+    "RenderHandoff": {
+      "rva": 3639312,
+      "file_offset": 3636240
+    },
+    "BaseFlush": {
+      "rva": 3482944,
+      "file_offset": 3479872
+    },
+    "BaseHandoff": {
+      "rva": 3638960,
+      "file_offset": 3635888
+    },
+    "CommandExecute": {
+      "rva": 3633328,
+      "file_offset": 3630256
+    },
+    "SavePoll": {
+      "rva": 1284272,
+      "file_offset": 1281200
+    },
+    "SaveLoad": {
+      "rva": 1279792,
+      "file_offset": 1276720
+    },
+    "SaveGame": {
+      "rva": 883712,
+      "file_offset": 880640
+    },
+    "ScriptExecute": {
+      "rva": 2533552,
+      "file_offset": 2530480
+    },
+    "CurrentLevelString": {
+      "rva": 894992,
+      "file_offset": 891920
+    },
+    "MaterialScalarLookup": {
+      "rva": 2570752,
+      "file_offset": 2567680
+    },
+    "MaterialVectorSet": {
+      "rva": 2568704,
+      "file_offset": 2565632
+    },
+    "MaterialTextureSet": {
+      "rva": 2569792,
+      "file_offset": 2566720
+    }
+  },
+  "artifacts": {
+    "JNET.dll": "2a68198bc60d73f1bb51ac84eed485479b9cca7ce90af301692b1b25c30630ea",
+    "JNET.exe": "0a0197f29f9aed725b9b9082131a1fed99cf77a8c57e6909465738c7956e360e",
+    "README.txt": "eeca58063d8f4c5b244c877bb8a99872497a1b3160036415f0c07320abdce0a2",
+    "JNETMenu.xme": "2b19001fcd7ba252676e2463ab25efe59e4d98b374aa2a05702e04993de121cd",
+    "JNETSpin3.D3D11x64": "5d4af83666f1377817948db9cc96c943b81182da043bf6e305bc5d2696d71b3f",
+    "JNETFlipL.D3D11x64": "ba05025abbe18ed2743be5efc6abb1aff945d9b5badad42fd0838368228609d2",
+    "JNETFlipR.D3D11x64": "8f295d1c36c1390ff4a9865bf6ebf31f54417d2280a1ad865a0b21ff99602e69",
+    "JNET_FlatFishFlip.D3D11x64": "35e20069e83257faf77a3f0d49abe3cbbb35946d311bd15f4f6864d6df84e5d5",
+    "JNET_FlatFishSwim.D3D11x64": "5f719daf6da627cf2112b96094c43af47afd2d7f73d897fcb6d39ce7df39a254",
+    "JNET_HeadBankL.D3D11x64": "2bbfcf3b62940a465ccfd11c1c9381ca90acd6e8741d943ec919bd700a208b3a",
+    "JNET_HeadSpin.D3D11x64": "f8060e9a8ce8a0052cc2b274e28a181c4580e6d488fa29750cf39cb0112009d7",
+    "JNET_NeckBankL.D3D11x64": "c841d3763ddb037166e5046bebf5448b02a3ea67077daeb0b9cc14cc912c74cf",
+    "JNET_NeckSpin.D3D11x64": "5b03dd3aa1e82aef40909e651dac10db279485978e43c428be3f0052ce0e2f18",
+    "JNET_TailBankL.D3D11x64": "7169861c732d0e36adf1e6d4c68bc42aad048f698081d6cc03ecda5c6aafc40f",
+    "JNET_TailSpin.D3D11x64": "f4b274897915f7455f9751beea39a28f90c5ca7712298a80e0ed6b82d38712b5",
+    "JNET_WingBankL.D3D11x64": "589859cb2a6f60e6999aeb14b1637eb87da214fd4da8fab279cb31b8ea2f0f81",
+    "JNET_WingSpin.D3D11x64": "e96a951b907d8a079910a406c15823dc020c821ea97730694bed107a440efe2c",
+    "JNETCharacter_P_ClothGuardianHead.D3D11x64": "f9e17bdcb6c55e0515c0566af7ad3bb18dab737e78b10dc49b67bef1c82bd236",
+    "JNETCharacter_P_ClothGuardianNeck.D3D11x64": "e209981535a5a798a8372ac799eb6980108dbaf7c1c8e9d94b607d457e0b765a",
+    "JNETCharacter_P_ClothGuardianTail.D3D11x64": "8816e1a43343de74ede5101fe8838fefbc6067b9deb5ef65983fea3d66ae85a9",
+    "JNETCharacter_P_ClothGuardianWing.D3D11x64": "f001138983e0ab4934857f23591ae4223cd0160865f00b4ed1782b228ec9275f",
+    "JNETCharacter_P_FishFlat_A_Test.D3D11x64": "8ce3831df900e7260115a0afa4584f76f685e9a27e831b81ba83e6f739f14c4e",
+    "JNETCharacter_P_FlowCreature_Body.D3D11x64": "0e4f8e957bbd635e198fa08d5560ccbfd61f67f827942e4d0256cd62427277ab",
+    "JNETCharacter_P_FlowCreature_Fins.D3D11x64": "ddc2b95ea37b1bf4a49263a7158a6708c13200950927a982fd34fc48861490c5",
+    "JNETCharacter_P_FlowCreature_Head.D3D11x64": "a8ead11f71fd31503327ebc8c1e9e2c4d3e48950a4607767391f4dbda0ad0b0a",
+    "JNETCharacter_P_FlowCreature_Tail.D3D11x64": "4b62f836bd9b0a3a87f4496984c4795af790f22c7f7a902fd50b2324b017de2c",
+    "JNETCharacter_P_FlowHunter_Body.D3D11x64": "9048a530189c0af6783e62b8ff8cd76677dc3aaf0f69c2a2927e7f06d1295e18",
+    "JNETCharacter_P_FlowHunter_Fins.D3D11x64": "dbc264f736258ca6578f31f1f55ef280b44fb671d062005c39156bf5a9e191d6",
+    "JNETCharacter_P_FlowHunter_FinsLarge.D3D11x64": "a8a544db34ac393a86f00644c599602addfc7744b3b3f7376f509c1b6d5f3b42",
+    "JNETCharacter_P_FlowHunter_Head.D3D11x64": "52d644a3aa87dd8601484007b8fe24bdf76789f74db422805cc70a319a7de30d",
+    "JNETCharacter_P_FlowHunter_Tail.D3D11x64": "9f59990c8d6453ec969f88d6e431331189810cbec200dd9f3eb0b4d91a8d3b6e",
+    "JNETCharacter_P_Guardian.D3D11x64": "dc9d8396ec22c1badb25b634d64a6132c19c6632bb15f598877c25c356074c67",
+    "JNETCharacter_P_GuardianWingL.D3D11x64": "e8dc7c9cff7700e09927b431a8b76f6cc3ef62e0c1484613027effb9ad536b86",
+    "JNETCharacter_P_GuardianWingR.D3D11x64": "3224993281ede5195738f518b558562a4ef4f8499a5ec86710087f9c7495e703",
+    "JNETCharacter_P_MechBodyCombined.D3D11x64": "d4ce0cc672384ec0a799eef0e120e0dd22ea77d969ab4a35aef9f1607409269b",
+    "JNETCharacter_P_MechHead.D3D11x64": "13cfd5497da931dbc04f7ed828c47ce03a057f8fc1822e8bdf992b29275e26a7",
+    "JNETCharacter_P_MechHeadEye.D3D11x64": "b6d3da54df60ef1dcadcdd12934b94045bd798ab7cae9727887986dadc4ba470",
+    "JNETCharacter_P_MechHeadFlaps.D3D11x64": "8a98bc8620bbde43176506a4be4d3f417f102898c4aa06ac522bfac07bdfa396",
+    "JNETCharacter_P_MechHeadGlowMask.D3D11x64": "6e27cadf44df89fa20c4336ddf8a546d5a5dd9824d8b833b4d93da3e3343250e",
+    "JNETCharacter_P_MechHeadGrate.D3D11x64": "029e7f94a724e1c1f796736a386f2a4f70d0b28fdd94dd7d58acba83afcd3efd",
+    "JNETCharacter_P_MechTail.D3D11x64": "9517f08174cfd0e2537f501f29b6886cea11e15ba7099628c132f9419686fc13",
+    "JNETCharacter_P_MechWing.D3D11x64": "d535037cba5521d8af7fc1712d0db1d8af09c22aa607ff95672208688f2c42fd"
+  }
+}

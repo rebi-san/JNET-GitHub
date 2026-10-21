@@ -1,0 +1,61 @@
+#include "Migratory.sh"
+// Notes:  Folds the blurred near DoF intensities into the original DoF
+//         intensity texture.  Flips the sign of near intensities so that all
+//         values go from 0 to 1.
+//
+// Author: John Edwards
+// Date C: 3-21-2011
+
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+#ifndef _IOS64
+
+struct v2f
+{
+	float4 position        VS_ATTR(POSITION);
+	float2 uv              VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+    float4 color           : FINAL_COLOR;
+};
+
+D_DECLARE_TEXTURE2D_4(texColor);
+D_DECLARE_TEXTURE2D_4(texNear);
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( v2f IN, out f2f OUT )
+//{
+
+
+FS_START(float4,
+    TEX2(
+        2D, texColor,
+        2D, texNear),)
+
+	float4 colorTap = tex2D( texColor, input.uv );
+
+	float avg = dot(colorTap,float4(1.0f,1.0f,1.0f,1.0f));
+	colorTap = isnan(avg) ? 0 : colorTap;
+
+	float nearTap = tex2D( texNear, input.uv ).a;
+
+	output.rgb = colorTap.rgb;
+	output.a = saturate( max( abs( colorTap.a ), nearTap ) );
+
+	// If we can assume there's always some small amount of DoF intensity,
+	// and we premultiply color by DoF intensity,  the MotionBlurDof shader
+	// can become significantly simpler.
+	output.a = saturate( 0.25 + 0.75 * output.a );
+	output.rgb *= output.a;
+
+SH_END()
+

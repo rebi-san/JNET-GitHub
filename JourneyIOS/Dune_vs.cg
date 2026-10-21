@@ -1,0 +1,98 @@
+#define GLOBAL_LEAN_AND_MEAN
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+// From Phyre:
+float4		eyePositionWS		: eyePositionWS	;
+float4x4	modelViewProj		: modelviewproj		;
+// From environment:
+float4 l_d;
+
+float4 dunecell_ll;
+float terrainScale;
+float dunecell_width;
+
+float4 texAoParams;
+
+// Point around which LOD drops:
+float4 focusPos;
+
+// Global dynamic sand texture params:
+float4 sandBias;
+float4 sandScale;
+// Strength of the sparkle mask needs to vary with FOV.
+float sparkleMaskMult;
+
+
+float noiseFadeScalar;//-0.02
+float noiseFadeBias;//1.5
+float F0spec;// = 0.01; // Skin is 0.028;
+float sandSpecScalar;// 1.f
+
+
+
+#endif
+
+
+
+// Input/output structs
+struct a2v
+{
+	float4 position VS_ATTR(POSITION);
+	float4 normal   VS_ATTR(NORMAL);
+};
+
+struct v2f
+{
+	float4 position FS_ATTR(POSITION);
+	float4 uv       FS_ATTR(TEXCOORD0); // xy: whole terrain, zw: terrain cell
+	HALF4  normalF  FS_ATTR(TEXCOORD1); // xyz: normal, w: normal detail fade
+	HALF4  eyeLd    FS_ATTR(TEXCOORD2); // xyz: eye, w: log(depth)
+	float3 sandSpec FS_ATTR(TEXCOORD3); // xy: sand uvs, z: specular mult
+	float4 worldPos FS_ATTR(TEXCOORD4);
+};
+
+
+// Program entry
+//void main( in a2v IN, out v2f OUT )
+//{
+
+VS_START()
+
+	float3 pos = input.position.xyz;
+
+	output.position = MatrixMul( GET_LOCAL(modelViewProj), float4( pos, 1.0 ) );
+	output.uv.xy = float2( 1 - (GET_LOCAL(terrainScale) * pos.x + 0.5) / 256.0, ( GET_LOCAL(terrainScale) * pos.z + 0.5 ) / 512.0 );
+	output.uv.zw = float2(( pos.xz - GET_LOCAL(dunecell_ll.xy) ) / GET_LOCAL(dunecell_width));
+
+	output.uv.zw *= GET_LOCAL(texAoParams.x);//127.0 / 128.0;
+	output.uv.zw += GET_LOCAL(texAoParams.y);//1.0 / 256.0;
+
+	output.eyeLd.xyz = HALF3(GET_GLOBAL(eyePositionWS.xyz) - pos);
+	output.eyeLd.w = 1.0 * GET_LOCAL(sparkleMaskMult) * log( length( output.eyeLd.xyz ) );
+	//output.eyeLd.w = 0.165 * log( length( output.eyeLd.xyz ) );
+	output.normalF.xyz = (HALF3)normalize(input.normal.xyz);
+	half noiseFade = saturate( GET_LOCAL(noiseFadeBias) + length( output.eyeLd.xyz ) * GET_LOCAL(noiseFadeScalar) );
+	output.normalF.w = noiseFade;
+
+	output.worldPos.xyz = input.position.xyz;
+
+#ifdef DETAIL
+	output.sandSpec.xy = ((float2( pos.x, pos.z ) + GET_LOCAL(sandBias.xy)) * GET_LOCAL(sandScale.xy));
+    float focusDist = length( GET_LOCAL(focusPos.xz) - pos.xz ); (void)focusDist;
+
+	// Calculate Fresnel.
+	half3 Ln = (half3)normalize( GET_GLOBAL(l_d.xyz) );
+	half3 Vn = (half3)normalize( output.eyeLd.xyz );
+	half3 Hn = (half3)normalize( Vn + Ln );
+	float base = ( 1.0 - saturate(dot( Vn, Hn )) );
+	float exponential = pow( base, 5.0 );
+	float fresnelSpec = exponential + GET_LOCAL(F0spec) * (1.0 - exponential);
+	output.sandSpec.z = noiseFade * fresnelSpec * GET_LOCAL(sandSpecScalar);
+#else
+	output.sandSpec.xyz = float3(0,0,0);
+#endif
+
+SH_END()
+

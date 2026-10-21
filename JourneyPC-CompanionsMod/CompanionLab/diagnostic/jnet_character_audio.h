@@ -24,6 +24,7 @@ static inline unsigned jnet_character_chirp_variant(unsigned kind,unsigned seque
     if(kind==1)return (charge==4?14:12)+(sequence%2);
     if(kind==2){static const unsigned sounds[]={16,17,19,20};return sounds[sequence%4];}
     if(kind==3)return 18;
+    if(kind==5 || kind==6)return 21+sequence%2;
     return 0;
 }
 #endif

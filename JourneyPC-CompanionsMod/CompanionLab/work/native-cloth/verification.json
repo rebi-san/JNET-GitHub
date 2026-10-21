@@ -1,0 +1,31 @@
+{
+  "journey_sha256": "16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f",
+  "game_runtime_tested": false,
+  "native_cloth_workers_executed": true,
+  "native_indexed_draw_functions_executed": true,
+  "gpu_executed": false,
+  "native_command_builder_and_vertex_binding_executed": true,
+  "native_publication_attribution_and_stream_redirection_executed": true,
+  "native_cloth_finalizer_executed": true,
+  "native_appearance_uniform_setters_executed": true,
+  "native_atlas_subscriber_bind_unlink_executed": true,
+  "native_texture_binding_setter_executed": true,
+  "native_occlusion_cube_empty_scene_executed": true,
+  "native_occlusion_cube_convex_fixture_executed": true,
+  "native_cube_configuration_and_occluder_copy_executed": true,
+  "production_probe_pipeline_executed": true,
+  "probe_factory_query_and_gpu_services": "intercepted; no live GPU validation",
+  "runtime_services": "fixture memory, allocation, resource factory, spatial query, GPU mapping and stack-probe services",
+  "output": "Native atlas subscribers: original bind/rebind/unlink and destructor, repeated binding and all six three-holder retirement orders preserve neighbors; no texture loading or GPU lifetime claim\nNative appearance routing: original vector/matrix setters and scalar lookup write two private destinations, preserve stock buffers; name-table service intercepted, no texture/GPU runtime\nNative texture bindings: original named setter, lookup and three texture-kind writes; four robe/six scarf bindings, owner/handle/index and repeated assignment verified; pointer copies do not retain textures, no GPU\nNative environment cube: original lookup initialization, six tight and twelve pitched jobs; three origins produce distinct six-face 8x8 outputs; row/face padding, source and guards preserved; GPU textures and live world capture/scheduling not exercised\nNative environment configuration: original cube size/format, mip and ring setters; two private identities, native sampler bytes, preserved stock, immutable texture and GPU-error refusal; allocation/sampler services intercepted, no GPU\nEnvironment owner pipeline: production creation/query/private-copy/map/native-job/unmap/retirement, two identities, lease refusals, malformed/cyclic query refusal before mapping, retry and balanced native refcounts; resource factory, spatial query and GPU services intercepted, no live GPU\nNative indexed draw: 24 original calls delivered participant byte offsets/counts and selected ring handles unchanged; ordinary/instanced paths; graphics API intercepted, no GPU execution\nNative staging: 45 original builder calls / 332 commands and 36 original vertex bindings; selected private buffer, stride60, semantic offsets, stock-compatible base, preserved source bindings, full 37-draw stage and rejected pass/stride/capacity bounds; no GPU\nNative publication: 25 original builder calls, 81 commands; copied state, instancing, multi-pass ranges and changed-byte/batch/duplicate rejection; distinct model dispatch with shared shader; native model reference release and queue append/reuse/capacity checks; private stream redirection preserves native constants and reservation/fence\nProduction cloth finish: real worker/seal/commit/native finalizer, all five failure stages and pending-job polling preserve native completion and first failure\nNative cloth finalizer: pending job, pass0/pass1 mapping and dependency order, ring advancement, empty-stock triangle, cleared outputs and ignored rotation errors verified against original code; buffer services intercepted, no GPU\nIntegrated cloth frames: 64 complete cycles, 384 native worker calls and 256 native indexed draws, distinct sender material identities, delayed worker/render completion and balanced fixture resource leases; native resource backend and GPU not executed\nNative cloth: 2534 original worker calls; both implementations, stock plus two recipients, robe/scarf roles, subdivision, hidden jobs, shuffled routing, 12 concurrent workers, exact vertex/index equivalence and untouched padding passed; no GPU or Journey runtime",
+  "sources": {
+    "native_environment_probe.h": "8595103220522adaa3cac8060155179da9d63d5f1b75e81e44dc71349a4a898e",
+    "native_cloth_material_live.h": "aa5ad70c9739690329dc68827a269020e583674cd4ffea6f359f884503e0839d",
+    "native_cloth_commands.h": "4abe4084c14398236eefdc4b9c68a6f4d4de9bac977ff9dc9eb053679ab0f088",
+    "native_cloth_publication.h": "ae0524895a78698a03a26da67be8407c38ae1dc1890759d6d3b35ab4a26ef14d",
+    "native_cloth_partition.h": "aa0cc788b6501f69f30bf602c23bd5f40313d44f9fc66dfd43a932f904777118",
+    "native_cloth_draw.h": "02e6f17e3920090d5d45311154e7a4ecbbb5441696a51f13dc45e8cc62ab2245",
+    "native_cloth_frame.h": "7d19e57963721e0a7d39b43c69827356d0588e440412424ba395500877a09bd0",
+    "test_native_cloth_engine.c": "30a2955850fb50526244dd7138f89563a99b979cdc862b7f0cf9112ad64f7b92",
+    "check_native_cloth.py": "db218a5153a7bb0b3bfb6ac97776a9ce2a736867d0bd40429a70edc0dff1686b"
+  }
+}

@@ -39,6 +39,12 @@ int main(void){
         assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,0));assert(!pool[0x10+0x94]);
         assert(jc_scarf_growth_stop(read_memory,write_memory,NULL,&g));
     }
+    position[3]=NAN;memcpy(actor+0x2290,position,16);
+    assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,6.4224e-06f));
+    assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,1.78814e-07f));
+    assert(!pool[0x10+0x94]);
+    assert(!jc_scarf_growth_step(read_memory,write_memory,NULL,&g,.9f));
+    position[3]=1;memcpy(actor+0x2290,position,16);
     assert(!jc_scarf_growth_step(read_memory,write_memory,NULL,&g,NAN));
     g.active=1;put(g.native,0x18,2);assert(jc_scarf_growth_stop(read_memory,write_memory,NULL,&g));assert(stops==1);
     _Alignas(16) unsigned char first[32],second[32];

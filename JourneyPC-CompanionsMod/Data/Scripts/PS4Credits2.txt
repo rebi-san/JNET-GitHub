@@ -1,0 +1,880 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$b Senior Producer					
+$b Chad Cox
+
+$b Creative Director					
+$b Nathan Gary
+
+
+
+
+
+
+
+$b Director of Technology					
+$b Jim Tilander
+
+$b Senior Vice President, Worldwide Studios America					
+$b Scott Rohde
+
+
+
+
+
+
+
+
+
+
+
+
+
+$b Sr. Quality Assurance Tester					
+$b Jarred Pellegrini
+
+
+
+
+
+$b Lead Quality Assurance Testers, TRC Test Team					
+$b Chris Biggin, Matt Morgan, Jason Ragatz	
+
+
+
+
+
+
+
+
+
+
+$b Lead Network Test Engineer					
+$b Paul Flannigan	
+
+
+
+
+
+
+$b Compliance Manager					
+$b Ian Jones
+
+$b Release Operative					
+$b Mylene Aslarona	
+
+
+
+
+
+
+$b Senior Software Engineer					
+$b Carlo Vogelsang
+
+
+
+
+
+
+
+$b Music Editor					
+$b Scott Shoemaker	
+
+
+
+$b Senior Audio Engineer					
+$b Chris Canning
+
+
+
+
+
+$b Regional Marketing Administrative Assistant					
+$b Sugeily Benitez
+
+$b Regional Trade Marketing Manager					
+$b Irma Sandoval
+
+
+$b Marketing Manager - Brazil					
+$b Pedro Caramuru	
+
+$b Regional Brand Marketing Manager					
+$b Jaime Casis	
+
+$b Regional Events Project Manager					
+$b Sue Aguilar			
+			
+$b Regional Public Relations and Social Media Associate Manager					
+$b Lorenzo Grajales	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$b Executive Producer					
+$b Elodie Hummel	
+
+$b Senior Project Manager, Localisation Services					
+$b Gunnar Hojem
+
+
+
+
+
+
+
+$b Release Operative					
+$b Mark Rice
+
+
+
+
+
+
+
+
+$b Test Manager					
+$b Gareth Tynan
+
+$b TRC Test Lead					
+$b Gary Jones
+
+$b TRC Testers					
+$b Kenneth Jaggar, Alex Trusty	
+
+
+
+
+
+
+
+
+
+$b Test Coordinators
+$b Seamus Blakeway, Nathan James, Paul Henderson
+
+
+
+
+$b Associate Manager, Support Services
+$b Neil Moran
+
+$b Principal Support Operatives
+$b Christian Hopley, Michael Bishop
+
+$b Support Operatives
+$b Matthew Phillips, Steven Weir
+
+$b Senior Supplier Coordinator
+$b Natalia Craddock
+
+
+
+
+$b PR Manager					
+$b Sasiprapa Charlanawat
+
+$b Designers					
+$b Umesh Mistry, Andy Hope
+
+
+
+
+
+
+
+
+
+
+
+
+$b Producer					
+$b Niina Taniguchi
+
+$b Director of Localisation					
+$b Jonah Masaru Nagai		
+
+
+
+$b Senior QA Manager					
+$b Yuichi Imai	
+
+$b QA Engineer					
+$b Koji Takano
+
+$b Function Test Tester					
+$b Makoto Hayashi
+
+
+
+
+$b Visual Coordinators					
+$b Hironori Komiya, Yasuko Nii, Sei Kokubu	
+
+
+
+
+
+
+
+$b Marketing and Communication Dept.
+$b Yoshinori Matsumoto, Seigo Sugai, Yui Miura
+
+
+
+
+
+
+
+
+
+
+
+
+$b Director					
+$b Satoshi Komuro 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$b Marketing Coordinators					
+$b Masafumi Chiba, Arata Naito
+
+
+
+
+
+
+
+$b Assistant Producers					
+$b Edmund Zoo (SCEK), Jae-Wook Ha (SCEK)	
+
+$b Quality Assurance Assistant Manager					
+$b Sung-Min Kim (SCEK)
+
+
+
+
+
+
+
+
+$b QA Coordinator					
+$b Yoon-Sun Choi (SCEK)
+
+$b Marketing Coordinator					
+$b Seong-Ok Jeon
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

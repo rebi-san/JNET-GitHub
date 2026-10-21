@@ -1,12 +1,16 @@
 # JNET (Journet)
 
-Current source version: **0.283**. The build produces `work/JNET-0.283.zip`, which extracts into `JNET/`. Release ZIPs are excluded from this source repository.
+Current release: **0.286**. Distribute `work/JNET-0.286.zip`; it extracts into `JNET/`.
 
-0.283 allows a previously JNET-owned native companion slot to resume after a receiver reset when storage, ownership, chapter and gate checks pass. Vanilla connection guards remain enabled. Successful state publication clears stale result 124 when no ownership guard failure is present. Focused receiver and menu checks passed; live multiplayer recovery remains unverified.
+0.286 leaves the Steam lobby and cancels pending group travel when Quit to Title is confirmed, then preserves Journey's original menu action. Cancelling the confirmation leaves the lobby unchanged. Native title-screen playback remains unverified.
+
+0.285 adds a remappable creature-only Sprint action to every Controls input page (hold for 2x movement; defaults: Shift and left-stick click). Whale and War Machine base speed is 8.28, up 20 percent from 6.9; sprint speed is 16.56. Longtail and both fl0w creatures sprint at 21.6.
+
+0.285 restores the Ruins riding multipliers (alignment, magnetism and pull: 1; Longtail cloth attraction: 1). fl0w 1 uses FlowSnakeCall and fl0w 2 uses FlowHunterCall through a persistent Ruins bank. All players require 0.285 (protocol 17). Live audibility and riding stability remain unverified.
+
+0.284 corrects a retained-receiver admission deadlock after chapter progression: a validated incoming current-chapter sample can replace the old native receiver chapter only when JNET ownership, initialized storage and inactive-departure checks pass. Unknown ownership and vanilla connection guards remain enforced. Native Chapter Select requests preserve their entry mode for guests waiting at the start menu; New Journey retains its separate entry mode. Waiting receiver gates are checked before consuming incoming stream state. Session logs retain recent entries after capacity is reached, with bounded nonwaiting access and additional receiver reset/ownership diagnostics. fl0w 1 and fl0w 2 use Longtail's camera distance multiplier. All five creature types now use the validated native head position for outgoing chirps, which is also transmitted to peers; unavailable head data retains the native origin. Focused receiver regressions, concurrent log rollover tests and menu/character checks pass; live recovery remains unverified.
 
 ## Historical release notes
-
-The version numbers below describe earlier changes, not the current source version.
 
 0.276 replaces the 0.275 custom rider-position code with native Journey events: CreaB_WhaleRide for multi-segment playable creatures and ProtoClothMagnetize for Longtail's cloth mesh. These are the native riding and cloth-attraction mechanisms used in Level_Ruins. Only a local Wayfarer can ride an admitted, fresh remote creature; Rocket Deathmatch is excluded. Native attraction/pull multipliers are increased to 2; carrying strength and online behavior still require live validation. Native LinkEnable, Link and LinkGlitter emitters remain suppressed for creature avatars without changing recharge state. Original level assets and environmental event definitions are unchanged.
 

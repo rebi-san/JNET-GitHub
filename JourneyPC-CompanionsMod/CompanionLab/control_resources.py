@@ -1,4 +1,5 @@
 """Extend the pinned PC menu while retaining its native mapping widgets."""
+import copy
 import struct
 import hashlib
 import xml.etree.ElementTree as ET
@@ -33,12 +34,32 @@ def menu_bytes():
              'None;D-Pad Up;D-Pad Down;D-Pad Left;D-Pad Right;Start;Back;Left Stick;Right Stick;LB;RB;A;B;X;Y;LT;RT']
     for branch,device in [('Keyboard',0),('Mouse',1),('Pad/DualShock',2),('Pad/Input',2)]:
         parent=controls.find(branch)
-        parent.find('Chime').set('Text','Chirp')
-        fly=parent.find('Fly')
-        at=list(parent).index(fly)+1
-        for offset,(action,label) in enumerate(((0,'Crouch'),(4,'Frontflip'),(1,'Backflip'),(5,'SideflipL'),(6,'SideflipR'),(2,'Spin'),(3,'Spotlight'))):
-            row=ET.Element('JNETAction'+str(action),Text=label,Options=(options[device].replace("LB","L1").replace("RB","R1").replace(";A;B;X;Y;LT;RT",";Cross;Circle;Square;Triangle;L2;R2") if branch=="Pad/DualShock" else options[device]),Setting=f'%JNET_BIND_{device}_{action}%')
-            parent.insert(at+offset,row)
+        native={name:copy.deepcopy(parent.find(name) if parent.find(name) is not None else controls.find('Pad/'+name)) for name in ('Move','Look','Chime','Fly')}
+        for name in native:
+            if parent.find(name) is not None:parent.remove(parent.find(name))
+        selector=ET.Element('JNETCharacter',Text='Character',Options='Wayfarer;Longtail;Whale;War Machine;fl0w',Setting='%JNET_CONTROL_CHARACTER%')
+        parent.insert(0,selector)
+        for index,kind in enumerate((0,1,3,2,5)):
+            group=ET.SubElement(selector,'Character'+str(kind),Flags=f'Show.Never;Traverse.IfSelected.{index}')
+            for name in ('Move','Look','Chime'):
+                row=copy.deepcopy(native[name])
+                if name=='Chime':row.set('Text','Chirp')
+                group.append(row)
+            if kind==0:
+                group.append(copy.deepcopy(native['Fly']))
+                actions=((0,'Crouch'),(4,'Frontflip'),(1,'Backflip'),(5,'SideflipL'),(6,'SideflipR'),(2,'Spin'))
+            else:
+                actions=[(0,'Fly Up'),(1,'Fly Down'),(2,'Level')]
+                if kind in (2,3):actions.extend(((3,'TiltL'),(4,'TiltR')))
+                if kind==2:actions.append((5,'Spotlight'))
+                if kind==1:actions.append((5,'Grab'))
+                actions.append((6,'Sprint'))
+            for action,label in actions:
+                setting=f'%JNET_BIND_{device}_{action}%' if kind==0 else f'%JNET_CREATURE_{kind}_{device}_{action}%'
+                choices=options[device]
+                if branch=='Pad/DualShock':choices=choices.replace('LB','L1').replace('RB','R1').replace(';A;B;X;Y;LT;RT',';Cross;Circle;Square;Triangle;L2;R2')
+                ET.SubElement(group,'JNETAction'+str(action),Text=label,Options=choices,Setting=setting)
+    for name in ('Move','Look'):controls.find('Pad').remove(controls.find('Pad/'+name))
     plain=ET.tostring(root,encoding='utf-8',xml_declaration=True)+b'\0'
     plain+=b'\0'*(-len(plain)%4)
     key=0x6341f337

@@ -1,0 +1,2322 @@
+{
+  "exe_sha256": "16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f",
+  "architecture": "PE32+ x86-64",
+  "known_static_fingerprint": true,
+  "runtime_compatibility": "UNVERIFIED",
+  "sections": [
+    {
+      "name": ".text",
+      "rva": 4096,
+      "raw_offset": 1024,
+      "raw_size": 5578752,
+      "virtual_size": 5578604,
+      "executable": true
+    },
+    {
+      "name": ".rdata",
+      "rva": 5582848,
+      "raw_offset": 5579776,
+      "raw_size": 1921536,
+      "virtual_size": 1921042,
+      "executable": false
+    },
+    {
+      "name": ".data",
+      "rva": 7507968,
+      "raw_offset": 7501312,
+      "raw_size": 51165696,
+      "virtual_size": 137055588,
+      "executable": false
+    },
+    {
+      "name": ".pdata",
+      "rva": 144564224,
+      "raw_offset": 58667008,
+      "raw_size": 264704,
+      "virtual_size": 264204,
+      "executable": false
+    },
+    {
+      "name": "_RDATA",
+      "rva": 144830464,
+      "raw_offset": 58931712,
+      "raw_size": 42496,
+      "virtual_size": 42032,
+      "executable": false
+    },
+    {
+      "name": ".rsrc",
+      "rva": 144875520,
+      "raw_offset": 58974208,
+      "raw_size": 737792,
+      "virtual_size": 737384,
+      "executable": false
+    },
+    {
+      "name": ".bind",
+      "rva": 145616896,
+      "raw_offset": 59712000,
+      "raw_size": 206032,
+      "virtual_size": 206032,
+      "executable": true
+    }
+  ],
+  "signatures": [
+    {
+      "symbol": "Render__Something",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 115,
+      "hits": [
+        {
+          "file_offset": 2584176,
+          "rva": 2587248
+        }
+      ]
+    },
+    {
+      "symbol": "Render__AddQuadPass",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 127,
+      "hits": [
+        {
+          "file_offset": 2592576,
+          "rva": 2595648
+        }
+      ]
+    },
+    {
+      "symbol": "SteamJourneySetup",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 141,
+      "hits": [
+        {
+          "file_offset": 2805920,
+          "rva": 2808992
+        }
+      ]
+    },
+    {
+      "symbol": "PlayerShout",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 151,
+      "hits": [
+        {
+          "file_offset": 2414224,
+          "rva": 2417296
+        }
+      ]
+    },
+    {
+      "symbol": "DoShoutImpl",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 164,
+      "hits": [
+        {
+          "file_offset": 1306544,
+          "rva": 1309616
+        }
+      ]
+    },
+    {
+      "symbol": "luaC_AddDecoration",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 171,
+      "hits": [
+        {
+          "file_offset": 650704,
+          "rva": 653776
+        }
+      ]
+    },
+    {
+      "symbol": "LoadDecorations",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 185,
+      "hits": [
+        {
+          "file_offset": 648576,
+          "rva": 651648
+        }
+      ]
+    },
+    {
+      "symbol": "LoadEmbeddedLuaFile",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 220,
+      "hits": [
+        {
+          "file_offset": 985008,
+          "rva": 988080
+        }
+      ]
+    },
+    {
+      "symbol": "GameUpdate",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 241,
+      "hits": [
+        {
+          "file_offset": 893248,
+          "rva": 896320
+        }
+      ]
+    },
+    {
+      "symbol": "lua_newstate",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 254,
+      "hits": [
+        {
+          "file_offset": 3270832,
+          "rva": 3273904
+        }
+      ]
+    },
+    {
+      "symbol": "DebugLog",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 259,
+      "hits": [
+        {
+          "file_offset": 3237280,
+          "rva": 3240352
+        }
+      ]
+    },
+    {
+      "symbol": "InputRelated",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 266,
+      "hits": [
+        {
+          "file_offset": 2654896,
+          "rva": 2657968
+        }
+      ]
+    },
+    {
+      "symbol": "luaB_print",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 273,
+      "hits": [
+        {
+          "file_offset": 3351616,
+          "rva": 3354688
+        }
+      ]
+    },
+    {
+      "symbol": "OnLobbyChat",
+      "source": "journey_detour-main/journey_detour_v4/game.cpp",
+      "line": 308,
+      "hits": [
+        {
+          "file_offset": 2825536,
+          "rva": 2828608
+        }
+      ]
+    },
+    {
+      "symbol": "Matchmaker_GetPartnerName",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 72,
+      "hits": [
+        {
+          "file_offset": 1046528,
+          "rva": 1049600
+        }
+      ]
+    },
+    {
+      "symbol": "Matchmaker_JoinRoomFromId",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 76,
+      "hits": [
+        {
+          "file_offset": 1044608,
+          "rva": 1047680
+        }
+      ]
+    },
+    {
+      "symbol": "GetSteamMatchmakingInterface",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 81,
+      "hits": [
+        {
+          "file_offset": 1049376,
+          "rva": 1052448
+        }
+      ]
+    },
+    {
+      "symbol": "GetSteamFriendsInterface",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 82,
+      "hits": [
+        {
+          "file_offset": 615776,
+          "rva": 618848
+        }
+      ]
+    },
+    {
+      "symbol": "lua_settop",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 97,
+      "hits": [
+        {
+          "file_offset": 3252960,
+          "rva": 3256032
+        }
+      ]
+    },
+    {
+      "symbol": "luaL_loadstring",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 102,
+      "hits": [
+        {
+          "file_offset": 3266128,
+          "rva": 3269200
+        }
+      ]
+    },
+    {
+      "symbol": "luaL_loadbufferx",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 105,
+      "hits": [
+        {
+          "file_offset": 3266064,
+          "rva": 3269136
+        }
+      ]
+    },
+    {
+      "symbol": "lua_pushcclosure",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 109,
+      "hits": [
+        {
+          "file_offset": 3255584,
+          "rva": 3258656
+        }
+      ]
+    },
+    {
+      "symbol": "lua_pushinteger",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 115,
+      "hits": [
+        {
+          "file_offset": 3255184,
+          "rva": 3258256
+        }
+      ]
+    },
+    {
+      "symbol": "luaL_checknumber",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 120,
+      "hits": [
+        {
+          "file_offset": 3262752,
+          "rva": 3265824
+        }
+      ]
+    },
+    {
+      "symbol": "lua_type",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 123,
+      "hits": [
+        {
+          "file_offset": 3253888,
+          "rva": 3256960
+        }
+      ]
+    },
+    {
+      "symbol": "lua_gettable",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 126,
+      "hits": [
+        {
+          "file_offset": 3255952,
+          "rva": 3259024
+        }
+      ]
+    },
+    {
+      "symbol": "lua_tolstring",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 131,
+      "hits": [
+        {
+          "file_offset": 3254192,
+          "rva": 3257264
+        }
+      ]
+    },
+    {
+      "symbol": "lua_rawlen",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 137,
+      "hits": [
+        {
+          "file_offset": 3254368,
+          "rva": 3257440
+        }
+      ]
+    },
+    {
+      "symbol": "lua_tonumberx",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 140,
+      "hits": [
+        {
+          "file_offset": 3253968,
+          "rva": 3257040
+        }
+      ]
+    },
+    {
+      "symbol": "lua_callk",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 145,
+      "hits": [
+        {
+          "file_offset": 3258176,
+          "rva": 3261248
+        }
+      ]
+    },
+    {
+      "symbol": "lua_pcallk",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 149,
+      "hits": [
+        {
+          "file_offset": 3258320,
+          "rva": 3261392
+        }
+      ]
+    },
+    {
+      "symbol": "lua_gettop",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 154,
+      "hits": [
+        {
+          "file_offset": 3252928,
+          "rva": 3256000
+        }
+      ]
+    },
+    {
+      "symbol": "lua_pushvalue",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 156,
+      "hits": [
+        {
+          "file_offset": 3253040,
+          "rva": 3256112
+        }
+      ]
+    },
+    {
+      "symbol": "lua_getglobal",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 159,
+      "hits": [
+        {
+          "file_offset": 3255888,
+          "rva": 3258960
+        }
+      ]
+    },
+    {
+      "symbol": "lua_setglobal",
+      "source": "journey_detour-main/journey_detour_v4/game.h",
+      "line": 166,
+      "hits": [
+        {
+          "file_offset": 3256944,
+          "rva": 3260016
+        }
+      ]
+    },
+    {
+      "symbol": "JoinLobbyFunc",
+      "source": "journey_detour-main/journey_detour_v4/steamapi.cpp",
+      "line": 8,
+      "hits": [
+        {
+          "file_offset": 2811520,
+          "rva": 2814592
+        }
+      ]
+    },
+    {
+      "symbol": "OnLobbyEnterCallback",
+      "source": "journey_detour-main/journey_detour_v4/steamapi.cpp",
+      "line": 12,
+      "hits": [
+        {
+          "file_offset": 2818528,
+          "rva": 2821600
+        }
+      ]
+    },
+    {
+      "symbol": "OnPlayerJoinEvent",
+      "source": "journey_detour-main/journey_detour_v4/steamapi.cpp",
+      "line": 24,
+      "hits": [
+        {
+          "file_offset": 1396272,
+          "rva": 1399344
+        }
+      ]
+    },
+    {
+      "symbol": "ConnectionBarn__DialOut",
+      "source": "journey_detour-main/journey_detour_v4/steamapi.h",
+      "line": 58,
+      "hits": [
+        {
+          "file_offset": 606384,
+          "rva": 609456
+        }
+      ]
+    }
+  ],
+  "libraries": {
+    "fmod64.dll": "8e5ec483da986ced5bb229426cf21746824f12123e1a34388083a48ca52f9943",
+    "libScePad.dll": "7d9a71a8a51bd6e81b6fb7835fea2c20e4f8f9e331ff26dd8ac09692ceb33de8",
+    "steam_api64.dll": "38f6a1dd1e738e142160322638dae7b88dabcc30eea3f15c58eb08c5341f9b29"
+  },
+  "working_exe_matches": true,
+  "counts": {
+    "JourneyPC": {
+      ".xme": 3,
+      ".dll": 3,
+      "": 1,
+      ".txt": 5,
+      ".vdf": 1,
+      ".exe": 1,
+      ".fnt": 1,
+      ".dds": 317,
+      ".gz": 320,
+      ".p64": 1,
+      ".streams": 19,
+      ".bnk": 20,
+      ".d3d11x64": 1351,
+      ".lua": 1,
+      ".fx": 238,
+      ".png": 1,
+      ".bin": 36,
+      ".ogg": 572,
+      ".xmp": 2,
+      ".mid": 92,
+      ".ini": 1
+    },
+    "JourneyIOS": {
+      ".cg": 76,
+      ".metallib": 1,
+      "": 5,
+      ".inl": 1,
+      ".png": 6,
+      ".cgfx": 1,
+      ".car": 1,
+      ".sh": 2,
+      ".fx": 1,
+      ".mobileprovision": 1,
+      ".cgbin": 1,
+      ".plist": 5,
+      ".strings": 2,
+      ".supp": 1,
+      ".supx": 1,
+      ".sinf": 1,
+      ".supf": 1,
+      ".xml": 3,
+      ".fnt": 1,
+      ".dds": 58,
+      ".pvr": 109,
+      ".lua": 335,
+      ".gz": 1221,
+      ".pssg": 3,
+      ".streams": 19,
+      ".bnk": 19,
+      ".txt": 2,
+      ".bin": 70,
+      ".cpt": 1,
+      ".ogg": 392,
+      ".mid": 92,
+      ".pdf": 1,
+      ".ini": 1,
+      ".mp3": 5,
+      ".nib": 4
+    }
+  },
+  "scripts": [
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "01a418a47ad3f58c59f09ee8b52e72a1a2f53f4c72d84433744004ac96ad19fd",
+      "decoded_sha256": "a1a65d09364fb297d1e9e8bc331fe8f58426a3e8e1767d2a84fe348615a27540",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__ClumpInstances.lua.gz",
+      "sha256": "285c006dcf73ab07d5c7ed513505b3f7426fbdc9b6ecac972a171d3e438b2e8a",
+      "decoded_sha256": "bf7487b42c255c25944fcd76643bcf027cc1fede493af3f517c03fe57dd44378",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__DynamicNodeInstances.lua.gz",
+      "sha256": "2d1f725a2c133f278eab20d9393d7357e0fa8bee2e71800954b0fd4c42eab13e",
+      "decoded_sha256": "594a86302c6281b595caed77e84bcdd5ad0fb1061328fcf285a7595d1512b4b5",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__EnvNodeInstances.lua.gz",
+      "sha256": "7f18ed13b533b6062437fc20a6a395933ca350c7b417984ea809840589bac73c",
+      "decoded_sha256": "3b8cb4fdb423dfb56b83164d6b8d72a7aa790c14c3c338ada84774da8a9dff82",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__JetInstances.lua.gz",
+      "sha256": "7bb29266ca922e6996277c5045b07e88d8578746f09b6d2e3787882b739f66e4",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__MarkerInstances.lua.gz",
+      "sha256": "47e9505532431fe4b44d10bb3793c95734632ddfe93f1dd9c00c75b470269b13",
+      "decoded_sha256": "2e8cc207617f5de24e982d095998e163fb7161dc5afc11f5fef0030498bee5f9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__ParticleEmitterInstances.lua.gz",
+      "sha256": "f8854a89325fe29a50d7167c88aaa74641e20b2e28e9503922a813d693892d91",
+      "decoded_sha256": "c6ca101af33f8c1d11e98d04d7573bd3e26aa569f2dd3c3408256c6e1e14ce99",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__RailInstances.lua.gz",
+      "sha256": "0366147814a98e3004cfe6148c75c800f36827319cdfe26dcc8c64e1609cbfee",
+      "decoded_sha256": "99a5e6d2094a7093ad97a3eb31249eeb9d1c264540ab1821e119bf5e4d185a68",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__SignData.lua.gz",
+      "sha256": "24d77e8300330d4c5dd653e88a8fb04c091f80eaa1ccd9050b400e800cb5777a",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__SignInstances.lua.gz",
+      "sha256": "8e29afac8dd9a6038c816032871970778813ef731e221a1dfc72f0bc2aaf3014",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__SoundEmitterInstances.lua.gz",
+      "sha256": "0373d62a4d159c0979225c3109bbbf65db22aabb41cdd51d3d85bbceb22f6d1b",
+      "decoded_sha256": "fc5acdf609639c27abbb6338176b5d7a7e21acc6131614f9e17a14e8834e465f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__StartLocation.lua.gz",
+      "sha256": "7f7f6b3d002c5c9c2ae1c9499a1d8e29c9af673fa99a85e372746a2e6dba5f41",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__TimelineInstances.lua.gz",
+      "sha256": "4785568174514fdbfabfaaa06b7daf562848cd0db03d68fb525d1499f860fed2",
+      "decoded_sha256": "8719347bdde900d983781adb4e7ee52f3e25934d402b406912e08ceb43f3bc1d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Barrens/__TriggerInstances.lua.gz",
+      "sha256": "83eaa17213b3da2040431908ead5126a9058e2896b528b8805b2fb2a3a566ddd",
+      "decoded_sha256": "167de03f1c2664b096c50f73649d2a8af539c1198a3ceb46628d6b4313da7fee",
+      "ios_equal_normalized": false,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "fe577066ba16059a64318e05fac7946d86b67709ac2c7e32c3c842e58cca8f3a",
+      "decoded_sha256": "b2f6524af646d0a0b5bf9cfe4a7759392d6a38d16debf5c8d96307a0ad91d55b",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__ClumpInstances.lua.gz",
+      "sha256": "65573e9fe4d85d92057264e5a13bbb5bde33ffc6b5ff7a099b36cb286075093f",
+      "decoded_sha256": "89f7fb78fb8f366d7ed480532dcb70579f459c79d4c14bfa258727a5349c0b4f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__DynamicNodeInstances.lua.gz",
+      "sha256": "0c887279797c5eb56f4bf8ee4a89df11aa9324dc3739821cfcbd39b1077e0a72",
+      "decoded_sha256": "ac33b4e5ba15634f937e15eae444ab9beeb53fccec2d510b41bdb9d30ece4855",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__EnvNodeInstances.lua.gz",
+      "sha256": "6d5be9ded49b53ce8c1bdb5281d0dec029fa34b38ff5fae3e0cedb71966f5f9f",
+      "decoded_sha256": "3eba9af0893c8f826016a564843a1e1d920694178e1e83994c1b20fdb3cb2c65",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__JetInstances.lua.gz",
+      "sha256": "a55a43fd5bf2a26acb4851c502a365f3a6ae225bba6555a673d75af1ccf6015f",
+      "decoded_sha256": "59b52199086daf126bfc55f9f774f8b98d69e22a565680e607afaa36a959eaf3",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__MarkerInstances.lua.gz",
+      "sha256": "d11e42226d6d6f2eae7c135bb5e241c69ce9b3e4235d947c36205294a62f3431",
+      "decoded_sha256": "9cbc34dc20d8bbfd4209770e2e849aa995001ad6c78d4de5b3530a1bccdb8ade",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__ParticleEmitterInstances.lua.gz",
+      "sha256": "6bcc6103c5414ba25d739a73be87807ff037cad6ef10523aee46a6818e55af3b",
+      "decoded_sha256": "3fbde19e4550b7b7e8e6cc2ef9ef0644fd43fb6e5de716574813fb2498683182",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__RailInstances.lua.gz",
+      "sha256": "d31b4323bb0a0bd22de3313beab41af8c2df4fd194e3d56c5b09aabfa88f7981",
+      "decoded_sha256": "08abda901fc4441884c331f3fcbc82430d2d793b12d7f1c645565a97d630d9fe",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__SignData.lua.gz",
+      "sha256": "24d77e8300330d4c5dd653e88a8fb04c091f80eaa1ccd9050b400e800cb5777a",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__SignInstances.lua.gz",
+      "sha256": "8e29afac8dd9a6038c816032871970778813ef731e221a1dfc72f0bc2aaf3014",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__SoundEmitterInstances.lua.gz",
+      "sha256": "1baf2f6cc847be6bf4fd898eb74c3fa56885daffe88c09cc7d407ed84121b3a5",
+      "decoded_sha256": "e8c2b574989003a57f16b53358d4425433dd587d82c15366b4b16aba8188c41a",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__StartLocation.lua.gz",
+      "sha256": "7f7f6b3d002c5c9c2ae1c9499a1d8e29c9af673fa99a85e372746a2e6dba5f41",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__TimelineInstances.lua.gz",
+      "sha256": "442f08f101736fc45bcaddeca169076bd981673dc7bca175e5566d96a4c8d8d7",
+      "decoded_sha256": "ec92999d724e7cd4c9c1978f924ea124b25f574ec1f53d54616088889a18b5c3",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Bryan/__TriggerInstances.lua.gz",
+      "sha256": "310ab2de761373677fab3e4f0c5c24f050e21df31ee9ebd93ecd6258775c7019",
+      "decoded_sha256": "6caaa35410caabc6835ab7c88f2fb753c8d9a5c9cb62b7fef32b1dfc07f4d041",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "a754182a28ab0301577d4e1792dd416048043e6adb86023f4c5b38f82218cdf0",
+      "decoded_sha256": "ba05940cb099a314adefac31292b4c923d25278838869a42737d7a29d5ff2af5",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__ClumpInstances.lua.gz",
+      "sha256": "96d4a43dc8dd3ac143c1d1453c38a80a61adce766fe7445c96515d1246d1a7b0",
+      "decoded_sha256": "5d7d083d6a8b092520e79901f1337ccba47992b01a33680f75c7de29304c6f33",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__DynamicNodeInstances.lua.gz",
+      "sha256": "f09b359cd202e05d37e700a580bd76395f279484b6d55fac72d0d738f2fb6761",
+      "decoded_sha256": "c35ace71369e89aca12733b3ff945d1653c74d9bb5bb5eabdf4caec3a64b7e13",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__EnvNodeInstances.lua.gz",
+      "sha256": "b96865f37104574db0fcf73d3164e22e53e0bbf7f1e7a74d42c4c5c7c350869a",
+      "decoded_sha256": "58517da04bc34f09ae7abd7b81adb366eeb37e57daa5ab2e32ea91479e3f8781",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__JetInstances.lua.gz",
+      "sha256": "48885354b9c8f8f358c71842db4335bf48fb1ac6a53471040d88f3f57c374cf6",
+      "decoded_sha256": "510026463f997fe9e0e5a0268d7cec463d321d643ba31cd5f65bf19bde55eb7a",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__MarkerInstances.lua.gz",
+      "sha256": "1d3ab384e254c36e306bc8f61c7c85323ce3dc0972162fef753d695edf9f82dd",
+      "decoded_sha256": "4c9565b9202e1b3063ab84d93d07ea0e6316607edc7d2e76d219faa989200d97",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__ParticleEmitterInstances.lua.gz",
+      "sha256": "bcb178333a42e3a4ce13ae9c330db9e1ab201238299665fafe26d3b66ecc6bd2",
+      "decoded_sha256": "99689d809ea1dfd0c56d369d1a05d73291effbbeef6fc2edbd93ffd29811e432",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__RailInstances.lua.gz",
+      "sha256": "cbf98b18bc704df810c87d5c14241f927d592ddfb13316fca69a4b05bbfb903e",
+      "decoded_sha256": "f3d3ba1b0162e258855ca797d7d30b6b931b2fc820c4583b0adc05b5c0510a27",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__SignData.lua.gz",
+      "sha256": "24d77e8300330d4c5dd653e88a8fb04c091f80eaa1ccd9050b400e800cb5777a",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__SignInstances.lua.gz",
+      "sha256": "8e29afac8dd9a6038c816032871970778813ef731e221a1dfc72f0bc2aaf3014",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__SoundEmitterInstances.lua.gz",
+      "sha256": "390913884f6f34017bc9cfdfe2d77e5bd85c95433c3bbb9911a09287e4e12aa1",
+      "decoded_sha256": "5e48ef033e11236c12f549ccf6b4a494c2381a487cd849943c825892669eef45",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__StartLocation.lua.gz",
+      "sha256": "7f7f6b3d002c5c9c2ae1c9499a1d8e29c9af673fa99a85e372746a2e6dba5f41",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__TimelineInstances.lua.gz",
+      "sha256": "c1ca363db7b2c21617b648cce3e8e94f36491b318b4226c0b80928f6056a3ac7",
+      "decoded_sha256": "8d9f2759ff2593bf862308699131af9207c328d78b45b759104340d3b9f8b4d8",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Canyon/__TriggerInstances.lua.gz",
+      "sha256": "efb69c432461683f03be01f37f4eab4c0e4568aa0643b7b17ace76f4893a6453",
+      "decoded_sha256": "746c31005962f198fda054fcb80942f0ebed8f142a3e2a371f450357efde5940",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "56031fa7b46ee6f2d0f18de825239090a07a27996cf6dd0aef6dc44d24d5bfd7",
+      "decoded_sha256": "1e8bb909c54086f820db3502245d69215c0bf8da75c7f2859a5ea0615c7aa4f5",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__ClumpInstances.lua.gz",
+      "sha256": "e6fa62d7eae514c71eddaf25d27147d08572f42eeb2d56cde363b1361d148af9",
+      "decoded_sha256": "a4000fd5b1924578e539d4ff1b81fce64680f860835207c258cbc3fb23151926",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__DynamicNodeInstances.lua.gz",
+      "sha256": "7b52b7bfd22570f91603f41b15a75c1d668db7dbd5b238dbbb4950a8b7257aa7",
+      "decoded_sha256": "3a883d8a4206d48c3d32f4be5ddec81ce3de8ef26f2cacff330eb2e28b8e9d8c",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__EnvNodeInstances.lua.gz",
+      "sha256": "bf8dbe4a25f6e127a2d94856cd4e1513010d8e2975e2e48433b80b0f743f0dbe",
+      "decoded_sha256": "67cfc54fb40c6fc87092779cdfe2230b094f58b889cb876a06c2629a19d9c4b9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__JetInstances.lua.gz",
+      "sha256": "573913f0594381cf860f71f5ee277e89ab2d85f60d4821738d7a0ec40bdf3d8c",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__MarkerInstances.lua.gz",
+      "sha256": "c67b7a2c1b55fdb4c70502efa2e6fcdf88a5f4d7dacae6db179720bfa97f060f",
+      "decoded_sha256": "4002ddc8f1bdeebe1271fee5594bab51bb01f5b254c6dd2c96e353491fb4d51d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__ParticleEmitterInstances.lua.gz",
+      "sha256": "460416ee2c59310d04168a199b7340599a80fc393f35154fe9c78945183a0a00",
+      "decoded_sha256": "4373fad4ddbc4ecd0eef814f9be3527504546d21708d3620304b5ad69b2b52cc",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__RailInstances.lua.gz",
+      "sha256": "e9713e13abf8ce7c0b94b933901c24c3d26efc6fd4d306e543ed910df19ec098",
+      "decoded_sha256": "84ef4b8e7d2ad9b9bfff4e2f1055c23115cd11a1bb222e0024fa23475e4ed0d2",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__SignData.lua.gz",
+      "sha256": "7c6e825da39addbf1188439096d3ed8a4baf02d9b7da1e8d7af659e5b22dc0a3",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__SignInstances.lua.gz",
+      "sha256": "74e21fcbc719f916a07940cef3b032c387615c1936bc025b7b0e7c2784ea59fb",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__SoundEmitterInstances.lua.gz",
+      "sha256": "cf1a88a0259d1468f8185dbe33f131eae58f8b5c9133381fdd8e79995e823dd2",
+      "decoded_sha256": "8296871feafe2b9771cac92bb84d266913463c13024d87809797f61497a7fd5e",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__StartLocation.lua.gz",
+      "sha256": "6d3f0ebb0a40d77552bd2b2ba32482f5f17b04445c040074696d64ce1ecb35bb",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__TimelineInstances.lua.gz",
+      "sha256": "9cb25191ea51b407e71f8d4c0ee1df9d0a6799dc4f86f78fc4040409c01dfe7b",
+      "decoded_sha256": "f6abe79674e19f73076de1d0b2a7dfd4c9393fe2f494ffcf634089d764aff1b3",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Cave/__TriggerInstances.lua.gz",
+      "sha256": "1913094f9ae5f46317771942bc3456d9b1d43016cbd837979e2c9d911eb5f71c",
+      "decoded_sha256": "f2d726b96ec6e47d2b8d870add62fa0f7267de3e1a8b1cdbb0298b0ca5206ed5",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "206dfbb234e2579ea74016f5b3591a85379e23c4ff1e5060a16536d3e8178035",
+      "decoded_sha256": "8dbc23b502b349955358b133d24eec41e64755b27a2009d7858b98d5505483aa",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__ClumpInstances.lua.gz",
+      "sha256": "de0bbd7ffbc1d26f35341767420104da1cff96c9d9f29812a498deb0005ecb0d",
+      "decoded_sha256": "d0468f7f8d0108e600d38e373e55d62472845c7f978589abf848e051f40d8f77",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__DynamicNodeInstances.lua.gz",
+      "sha256": "b505ce61d9ada342bf6c7e7554e2933d159ad12958633b7612f451168e959b8a",
+      "decoded_sha256": "a5cc4436db9d0bebf0cb9aa9f60ef611ef8ce6b9a9515e778194757a3291b869",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__EnvNodeInstances.lua.gz",
+      "sha256": "627492628967e68601ed0789d44206ebc629396c91cf93df661ac838b1fea155",
+      "decoded_sha256": "45fd2b5551168919cb0518601e8b4720aca196b6b612940546710368f6d46e06",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__JetInstances.lua.gz",
+      "sha256": "573913f0594381cf860f71f5ee277e89ab2d85f60d4821738d7a0ec40bdf3d8c",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__MarkerInstances.lua.gz",
+      "sha256": "cf008071f6ede15a07bc9eb06fcac06d6d810862e44addb4f2225c469e3007f2",
+      "decoded_sha256": "aa667b7cdc6a9955595de47de403d188d963472c4fdd2f5ca3675017945584c1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__ParticleEmitterInstances.lua.gz",
+      "sha256": "1439787730975948fac224f1d5c45dfc39487120349895f439d53fde168b3001",
+      "decoded_sha256": "5a436f119637df6965c10c7ef393d3d8b57da1b5605ff74cdb2c2b9477f4e456",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__RailInstances.lua.gz",
+      "sha256": "76767056e23a13c5a21f9bf9bd625e8aff253fa7449b0b4739b92ff22be9a6fb",
+      "decoded_sha256": "21eca97201fa0c36ae0771e6fa6ec79b42e2f80f7be77c0fc10cc749df4508c5",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__SignData.lua.gz",
+      "sha256": "f089e693299e128fc8975aaaee61140c8a59e762c25c20ba787e7651fb035720",
+      "decoded_sha256": "62f23e07545f28d8cb64f5a4b9b145522b0574fcff052b43cd2ebe032f9b342d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__SignInstances.lua.gz",
+      "sha256": "47769a97657f620203483af5e9128e6e19182e848059462802c134916c054405",
+      "decoded_sha256": "f567343d9dd67e09e33c04557d4368b7839eb5ad53bd6a7e6db4efdf7c77d277",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__SoundEmitterInstances.lua.gz",
+      "sha256": "48cc1ae8c6c193fc54574ceefd0ad7c9a5a8dd4b77f8bcc27a27832697ab15bb",
+      "decoded_sha256": "3bf145fb9e2246974f0e10e18fa34839d7ec62f1e40f65ba0221eea69164451a",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__StartLocation.lua.gz",
+      "sha256": "6d3f0ebb0a40d77552bd2b2ba32482f5f17b04445c040074696d64ce1ecb35bb",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__TimelineInstances.lua.gz",
+      "sha256": "315723c6583a49cc15f20e12c231b148517b824179bcd9f8458fd1e0f4683180",
+      "decoded_sha256": "a0940caf8f20923c6d31bc2bb2c61805754c3483c77261552fbafaeed1b0f521",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Chris/__TriggerInstances.lua.gz",
+      "sha256": "f4546ff9d782911760a1cf0d382100b8eeb1debcbd48c02310a1ec8397d38c53",
+      "decoded_sha256": "42aca0dace2a12f87973ca086d619af80bbc87eae86f3b2ff02be7c1d997d62d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "87ee885cfcc2906aa5df043112862537a31830a1a3c036f433d0a02e4a55ecf2",
+      "decoded_sha256": "2975598db86fe6aa322569a4d0c1a57a741ff864f96b7c42ed0bfeb42bf166ab",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__ClumpInstances.lua.gz",
+      "sha256": "25a08a522f3ee41e11a70adc65ef5488284312605193b66c7f3df2c2e4c6e17d",
+      "decoded_sha256": "00fe6f4de7e53c43b74c346b322debabb136e6ad43d9f4129d48bb1ed3befee5",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__DynamicNodeInstances.lua.gz",
+      "sha256": "b505ce61d9ada342bf6c7e7554e2933d159ad12958633b7612f451168e959b8a",
+      "decoded_sha256": "a5cc4436db9d0bebf0cb9aa9f60ef611ef8ce6b9a9515e778194757a3291b869",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__EnvNodeInstances.lua.gz",
+      "sha256": "7cadcaf44d5f748af0d75b1b6b0f4d3cafe63c51a2d14ec54347e1edb53ff228",
+      "decoded_sha256": "9606b25c0040ee1da151c1beb8fb64828e32bc3c548ea361a44bfd3f369fa399",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__JetInstances.lua.gz",
+      "sha256": "573913f0594381cf860f71f5ee277e89ab2d85f60d4821738d7a0ec40bdf3d8c",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__MarkerInstances.lua.gz",
+      "sha256": "6e56fd5a2ba084fb2e955464b4294f782ce8412470c29b675e03444170f6c4b2",
+      "decoded_sha256": "bfff9c90c0371be675711c64d7fb8c65104202929bc257c208f64aabb5a3f946",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__ParticleEmitterInstances.lua.gz",
+      "sha256": "cbca4de778d529cc0fd57d384b58523f9eea4524a64628e04a8bf1d62daea8e3",
+      "decoded_sha256": "a973ebe3efde48e91eeaeccd13cd2108d8e9d1f45f086efd9e1743bea0ea82cb",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__RailInstances.lua.gz",
+      "sha256": "662f9a3b446b23b07eda1cb017f8bb61374c4b149f31eb29c4b8e734b1a054ed",
+      "decoded_sha256": "7107a8eb388adfe8257349b65907a58346952752be4049d72750cb6bb381876b",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__SignData.lua.gz",
+      "sha256": "6bd118216c2ab7803603782cbd929897a6c9601657902919b42b76ff5aa55259",
+      "decoded_sha256": "54f5d1822edb954e921d75026dd42bd4cf5630e33982af4a7cd0ed1c459e2eab",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__SignInstances.lua.gz",
+      "sha256": "f312db7c13d1573b57703b76d6c9f9ef2cf14165fe280d94b79efb0acc4e4dfc",
+      "decoded_sha256": "3450f840164b1c9ddcd9e4153a33f4675e325702d0c44e1981763a991e71217f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__SoundEmitterInstances.lua.gz",
+      "sha256": "4676491dd62706ffac1ad4388c3b1fcda0608a5ac10d63c9d805e9d921bd995e",
+      "decoded_sha256": "abe8b3841c60ec23e48ddf3dda3be2d04621ace6c26c9c73ddeaf53d30a9d40d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__StartLocation.lua.gz",
+      "sha256": "6d3f0ebb0a40d77552bd2b2ba32482f5f17b04445c040074696d64ce1ecb35bb",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__TimelineInstances.lua.gz",
+      "sha256": "b51365c633b2d4109e75e5c8c79d68749d97b4c05b4ebe17b91831cc1e6e5509",
+      "decoded_sha256": "c4a46304e0ee5c4957aa38d635cade811aeafee1bc3a0e569141f762236a7761",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Credits/__TriggerInstances.lua.gz",
+      "sha256": "bbf39b13a9a1f5c57d29fc43731779dc088d640ff20ed298b5bd19f5317ff443",
+      "decoded_sha256": "e9aae11dc5cbcb4298b7662b67afc8c4f8969dbb64352d8019e89f3f5c299295",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "f253f739f41d58fe1879c366ccf489f337faf700d5dc70954056be85a32d7010",
+      "decoded_sha256": "f0bc6e51068e3b2fbd46beb8f4b0d2f6259d40fcc9918705ac519dbbf9cda593",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__ClumpInstances.lua.gz",
+      "sha256": "328d14e8b5cd2f378f0e599608bc3e5391f096212999f99886fd0c6741622a55",
+      "decoded_sha256": "9d5e959c30cae0911aa07ca222e12988f9319cf46c7f7605426f506eff6fa9f3",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__DynamicNodeInstances.lua.gz",
+      "sha256": "d422e5424893d6d4827b160a814611f022cb32fff81a9198faac27963e6bad90",
+      "decoded_sha256": "b22a0d64a8079c2de9904b86f2fdd3c4ec77c36aab19b48810c364bf18e32ca4",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__EnvNodeInstances.lua.gz",
+      "sha256": "9d348d18422fc76dd42ed2bfd337265d87acd77dfd4280299c6ba3d69e4ccdd8",
+      "decoded_sha256": "4dcca1dd95b4b27fdbc0a8ff41f3d0878c854624102710532197e27a56ee33ee",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__JetInstances.lua.gz",
+      "sha256": "7cd1528795deebf7da498094c90cf99272926675db1bb374aab683fc199c73ea",
+      "decoded_sha256": "443d04c6da9b428a340660c2ee8953e19263700fca3354d8584a3c05f2cbf0b9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__MarkerInstances.lua.gz",
+      "sha256": "4538f5f6f33681b2b662a8743ec75544bcc2ca5a350abf61a38363ffc60347bc",
+      "decoded_sha256": "36ed68359a711fd0c1891787ea23a6bc7e63eccf720a06263cd47a7fbedf9749",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__ParticleEmitterInstances.lua.gz",
+      "sha256": "e0c7d95d8591c2e9cad2bf774cf005149848bc900cb4522464f0437e77b6122b",
+      "decoded_sha256": "ed2478394a8530d8031f4fb48ca4fb8d9972ee650fe21b0c211cd89c171fd1dd",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__RailInstances.lua.gz",
+      "sha256": "e9e77566abdee6c363bc57c5f1915bc1edeec977156c2e9db41b6454367607e9",
+      "decoded_sha256": "ad758bf0e1fa9d7db785cd0b84113d19c5a29e8a423d5b2524193de6f46c0af3",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__SignData.lua.gz",
+      "sha256": "7c6e825da39addbf1188439096d3ed8a4baf02d9b7da1e8d7af659e5b22dc0a3",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__SignInstances.lua.gz",
+      "sha256": "74e21fcbc719f916a07940cef3b032c387615c1936bc025b7b0e7c2784ea59fb",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__SoundEmitterInstances.lua.gz",
+      "sha256": "8e4fcdf3bd95c2a2624540b571cb56465da03828cdec39b2c8e61c941dd331e0",
+      "decoded_sha256": "676e71920d3112caee0e888a97a95d0d99df3d0a5622bc62e10ffe64e92113ec",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__StartLocation.lua.gz",
+      "sha256": "6d3f0ebb0a40d77552bd2b2ba32482f5f17b04445c040074696d64ce1ecb35bb",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__TimelineInstances.lua.gz",
+      "sha256": "5c9f61384c36996b3cae6f21e1abcdcdbb7f02d1f169eb450964916fa986bd9c",
+      "decoded_sha256": "3103eedd18460be09532115f05b58013efe127df19db905246526be13b4ad8be",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Desert/__TriggerInstances.lua.gz",
+      "sha256": "ec705909f51fe22af77c7b465cd94572c1c905e9ae9969f5370b38dca8ccf030",
+      "decoded_sha256": "49d8d573200dde663260c3617f5f863647c90db72c84075d461439df72da17b2",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "5b7cdc770863c0d581f557e118bd65e468eb1f2a286ff5ffc072ab18705a7c3e",
+      "decoded_sha256": "9c1d033bb13e239b721e81dae8a86c13252e04a86af731b777df57b9df8ea2a9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__ClumpInstances.lua.gz",
+      "sha256": "13c502747a64074b53ed707530498e32e683b9f2887c4532b52b92791d684eb6",
+      "decoded_sha256": "192e8dd1b8c0eed27f563b810651853c95d564362a2eee408ac12200a3fa6f60",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__DynamicNodeInstances.lua.gz",
+      "sha256": "4c4253540313212fc216701e83449d42e77b410808ff0b9cd9babc0bfedc26f1",
+      "decoded_sha256": "1594c8c9cbcd6637a34bb01540b0c2cbed2dd90c486048ec0538eebffc6598bc",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__EnvNodeInstances.lua.gz",
+      "sha256": "7de4f42b3e4c421c6e8c183ec8ca7b88c501e047730b67fecbe850a183e4c911",
+      "decoded_sha256": "a2f68db481548c60ad73b70e06130352bfdf0ca451d61c26f0f5271600d73aff",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__JetInstances.lua.gz",
+      "sha256": "573913f0594381cf860f71f5ee277e89ab2d85f60d4821738d7a0ec40bdf3d8c",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__MarkerInstances.lua.gz",
+      "sha256": "4a9956458108ba95295ad199a1640e920e2c2b8f0dc185bb35a5565648ff3e13",
+      "decoded_sha256": "4089414fd84b83c3ca5509a76f8c9f1d94b179774248bf50b3960635976e7f97",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__ParticleEmitterInstances.lua.gz",
+      "sha256": "ca68186f05591c5d79db364ae25771f6ffbc929872d39f03dc2d1a4b8ab74e9e",
+      "decoded_sha256": "6bcb0078600366f019b86505ecae8b4bfc4f3a5b2d48c9381183c552ed064577",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__RailInstances.lua.gz",
+      "sha256": "01b42a7b7f02f00abc51ad2304d47d55dcfb295cb85258f3cd307dcd1dcc332a",
+      "decoded_sha256": "dc4a129f86034b73b3f8dd5f8cebf324491ab20f8ffe505a4950f6dcd118ccb7",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__SignData.lua.gz",
+      "sha256": "7c6e825da39addbf1188439096d3ed8a4baf02d9b7da1e8d7af659e5b22dc0a3",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__SignInstances.lua.gz",
+      "sha256": "74e21fcbc719f916a07940cef3b032c387615c1936bc025b7b0e7c2784ea59fb",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__SoundEmitterInstances.lua.gz",
+      "sha256": "b10cb617968323d6eca8c5fa65bdca01092e879a3723fed865c0e220a9075b82",
+      "decoded_sha256": "939c765694c6b326addcf138aced78fb0a6f89933e24fad8ea4c1d4c18c15a2d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__StartLocation.lua.gz",
+      "sha256": "6d3f0ebb0a40d77552bd2b2ba32482f5f17b04445c040074696d64ce1ecb35bb",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__TimelineInstances.lua.gz",
+      "sha256": "6af1e3172825a3a9ba8f2b4be0d821aa43d2db2d389ca8bc693293a326bdf1b9",
+      "decoded_sha256": "4c75a0e9294010485b3295ec0d698302b676b9dd31d802b971e8a2aafa72d78c",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Graveyard/__TriggerInstances.lua.gz",
+      "sha256": "25a948d0d391b41eb3bce037ff23a4c594e8c9af879abc8eba65842be9342d1d",
+      "decoded_sha256": "e0ed426d291d5a8fb30e64313b6015beb831db2c00267983eaf1d02a7b24b2b6",
+      "ios_equal_normalized": false,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "58598639ace21ca782774cbbc5fe3c88d7e98cc33d928bfacf789dae141f2802",
+      "decoded_sha256": "9d70ff962145642c0bd3b8167273ff73fa252ebc983c1f9c85d665393bd517d0",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__ClumpInstances.lua.gz",
+      "sha256": "a824f3bbc3096fe26cc5c990b50255529d33c333f8b7b41d5d775d95b1f1f74e",
+      "decoded_sha256": "952d538a04466ef6eb37123654ad1f7dc75fc295f6a97e890527a361ac344ffa",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__DynamicNodeInstances.lua.gz",
+      "sha256": "47d0625f709d03e820a1dd7719d94be0e81cf6ec2fbcbfab8563d1d4db612c8d",
+      "decoded_sha256": "7bbcbd67f80cf89ebddfd4fda8d7a52f94e5107cf079351d05e2ed06172acf74",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__EnvNodeInstances.lua.gz",
+      "sha256": "6c76ad7a65a54b66590aa8144c92c921561db563b037f8df8f82f4789e13d81c",
+      "decoded_sha256": "1b16bf3e684aa643ab55a76f9c83fb2bff727ff47e6f5b210e3c669f9ac486a7",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__JetInstances.lua.gz",
+      "sha256": "573913f0594381cf860f71f5ee277e89ab2d85f60d4821738d7a0ec40bdf3d8c",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__MarkerInstances.lua.gz",
+      "sha256": "7acf270d7b360018c84e7cae00927415035107721ec8f0bca34e0fa56f1be7f7",
+      "decoded_sha256": "ce41659d4b2b9305a6a8a6ff93dba18feb6e11fc326f2afe59ff1f1ebdb63929",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__ParticleEmitterInstances.lua.gz",
+      "sha256": "827bd4ce14030673a9befa7bf4fca6773fd0e1822ba665836141688a1c503db4",
+      "decoded_sha256": "57cd474521b40d055d412bf58c7478e0a166d1e1e373cd232ce07ff99ef46200",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__RailInstances.lua.gz",
+      "sha256": "751ef351ae28775b8061d990a760462b5199f17e96d2ceb3f9beb1114a54242a",
+      "decoded_sha256": "2648bb68c4d72218f107b3e2282d072eb753e407acbc39ccdbfb5257950956de",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__SignData.lua.gz",
+      "sha256": "db7a5f4620ad01851693102d61a86380d36607692ad28e192ceaead0081c6cdb",
+      "decoded_sha256": "eef404b70ac739a0db48fef6444bc36b9e47aafab36c2b29c9ffc723c1f6f8c1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__SignInstances.lua.gz",
+      "sha256": "74e21fcbc719f916a07940cef3b032c387615c1936bc025b7b0e7c2784ea59fb",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__SoundEmitterInstances.lua.gz",
+      "sha256": "fd72c9e818b2ce7cde516b25fd70cce85418ca3f919c16cad6e00bc05fcac86b",
+      "decoded_sha256": "eb7600eb064e50e36bdf7c248763b9b247cc0a28febe5bf90e95d24bffa1859d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__StartLocation.lua.gz",
+      "sha256": "6d3f0ebb0a40d77552bd2b2ba32482f5f17b04445c040074696d64ce1ecb35bb",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__TimelineInstances.lua.gz",
+      "sha256": "75cad7f056946103bcb94148d7247c9aee732336b4ea4530b86f87e1ab451058",
+      "decoded_sha256": "a7cee929481c6255151ad866a2f8b39e3e286f878fec65fc94024a51a3389421",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Matt/__TriggerInstances.lua.gz",
+      "sha256": "63dcad1c0616b3207157e1e999e9c53b6734c5563da3aecf46fb247433569020",
+      "decoded_sha256": "1fd1081e49abf7149b9a5590822b030b34aca13fbe0b3efbdf2fd95b3c94a3f4",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "92cb69dbae3373eee7b76f78ad88b69d61b2891cca506514fb4065c2e16a013c",
+      "decoded_sha256": "93e7a9fe30ceaf94eb0fc087dc259a111034a409fc435d54e27fd9cfa43c7f50",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__ClumpInstances.lua.gz",
+      "sha256": "e48aeaac892506703ced402cddf874d2b87e9c85c7c3b6a43db428e71bb27592",
+      "decoded_sha256": "1b659f320e0d569c52044db01f6ef291cdb423c54a9c15f8532e10a03349d739",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__DynamicNodeInstances.lua.gz",
+      "sha256": "7c3d0bf7c08bfbe9f6ed9cd9573e0f4b4e16a9eb05cb0b9b0146ea9153bb9a52",
+      "decoded_sha256": "f4691d42876309b55304a5d3fe8e2d1c911f60866df6cb9411b402dddfcde9ba",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__EnvNodeInstances.lua.gz",
+      "sha256": "ff410908e2d0fcbe94be8f21c86754d6d1d57b3c32919a191f587c1cf415ddf7",
+      "decoded_sha256": "535242dcca045ad597a8f351db38e08053367cbb540a88d11675266c014b1cfe",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__JetInstances.lua.gz",
+      "sha256": "6427127f2c4aa3c1c8d2353aa24c571383559388500bd4a9b2d0a1711704839f",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__MarkerInstances.lua.gz",
+      "sha256": "2d93800d6c9d0e2c5030c9a1526a4d8e3750045f9fab71f86c303a9f716ee1a4",
+      "decoded_sha256": "51b35a088eea3b4f54169ad8a1fed0d33e13b6cecde6033ff8cad715d4ba6c04",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__ParticleEmitterInstances.lua.gz",
+      "sha256": "7f64260f1a4448d5a8c3afdb24c8a71b1168ca4a0016e720c1ebd07f5af21e8d",
+      "decoded_sha256": "79be0402e802a818e810a0ae5d126b226b87a75e5855a077305917944a610994",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__RailInstances.lua.gz",
+      "sha256": "211b57d063e0c65eae72066a150d04dae75973b9dbfe6f154b679e8569c82814",
+      "decoded_sha256": "9dda17f1edfdfd0252c896b573d35bc212d5494ce8623568c848a357ffc494ef",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__SignData.lua.gz",
+      "sha256": "a15db20e477a287938e52b30061bef2e3336cd3c3dc3366672933d73a42c8ee1",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__SignInstances.lua.gz",
+      "sha256": "f953401d9e956b6409ce2d84913779188e234cb2895c33f23eeb4915e6010d09",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__SoundEmitterInstances.lua.gz",
+      "sha256": "64b3bc0ee470a07253db93fee1ab7164c2cadc477762a61627d372f6c8722797",
+      "decoded_sha256": "62c4cdf14da37c63fc6d90a3778bfb8bf1e69ef09a9a0f97f0bf2e7aec3a8b9a",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__StartLocation.lua.gz",
+      "sha256": "33de43731b66edb37d6c70fc9ee296676d47078f6c8998a49984b11e1de94d80",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__TimelineInstances.lua.gz",
+      "sha256": "75cc0f718e05c895c3f90cc87c51e2ef4c7928516ba2f58df9875252521efbb8",
+      "decoded_sha256": "107cb9210205963cf56c3966d6341ddbd888a7381553ce5a78fed0b1432cdf24",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Mountain/__TriggerInstances.lua.gz",
+      "sha256": "5b339908d4c9e5c27b6bcb8007c30fc4ceec4b9c4c611c4fc2961cd6092cf64f",
+      "decoded_sha256": "a94f68eb6e2ea813a39e11d49f86285beaba2396b99ab06c74f4ae8cb729de23",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "8cbff6e8c73023a660728dd878d460f95ecec88626507ec3b3d31f6187134ccb",
+      "decoded_sha256": "3e3e7c8f271e5813f0f4d90248ae56f46ed9137a328da26358e7140835edc75a",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__ClumpInstances.lua.gz",
+      "sha256": "b0070bf1c52c161a176cfe69d7190ecc57b6b5d66232502fdd325d7a7f68f737",
+      "decoded_sha256": "4ad0f787c87ddee6f59b31721870f480e350bed04a5cf3aa54c9e2f153a0a4ff",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__DynamicNodeInstances.lua.gz",
+      "sha256": "9c23609a9673499945fb2df1165c137795d1824cca33a1ffc164867a3721b648",
+      "decoded_sha256": "05cc53ea46eb3bd01ce93aacde77b1162800a94cb9b9458d0efc81ed54aeb5ac",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__EnvNodeInstances.lua.gz",
+      "sha256": "070729713bdae43afaf619b327214820b7651894e8031619b277fe29fb03d8b2",
+      "decoded_sha256": "fdfb3ef95ee9cc8433a41d453e37db3fe827c743505b4ad93b6969537b1db67a",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__JetInstances.lua.gz",
+      "sha256": "6427127f2c4aa3c1c8d2353aa24c571383559388500bd4a9b2d0a1711704839f",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__MarkerInstances.lua.gz",
+      "sha256": "426f6269e25f9248838b1bd4d96591b2d243b2423bae39ab5ce4e8c40dc07f06",
+      "decoded_sha256": "1a0dfc9b14e2f8dc4b268280a43784ee574c6db9d59fbd731cd34e14f667479c",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__ParticleEmitterInstances.lua.gz",
+      "sha256": "50b33858c2afbf5e3b19bca70c919f5f638b7f946db402601e2d79be4fd654f7",
+      "decoded_sha256": "5fe3bc36bb04192f1648f73bd07bc36f8f4259d7ebcf8a58b79b293a46d0f280",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__RailInstances.lua.gz",
+      "sha256": "d1ede587ac26d4b8ef4e063978d972e4062002d42887d51c2616aacd9f69b63f",
+      "decoded_sha256": "699bf6b2ae59ddb174a14ba441d6c89258c60bde9dfc0cb88f9f5da4db3b3b97",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__SignData.lua.gz",
+      "sha256": "a15db20e477a287938e52b30061bef2e3336cd3c3dc3366672933d73a42c8ee1",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__SignInstances.lua.gz",
+      "sha256": "f953401d9e956b6409ce2d84913779188e234cb2895c33f23eeb4915e6010d09",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__SoundEmitterInstances.lua.gz",
+      "sha256": "4436c9bf694f3c6c3902ee4e7ce3bde4c59e0538e2e73f88139c48cdaf1ca611",
+      "decoded_sha256": "da1a991c574106eca2acb5719c36eb1b6c9676aaf755aadf206f37c2fb8c240e",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__StartLocation.lua.gz",
+      "sha256": "33de43731b66edb37d6c70fc9ee296676d47078f6c8998a49984b11e1de94d80",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__TimelineInstances.lua.gz",
+      "sha256": "e0ae0953d9a9818a84240a59ccbed3aa13c64a705ce9b030dba906327680cd66",
+      "decoded_sha256": "b443d8bcf2b241127aa1ee1d3ca7f94b8cd3fff06ee9621e4d61f6c6b6c95be6",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Ruins/__TriggerInstances.lua.gz",
+      "sha256": "cd7d753a8ca437b31b537f8b15ce9fc28e454efb3c7693ba37f526a00017b948",
+      "decoded_sha256": "c6cc33ba3086d7bedb855009f6f437baddaaeebfb3082f711ad8e22ee56a3ec2",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__CameraKeyFrameInstances.lua.gz",
+      "sha256": "7e4cd92812afc3f841dc9e8cfba986bc9570c85f1cd99f6b21e9994e6dfb40fd",
+      "decoded_sha256": "53d9c1874429cc2fbc0593b5fe8307eb02067cbf82f3e35238b4f5b3d9825c64",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__ClumpInstances.lua.gz",
+      "sha256": "2216823190684e16270658297b72c9a0ffd59e01a6339cfa579b7ba4f77dc9f7",
+      "decoded_sha256": "562d24dc5bb1f3fe7396742ab8a58212435b46ab9b1a7615dc629c7bd8c51aa5",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__DynamicNodeInstances.lua.gz",
+      "sha256": "653e1832a45820d0664134453f3c8049374a2ff6ba72c5100dc376cee7d0655c",
+      "decoded_sha256": "6e0578aea6dc3610249f0f838245d1bde0b3a44b0b07daf4bb148d26f83b33e4",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__EnvNodeInstances.lua.gz",
+      "sha256": "8e3f67c45fa787f4c0e1d427bdad28838917f166be0c75ee3e5a9bf2e73eeba4",
+      "decoded_sha256": "206fc1d6e6b214383225076c70d7f4f326c5b7dd6c9ebb0fe185b6238d21b8d6",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__JetInstances.lua.gz",
+      "sha256": "031e5eb3b018563321897c01d303f2a3c2749f7f02cce4ad8141c1a8edc426e1",
+      "decoded_sha256": "1edf6283aed3bd560bda1ce1f1eb9c89499f9bdd5dda183a17fbade183990aa9",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__MarkerInstances.lua.gz",
+      "sha256": "e98bbf5c6f7305532f6c481159d57fb45d500eb57978cbe09777e81da1907d75",
+      "decoded_sha256": "ca9c2be6b323263368ce7e877160ced92f78717fdac3d130dfc187543cf40b60",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__ParticleEmitterInstances.lua.gz",
+      "sha256": "3e7f586bc58b4c6d68bfa74bf58630a916931af958da0239eb0b86f287ec8084",
+      "decoded_sha256": "886761d49b47b7478be5188f670ed9400b501ab8d4c6a8fd8b533e688aaadad2",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__RailInstances.lua.gz",
+      "sha256": "f7eb42e3a74784122290e7568916493dc3f5d5aad8ce8a7f7001808b98d7effa",
+      "decoded_sha256": "9b8479b1e427c285c1affe5467cfce0f2c077e6aa2c99303fe2e3143afe9a89c",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__SignData.lua.gz",
+      "sha256": "d3071644ce66f55f3ff8a2f6e92dbb3e4f4cd88153274c89261b7e93d26f2a11",
+      "decoded_sha256": "e005b81dcd49f9902d852c03e578587abca87cf8c9999d5601b8bd023dfe3957",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__SignInstances.lua.gz",
+      "sha256": "7e6024c2ba673b2e19eba443761e482a528109be8cb5dc2548cdbce342f162ed",
+      "decoded_sha256": "64dff2195edea298538fe0765b535034e5c21c796de898e275ebd514885894e1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__SoundEmitterInstances.lua.gz",
+      "sha256": "6d55e8451aa50abcd36342b4bcd69325c7a899d29890c59e89a5fdf0e385abe2",
+      "decoded_sha256": "440eb815664c186d5d2d1590d80ddcc1396c8f620445f22187e07edbc8de4624",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__StartLocation.lua.gz",
+      "sha256": "1286e084bd14617b085427a3523d2aece92a08514be77381830b3bc374531373",
+      "decoded_sha256": "e083a5d83995259cd024306a57f5fda32b3c13e95ce0d0a4bf05be3ad3e35d6f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__TimelineInstances.lua.gz",
+      "sha256": "16a19b291675626ba5fc2f09a0d59e9f6b44e28be425101286c019d56a7da03c",
+      "decoded_sha256": "53c676320ed1b484de93a5d749d8e09f0eaf8507019bee34285341f5eade54c7",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/Level_Summit/__TriggerInstances.lua.gz",
+      "sha256": "043b572c87e06d4fd6ffe0a1bd82536f0bf27d0764872c3989842f310fabf694",
+      "decoded_sha256": "8f0b91b4b2506c5d9ace99a41bfec48285c3d6249655176f10e712a9e18cfa08",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__CameraInit.lua.gz",
+      "sha256": "fdba7e43d48b9ebde92aa2f11eb238bd9f30deea37ef8d4a7c6ef6a1d1dfeafa",
+      "decoded_sha256": "5022c92a7644e2f95d0d2df9d3c691ed7965e797d64645c09389751ef6fae18f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__ClumpLoader.lua.gz",
+      "sha256": "e51d06792744d411a696c483603578618bb7229ca49824004122e2c17a52034e",
+      "decoded_sha256": "0c4a12cde493902f5f7678a5c7adda62418df61a5c314081aaefe788eaff37c3",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Creatures.lua.gz",
+      "sha256": "0aff144bad03b80051918fe689573ed1597eef34ddf421c20581f4f35968dc6f",
+      "decoded_sha256": "1a5b3096fa739a53c785146925e8b317808e8de72ee2f8b8a9c1a83f1e11565e",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__DebugKeys.lua.gz",
+      "sha256": "d88c9ede40e4d3e42a97e030fc686c02489b7200031dfaf399b587c09d4baeba",
+      "decoded_sha256": "f83d9b0d5b070c90aaf10c9f7fe00814c197225dbf03d0a40d5c8053218a9f2b",
+      "ios_equal_normalized": false,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__DecorationMeshes.lua.gz",
+      "sha256": "ee0f7b0427568d48da961ed2ef7c847fca111c175677709d8df95948bde7810d",
+      "decoded_sha256": "c6cfea1460465b36fdc63227c261bd1a9280688ba5f72acbd8ad88c86941bff4",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__DudeAnimation.lua.gz",
+      "sha256": "b79509bb4d35ce39ede4b2cb88af851056d86f52e3b946bbe685ee2f8abf7d88",
+      "decoded_sha256": "472e505067679f9d9198eacdc2c217100475cbfea967ece2285d67844c347ab4",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__EnvFX.lua.gz",
+      "sha256": "8de1f7a987dd7501b20edbdab04aa296eda75af03ad02e429be6c36672266437",
+      "decoded_sha256": "92d303ff55857b5af1e6e3f9509db69492b1a44fcd5a887e4b554a838db70db2",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Environment.lua.gz",
+      "sha256": "7476fe9779d26c6f3ae2cc0606ebca0acbc74425ea872a67b3fbdfd59c974b92",
+      "decoded_sha256": "2a20e13570f530db7ec33880fe160b9353d7fa45701d4182b8d3db4db2ae800b",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__EventSetter.lua.gz",
+      "sha256": "4ea0068a5cbf38e27467c96a0d9138e2e0acbcdfa62926bb5394cacf1a210732",
+      "decoded_sha256": "d730846f272a2bbeb2d6bc430a75c211ff4581b54d752b0ddbbb8a950a5d9540",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__FadeToBlack.lua.gz",
+      "sha256": "e3b916c1933fa06e46de39255d8abfcf430a44076e45ce1d710672429f86da98",
+      "decoded_sha256": "20219eda267835c1c0a8bf771848964956fa0fba05cfcda426602d7e7a41c468",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__FadeToWhite.lua.gz",
+      "sha256": "c4980ad42ffc4f4be2d876dca5904a9e85ed08f91e09d4445860a1cad8d0c4ef",
+      "decoded_sha256": "1368acacbe353dc2fc205264744cee693a94742573c1da9e64dde8979ac9683c",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Font.lua.gz",
+      "sha256": "e301e01641c8766432f990420278ad79274e8366762ccfcd8a0fc5ec6deb851e",
+      "decoded_sha256": "ee2d4a9d8e42ce511f7b153861c9dae90c775c581b0f3fc78d05b4cfc54d8d2a",
+      "ios_equal_normalized": false,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Garnet.lua.gz",
+      "sha256": "f6d918034efbce96db173e0de5190b91fbdce15b7016f31a42d263b3a4c1f371",
+      "decoded_sha256": "1b1390ce5a4f13cd425086165008363cb125f1553f2ee4b8191dc65f06b2985d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Helpers.lua.gz",
+      "sha256": "32cbee362e4009bef18c6e4dad225fa447511bbce1905ce3af756ec7789472d8",
+      "decoded_sha256": "a7391c7b0e6cb7af8695b1f86a81768158aac3cb5aa6855f4b52aa77e57a593c",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Hud.lua.gz",
+      "sha256": "f13e159ea0e45e02f0debdf16199e11871d2f7ccdb7b03a84e29cae264e57b5b",
+      "decoded_sha256": "4a8f462043e11695183fa336b15f9dfd10633614f0ec80363ae5f8133cd2fb09",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__HullBarn.lua.gz",
+      "sha256": "961d8da21724f3d97224b23338c3cbf9e3694a5e3560bb72bf4c8c87d255c1f9",
+      "decoded_sha256": "5a6d60a009e31046aff7ff7d59a1a1c1a5a7e6e4dd5aa5990443dc2432e74530",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Jets.lua.gz",
+      "sha256": "5ba5df7d058858f946d628f91ffc98210ea2c5b0251fcdfa3cc755fe091040f8",
+      "decoded_sha256": "238a5a221abf8c0346aae8f788440c38918a83b0334acb20476eba4dc7496b42",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__LevelUid.lua.gz",
+      "sha256": "a9c74cf980ebe440d9e0acfc641ebbaf8c42307916b2eb841d7f8420b2e5bbad",
+      "decoded_sha256": "f757b53804b28a164756fcc790f7949a690829dbc508ea7d016e1081a9f1e828",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__LocalizedStrings.lua.gz",
+      "sha256": "6b9b6e49972ddfd6756aa855cd95ae7c6b4b20b326b0224fa1f4baddc06c2667",
+      "decoded_sha256": "c390e652b75f41aaf1a02308f5c23c6e623c69aff28524bc9e4db2beae082c6e",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Markers.lua.gz",
+      "sha256": "54d0a7a87211f0ba78031a9a1c07247cba295b9b2ac11f0bcc956e8e23a2d45e",
+      "decoded_sha256": "cf3dd772749b70938e9a5c4a8fd6181c62c298444f8c7bd7f5434ed0d2207738",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__OpeningTitles.lua.gz",
+      "sha256": "b1b9df788861436a364544bae9a5c08366f7c9981050dda8b20e8cc176cddb96",
+      "decoded_sha256": "0f28a3bb914ab61999122baa4e5f80b6332d3e448d862bea3b9c349c2414fd76",
+      "ios_equal_normalized": false,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__PWeb3.lua.gz",
+      "sha256": "032fc53cc028231ab0383ade16f756d0470b658c205c8dbcc14d4b34dbc71c2b",
+      "decoded_sha256": "5665551887b847c769d81355219d0ddd9a61d3f7974871f9463e481d7f4b5999",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__ParticleBarn.lua.gz",
+      "sha256": "1f1851670e866455809ba9effb7c283f5de069e4ed281b17e191e570bba2b459",
+      "decoded_sha256": "1db1325b485519fcbedd5fbe34a5e0681b522b624553945bb204c4a8129d8b8d",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__ParticleDefs.lua.gz",
+      "sha256": "05279134ae6ffe317f7950282a8ecdfcc0571b24723b43659bf1272723a4f1ed",
+      "decoded_sha256": "68b180d8bf135809f5fa0424db4ce26fdc7bc6c7b716b5c3fd9afaf84b576092",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__RailBarn.lua.gz",
+      "sha256": "323a968087a65197f484b165784982e58c2fff0a70fe5aaebc875a8dedb7b805",
+      "decoded_sha256": "4eeb76ee374f996bc05a54f77aee50f226ab806894b3757db1bec5abd5b98fb1",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Render.lua.gz",
+      "sha256": "986bec97b74858243fd71c5b49f25b10801cc4dc1398d3f4e4d096349866fae9",
+      "decoded_sha256": "232ac852b95b2e69bb45b35f3a6ee3f7e5767e78850f1407d37729acb872be8a",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__ReverbBarn.lua.gz",
+      "sha256": "0a15c2765d048bd4be30bb6d5da3f8e4e6428a6e492a785a14111490a732825f",
+      "decoded_sha256": "27ea1bb2e623b359f707d8aa6c14776d6a4569ff2fcaac4724f8a3b2edd3c413",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__SignBarn.lua.gz",
+      "sha256": "24d245b94729f7410a0072bc81710a2d1babbf3944833987da03bef1afd4bab6",
+      "decoded_sha256": "954baa4a535a42403084887ba6fb6409114fed4e6bad4a1bf8b248e3ad978603",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__SlideRender.lua.gz",
+      "sha256": "28f884666b6e3b478ed5b6369db718351628312d752192e8b41f95cead63bb57",
+      "decoded_sha256": "684af48a690c6db98164ed9eeab185efe0d2cbf8a448564803e9c0e2d5b1efff",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__SoundBarn.lua.gz",
+      "sha256": "b3c185d07dce6c2ba0f8d2c3d3b0992622f6160eb2230a959d2251552ff04121",
+      "decoded_sha256": "b6b1f3a8e11844d1a2bfaf2aca7313b3925657dfced0e1cbaaed2af46df83adc",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__SoundEffectData.lua.gz",
+      "sha256": "468e4683be3ac35ff9992e528711bee0dbe19fb16a9cb468b69cf3d441c0e472",
+      "decoded_sha256": "9da12c978e9be045fc50c409b04a61e8008d3d60e65acfc94891cbe5ab4201b0",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__TerrainData.lua.gz",
+      "sha256": "109d583f9567b4368b4e266076fbab5dc3339e92a7a1875a672cff5769e71c91",
+      "decoded_sha256": "755f1993e46a6aa9bc0eaa3a9348e8fadf20e91b14a974fc7c5c889ee98c79fb",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__Tick.lua.gz",
+      "sha256": "3d927ef3980f9ab42dc6ff68b77970a311c9bd297906415c0902f31010fa9443",
+      "decoded_sha256": "43af574088583fec26e65e9b6bf4db822d95e26462bf871774e11c59ae54fe38",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    },
+    {
+      "source": "JourneyPC/Data/Scripts/__TimelineBarn.lua.gz",
+      "sha256": "d7c4b1b30dc54ecd0f8f37d5263791c186779a68028a21f9f3e5b9ab9536b5af",
+      "decoded_sha256": "4246bc0a255386ca8b89ffc5502d70cabd37ed5964e9c2b7eda22e5cbdd7347f",
+      "ios_equal_normalized": true,
+      "format": "UTF-8 text",
+      "working_copy_matches": true
+    }
+  ],
+  "loose_scripts": [
+    {
+      "source": "JourneyPC/Data/Scripts/Vars.lua",
+      "sha256": "0ade9892a7797518da098266cb3c1edcdcc4829a6ec0073d529d33d9ac453973",
+      "ios_equal_normalized": false,
+      "working_copy_matches": true
+    }
+  ],
+  "binary_evidence": [
+    {
+      "file_offset": 5653248,
+      "text": "$LuaVersion: Lua 5.3.4  Copyright (C) 1994-2017 Lua.org, PUC-Rio $$LuaAuthors: R. Ierusalimschy, L. H. de Figueiredo, W. Celes $"
+    },
+    {
+      "file_offset": 6082200,
+      "text": "ConnectionBarn::HandleIncomingConnection - (target id: %I64x)"
+    },
+    {
+      "file_offset": 6082272,
+      "text": "ConnectionBarn::HandleIncomingConnection - we're already hooked up (new id: %s, vs existing target id: %s)"
+    },
+    {
+      "file_offset": 6082384,
+      "text": "ConnectionBarn::HandleIncomingConnection - COMPLETED (npId: %s, signaling peer: %s)"
+    },
+    {
+      "file_offset": 6082472,
+      "text": "ConnectionBarn::Initialize"
+    },
+    {
+      "file_offset": 6082504,
+      "text": "ConnectionBarn::NetInitialize"
+    },
+    {
+      "file_offset": 6082536,
+      "text": "ConnectionBarn::NetTerminate"
+    },
+    {
+      "file_offset": 6082568,
+      "text": "ConnectionBarn::m_HandleMutualActivate"
+    },
+    {
+      "file_offset": 6082608,
+      "text": "ConnectionBarn::DialOut - target id: %s (our id: %s)"
+    },
+    {
+      "file_offset": 6082672,
+      "text": "ConnectionBarn::DialOut - we're already hooked up (target id: %s)"
+    },
+    {
+      "file_offset": 6082768,
+      "text": "ConnectionBarn::DialOut - COMPLETED (npId: %s, signaling peer: %s), acting as: %s"
+    },
+    {
+      "file_offset": 6082856,
+      "text": "ConnectionBarn::DialOut - failed to create connection"
+    },
+    {
+      "file_offset": 6082944,
+      "text": "ConnectionBarn::GetConnectionStatus - remote: %s; STATE: %s"
+    },
+    {
+      "file_offset": 6083008,
+      "text": "ConnectionBarn::HangUp()"
+    },
+    {
+      "file_offset": 6083040,
+      "text": "ConnectionBarn::HangUp"
+    },
+    {
+      "file_offset": 6083072,
+      "text": "ConnectionBarn::HangUp() - inactive, but clear peer id regardless"
+    },
+    {
+      "file_offset": 6083472,
+      "text": "ConnectionClient::SetAsServerOrClient: we are %s [us: %s, them: %s)"
+    },
+    {
+      "file_offset": 6083544,
+      "text": "ConnectionClient::_SocketEstablished"
+    },
+    {
+      "file_offset": 6083584,
+      "text": "ConnectionClient::HangUpSocket"
+    },
+    {
+      "file_offset": 6083616,
+      "text": "ConnectionClient::HangUpSocket() Hanging up Socket!"
+    },
+    {
+      "file_offset": 6083680,
+      "text": "ConnectionClient::HangUpSocket() Socket doesn't exist, can't hang up!"
+    },
+    {
+      "file_offset": 6157144,
+      "text": "GetRemoteDude"
+    },
+    {
+      "file_offset": 6157160,
+      "text": "GetLocalDude"
+    },
+    {
+      "file_offset": 6173784,
+      "text": "Player2Chirp"
+    },
+    {
+      "file_offset": 6173800,
+      "text": "PlayerChirp"
+    },
+    {
+      "file_offset": 6180400,
+      "text": "SynchVarBarn::SetRemoteSequenceNum - out of order packet? :: this failed (%d <= %d)"
+    },
+    {
+      "file_offset": 6826512,
+      "text": "SteamNetworking005"
+    },
+    {
+      "file_offset": 7508304,
+      "text": "Lua 5.3"
+    }
+  ],
+  "wad_sample": {
+    "path": "JourneyPC/Data/Wads/Additive0_39764.Phyre.D3D11x64.gz",
+    "format": "gzip containing tar",
+    "members": [
+      {
+        "name": "Data/Wads/Additive0_39764.Phyre.tar.tmp.lst",
+        "size": 689
+      },
+      {
+        "name": "x64/Data/Meshes/C_ClothNinja_A_AddBreath.D3D11x64",
+        "size": 78826
+      },
+      {
+        "name": "x64/Data/Meshes/C_ClothNinja_A_AddCapeBlowB.D3D11x64",
+        "size": 75859
+      }
+    ]
+  },
+  "signature_check": "unique"
+}

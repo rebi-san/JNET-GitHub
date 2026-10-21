@@ -125,7 +125,7 @@ static void jnet_appearance_game(uintptr_t game) {
             ok=0;
         }
         jnet_appearance_complete(&jnet_menu_edit,ok);
-        if(ok){jnet_appearance_applied_at=GetTickCount64();jnet_appearance_saved[0]=changed[2];jnet_appearance_saved[1]=changed[3];jnet_appearance_saved[2]=changed[1];jnet_appearance_has_save=1;memcpy(values,changed,sizeof(values));if(save_changed)jnet_save_requested=1;jnet_appearance_status[0]=0;}
+        if(ok){jnet_appearance_applied_at=jnet_menu_edit.applied.character?0:GetTickCount64();jnet_appearance_saved[0]=changed[2];jnet_appearance_saved[1]=changed[3];jnet_appearance_saved[2]=changed[1];jnet_appearance_has_save=1;memcpy(values,changed,sizeof(values));if(save_changed)jnet_save_requested=1;strcpy(jnet_appearance_status,jnet_menu_edit.applied.character?"Activating character":"");}
         else strcpy(jnet_appearance_status,"Appearance could not be applied");
     }
     if(jnet_menu_edit.applied.locked_scarf){

@@ -32,7 +32,16 @@ static unsigned arrivals;
 static void traveler_native_arrival(uint64_t actor,uint64_t generation){assert(actor==traveler_barn+0x146f0 && generation);++arrivals;}
 static void message(const char *p){assert(p && *p);}
 #include "traveler_stream_test.h"
+static unsigned forced_sample_chapter=32,sample_calls;
+static int test_local_sample(unsigned slot,int first,uint64_t peer,uint64_t generation,
+        unsigned outfit,unsigned symbol,struct jc_actor_sender *sender) {
+    ++sample_calls;
+    if(forced_sample_chapter<32){sender->chapter=forced_sample_chapter;return 0;}
+    return traveler_stream_sample(slot,first,peer,generation,outfit,symbol,sender);
+}
+#define traveler_stream_sample test_local_sample
 #include "traveler_local_peer.h"
+#undef traveler_stream_sample
 static void put(void *p,unsigned offset,uint64_t v){memcpy((unsigned char *)p+offset,&v,8);}
 static const char *__attribute__((ms_abi)) med_name(uintptr_t controller) {
     assert(controller==traveler_barn+0x146f0+0xa390);return "Med";
@@ -44,6 +53,8 @@ static void setup(void) {
     memset(barn,0,JC_RECEIVER_BYTES);memset(match,0,0x11dc0);memset(extra,0,0x100);
     memset(JNETActor,0,sizeof(JNETActor));traveler_local_state=0;traveler_local_completed=0;traveler_local_frames=0;
     traveler_local_owned_barn=0;traveler_network_active=0;storage_ok=1;
+    traveler_stream_enabled=0;memset(traveler_streams,0,sizeof(traveler_streams));
+    memset(traveler_stream_waiting,0,sizeof(traveler_stream_waiting));
     traveler_local_overlap=0;traveler_actor=NULL;traveler_repeat.state=0;traveler_repeat.completed=0;context_ok=1;start_result=0;
     put(game,0x180,(uintptr_t)match);put(game,0x1e0,(uintptr_t)barn);
     put(game,0x68,(uintptr_t)clock_data);jc_receiver_store(clock_data+0x10,1.f/60);
@@ -117,7 +128,11 @@ int main(void) {
     }
     traveler_local_level_initialized(traveler_barn+0x146f0);
     assert(!traveler_local_start());
+    traveler_stream_enabled=1;forced_sample_chapter=2;
+    unsigned samples_before=sample_calls;
     barn[0xa3]=1;before=writes;traveler_local_before_input(traveler_barn,traveler_game);
+    assert(sample_calls==samples_before);
+    traveler_stream_enabled=0;forced_sample_chapter=32;
     assert(traveler_local_state==1 && writes==before);
     barn[0xa3]=0;match[0x11db4]=1;
     assert(!traveler_local_offline() && !traveler_local_owned_barn);
@@ -126,9 +141,19 @@ int main(void) {
     traveler_local_owned_barn=traveler_barn;barn[0x1670c]=1;
     traveler_local_before_input(traveler_barn,traveler_game);
     assert(traveler_local_state==1 && writes==before);
-    barn[0x1670c]=0;barn[0x64]=3;
+    barn[0x1670c]=0;barn[0x64]=1;
     traveler_local_before_input(traveler_barn,traveler_game);
     assert(traveler_local_state==1 && writes==before);
+    traveler_stream_enabled=1;forced_sample_chapter=4;
+    traveler_local_before_input(traveler_barn,traveler_game);
+    assert(traveler_local_state==1 && writes==before && barn[0x64]==1);
+    forced_sample_chapter=2;
+    traveler_local_before_input(traveler_barn,traveler_game);
+    assert(traveler_local_state==2 && traveler_local_frames==1 && barn[0x64]==2 && writes>before);
+    forced_sample_chapter=32;
+    traveler_stream_enabled=0;
+    traveler_local_level_initialized(traveler_barn+0x146f0);
+    assert(!traveler_local_start());before=writes;
     barn[0x64]=2;storage_ok=0;
     traveler_local_before_input(traveler_barn,traveler_game);
     assert(traveler_local_state==5 && JNETActor[17]==5 && writes==before);

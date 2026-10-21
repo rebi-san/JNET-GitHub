@@ -1,0 +1,32 @@
+{
+  "installed_utc": "2026-10-14T02:56:35.891761+00:00",
+  "bottle": "smooviepuffs",
+  "directory": "/Users/rebisan/Library/Containers/com.isaacmarovitz.Whisky/Bottles/598C5EF7-1BBF-4C6F-815E-6068C5507D85/drive_c/Program Files (x86)/Steam/steamapps/common/Journey/Journet",
+  "package_sha256": "6bf0802bc62214b44d36aff7f490756e4622a5942b1375efd472afdc49b9d156",
+  "files": {
+    "JNET.dll": "38b0a4e20ca4b08785e596cf36cf115b578964708d0de5c26c23c8d46ac453f3",
+    "QUICKSTART.txt": "7ff60d16f9afffdd7e11ec493f1459c0bee51aa02466bd4cd2f2cb9aa8861323",
+    "LICENSE-MINHOOK.txt": "d5c2224982b0b95a16b098a561335fa93f3eaf4d0aa964b7843edb986df78dc8",
+    "LICENSE-JOURNEY-DETOUR.txt": "002c2696d92b5c8cf956c11072baa58eaf9f6ade995c031ea635c6a1ee342ad1",
+    "JNET.exe": "8444570c518fc003044e19f6b7b65842c41bb7582c4a790807d34bd311f153b4",
+    "LICENSE-ZIG.txt": "5c537d6853e005298a285d508cff9ac7192cea23576c840d485b2b586a7ff177",
+    "manifest.json": "1ea100089aeae4e5c811d341742064ea8315080eae58f27ad4fd8c41aac2a522",
+    "LICENSE-MINGW.txt": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f",
+    "THIRD-PARTY.txt": "cb49b8ed313b6c5dfe4b1f675f0ee87514338047d9ddbf23d1d3132953c0f001",
+    "session-peers.bin": "1ab81da840c7f8ceaf3560b892bdb4154a1154b9f278b064e725af40b34f96f8"
+  },
+  "original_checks_passed": 8,
+  "game_launched": false,
+  "runtime_verified": false,
+  "version": "0.182",
+  "process_check": "closed before replacement",
+  "helper_launched": false,
+  "connection_scope": "three approved Whisky bottles on this Mac",
+  "validation": "Windows DLL/helper build passed; helper layout and action routing inspected. Gameplay implementation unchanged from 0.181; previous eight-suite validation retained. Archive artifact hashes verified. Live all-level gameplay, progression and cutscenes remain unverified.",
+  "folder_renamed_utc": "2026-10-12T02:43:42.458408+00:00",
+  "log_cleanup": {
+    "utc": "2026-10-12T02:43:42.482488+00:00",
+    "files_deleted": 220,
+    "bytes_deleted": 221088
+  }
+}

@@ -1,0 +1,2190 @@
+{
+  "created_utc": "2026-10-08T22:05:34.986255+00:00",
+  "scope": "CompanionLab generated outputs only; Journey folders, reference mods and Whisky installations untouched",
+  "archive": {
+    "path": "work/research-history.zip",
+    "sha256": "7bac22367d6c8fbad44ef81c4a29da85a0f36a418b67e19e6feb9aa934d80ba5",
+    "members": {
+      "README.md": "e9c4e8a96d88fd45ff2e44600cda03c13514819a3d555852e6688e3cc503a448",
+      "RESEARCH.md": "8870febe74c34adf3b1d21725ac01ffaafc70ff93300a421e5e808a368cad82f",
+      "diagnostic/QUICKSTART.txt": "55a1e883b7d7def2a784b0f7abf25492a28b5993b24a03dca0ef36b333807a5a"
+    }
+  },
+  "removed_groups": [
+    {
+      "path": "__pycache__",
+      "file_count": 7,
+      "bytes": 54398
+    },
+    {
+      "path": "diagnostic/__pycache__",
+      "file_count": 1,
+      "bytes": 22363
+    },
+    {
+      "path": "work/JCProbe-0.7.exe",
+      "file_count": 1,
+      "bytes": 174592
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.1.zip",
+      "file_count": 1,
+      "bytes": 159357
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.10.zip",
+      "file_count": 1,
+      "bytes": 172311
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.11.zip",
+      "file_count": 1,
+      "bytes": 176394
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.12.1.zip",
+      "file_count": 1,
+      "bytes": 178776
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.12.zip",
+      "file_count": 1,
+      "bytes": 178634
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.13.1.zip",
+      "file_count": 1,
+      "bytes": 181165
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.13.2.zip",
+      "file_count": 1,
+      "bytes": 182837
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.13.zip",
+      "file_count": 1,
+      "bytes": 182672
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.14.1.zip",
+      "file_count": 1,
+      "bytes": 186171
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.14.zip",
+      "file_count": 1,
+      "bytes": 186136
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.15.1.zip",
+      "file_count": 1,
+      "bytes": 188950
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.15.zip",
+      "file_count": 1,
+      "bytes": 187457
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.16.zip",
+      "file_count": 1,
+      "bytes": 190361
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.17.zip",
+      "file_count": 1,
+      "bytes": 191820
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.18.zip",
+      "file_count": 1,
+      "bytes": 194290
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.19.zip",
+      "file_count": 1,
+      "bytes": 195011
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.2.zip",
+      "file_count": 1,
+      "bytes": 163231
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.20.1.zip",
+      "file_count": 1,
+      "bytes": 196586
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.20.zip",
+      "file_count": 1,
+      "bytes": 196217
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.21.1.zip",
+      "file_count": 1,
+      "bytes": 198398
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.21.2.zip",
+      "file_count": 1,
+      "bytes": 198688
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.21.zip",
+      "file_count": 1,
+      "bytes": 198213
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.22.zip",
+      "file_count": 1,
+      "bytes": 199220
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.23.zip",
+      "file_count": 1,
+      "bytes": 200332
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.24.zip",
+      "file_count": 1,
+      "bytes": 202428
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.25.zip",
+      "file_count": 1,
+      "bytes": 204206
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.26.zip",
+      "file_count": 1,
+      "bytes": 206661
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.27.zip",
+      "file_count": 1,
+      "bytes": 209375
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.28.zip",
+      "file_count": 1,
+      "bytes": 209924
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.29.zip",
+      "file_count": 1,
+      "bytes": 212747
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.3.zip",
+      "file_count": 1,
+      "bytes": 164153
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.30.zip",
+      "file_count": 1,
+      "bytes": 212717
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.31.zip",
+      "file_count": 1,
+      "bytes": 214245
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.32.zip",
+      "file_count": 1,
+      "bytes": 215349
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.33.zip",
+      "file_count": 1,
+      "bytes": 216081
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.34.zip",
+      "file_count": 1,
+      "bytes": 216819
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.35.zip",
+      "file_count": 1,
+      "bytes": 220016
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.36.zip",
+      "file_count": 1,
+      "bytes": 220034
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.37.zip",
+      "file_count": 1,
+      "bytes": 220636
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.38.zip",
+      "file_count": 1,
+      "bytes": 221980
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.39.zip",
+      "file_count": 1,
+      "bytes": 222659
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.4.zip",
+      "file_count": 1,
+      "bytes": 164352
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.40.zip",
+      "file_count": 1,
+      "bytes": 223410
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.41.zip",
+      "file_count": 1,
+      "bytes": 225232
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.42.zip",
+      "file_count": 1,
+      "bytes": 226667
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.43.zip",
+      "file_count": 1,
+      "bytes": 227479
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.44.zip",
+      "file_count": 1,
+      "bytes": 229083
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.45.zip",
+      "file_count": 1,
+      "bytes": 229954
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.46.zip",
+      "file_count": 1,
+      "bytes": 230923
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.47.zip",
+      "file_count": 1,
+      "bytes": 231018
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.48.zip",
+      "file_count": 1,
+      "bytes": 231310
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.49.zip",
+      "file_count": 1,
+      "bytes": 233940
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.5.zip",
+      "file_count": 1,
+      "bytes": 164431
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.50.zip",
+      "file_count": 1,
+      "bytes": 236657
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.51.zip",
+      "file_count": 1,
+      "bytes": 242600
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.52.zip",
+      "file_count": 1,
+      "bytes": 244346
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.53.zip",
+      "file_count": 1,
+      "bytes": 245920
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.54.zip",
+      "file_count": 1,
+      "bytes": 248205
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.55.zip",
+      "file_count": 1,
+      "bytes": 254717
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.56.zip",
+      "file_count": 1,
+      "bytes": 265009
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.6.zip",
+      "file_count": 1,
+      "bytes": 165932
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.7.zip",
+      "file_count": 1,
+      "bytes": 167392
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.8.zip",
+      "file_count": 1,
+      "bytes": 168240
+    },
+    {
+      "path": "work/JourneyCompanions-Diagnostics-0.9.zip",
+      "file_count": 1,
+      "bytes": 170732
+    },
+    {
+      "path": "work/checkpoint-0.47-jc-probe-20261008-045906-2980.log",
+      "file_count": 1,
+      "bytes": 3481
+    },
+    {
+      "path": "work/companion-components/test_companion_pose",
+      "file_count": 1,
+      "bytes": 90448
+    },
+    {
+      "path": "work/companion-components/test_companion_pose.exe",
+      "file_count": 1,
+      "bytes": 173568
+    },
+    {
+      "path": "work/companion-components/test_companion_pose.pdb",
+      "file_count": 1,
+      "bytes": 1093632
+    },
+    {
+      "path": "work/companion-components/test_companion_session",
+      "file_count": 1,
+      "bytes": 107320
+    },
+    {
+      "path": "work/companion-components/test_companion_session.exe",
+      "file_count": 1,
+      "bytes": 183808
+    },
+    {
+      "path": "work/companion-components/test_companion_session.pdb",
+      "file_count": 1,
+      "bytes": 1077248
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_checkpoint",
+      "file_count": 1,
+      "bytes": 55560
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_checkpoint.exe",
+      "file_count": 1,
+      "bytes": 158720
+    },
+    {
+      "path": "work/companion-components/test_diagnostic_checkpoint.pdb",
+      "file_count": 1,
+      "bytes": 1064960
+    },
+    {
+      "path": "work/companion-components/test_native_appearance",
+      "file_count": 1,
+      "bytes": 386152
+    },
+    {
+      "path": "work/companion-components/test_native_appearance.exe",
+      "file_count": 1,
+      "bytes": 304640
+    },
+    {
+      "path": "work/companion-components/test_native_appearance.pdb",
+      "file_count": 1,
+      "bytes": 1105920
+    },
+    {
+      "path": "work/companion-components/test_native_local_read",
+      "file_count": 1,
+      "bytes": 54360
+    },
+    {
+      "path": "work/companion-components/test_native_local_read.exe",
+      "file_count": 1,
+      "bytes": 163328
+    },
+    {
+      "path": "work/companion-components/test_native_local_read.pdb",
+      "file_count": 1,
+      "bytes": 1056768
+    },
+    {
+      "path": "work/companion-components/test_native_render_queue",
+      "file_count": 1,
+      "bytes": 204968
+    },
+    {
+      "path": "work/companion-components/test_native_render_queue.exe",
+      "file_count": 1,
+      "bytes": 215552
+    },
+    {
+      "path": "work/companion-components/test_native_render_queue.pdb",
+      "file_count": 1,
+      "bytes": 1077248
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-042433-063-1480.log",
+      "file_count": 1,
+      "bytes": 211
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-042645-304-1700.log",
+      "file_count": 1,
+      "bytes": 317
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-043028-916-2252.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-044237-683-2660.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-045501-694-2952.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-050234-682-796.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-050252-233-1280.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-051146-741-1048.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-051348-501-1364.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-201903-673-1328.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-203539-870-1308.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204151-327-1496.log",
+      "file_count": 1,
+      "bytes": 545
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204159-731-1496.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204219-829-1496.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204222-390-1496.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204648-425-1496.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204701-134-1496.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204912-217-1496.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-204917-114-1496.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-205541-541-1304.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-205626-767-1304.log",
+      "file_count": 1,
+      "bytes": 599
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-205701-632-1304.log",
+      "file_count": 1,
+      "bytes": 368
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-210125-613-1304.log",
+      "file_count": 1,
+      "bytes": 263
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-210142-429-1304.log",
+      "file_count": 1,
+      "bytes": 369
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-215619-135-1448.log",
+      "file_count": 1,
+      "bytes": 209
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-215641-502-1448.log",
+      "file_count": 1,
+      "bytes": 599
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-215653-306-1448.log",
+      "file_count": 1,
+      "bytes": 452
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-215700-763-1448.log",
+      "file_count": 1,
+      "bytes": 263
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-215912-695-1448.log",
+      "file_count": 1,
+      "bytes": 452
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-221459-105-1748.log",
+      "file_count": 1,
+      "bytes": 210
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-221524-693-1748.log",
+      "file_count": 1,
+      "bytes": 600
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-221536-282-1748.log",
+      "file_count": 1,
+      "bytes": 453
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-223506-713-728.log",
+      "file_count": 1,
+      "bytes": 210
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-223509-906-728.log",
+      "file_count": 1,
+      "bytes": 600
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-223534-025-728.log",
+      "file_count": 1,
+      "bytes": 264
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-223541-705-728.log",
+      "file_count": 1,
+      "bytes": 369
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-225704-003-988.log",
+      "file_count": 1,
+      "bytes": 210
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-225711-474-988.log",
+      "file_count": 1,
+      "bytes": 600
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-225750-206-988.log",
+      "file_count": 1,
+      "bytes": 264
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-225756-724-988.log",
+      "file_count": 1,
+      "bytes": 369
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-225819-962-988.log",
+      "file_count": 1,
+      "bytes": 369
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-225906-592-988.log",
+      "file_count": 1,
+      "bytes": 369
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231119-209-1440.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231124-012-1440.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231147-823-1440.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231159-524-1440.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231234-622-1440.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231625-507-1728.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231654-742-1728.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231704-615-1728.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231724-593-1728.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-231750-616-1728.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-232257-940-1956.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-232306-692-1956.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-232324-518-1956.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-232352-963-1956.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-232410-228-1956.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-232927-249-96.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233012-210-96.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233033-498-96.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233041-850-96.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233414-885-832.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233447-196-832.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233516-989-832.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233521-411-832.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233535-376-832.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233910-984-2084.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233934-874-2084.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233943-024-2084.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-233953-887-2084.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-234012-562-2084.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-234337-386-2192.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-234347-880-2192.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-234412-446-2192.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-234419-847-2192.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-234451-490-2192.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-235738-516-2548.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-235805-660-2548.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-235818-209-2548.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-235826-484-2548.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261007-235841-885-2548.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-000802-645-3000.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-000808-596-3000.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-000920-815-3000.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-002313-618-1412.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-002319-746-1412.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-002433-161-1412.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-002803-780-1652.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-002810-976-1652.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-002853-635-1652.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-002956-665-1652.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003002-858-1652.log",
+      "file_count": 1,
+      "bytes": 372
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003027-589-1652.log",
+      "file_count": 1,
+      "bytes": 372
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003351-194-1996.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003356-621-1996.log",
+      "file_count": 1,
+      "bytes": 271
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003445-138-1996.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003621-211-124.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003623-959-124.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003710-462-124.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003719-045-124.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003734-513-124.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-003749-561-124.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004228-059-1100.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004230-509-1100.log",
+      "file_count": 1,
+      "bytes": 608
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004308-763-1100.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004317-316-1100.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004326-963-1100.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004347-651-1100.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004559-610-2272.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004604-463-2272.log",
+      "file_count": 1,
+      "bytes": 908
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004641-282-2272.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004656-832-2272.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004706-719-2272.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-004730-319-2272.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005028-296-2556.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005032-963-2556.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005107-215-2556.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005117-134-2556.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005123-855-2556.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005137-990-2556.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005903-061-1952.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005905-769-1952.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005942-245-1952.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-005956-472-1952.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010003-635-1952.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010017-609-1952.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010531-650-916.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010536-455-916.log",
+      "file_count": 1,
+      "bytes": 848
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010613-093-916.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010620-258-916.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010626-845-916.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-010638-164-916.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011057-818-1324.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011102-832-1324.log",
+      "file_count": 1,
+      "bytes": 668
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011141-365-1324.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011151-781-1324.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011158-186-1324.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011211-449-1324.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011912-956-1844.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-011917-187-1844.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-012006-271-1844.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-012014-373-1844.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-012020-010-1844.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-012032-502-1844.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-013814-749-1036.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-013945-860-1036.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-013952-574-1036.log",
+      "file_count": 1,
+      "bytes": 370
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-015227-628-2348.log",
+      "file_count": 1,
+      "bytes": 212
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-015253-022-2348.log",
+      "file_count": 1,
+      "bytes": 602
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-015259-958-2348.log",
+      "file_count": 1,
+      "bytes": 370
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-015319-623-2348.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-020506-842-2560.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-020509-381-2560.log",
+      "file_count": 1,
+      "bytes": 728
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-020551-368-2560.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-020558-312-2560.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-020612-337-2560.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-020639-345-2560.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-020655-781-2560.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-021502-516-2956.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-021510-459-2956.log",
+      "file_count": 1,
+      "bytes": 848
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-021551-693-2956.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-021603-985-2956.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-021609-899-2956.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-021639-623-2956.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-021702-350-2956.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022153-663-1452.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022156-110-1452.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022231-353-1452.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022243-083-1452.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022249-369-1452.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022309-069-1452.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022331-934-1452.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022858-490-1528.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022903-051-1528.log",
+      "file_count": 1,
+      "bytes": 788
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022936-955-1528.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022946-335-1528.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-022953-990-1528.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023011-319-1528.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023039-863-1528.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023407-641-324.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023410-821-324.log",
+      "file_count": 1,
+      "bytes": 668
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023445-674-324.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023459-493-324.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023508-041-324.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023520-579-324.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-023547-276-324.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-025155-239-1156.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-025201-758-1156.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-025240-828-1156.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-025253-983-1156.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-025309-859-1156.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-025338-691-1156.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.36-jc-helper-20261008-025355-577-1156.log",
+      "file_count": 1,
+      "bytes": 267
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-043029-2120.log",
+      "file_count": 1,
+      "bytes": 1381
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-044239-2520.log",
+      "file_count": 1,
+      "bytes": 16202
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-045502-2776.log",
+      "file_count": 1,
+      "bytes": 7599
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-050236-1736.log",
+      "file_count": 1,
+      "bytes": 23936
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-051148-1376.log",
+      "file_count": 1,
+      "bytes": 11780
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-201905-1172.log",
+      "file_count": 1,
+      "bytes": 30954
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-203540-1160.log",
+      "file_count": 1,
+      "bytes": 16752
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-204152-1364.log",
+      "file_count": 1,
+      "bytes": 8260
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-205627-1172.log",
+      "file_count": 1,
+      "bytes": 11368
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-215642-1304.log",
+      "file_count": 1,
+      "bytes": 262
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-221525-1620.log",
+      "file_count": 1,
+      "bytes": 206
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-223510-2076.log",
+      "file_count": 1,
+      "bytes": 398
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-225711-1056.log",
+      "file_count": 1,
+      "bytes": 500
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-231124-1484.log",
+      "file_count": 1,
+      "bytes": 206
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-231655-1632.log",
+      "file_count": 1,
+      "bytes": 786
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-232307-1288.log",
+      "file_count": 1,
+      "bytes": 866
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-233012-2044.log",
+      "file_count": 1,
+      "bytes": 1052
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-233447-860.log",
+      "file_count": 1,
+      "bytes": 1313
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-233935-1064.log",
+      "file_count": 1,
+      "bytes": 1719
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-234348-2140.log",
+      "file_count": 1,
+      "bytes": 1856
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261007-235806-2412.log",
+      "file_count": 1,
+      "bytes": 784
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-000815-3024.log",
+      "file_count": 1,
+      "bytes": 348
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-002325-1484.log",
+      "file_count": 1,
+      "bytes": 351
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-002815-1712.log",
+      "file_count": 1,
+      "bytes": 2116
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-003627-900.log",
+      "file_count": 1,
+      "bytes": 2095
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-004233-1152.log",
+      "file_count": 1,
+      "bytes": 984
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-004607-2184.log",
+      "file_count": 1,
+      "bytes": 986
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-005036-2460.log",
+      "file_count": 1,
+      "bytes": 2251
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-005909-2780.log",
+      "file_count": 1,
+      "bytes": 2328
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-010539-3056.log",
+      "file_count": 1,
+      "bytes": 2417
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-011107-1384.log",
+      "file_count": 1,
+      "bytes": 2493
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-011920-1676.log",
+      "file_count": 1,
+      "bytes": 2715
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-013946-996.log",
+      "file_count": 1,
+      "bytes": 206
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-015253-2264.log",
+      "file_count": 1,
+      "bytes": 206
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-020512-2228.log",
+      "file_count": 1,
+      "bytes": 2440
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-021513-2996.log",
+      "file_count": 1,
+      "bytes": 2440
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-022159-1436.log",
+      "file_count": 1,
+      "bytes": 2440
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-022906-1824.log",
+      "file_count": 1,
+      "bytes": 2440
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-023414-36.log",
+      "file_count": 1,
+      "bytes": 2780
+    },
+    {
+      "path": "work/crash-0.36-jc-probe-20261008-025205-1100.log",
+      "file_count": 1,
+      "bytes": 2440
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034734-455-1064.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034737-002-1064.log",
+      "file_count": 1,
+      "bytes": 548
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034811-255-1064.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034820-852-1064.log",
+      "file_count": 1,
+      "bytes": 266
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034826-316-1064.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034848-252-1064.log",
+      "file_count": 1,
+      "bytes": 371
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034856-270-1064.log",
+      "file_count": 1,
+      "bytes": 267
+    },
+    {
+      "path": "work/crash-0.43-jc-helper-20261008-034900-942-1064.log",
+      "file_count": 1,
+      "bytes": 156
+    },
+    {
+      "path": "work/crash-0.43-jc-probe-20261008-034740-2252.log",
+      "file_count": 1,
+      "bytes": 2440
+    },
+    {
+      "path": "work/diagnostic-build",
+      "file_count": 4,
+      "bytes": 15515
+    },
+    {
+      "path": "work/edit_boundary.py",
+      "file_count": 1,
+      "bytes": 7548
+    },
+    {
+      "path": "work/edit_build_check.py",
+      "file_count": 1,
+      "bytes": 10074
+    },
+    {
+      "path": "work/edit_geometry.py",
+      "file_count": 1,
+      "bytes": 5478
+    },
+    {
+      "path": "work/edit_guarded_mesh.py",
+      "file_count": 1,
+      "bytes": 9443
+    },
+    {
+      "path": "work/edit_material_prep.py",
+      "file_count": 1,
+      "bytes": 7943
+    },
+    {
+      "path": "work/edit_pool.py",
+      "file_count": 1,
+      "bytes": 5261
+    },
+    {
+      "path": "work/edit_resource.py",
+      "file_count": 1,
+      "bytes": 10261
+    },
+    {
+      "path": "work/install-devishaz-0.1.json",
+      "file_count": 1,
+      "bytes": 1295
+    },
+    {
+      "path": "work/install-devishaz-0.10.json",
+      "file_count": 1,
+      "bytes": 1371
+    },
+    {
+      "path": "work/install-devishaz-0.11.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.12.1.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.12.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.13.1.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.13.2.json",
+      "file_count": 1,
+      "bytes": 1376
+    },
+    {
+      "path": "work/install-devishaz-0.13.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.14.1.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.14.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.15.1.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.15.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.16.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.17.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.18.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.19.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.2.json",
+      "file_count": 1,
+      "bytes": 1366
+    },
+    {
+      "path": "work/install-devishaz-0.20.1.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.20.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.21.2.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.21.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.22.json",
+      "file_count": 1,
+      "bytes": 1374
+    },
+    {
+      "path": "work/install-devishaz-0.23.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.24.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.25.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.26.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.27.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.28.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.3.json",
+      "file_count": 1,
+      "bytes": 1366
+    },
+    {
+      "path": "work/install-devishaz-0.30.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.31.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.32.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.33.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.34.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.36.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.37.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.38.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.39.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.4.json",
+      "file_count": 1,
+      "bytes": 1366
+    },
+    {
+      "path": "work/install-devishaz-0.40.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.41.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.42-restored.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.42.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.43.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.44.json",
+      "file_count": 1,
+      "bytes": 1381
+    },
+    {
+      "path": "work/install-devishaz-0.45.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.46.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.47.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.48.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.49.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.5.json",
+      "file_count": 1,
+      "bytes": 1366
+    },
+    {
+      "path": "work/install-devishaz-0.50.json",
+      "file_count": 1,
+      "bytes": 1372
+    },
+    {
+      "path": "work/install-devishaz-0.51.json",
+      "file_count": 1,
+      "bytes": 1371
+    },
+    {
+      "path": "work/install-devishaz-0.52.json",
+      "file_count": 1,
+      "bytes": 1371
+    },
+    {
+      "path": "work/install-devishaz-0.53.json",
+      "file_count": 1,
+      "bytes": 1371
+    },
+    {
+      "path": "work/install-devishaz-0.54.json",
+      "file_count": 1,
+      "bytes": 1371
+    },
+    {
+      "path": "work/install-devishaz-0.55.json",
+      "file_count": 1,
+      "bytes": 1371
+    },
+    {
+      "path": "work/install-devishaz-0.56.json",
+      "file_count": 1,
+      "bytes": 1371
+    },
+    {
+      "path": "work/install-devishaz-0.6.json",
+      "file_count": 1,
+      "bytes": 1366
+    },
+    {
+      "path": "work/install-devishaz-0.7.json",
+      "file_count": 1,
+      "bytes": 1366
+    },
+    {
+      "path": "work/install-devishaz-0.8.json",
+      "file_count": 1,
+      "bytes": 1370
+    },
+    {
+      "path": "work/install-devishaz-0.9.json",
+      "file_count": 1,
+      "bytes": 1370
+    },
+    {
+      "path": "work/install-smooviepuffs-0.56.json",
+      "file_count": 1,
+      "bytes": 1297
+    },
+    {
+      "path": "work/install_smooviepuffs.py",
+      "file_count": 1,
+      "bytes": 2211
+    },
+    {
+      "path": "work/pose-0.45-jc-probe-20261008-043650-2068.log",
+      "file_count": 1,
+      "bytes": 3387
+    },
+    {
+      "path": "work/spawn_preflight.obj",
+      "file_count": 1,
+      "bytes": 38259
+    },
+    {
+      "path": "work/test_companion_session",
+      "file_count": 1,
+      "bytes": 107320
+    },
+    {
+      "path": "work/test_diagnostic_checkpoint",
+      "file_count": 1,
+      "bytes": 53688
+    },
+    {
+      "path": "work/test_native_allocation",
+      "file_count": 1,
+      "bytes": 72904
+    },
+    {
+      "path": "work/test_native_animation_storage",
+      "file_count": 1,
+      "bytes": 88064
+    },
+    {
+      "path": "work/test_native_appearance",
+      "file_count": 1,
+      "bytes": 160376
+    },
+    {
+      "path": "work/test_native_clone_pool",
+      "file_count": 1,
+      "bytes": 70888
+    },
+    {
+      "path": "work/test_native_geometry_pool",
+      "file_count": 1,
+      "bytes": 71352
+    },
+    {
+      "path": "work/test_native_idle_pose",
+      "file_count": 1,
+      "bytes": 89432
+    },
+    {
+      "path": "work/test_native_initialized_lifetime",
+      "file_count": 1,
+      "bytes": 160992
+    },
+    {
+      "path": "work/test_native_layout",
+      "file_count": 1,
+      "bytes": 54048
+    },
+    {
+      "path": "work/test_native_material_ready",
+      "file_count": 1,
+      "bytes": 53224
+    },
+    {
+      "path": "work/test_native_mesh_callbacks",
+      "file_count": 1,
+      "bytes": 71064
+    },
+    {
+      "path": "work/test_native_mesh_guard",
+      "file_count": 1,
+      "bytes": 52968
+    },
+    {
+      "path": "work/test_native_mesh_rehearsal",
+      "file_count": 1,
+      "bytes": 89784
+    },
+    {
+      "path": "work/test_native_pose_storage",
+      "file_count": 1,
+      "bytes": 87960
+    },
+    {
+      "path": "work/test_native_pose_writes",
+      "file_count": 1,
+      "bytes": 105480
+    },
+    {
+      "path": "work/test_native_render_queue",
+      "file_count": 1,
+      "bytes": 204968
+    },
+    {
+      "path": "work/test_native_resources",
+      "file_count": 1,
+      "bytes": 71320
+    },
+    {
+      "path": "work/test_native_shader_inputs",
+      "file_count": 1,
+      "bytes": 72904
+    },
+    {
+      "path": "work/test_native_spawn_preflight",
+      "file_count": 1,
+      "bytes": 88328
+    },
+    {
+      "path": "work/test_remote_pe",
+      "file_count": 1,
+      "bytes": 71136
+    },
+    {
+      "path": "work/tmp",
+      "file_count": 1,
+      "bytes": 1277
+    },
+    {
+      "path": "work/update_devishaz.py",
+      "file_count": 1,
+      "bytes": 2579
+    },
+    {
+      "path": "work/update_pose_bottles.py",
+      "file_count": 1,
+      "bytes": 3270
+    },
+    {
+      "path": "work/zig-cache",
+      "file_count": 4704,
+      "bytes": 125288430
+    },
+    {
+      "path": "work/zig-local-cache",
+      "file_count": 223,
+      "bytes": 40763583
+    }
+  ],
+  "removed_file_count": 5362,
+  "removed_bytes": 190336441,
+  "phase": "complete: generated artifacts removed, docs condensed, retained files and artifact hashes verified; no application build or runtime test performed",
+  "protected_verification": {
+    "files_verified": 15732,
+    "manifest_sha256": "99fc95b92a79241cec510386c05809338714c63b7bc7bcafb7887b9d7a8b6240",
+    "key_files": {
+      "work/JourneyCompanions-Diagnostics-0.58.zip": "6d43fe69a283907fa1d6b3daee39d40dcb05c791aa3712803057a581d8752f6b",
+      "work/install-smooviepuffs.json": "58d6d88c688358f464b39eaf7fa4b034ec43e5ea7755358e1546a2104d90a050",
+      "work/install-devishaz.json": "b7ebaa1cc8ba17aa7bddadc2f600091be9e69be8d4b3c4f8b354f3df04f0a466",
+      "work/JourneyCompanions-Diagnostics-0.57.zip": "a73e247c8a9972c8f6b11a914fade6895b63d0002c6390eb5cffde4349992749",
+      "work/companion-components/verification.json": "52eb9406b39b25e98afcd30201d135428ab1e1984741f00b2537a57145bda9bf"
+    }
+  },
+  "documentation": {
+    "README.md": {
+      "bytes": 12174,
+      "sha256": "87bf3c38e03a6c27c0cfd14334ecdae3774d8849fb33ad69b05382b103a97802"
+    },
+    "RESEARCH.md": {
+      "bytes": 11418,
+      "sha256": "7281ad7705b854b930e37fc61d37c4a4bb015cf0caf0f1518719b05b60d8703b"
+    },
+    "diagnostic/QUICKSTART.txt": {
+      "bytes": 6625,
+      "sha256": "9c1290970d31220e3ea4390d8c7ad00c992258623bc694910564f23da6722853"
+    },
+    "NEXT_CHAT_PROMPT.txt": {
+      "bytes": 1448,
+      "sha256": "a357f4de608b094aee7b60ef4ac71707f38da9c3540655a940dd4d5313efa0fd"
+    }
+  },
+  "documentation_bytes_before": 366674,
+  "documentation_bytes_after": 31665,
+  "completed_utc": "2026-10-08T22:09:22.584605+00:00"
+}

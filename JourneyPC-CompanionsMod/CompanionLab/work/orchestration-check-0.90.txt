@@ -1,0 +1,6 @@
+native orchestration: 86 production-body scenarios passed for both owners, precise binding failures, alternating order and room sequences
+native report: 49 production-body scenarios passed; maximal numeric report 4667 / 10000 characters; exit report retention and 499 bounded capacities and two exit-recorder cases passed
+native companion cloth: scarf charge/length, per-participant outfit/symbol, atlas changes and isolated descriptor failures passed
+native companion cloth: phase, capacity, peer handoff, ownership, native sequencing and retirement scenarios passed
+native cloth orchestration: 8 extracted-production finish, cleanup and 14-argument forwarding scenarios passed
+native cloth appearance: 29 extracted-production buffer-disjointness, exact restoration and texture-binding scenarios passed

@@ -260,6 +260,11 @@ static void jnet_image_draw(uintptr_t renderer) {
     ID3D11Texture2D *back=NULL;ID3D11RenderTargetView *target=NULL;
     if(jnet_image_failed(swap->lpVtbl->GetBuffer(swap,0,&texture_id,(void **)&back)) ||
        jnet_image_failed(device->lpVtbl->CreateRenderTargetView(device,(ID3D11Resource *)back,NULL,&target))) {
+        HRESULT reason=device->lpVtbl->GetDeviceRemovedReason(device);
+        if(FAILED(reason)){
+            char line[160];snprintf(line,sizeof(line),"[JNET] menu images suspended: graphics device unavailable; removed reason=%08lx",(unsigned long)reason);
+            message(line);jnet_image_gpu.failed=1;jnet_image_gpu.failed_stage=7;
+        }
         InterlockedExchange(&jnet_image_result,3);goto done;
     }
     D3D11_TEXTURE2D_DESC desc;back->lpVtbl->GetDesc(back,&desc);

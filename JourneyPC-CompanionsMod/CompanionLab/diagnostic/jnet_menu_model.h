@@ -28,12 +28,15 @@ struct jnet_menu_session {
     struct jnet_room_listing pending, current;
 };
 struct jnet_appearance_choice {
-    unsigned outfit, scarf_segments, character, symbol, infinite_scarf, locked_scarf;
+    unsigned outfit, scarf_segments, character, symbol, infinite_scarf, locked_scarf, variant;
 };
 struct jnet_appearance_edit {
     struct jnet_appearance_choice applied, draft, pending;
     unsigned awaiting;
 };
+static inline unsigned jnet_appearance_row_count(unsigned character) {
+    return 6u+(jnet_character_variant_limit(character)!=0 || jnet_character_is_flow(character));
+}
 static inline void jnet_appearance_observe(struct jnet_appearance_edit *edit,unsigned outfit,unsigned scarf,unsigned symbol,int initial) {
     if(!edit || outfit>6 || scarf>JNET_SCARF_MAX || symbol>20 || edit->awaiting)return;
     if(initial || edit->draft.outfit==edit->applied.outfit)edit->draft.outfit=outfit;
@@ -43,6 +46,7 @@ static inline void jnet_appearance_observe(struct jnet_appearance_edit *edit,uns
     edit->applied.outfit=outfit;edit->applied.scarf_segments=scarf;edit->applied.symbol=symbol;
     if(initial){
         edit->applied.character=edit->draft.character=0;
+        edit->applied.variant=edit->draft.variant=0;
         edit->applied.infinite_scarf=edit->draft.infinite_scarf=0;
         edit->applied.locked_scarf=edit->draft.locked_scarf=0;
     }
@@ -127,12 +131,21 @@ static inline struct jnet_lobby_labels jnet_lobby_labels(const struct jnet_menu_
     snprintf(out.population,sizeof(out.population),"Players %u/%u",r->players,r->capacity);
     return out;
 }
-enum jnet_selector { JNET_SELECT_ROBE, JNET_SELECT_SCARF, JNET_SELECT_SYMBOL, JNET_SELECT_CHARACTER, JNET_SELECT_SCARF_MODE, JNET_SELECT_SCARF_GROW };
+enum jnet_selector { JNET_SELECT_ROBE, JNET_SELECT_SCARF, JNET_SELECT_SYMBOL, JNET_SELECT_CHARACTER, JNET_SELECT_SCARF_MODE, JNET_SELECT_SCARF_GROW, JNET_SELECT_VARIANT };
 static inline int jnet_appearance_step(struct jnet_appearance_edit *edit,unsigned selector,int direction,unsigned max_scarf) {
     if(!edit || (direction!=1 && direction!=-1))return JNET_MENU_INVALID;
     if(edit->awaiting)return JNET_MENU_BUSY;
     unsigned *value,limit;
     switch(selector) {
+        case JNET_SELECT_VARIANT:
+            if(jnet_character_is_flow(edit->draft.character)){
+                edit->draft.character=edit->draft.character==JNET_CHARACTER_FLOW_1?JNET_CHARACTER_FLOW_2:JNET_CHARACTER_FLOW_1;
+                edit->draft.variant=0;return JNET_MENU_OK;
+            }
+            value=&edit->draft.variant;
+            limit=jnet_character_variant_limit(edit->draft.character);
+            if(!limit)return JNET_MENU_UNAVAILABLE;
+            break;
         case JNET_SELECT_ROBE:value=&edit->draft.outfit;limit=6;break;
         case JNET_SELECT_SCARF:value=&edit->draft.scarf_segments;limit=max_scarf;break;
         case JNET_SELECT_SYMBOL:value=&edit->draft.symbol;limit=20;break;
@@ -142,9 +155,12 @@ static inline int jnet_appearance_step(struct jnet_appearance_edit *edit,unsigne
             if(edit->draft.character>=JNET_CHARACTER_COUNT)return JNET_MENU_INVALID;
             {
                 const unsigned order[]={JNET_CHARACTER_WAYFARER,JNET_CHARACTER_LONGTAIL,JNET_CHARACTER_WHALE,
-                    JNET_CHARACTER_WAR_MACHINE,JNET_CHARACTER_FLOW_1,JNET_CHARACTER_FLOW_2,JNET_CHARACTER_ROCKET};
-                for(unsigned i=0;i<JNET_CHARACTER_COUNT;++i)if(order[i]==edit->draft.character){
-                    edit->draft.character=order[(i+JNET_CHARACTER_COUNT+direction)%JNET_CHARACTER_COUNT];
+                    JNET_CHARACTER_WAR_MACHINE,JNET_CHARACTER_FLOW_1,JNET_CHARACTER_ROCKET};
+                unsigned count=sizeof(order)/sizeof(order[0]);
+                unsigned current=jnet_character_is_flow(edit->draft.character)?JNET_CHARACTER_FLOW_1:edit->draft.character;
+                for(unsigned i=0;i<count;++i)if(order[i]==current){
+                    edit->draft.variant=0;
+                    edit->draft.character=order[(i+count+direction)%count];
                     return JNET_MENU_OK;
                 }
             }
@@ -167,6 +183,7 @@ static inline int jnet_appearance_apply(struct jnet_appearance_edit *edit,unsign
     if(!edit || edit->draft.outfit>6 || edit->draft.character>=JNET_CHARACTER_COUNT || edit->draft.symbol>20 || edit->draft.infinite_scarf>1 || edit->draft.locked_scarf>1 || edit->draft.scarf_segments>max_scarf)
         return JNET_MENU_INVALID;
     if(edit->awaiting)return JNET_MENU_BUSY;
+    if(edit->draft.variant>jnet_character_variant_limit(edit->draft.character))return JNET_MENU_INVALID;
     if(edit->draft.character && !(supported_characters&(1u<<edit->draft.character)))return JNET_MENU_UNAVAILABLE;
     edit->pending=edit->draft;edit->awaiting=1;return JNET_MENU_OK;
 }

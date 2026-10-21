@@ -1,0 +1,1004 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+
+  <!-- config settings -->
+  <Settings Version="89">
+
+    <!-- hidden data won't be stored in the user config -->
+    <Hidden>
+
+      <Affinity Worker="0"/>
+
+      <!-- these are just outright hacks -->
+      <Assorted AdditiveZHack="0.05"/>
+
+      <Logs OutputFilePath="" Enable="false" Internal="DebugString">
+
+        <Root       Desc="DebugString"/>
+        <RootTS     Desc="Wrapper:Root:'[$TIMESTAMP_CURRENT$] '"/>
+        <Main       Desc="Wrapper:RootTS:'Main:     ';"/>
+        <Audio      Desc="Wrapper:RootTS:'Audio:    ';"/>
+        <Input      Desc="Wrapper:RootTS:'Input:    ';"/>
+        <RTDB       Desc="Wrapper:RootTS:'RTDB:     ';"/>
+        <Render     Desc="Wrapper:RootTS:'Render:   ';"/>
+        <Graphics   Desc="Wrapper:RootTS:'Graphics: ';"/>
+        <System     Desc="Wrapper:RootTS:'System:   ';"/>
+        <Steam      Desc="Wrapper:RootTS:'Steam:    ';"/>
+        <Legacy     Desc="Wrapper:RootTS:'Legacy:   ';"/>
+        <Sand       Desc="Wrapper:RootTS:'Sand:     ';"/>
+        <Crash      Desc="Wrapper:RootTS:'[[CRASH]] ';"/>
+        <Resource   Desc="Wrapper:RootTS:'Resource: ';"/>
+        <Mesh       Desc="Wrapper:RootTS:'Mesh:     ';"/>
+        <Anim       Desc="Wrapper:RootTS:'Anim:     ';"/>
+
+        <Error      Desc="WaitLn:RootTS:'[ERROR]   '"/>
+        <Out        Desc="WaitLn:RootTS:'[OUT]     '"/>
+
+        <Trigger      Desc="DebugString;Off:Net:127.0.0.1"/>
+        <TriggerRoot  Desc="Wrapper:Trigger:'[$TIMESTAMP_CURRENT$] '"/>
+        <TriggersNew  Desc="Wrapper:TriggerRoot:'[[NEW]] ';"/>
+        <TriggersRep  Desc="Wrapper:TriggerRoot:'        ';"/>
+
+        <TTY02 Desc="WaitLn:Legacy:'[TTY02] ':' [Audio]'"/>
+        <TTY04 Desc="WaitLn:Legacy:'[TTY04] ':' [MatchMaker]'"/>
+        <TTY05 Desc="WaitLn:Legacy:'[TTY05] ':' [ConnClient]'"/>
+        <TTY06 Desc="WaitLn:Legacy:'[TTY06] ':' [Anim]'"/>
+        <TTY07 Desc="WaitLn:Legacy:'[TTY07] ':' [Sync]'"/>
+        <TTY08 Desc="WaitLn:Legacy:'[TTY08] ':' [Grave]'"/>
+        <TTY09 Desc="WaitLn:Legacy:'[TTY09] ':' [Zephyr]'"/>
+        
+      </Logs>
+
+      <!-- things steam -->
+      <Steam Enable="true" ErrorMsg="false">
+        <Cloud FileName="SAVE.BIN"/>
+      </Steam>
+      <Streaming Enable="true" Serialize="false"/>
+
+
+      <Cloth>
+        <Dude VertCount="528">
+          <Frame FPS="30" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="1.0" ddgwMaster="1.0" Falloff="1.0" NonFrozenDamping="1.0" GravityMaster="1.0" GrabPointMagnitude="1.0"/>
+          <Frame FPS="45" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="0.97" ddgwMaster="1.0" Falloff="2.5" NonFrozenDamping="1.1" GravityMaster="0.9" GrabPointMagnitude="0.9"/>
+          <Frame FPS="60" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="0.9" ddgwMaster="1.0" Falloff="7.0" NonFrozenDamping="1.4" GravityMaster="0.7" GrabPointMagnitude="0.7"/>
+          <Frame FPS="120" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="0.8" ddgwMaster="1.0" Falloff="11.0" NonFrozenDamping="1.8" GravityMaster="0.5" GrabPointMagnitude="0.6"/>
+          <Frame FPS="240" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="0.6" ddgwMaster="1.0" Falloff="18.0" NonFrozenDamping="2.6" GravityMaster="0.3" GrabPointMagnitude="0.4"/>
+        </Dude>
+        <DogFish VertCount="137;378;459">
+          <Frame FPS="30" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="1.0" ddgwMaster="1.0" Falloff="1.0" NonFrozenDamping="1.0" GravityMaster="1.0" GrabPointMagnitude="1.0"/>
+          <Frame FPS="45" Drag="1.0" Damping="1.4" Gravity="1.4" Wind="1.4" ddgwMaster="0.8" Falloff="2.0" NonFrozenDamping="1.1" GravityMaster="0.9" GrabPointMagnitude="1.0"/>
+          <Frame FPS="60" Drag="1.0" Damping="2.5" Gravity="2.0" Wind="2.0" ddgwMaster="0.3" Falloff="5.0" NonFrozenDamping="1.4" GravityMaster="0.7" GrabPointMagnitude="1.0"/>
+          <Frame FPS="120" Drag="1.0" Damping="4.0" Gravity="3.0" Wind="3.0" ddgwMaster="0.2" Falloff="8.0" NonFrozenDamping="1.8" GravityMaster="0.5" GrabPointMagnitude="1.0"/>
+          <Frame FPS="240" Drag="1.0" Damping="8.0" Gravity="5.0" Wind="5.0" ddgwMaster="0.1" Falloff="15.0" NonFrozenDamping="2.5" GravityMaster="0.2" GrabPointMagnitude="1.0"/>
+        </DogFish>
+        <Common>
+          <Frame FPS="30" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="1.0" ddgwMaster="1.0" Falloff="1.0" NonFrozenDamping="1.0" GravityMaster="1.0" GrabPointMagnitude="1.0"/>
+          <Frame FPS="45" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="1.0" ddgwMaster="0.8" Falloff="3.0" NonFrozenDamping="1.0" GravityMaster="1.0" GrabPointMagnitude="1.0"/>
+          <Frame FPS="60" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="1.0" ddgwMaster="0.5" Falloff="10.0" NonFrozenDamping="1.0" GravityMaster="1.0" GrabPointMagnitude="1.0"/>
+          <Frame FPS="120" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="1.0" ddgwMaster="0.3" Falloff="15.0" NonFrozenDamping="1.0" GravityMaster="1.0" GrabPointMagnitude="1.0"/>
+          <Frame FPS="240" Drag="1.0" Damping="1.0" Gravity="1.0" Wind="1.0" ddgwMaster="0.1" Falloff="35.0" NonFrozenDamping="1.0" GravityMaster="1.0" GrabPointMagnitude="1.0"/>
+        </Common>
+      </Cloth>
+
+      <!-- debug controls, these won't do anything in the final build -->
+      <Debug>
+        <Game AllowCheatToggling="true" AllowCheating="true" EnableSaving="true" EnableTrophies="true" PlayTitles="true">
+          <Cheating Enable="true" Toggle="true"/>
+        </Game>
+        
+        <Matchmaker EnableInfo="false"/>
+        
+        <System SkipConfigScreen="false">
+          <ExceptionHandling Enable="false" Test="false"/>
+          <GPU CrashTrace="false"
+               ProfileTimings="false"
+               ProfileStatistics="false"
+               ProfileOcclusion="false"/>
+          <HangDetection Main="true"
+                         Audio="true"
+                         PrefetchSymbols="true"
+                       />
+        </System>
+        <Graphics>
+          <Dune Wireframe="false" FixParent="true" FixNeighbour="true"/>
+          <Cloth Wireframe="false"/>
+        </Graphics>
+        <Steam>
+          <Warning Break="false"/>
+        </Steam>
+        <Misc OutputCamera="false"
+              OutputDude="false"
+              OutputTriggers="false"
+              OutputDudeAnim="false"
+              ReturnInFiveMinutes="false"
+              TutorialIcons="false"
+            />
+        <Culling Enable="true" MaskAnd="0" MaskEq="0" ExemptTraversal=""/>
+        <Lua OutputStats="false"/>
+
+        <DebugLines Enable="false"
+                    Cloth="false"
+                    Dude="false"
+                    Gravestone="false"
+                    Hull="false"
+                    Particle="false"
+                    Zephyr="false"
+                    BoundaryRail="false"
+                    GrindToPos="false"
+                    AutoJump="false"
+                    LedgeClimb="false"
+                    Player="false"
+                    Voxel="false"
+                    SandFall="false"
+                    Creature="false"
+                    Guardian="false"
+                    JellyFish="false"
+                    DogFish="false"
+                    JetBarn="false"
+                    CompositionCamera="false"
+                    StrandOrbit="false"
+                    SnapToRail="false"
+                    Lobby="false"
+                    MarkerBarn="false"
+                    PlatformInputCorrection="false"
+                    GuideRail="false"
+                    DiveSequenceRail="false"
+                    Debris="false"
+                    FlockInCylinder="false"
+                    CreaFallFish="false"
+                    DudeAlignment="false"
+                    Mesh="false"
+                    CameraHelpers="false"
+                    DuneBarn="false"
+                    AttachmentMesh="false"
+                    CameraSystem="false"
+                    CreaKiss="false"
+                    SnapToHull="false"
+                    WhaleRide="false"
+                    Rideable="false"
+                    StrandBarn="false"
+                    FlockToTarget="false"
+                    Ambience="false"
+                    ClothCollision="false"
+                    AttachEmitterToDude="false"
+                    FocusCam="false"
+                    ExplodeDude="false"
+                    FollowDude="false"
+                    BoostDude="false"
+                    SpawnRocket="false"
+                    ColdMove="false"
+                    Attack="false"
+                  />
+
+        <Passes SandTexture="true"
+                Color="true"
+                Decoration="true"
+                MultiPassColor="true"
+                Decal="true"
+                PreSkyBox="true"
+                SkyBox="true"
+                Occlusion="true"
+                Blended="true"
+                Additive="true"
+                AdditiveNoZ="true"
+                ParticleBlended="true"
+                LowResAddFill="true"
+                LowResBlendFill="true"
+                AdditivePostDOF="true"
+                Text="true"
+              />
+      </Debug>
+
+
+    </Hidden>
+    
+    <Inputs>
+
+        <!-- new system -->
+        -----------
+        <Textures Default="textureBlank">
+
+            <textureMove Id="155" Width="64" Height="64"/>
+            <textureTouch Id="159" Width="64" Height="64"/>
+            <textureTouchXflip Id="159" Width="-64" Height="64"/>
+            <textureLook Id="160" Width="64" Height="64"/>
+            
+            <textureInvertIcon Id="28" Width="$CfgSmallStepX$*6" Height="$CfgSmallStepX$*6"/>
+            
+            <textureSensitivityL Id="157" Width="$CfgSmallStepX$*10" Height="$CfgSmallStepY$*5"/>
+            <textureSensitivityM Id="29" Width="$CfgSmallStepX$*10" Height="$CfgSmallStepY$*5"/>
+            <textureSensitivityH Id="30" Width="$CfgSmallStepX$*10" Height="$CfgSmallStepY$*5"/>
+            
+            <textureCtrlLeftRight Id="161" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+            <textureCtrlRightLeft Id="162" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+            
+            <textureCtrlXboxLR Id="132" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+            <textureCtrlXboxRL Id="133" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+            <textureCtrlPS4LR Id="140" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+            <textureCtrlPS4RL Id="141" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+
+            <texturePadButtonA Id="167" Width="$ButtonCircleSize" Height="$ButtonCircleSize"/>
+            <texturePadButtonB Id="168" Width="$ButtonCircleSize" Height="$ButtonCircleSize"/>
+            <texturePadButtonO Id="148" Width="$ButtonCircleSize" Height="$ButtonCircleSize"/>
+            <texturePadButtonX Id="149" Width="$ButtonCircleSize" Height="$ButtonCircleSize"/>
+            
+            <textureCtrlTiltLeft Id="163" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+            <textureCtrlTiltRight Id="164" Width="$CfgBtnSz" Height="($CfgBtnSz$/2)"/>
+            <textureCtrlHapticsOn Id="165" Width="$CfgBtnSz$" Height="($CfgBtnSz$/2)"/>
+            <textureCtrlHapticsOff Id="166" Width="$CfgBtnSz$" Height="($CfgBtnSz$/2)"/>
+            
+            <texturePad Id="158" Width="64" Height="64"/>
+            <texturePlay Id="150" Width="48" Height="48"/>
+            <texturePause Id="150" Width="48" Height="48"/>
+            <textureWings Id="130" Width="64" Height="64"/>
+            <textureMusicNote Id="131" Width="64" Height="64"/>
+            <textureFilledCircle Id="152" Width="64" Height="64"/>
+            
+            <textureOutlinedCircle Id="151" Width="64" Height="64"/>
+            
+            <textureMenu Id="150" Width="64" Height="64"/>
+            <textureMenuClose Id="151" Width="48" Height="48"/>
+            <textureConfig Id="27" Width="64" Height="64"/>
+            <textureConfigLarge Id="27" Width="$CfgBtnSz$*7/8" Height="$CfgBtnSz$*7/8"/>
+            <textureBlack Id="31" Width="1" Height="1" CentreX="0"/>
+            <textureConfigOptions Id="150" Width="96" Height="64"/>
+            
+            <textureCog Id="27" Width="64" Height="64"/>
+            
+            <textureBlank Id="139" Width="64" Height="64"/>
+            <textureDown Id="138" Width="64" Height="64"/>
+            <textureUp Id="137" Width="64" Height="64"/>
+            <textureRight Id="136" Width="64" Height="64"/>
+            <textureLeft Id="135" Width="64" Height="64"/>
+            <textureCentre Id="134" Width="64" Height="64"/>
+            <textureChant Id="131" Width="64" Height="64"/>
+            <textureFly Id="130" Width="64" Height="64"/>
+            <textureSelect Id="129" Width="64" Height="64"/>
+            <textureStart Id="138" Width="$ButtonCircleSize" Height="$ButtonCircleSize"/>
+            <textureChapSelect Id="138" Width="($CfgBtnSz$/3)" Height="($CfgBtnSz$/3)"/>
+            <textureButtonOutlinedCircle Id="151" Width="$ButtonCircleSize" Height="$$ButtonCircleSize"/>
+            
+        </Textures>
+        
+        <Layers>
+
+            <layerStart Alpha="0.0" x="-15" Rotation="45" Scale="1.Z">
+                 <Frame0 Texture="textureStart" x="-15" Rotation="45" Duration="0.8" Alpha="1.0" Scale="1.2"/>
+                 <Frame1 Texture="textureStart" x="-15" Rotation="45" Duration="0.8" Alpha="0.0" Scale="1.2"/>
+            </layerStart>
+            
+            <layerStartGamepadA Alpha="0.0" x="-15">
+                <Frame0 Texture="texturePadButtonA" x="-15" Duration="0.8" Alpha="1.0"/>
+                <Frame1 Texture="texturePadButtonA" x="-15" Duration="0.8" Alpha="0.0"/>
+            </layerStartGamepadA>
+            
+            <layerStartGamepadB Alpha="0.0" x="-15">
+                <Frame0 Texture="texturePadButtonB" x="-15" Duration="0.8" Alpha="1.0"/>
+                <Frame1 Texture="texturePadButtonB" x="-15" Duration="0.8" Alpha="0.0"/>
+            </layerStartGamepadB>
+            
+            <layerStartGamepadX Alpha="0.0" x="-15">
+                <Frame0 Texture="texturePadButtonX" x="-15" Duration="0.8" Alpha="1.0"/>
+                <Frame1 Texture="texturePadButtonX" x="-15" Duration="0.8" Alpha="0.0"/>
+            </layerStartGamepadX>
+            
+            <layerStartGamepadO Alpha="0.0" x="-15">
+                <Frame0 Texture="texturePadButtonO" x="-15" Duration="0.8" Alpha="1.0"/>
+                <Frame1 Texture="texturePadButtonO" x="-15" Duration="0.8" Alpha="0.0"/>
+            </layerStartGamepadO>
+
+            <layerChapSelectIcon Rotation="45" Scale="0.5">
+                <Frame0 Texture="textureChapSelect" Rotation="45" Scale="0.5"/>
+            </layerChapSelectIcon>
+            
+            <layerTestOutlineCircleLarge Scale="0.0" Alpha="0.0">
+                <Frame0 Texture="textureButtonOutlinedCircle" Duration="0.5" Scale="0.8"/>
+                <Frame1 Texture="textureButtonOutlinedCircle" Duration="0.5" Scale="1.6" Alpha="0.0"/>
+                <Frame2 Texture="textureButtonOutlinedCircle" Duration="0.1" Scale="0.0" Alpha="0.0"/>
+            </layerTestOutlineCircleLarge>
+            
+            <layerTestOutlineCircle Scale="0.0" Alpha="0.0">
+                <Frame0 Texture="textureButtonOutlinedCircle" Duration="0.5" Scale="0.5"/>
+                <Frame1 Texture="textureButtonOutlinedCircle" Duration="0.5" Scale="1.0" Alpha="0.0"/>
+                <Frame2 Texture="textureButtonOutlinedCircle" Duration="0.1" Scale="0.0" Alpha="0.0"/>
+            </layerTestOutlineCircle>
+            
+            <layerOutlineCircle Scale="0.0">
+                <Frame0 Texture="textureOutlinedCircle" Duration="0.5" Scale="0.3"/>
+                <Frame1 Texture="textureOutlinedCircle" Duration="0.5" Scale="0.5" Alpha="0.0"/>
+                <Frame2 Texture="textureOutlinedCircle" Duration="0.1" Scale="0.0" Alpha="0.0"/>
+            </layerOutlineCircle>
+  
+            <layerWings Scale="0.0" x="-40" y="-80" >
+                <Frame0 Texture="textureWings" x="-40" y="-80" Duration="0.25" Scale="0.3"/>
+                <Frame1 Texture="textureWings" x="-40" y="-80" Duration="0.5" Scale="0.7" Alpha="0.0"/>
+                <Frame2 Texture="textureWings" x="-40" y="-80" Duration="0.1" Scale="0.0" Alpha="0.0"/>
+            </layerWings>
+            
+            <layerWingsLeft Scale="0.0" x="40" y="-80" >
+                <Frame0 Texture="textureWings" x="40" y="-80" Duration="0.25" Scale="0.3"/>
+                <Frame1 Texture="textureWings" x="40" y="-80" Duration="0.5" Scale="0.7" Alpha="0.0"/>
+                <Frame2 Texture="textureWings" x="40" y="-80" Duration="0.1" Scale="0.0" Alpha="0.0"/>
+            </layerWingsLeft>
+            
+            <layerNotes Scale="0.0" x="-80" y="-40" >
+                <Frame0 Texture="textureMusicNote" x="-80" y="-40" Duration="0.25" Scale="0.3"/>
+                <Frame1 Texture="textureMusicNote" x="-80" y="-40" Duration="0.5" Scale="0.7" Alpha="0.0"/>
+                <Frame2 Texture="textureMusicNote" x="-80" y="-40" Duration="0.1" Scale="0.0" Alpha="0.0"/>
+            </layerNotes>
+            
+            <layerNotesLeft Scale="0.0" x="80" y="-40" >
+                <Frame0 Texture="textureMusicNote" x="80" y="-40" Duration="0.25" Scale="0.3"/>
+                <Frame1 Texture="textureMusicNote" x="80" y="-40" Duration="0.5" Scale="0.7" Alpha="0.0"/>
+                <Frame2 Texture="textureMusicNote" x="80" y="-40" Duration="0.1" Scale="0.0" Alpha="0.0"/>
+            </layerNotesLeft>
+            
+            <layerConfig>
+                <Frame0 Texture="textureConfig" Duration="0.0"/>
+                <Frame1 Texture="textureConfig" Rotation="360" Duration="4.0" Loop="Frame0"/>
+            </layerConfig>
+
+            <layerConfigLarge>
+                <Frame0 Texture="textureConfigLarge" Duration="0.0"/>
+                <Frame1 Texture="textureConfigLarge" Rotation="360" Duration="4.0" Loop="Frame0"/>
+            </layerConfigLarge>
+            
+            <layerConfigLargeLow>
+                <Frame0 Texture="textureConfigLarge" Duration="0.0"/>
+                <Frame1 Texture="textureConfigLarge" Rotation="360" Duration="6.0" Loop="Frame0"/>
+            </layerConfigLargeLow>
+            
+            <layerConfigLargeMedium>
+                <Frame0 Texture="textureConfigLarge" Duration="0.0"/>
+                <Frame1 Texture="textureConfigLarge" Rotation="360" Duration="4.0" Loop="Frame0"/>
+            </layerConfigLargeMedium>
+            
+            <layerConfigLargeHigh>
+                <Frame0 Texture="textureConfigLarge" Duration="0.0"/>
+                <Frame1 Texture="textureConfigLarge" Rotation="360" Duration="2.0" Loop="Frame0"/>
+            </layerConfigLargeHigh>
+            
+            <layerSensitivityL>
+                <Frame0 Texture="textureSensitivityL"/>
+            </layerSensitivityL>
+            
+            <layerSensitivityM>
+                <Frame0 Texture="textureSensitivityM"/>
+            </layerSensitivityM>
+            
+            <layerSensitivityH>
+                <Frame0 Texture="textureSensitivityH"/>
+            </layerSensitivityH>
+            
+            <layerU Alpha="0.0" x="0" y="60" Alpha="0.0">
+                <Frame0 Texture="textureUp" x="0" y="60" Duration="0.4" Alpha="1.0" />
+                <Frame1 Texture="textureUp" x="0" y="60" Duration="1.4" Alpha="1.0" />
+                <Frame2 Texture="textureUp" x="0" y="60" Duration="1.8" Alpha="0.0" />
+            </layerU>
+            <layerD Alpha="0.0" x="0" y="-60" Alpha="0.0">
+                <Frame0 Texture="textureDown" x="0" y="-60" Duration="0.4" Alpha="1.0" />
+                <Frame1 Texture="textureDown" x="0" y="-60" Duration="1.4" Alpha="1.0" />
+                <Frame2 Texture="textureDown" x="0" y="-60" Duration="1.8" Alpha="0.0" />
+            </layerD>
+            <layerL Alpha="0.0" x="-60" y="0" Alpha="0.0">
+                <Frame0 Texture="textureLeft" x="-60" y="0" Duration="0.4" Alpha="1.0" />
+                <Frame1 Texture="textureLeft" x="-60" y="0" Duration="1.4" Alpha="1.0" />
+                <Frame2 Texture="textureLeft" x="-60" y="0" Duration="1.8" Alpha="0.0" />
+            </layerL>
+            <layerR Alpha="0.0" x="60" y="0" Alpha="0.0">
+                <Frame0 Texture="textureRight" x="60" y="0" Duration="0.4" Alpha="1.0" />
+                <Frame1 Texture="textureRight" x="60" y="0" Duration="1.4" Alpha="1.0" />
+                <Frame2 Texture="textureRight" x="60" y="0" Duration="1.8" Alpha="0.0" />
+            </layerR>
+        </Layers>
+        
+        <Animations>
+            
+            <animConcentricCircles Repeat="4.0">
+                <Layer0 Layer="layerTestOutlineCircle"/>
+                <Layer1 Layer="layerTestOutlineCircle" StartTime="0.25f"/>
+                <Layer2 Layer="layerTestOutlineCircle" StartTime="0.50f"/>
+                <Layer3 Layer="layerTestOutlineCircle" StartTime="0.75f"/>
+            </animConcentricCircles>
+
+            <animConcentricCirclesToo Repeat="2.0">
+                <Layer0 Layer="layerTestOutlineCircleLarge" xTTY="true"/>
+                <Layer1 Layer="layerTestOutlineCircleLarge" StartTime="0.25f"/>
+                <Layer2 Layer="layerTestOutlineCircleLarge" StartTime="0.50f"/>
+                <Layer3 Layer="layerTestOutlineCircleLarge" StartTime="0.75f"/>
+            </animConcentricCirclesToo>
+
+            <animStart Repeat="1.6">
+                <Layer0 Layer="layerStart" StartTime="0.0"/>
+            </animStart>
+            
+            <animStartGamepadA Repeat="1.6">
+                <Layer0 Layer="layerStartGamepadA" StartTime="0.0"/>
+            </animStartGamepadA>
+            
+            <animStartGamepadB Repeat="1.6">
+                <Layer0 Layer="layerStartGamepadB" StartTime="0.0"/>
+            </animStartGamepadB>
+            
+            <animStartGamepadX Repeat="1.6">
+                <Layer0 Layer="layerStartGamepadX" StartTime="0.0"/>
+            </animStartGamepadX>
+            
+            <animStartGamepadO Repeat="1.6">
+                <Layer0 Layer="layerStartGamepadO" StartTime="0.0"/>
+            </animStartGamepadO>
+
+            <animArrows Repeat="2.5">
+                <Layer0 Layer="layerU" StartTime="0.0"/>
+                <Layer1 Layer="layerD" StartTime="0.0"/>
+                <Layer2 Layer="layerL" StartTime="0.0"/>
+                <Layer3 Layer="layerR" StartTime="0.0"/>
+            </animArrows>
+            
+        </Animations>
+    
+        <Templates>
+            <ButtonBase Shape="4" HoldDuration="0" Scale="0.9;0.9" Alpha="0.25;1.00" CmdActivate="Haptics:Small" Text=""/>
+            <DebugControlState Template="ButtonBase" Mask="0x100" Condition="DebugMenuEnable"/>
+            
+            <GameControlButton Template="ButtonBase" Distance="75"/>
+            
+            <StickCtrlTouch HoldDuration="0" Scale="2.0" Texture="textureBlack" Text="" />
+
+            <StickCtrl Shape="4" HoldDuration="0" Distance="60" Scale="2.0" Alpha="0.14" Text=""/>
+            
+            <StickCtrlArrows Radius="60" Template="StickCtrl" Scale="2.0" Angle="-1" MaskedDimmer="true" >
+                <Up Text="" Texture="textureUp" Scale="1.0" HoldDuration="0" CmdPress="Control:DisableArrows"/>
+                <Right Text="" Texture="textureRight" Scale="1.0" HoldDuration="0" CmdPress="Control:DisableArrows"/>
+                <Down Text="" Texture="textureDown" Scale="1.0" HoldDuration="0" CmdPress="Control:DisableArrows"/>
+                <Left Text="" Texture="textureLeft" Scale="1.0" HoldDuration="0" CmdPress="Control:DisableArrows"/>
+            </StickCtrlArrows>
+            
+            <AudioPlayer Condition="DebugAudioPlayer" Scale="0.8;1.0" Shape="4" HoldDuration="0" Distance="90" Alpha="0.35;1.00" Alignment="LT" Step="-1" Texture="textureCentre" CmdPress="Control:ResetPos;Haptics:Medium" CmdHold="Control:LeftStick" TxColor="0x00ffff"/>
+            
+            <PadButtonText Text="" CmdActivate="Haptics:Large" HoldDuration="0.0"/>
+            <PadButton Text="" CmdActivate="Haptics:Large" Distance="60" HoldDuration="0.0"/>
+            <PadButtonPause Text="" CmdActivate="Haptics:Large" Distance="90" HoldDuration="0.0"/>
+            <NewJourneyTouch Text="" CmdActivate="Haptics:Large" Distance="80" HoldDuration="0.0"/>
+            <CSPadButton Text="" CmdActivate="Haptics:Large" Distance="60" HoldDuration="0.0" Scale="1.0"/>
+            <Icon Template="PadButton" Scale="0.9" Mask="0x400"/>
+            <PauseIcon Scale="0.9" Text="" CmdActivate="Haptics:Large" Distance="80" HoldDuration="0.0" Mask="0x400"/>
+            <GameButton Template="PadButton" Enable="false" Mask="0x200" Texture="animStart"/>
+            <StartNewText Template="PadButtonText" Enable="false" Mask="0x200" />
+
+            <ConfigChapSelectTextInactive Alpha="0.3" Condition="$ChapSelectScreenConditionsInactive"/>
+            <ConfigChapSelectIconInactive  Alpha="0.3" Condition="$ChapSelectScreenConditionsInactive" Template="CSPadButton" Text="" Texture="layerChapSelectIcon"/>
+
+            <ConfigChapSelectText Condition="$ChapSelectScreenConditions"/>
+            <ConfigChapSelectIcon Condition="$ChapSelectScreenConditions" Template="CSPadButton" Text="" Texture="layerChapSelectIcon"/>
+
+            <ConfigInputLR Condition="$ConfigScreenConditionsLR" Distance="160" Scale="$CfgButtonScaler$" HoldDuration="0.0" Mask="0x1000"/>
+            <ConfigInputTouchLR Condition="$ConfigScreenConditionsLR" Texture="textureBlack" Text="" Distance="160" Scale="$CfgButtonScaler$" HoldDuration="0.0" Mask="0x1000"/>
+            <ConfigInputRL Condition="$ConfigScreenConditionsRL" Distance="160" Scale="$CfgButtonScaler$" HoldDuration="0.0" Mask="0x1000"/>
+            <ConfigInputTouchRL Condition="$ConfigScreenConditionsRL" Texture="textureBlack" Text="" Distance="160" Scale="$CfgButtonScaler$" HoldDuration="0.0" Mask="0x1000"/>
+            
+            <ConfigInvertText Condition="$ConfigScreenConditions"/>
+            <ConfigInvertIcon Condition="$ConfigScreenConditions" Scale="1.0" Distance="100" Alpha="0.35;1.00" HoldDuration="0.0" Mask="0x2000"/>
+            <ConfigSensitivity Condition="$ConfigScreenConditions" Texture="textureConfigLarge;layerConfigLargeLow" Scale="$CfgButtonScaler$" Distance="120" HoldDuration="0.0" Mask="0x2000"/>
+            <HapticsTouch Condition="$ConfigScreenConditions" Texture="textureBlack" Text="" Scale="$CfgButtonScaler$" Distance="120" HoldDuration="0.0" Mask="0x2000"/>
+            
+            
+            <ConfigSensitivityL Condition="$ConfigScreenConditionsSL" Scale="1.0" Distance="120" HoldDuration="0.0" Mask="0x2000"/>
+            <ConfigSensitivityM Condition="$ConfigScreenConditionsSM" Scale="1.0" Distance="120" HoldDuration="0.0" Mask="0x2000"/>
+            <ConfigSensitivityH Condition="$ConfigScreenConditionsSH" Scale="1.0" Distance="120" HoldDuration="0.0" Mask="0x2000"/>
+        </Templates>
+
+        
+        <Macros
+        
+            StartContinuScreenConditions="((ControlState==Boot)&&(CurrentScreen==StartContinue))"
+            ConfirmRestartScreenConditions="((AllowOptionsModuleButtons)&&(CurrentScreen==ConfirmRestart))"
+            ConfigScreenConditionsLR="((((ControlState==Config)&&(CurrentScreen==BootConfig))||((ControlState==Menu)&&(CurrentScreen==BootConfig)))&&InputMoveLookState==MoveLeft_LookRight)"
+            ConfigScreenConditionsRL="((((ControlState==Config)&&(CurrentScreen==BootConfig))||((ControlState==Menu)&&(CurrentScreen==BootConfig)))&&InputMoveLookState==MoveRight_LookLeft)"
+            ConfigScreenConditionsSL="((((ControlState==Config)&&(CurrentScreen==BootConfig))||((ControlState==Menu)&&(CurrentScreen==BootConfig)))&&TiltSensitivity==Low)"
+            ConfigScreenConditionsSM="((((ControlState==Config)&&(CurrentScreen==BootConfig))||((ControlState==Menu)&&(CurrentScreen==BootConfig)))&&TiltSensitivity==Medium)"
+            ConfigScreenConditionsSH="((((ControlState==Config)&&(CurrentScreen==BootConfig))||((ControlState==Menu)&&(CurrentScreen==BootConfig)))&&TiltSensitivity==High)"
+            ConfigScreenConditions="(((ControlState==Config)&&(CurrentScreen==BootConfig))||((ControlState==Menu)&&(CurrentScreen==BootConfig)))"
+        
+            ChapSelectScreenConditionsInactive="((ControlState==Pause)&&(IsChapterSelectUnlocked==false))"
+            ChapSelectScreenConditions="((IsChapterSelectUnlocked==true)&&(CurrentScreen==bootPause))"
+            ConfirmChapSelectScreenConditions="((AllowOptionsModuleButtons)&&(CurrentScreen==ConfirmChapSelect))"
+
+            Strt_Cntn_TextSize="0.6"
+            Dialog_TextSize="0.6"
+            ChapSelect_TextSize="0.6"
+            Cfg_TextSize="0.6"
+
+            DialogTextPosY_CS = "CLAMP(VCENTRE-(HEIGHT/3), 65, 300)-30"
+            DialogTextPosY_SN = "CLAMP(VCENTRE-(VCENTRE/3), 90, 300)-20"
+            
+            ChapSelectIconX = "HCENTRE-CLAMP(11*$CfgSmallStepX$, 90, 190)"
+
+            ButtonDeltaA="100"
+            ButtonDeltaB="40"
+            
+            StickDeltaHoriz="MAX(60,WIDTH/8)"
+            StickCircleDeltaHoriz="MAX(140,WIDTH/5)"
+            StickDeltaVert="MAX(70,HEIGHT/10)"
+            
+            StickY="VBOTTOM-$StickDeltaVert"
+            StickXLeft="HLEFT+$StickDeltaHoriz"
+            StickCirleXLeft="HLEFT+$StickCircleDeltaHoriz"
+            StickXRight="HRIGHT-$StickDeltaHoriz"
+            StickCircleXRight="HRIGHT-$StickCircleDeltaHoriz"
+            
+            LeftButton0X="$StickXLeft$-$ButtonDeltaB$"
+            LeftButton1X="$StickXLeft$+$ButtonDeltaA$"
+            
+            RightButton0X="$StickXRight$+$ButtonDeltaB$"
+            RightButton1X="$StickXRight$-$ButtonDeltaA$"
+            
+            Button0Y="$StickY$-$ButtonDeltaA$"
+            Button1Y="$StickY$+$ButtonDeltaB$/2"
+            
+            CtrlStateBaseX="HLEFT+50"
+            CtrlStateStepX="70"
+            CtrlStateBaseY="HEIGHT/4"
+            
+            IconBaseX="HRIGHT-CLAMP(WIDTH/10, 10, 40)-5"
+            IconBaseXL="HLEFT+CLAMP(WIDTH/10, 10, 40)+5"
+            IconStepX="-70"
+            IconBaseY="VTOP+CLAMP(WIDTH/10, 10, 40)-10"
+            
+            DialogBaseX="HLEFT+(HEIGHT/16)"
+            DialogBaseY="VBOTTOM-(HEIGHT/16)"
+            
+            CfgButtonScaler="1.0"
+            CfgBtnSz="(WIDTH/16)*6"
+            
+            CfgStepX="($CfgBtnSz$/2)"
+            CfgSmallStepX="($CfgBtnSz$/16)"
+            CfgBaseX="HCENTRE-$CfgStepX$"
+            CfgBaseXR="HCENTRE+$CfgStepX$"
+            CfgBaseXL="HCENTRE-$CfgStepX$"
+
+            CfgSmallStepY="$CfgBtnSz$/16"
+            CfgBaseY="VCENTRE-(($CfgBtnSz$/2)-($CfgStepY$/2))"
+            CfgBaseYTop="VCENTRE-($CfgSmallStepY$*5)"
+            CfgBaseYBottom="VCENTRE+($CfgSmallStepY$*4)"
+            CfgStepY="($CfgBtnSz$/2)"
+
+            CfgL2SensitivityStepX="($CfgStepX$/8)"
+            CfgL2StepX="($CfgStepX$/8)"
+            CfgL2BaseX="HCENTRE-(3*$CfgStepX$)"
+            CfgL2BaseY="VCENTRE+(5*($CfgL2StepY$))"
+            CfgL2StepY="$CfgBtnSz$/8"
+
+            ButtonCircleSize="MIN(64, WIDTH/16)"
+        />
+        
+        <Groups>
+            <GrpGameMode Input="ControlState" SelectedColor="0x77ff77" NotSelectedColor="0x777777" ClearStack="false">
+                <Off Node="CS_Off"/>
+                <Debug Node="CS_Debug"/>
+                <Game Node="CS_Game"/>
+                <Boot Node="CS_Boot"/>
+                <Pause Node="CS_Pause"/>
+                <Menu Node="CS_Menu"/>
+                <Config Node="CS_Config"/>
+            </GrpGameMode>
+            
+            <GrpInput Input="InputMoveLookState" SelectedAlpha="1.0" NotSelectedAlpha="1.0">
+                <MoveLeft_LookRight Node="Cfg_LeftRight"/>
+                <MoveRight_LookLeft Node="Cfg_RightLeft"/>
+            </GrpInput>
+                
+            <GrpSensitivity Input="TiltSensitivity">
+                <Low Node="Cfg_TiltLow"/>
+                <Medium Node="Cfg_TiltMedium"/>
+                <High Node="Cfg_TiltHigh"/>
+            </GrpSensitivity>
+            
+            <GrpInvert Input="InvertCameraStr" SelectedAlpha="1.0" NotSelectedAlpha="0.5" ClearStack="false">
+                <true Node="Cfg_InvertIcon"/>
+            </GrpInvert>
+            
+            <GrpMenuButton Input="ControlState" ClearStack="false">
+                <Pause Node="PAUSE_PadButtonSelect"/>
+                <UnPause Node="UNPAUSE_PadButtonSelect"/>
+                <PauseGame Node="PAUSEGAME_PadButtonSelect"/>
+                <UnPauseGame Node="UNPAUSEGAME_PadButtonSelect"/>
+                <Menu Node="START_PadButtonStart"/>
+                <CloseMenu Node="CLOSEMENU_PadButtonSelect"/>
+                <Config Node="Config"/>
+            </GrpMenuButton>
+
+            <GrpHaptics Input="HapticsSelectStr" SelectedTexture="textureCtrlHapticsOn" NotSelectedTexture="textureCtrlHapticsOff" ClearStack="false">
+                <true Node="Cfg_Haptics"/>
+            </GrpHaptics>
+
+            <GrpChapSelect>
+                <ChapSelectIcon Node="ChapterSelectIcon"/>
+            </GrpChapSelect>
+            
+        </Groups>
+        
+        <Controls>
+            
+            <!-- <test0 Pos="200;100" Alignment="LT" Texture="textureFilledCircle" Scale="1.0;2.0"/>
+             <test1 Pos="300;100" Alignment="LT" Texture="animConcentricCircles" Scale="1.0;2.0"/>
+             <test2 Pos="400;100" Alignment="LT" Texture="layerTestUVScroll" Scale="1.0;2.0"/>
+             <test3 Pos="500;100" Alignment="LT" Texture="layerTestPivot" Scale="1.0;2.0"/>
+             <test4 Pos="600;100" Alignment="LT" Texture="animSwipeUp" Scale="1.0;2.0"/>
+             <test5 Pos="700;100" Alignment="LT" Texture="layerLineSwipeLeft" Scale="1.0;2.0"/>
+             <test6 Pos="800;100" Alignment="LT" Texture="layerClick" Scale="0.8;2.0"/>
+             <test7 Pos="400;300" Alignment="LT" Texture="animSwipeLeft" Scale="2.0;2.0"/>
+             <test8 Pos="400;500" Alignment="LT" Texture="animSwipeLeft" Scale="2.0;2.0"/>
+             <test9 Pos="600;300" Alignment="LT" Texture="animSwipeUp" Scale="2.0"/>
+             <testA Pos="600;500" Alignment="LT" Texture="layerWings" Scale="2.0"/>
+             
+            <atest0 Enable="true" Pos="200;100" Alignment="LT" Texture="textureFilledCircle" Scale="1.0;2.0"/>
+            <atest1 Enable="true" Pos="300;100" Alignment="LT" Texture="animConcentricCircles" Scale="1.0;2.0"/>
+            <atest2 Enable="true" Pos="400;100" Alignment="LT" Texture="layerTestUVScroll" Scale="1.0;2.0"/>
+            <atest3 Enable="true" Pos="500;100" Alignment="LT" Texture="layerTestPivot" Scale="1.0;2.0"/>
+            <atest4 Enable="true" Pos="600;100" Alignment="LT" Texture="animSwipeUp" Scale="1.0;2.0"/>
+            <atest5 Ignore="true" Pos="700;100" Alignment="LT" Texture="textureFullCircle" Scale="1.0;2.0"/>
+
+             
+             <test7 Text="lf" Pos="400;300" Alignment="LT" Texture="animSwipeLeft"/>
+             <test9 Text="up" Pos="600;300" Alignment="LT" Texture="animSwipeUp"/>
+             
+             -->
+            
+            
+            <ShowUIToggle NoGold="true" X="WIDTH/2" Y="30" HoldDuration="2" Distance="60" Alpha="0.0001;1" CmdReleaseExclusive="Control:ShowUIToggle" Text=""/>
+
+            <!-- debug menu controller select -->
+            
+            <CS_Off Template="DebugControlState" X="$CtrlStateBaseX$+$CtrlStateStepX$*0" Y="$CtrlStateBaseY$" CmdReleaseExclusive="Assignment:ControlState:Off" Text="OFF"/>
+            <CS_Debug Template="DebugControlState" X="$CtrlStateBaseX$+$CtrlStateStepX$*1" Y="$CtrlStateBaseY$" CmdReleaseExclusive="Assignment:ControlState:Debug" Text="DBG"/>
+            <CS_Game Template="DebugControlState" X="$CtrlStateBaseX$+$CtrlStateStepX$*2" Y="$CtrlStateBaseY$" CmdReleaseExclusive="Assignment:ControlState:Game" Text="GAME"/>
+            <CS_Boot Template="DebugControlState" X="$CtrlStateBaseX$+$CtrlStateStepX$*3" Y="$CtrlStateBaseY$" CmdReleaseExclusive="Assignment:ControlState:Boot" Text="BOOT"/>
+            <CS_Pause Template="DebugControlState" X="$CtrlStateBaseX$+$CtrlStateStepX$*4" Y="$CtrlStateBaseY$" CmdReleaseExclusive="Assignment:ControlState:Pause" Text="PAUSE"/>
+            <CS_Menu Template="DebugControlState" X="$CtrlStateBaseX$+$CtrlStateStepX$*5" Y="$CtrlStateBaseY$" CmdReleaseExclusive="Assignment:ControlState:Menu" Text="MENU"/>
+            <CS_Config Template="DebugControlState" X="$CtrlStateBaseX$+$CtrlStateStepX$*6" Y="$CtrlStateBaseY$" CmdReleaseExclusive="Assignment:ControlState:Config" Text="CFG"/>
+            
+            <!-- on-screen game buttons (simulated pad buttons) -->
+            
+            <PadButtonCross  Condition="AllowOptionsModuleButtons" Template="GameButton" CmdReleaseExclusive="Control:PadButtonCross"/>
+            <PadButtonCircle Condition="AllowOptionsModuleButtons" Template="GameButton" CmdReleaseExclusive="Control:PadButtonCircle"/>
+            <PadButtonSquare Condition="AllowOptionsModuleButtons" Template="GameButton" CmdReleaseExclusive="Control:PadButtonSquare"/>
+            <MENU_PadButtonTriangle Condition="AllowOptionsModuleButtons" Template="GameButton" CmdReleaseExclusive="Control:MENU_PadButtonTriangle"/>
+            
+            
+            <!-- Boot screen-->
+            
+            <NewJourney Condition="$StartContinuScreenConditions" Enable="false" Text="" DialogText="Start New Journey" Scale="$Strt_Cntn_TextSize" Texture="textureBlack"/>
+            <NewJourneyTouchA Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureBlack" CmdReleaseExclusive="Control:PadButtonCross"/>
+            <NewJourneyTouchB Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureBlack" CmdReleaseExclusive="Control:PadButtonCross"/>
+            <NewJourneyTouchC Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureBlack" CmdReleaseExclusive="Control:PadButtonCross"/>
+            <!--<NewJourneyTouchD Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureUp" CmdReleaseExclusive="Control:PadButtonCross"/>
+            <NewJourneyTouchE Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureUp" CmdReleaseExclusive="Control:PadButtonCross"/>
+            <NewJourneyTouchF Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureRight" CmdReleaseExclusive="Control:PadButtonCross"/>
+            <NewJourneyTouchG Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureRight" CmdReleaseExclusive="Control:PadButtonCross"/>-->
+
+            <Continue Condition="$StartContinuScreenConditions" Enable="false" Text="" DialogText="Continue" Scale="$Strt_Cntn_TextSize" Texture="textureBlack"/>
+            <ContinueTouchA Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureBlack" CmdReleaseExclusive="Control:PadButtonCircle"/>
+            <ContinueTouchB Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureBlack" CmdReleaseExclusive="Control:PadButtonCircle"/>
+            <!--<ContinueTouchC Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureUp" CmdReleaseExclusive="Control:PadButtonCircle"/>
+            <ContinueTouchD Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureUp" CmdReleaseExclusive="Control:PadButtonCircle"/>
+            <ContinueTouchE Condition="$StartContinuScreenConditions" Enable="false" Text="" Template="NewJourneyTouch" Texture="textureRight" CmdReleaseExclusive="Control:PadButtonCircle"/>-->
+            <!-- Confirm start new game screen-->
+            
+            <NewConfirmIOS Condition="$ConfirmRestartScreenConditions" Text="" DialogText="Current progress will be lost." Scale="$Dialog_TextSize$" Distance="0.0" Texture="textureBlack" X="HLEFT+(3*$CfgSmallStepX$)" Y="$DialogTextPosY_SN"/>
+            <YesRestart Condition="$ConfirmRestartScreenConditions" Enable="false" Text="" DialogText="Yes" Scale="$Strt_Cntn_TextSize$" Texture="textureBlack"/>
+            <NoRestart Condition="$ConfirmRestartScreenConditions" Enable="false" Text="" DialogText="No" Scale="$Strt_Cntn_TextSize$" Texture="textureBlack"/>
+            
+            <!-- top right/left icons -->
+            
+            <Config Condition="((ControlState==Pause)&&(ShowIcon_Config)&&(ShowIcon_Pause==true)&&(CurrentScreen==bootPause))" Template="PauseIcon" X="$IconBaseX$" Y="$IconBaseY$" Texture="texturePad" CmdReleaseExclusive="Control:TapIcon_Config"/>
+            
+            <START_PadButtonStart Condition="ShowIcon_Menu" Template="PauseIcon" X="$IconBaseX$" Y="$IconBaseY$" Texture="textureCog" CmdReleaseExclusive="Control:TapIcon_Menu"/>
+            
+            <PAUSE_PadButtonSelect Condition="((ControlState==Boot)&&(ShowIcon_Pause==true)&&(CurrentScreen==StartContinue))" Template="PauseIcon" X="$IconBaseX$" Y="$IconBaseY$" Texture="textureCog" CmdReleaseExclusive="Control:TapIcon_Pause" CmdHold="Control:ToggleDebugMenu" />
+            
+            <UNPAUSE_PadButtonSelect Condition="((ShowIcon_Pause==true)&&(ControlState==Config))" Template="PauseIcon" X="$IconBaseX$" Y="$IconBaseY$" Texture="textureMenuClose" CmdReleaseExclusive="Control:TapIcon_Pause" CmdHold="Control:ToggleDebugMenu" />
+
+            <PAUSEGAME_PadButtonSelect Condition="((ShowIcon_Pause==true)&&(ControlState==Game))" Alpha="0.6" Template="PauseIcon" X="$IconBaseXL$" Y="$IconBaseY$" Texture="texturePause" CmdReleaseExclusive="Control:TapIcon_Pause" CmdHold="Control:ToggleDebugMenu" />
+
+            <UNPAUSEGAME_PadButtonSelect Condition="((ShowIcon_Pause==true)&&(ControlState==Pause)&&(CurrentScreen==bootPause))" Template="PauseIcon" X="$IconBaseXL$" Y="$IconBaseY$" Texture="textureMenuClose" CmdReleaseExclusive="Control:TapIcon_Pause" CmdHold="Control:ToggleDebugMenu" />
+            
+            <CLOSEMENU_PadButtonSelect Condition="((ShowIcon_Pause==true)&&(ControlState==Menu)&&(CurrentScreen==BootConfig))" Template="PauseIcon" X="$IconBaseX$" Y="$IconBaseY$" Texture="textureMenuClose" CmdReleaseExclusive="Control:TapIcon_Config" CmdHold="Control:ToggleDebugMenu" />
+
+           <!-- <CLOSEMENUGAME_PadButtonSelect Condition="((ShowIcon_Pause==true)&&(ControlState==Menu))" Template="PauseIcon" X="$IconBaseX$" Y="$IconBaseY$" Texture="textureMenuClose" CmdReleaseExclusive="Control:TapIcon_Config" CmdHold="Control:ToggleDebugMenu" />-->
+            
+            <!-- configuration screen -->
+            
+            <!--<ChapterSelectIconInactive Template="ConfigChapSelectIconInactive" X="$ChapSelectIconX" Y="VBOTTOM-(1*$CfgL2StepY$)"/>
+            <ChapterSelectInactive Template="ConfigChapSelectTextInactive" Text="" LabelText="Chapter Select" Alpha="0.5" Texture="textureBlack" Scale="$ChapSelect_TextSize$" X="HCENTRE" Y="VBOTTOM-(1*$CfgL2StepY$)"/>-->
+ 
+            <ChapterSelectIcon Template="ConfigChapSelectIcon" X="$ChapSelectIconX" Y="VBOTTOM-(1*$CfgL2StepY$)" CmdReleaseExclusive="Control:MENU_PadButtonTriangle"/>
+            <ChapterSelect Template="ConfigChapSelectText" Text="" LabelText="Chapter Select" Alpha="1.0" Texture="textureBlack" Scale="$ChapSelect_TextSize$" X="HCENTRE" Y="VBOTTOM-(1*$CfgL2StepY$)"/>
+
+            <ChapterConfirmIOS Condition="$ConfirmChapSelectScreenConditions" Text="" DialogText="Now entering chapter select area." Scale="$Dialog_TextSize$" Texture="textureBlack" X="HLEFT+(3*$CfgSmallStepX$)" Y="$DialogTextPosY_CS"/>
+            <YesChapSelect Condition="$ConfirmChapSelectScreenConditions" Enable="false" Text="" DialogText=" Yes" Scale="$Strt_Cntn_TextSize$" Distance="0.0" Texture="textureBlack"/>
+            <NoChapSelect Condition="$ConfirmChapSelectScreenConditions" Enable="false" Text="" DialogText=" No" Scale="$Strt_Cntn_TextSize$" Distance="0.0" Texture="textureBlack"/>
+            
+            <Cfg_LeftRight Template="ConfigInputLR" Texture="textureCtrlLeftRight" Text="" X="$CfgBaseXL$" Y="$CfgBaseYTop$" CmdActivate="Assignment:InputMoveLookState:MoveRight_LookLeft"/>
+            <Cfg_LeftRightTouchA Template="ConfigInputTouchLR" X="($CfgBaseXL$)+$CfgSmallStepX$*4" Y="$CfgBaseYTop$" CmdActivate="Assignment:InputMoveLookState:MoveRight_LookLeft"/>
+            <Cfg_LeftRightTouchB Template="ConfigInputTouchLR" X="($CfgBaseXL$)-$CfgSmallStepX$*4" Y="$CfgBaseYTop$" CmdActivate="Assignment:InputMoveLookState:MoveRight_LookLeft"/>
+
+            <Cfg_RightLeft Template="ConfigInputRL" Texture="textureCtrlRightLeft" Text="" X="$CfgBaseXL$" Y="$CfgBaseYTop$" CmdActivate="Assignment:InputMoveLookState:MoveLeft_LookRight"/>
+            <Cfg_RightLeftTouchA Template="ConfigInputTouchRL" X="($CfgBaseXL$)+$CfgSmallStepX$*4" Y="$CfgBaseYTop$" CmdActivate="Assignment:InputMoveLookState:MoveLeft_LookRight"/>
+            <Cfg_RightLeftTouchB Template="ConfigInputTouchRL" X="($CfgBaseXL$)-$CfgSmallStepX$*4" Y="$CfgBaseYTop$" CmdActivate="Assignment:InputMoveLookState:MoveLeft_LookRight"/>
+            
+            <Movement Template="ConfigInvertText" Text="" LabelText="Vibration" Texture="textureBlack" Scale="$Cfg_TextSize$" X="$CfgBaseXL$" Y="$CfgBaseYTop$+(($CfgBtnSz$/16)*5)"/>
+            
+            <Cfg_Haptics Template="ConfigSensitivity" Text="" X="$CfgBaseX$+$CfgStepX$*2" Y="$CfgBaseYTop$" CmdActivate="Control:ToggleHaptics;Haptics:Large"/>
+            <Cfg_HapticsTouchA Template="HapticsTouch" Text="" X="($CfgBaseX$+$CfgStepX$*2)+$CfgSmallStepX$*5" Y="$CfgBaseYTop$" CmdActivate="Control:ToggleHaptics;Haptics:Large"/>
+            <Cfg_HapticsTouchB Template="HapticsTouch" Text="" X="($CfgBaseX$+$CfgStepX$*2)-$CfgSmallStepX$*5" Y="$CfgBaseYTop$" CmdActivate="Control:ToggleHaptics;Haptics:Large"/>
+            
+            <Vibration Template="ConfigSensitivity" Text="" LabelText="Movement" Texture="textureBlack" Scale="$Cfg_TextSize$" X="$CfgBaseXR$" Y="$CfgBaseYTop$+(($CfgBtnSz$/16)*5)"/>
+
+            <Cfg_InvertIcon Template="ConfigInvertIcon" Text="" Texture="textureInvertIcon" X="$CfgBaseXL$" Y="$CfgBaseYBottom$"  CmdActivate="Control:ToggleInvertCamera"/>
+            <InvertCameraIOS Template="ConfigInvertText" Text="" LabelText="INVERT" Texture="textureBlack" Scale="$Cfg_TextSize$" X="$CfgBaseXL$" Y="$CfgBaseYBottom$+($CfgBtnSz$/4)"/>
+            
+            <Cfg_TiltLow Template="ConfigSensitivityL" Text="" Texture="layerSensitivityL" X="$CfgBaseXR$" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:Medium"/>
+            <Cfg_TiltTouchA Template="ConfigSensitivityL" Text="" Texture="textureBlack" X="$CfgBaseXR$+($CfgSmallStepX$*4)" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:Medium"/>
+            <Cfg_TiltTouchB Template="ConfigSensitivityL" Text="" Texture="textureBlack" X="$CfgBaseXR$-($CfgSmallStepX$*4)" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:Medium"/>
+            
+            <Cfg_TiltMedium Template="ConfigSensitivityM" Text="" Texture="layerSensitivityM" X="$CfgBaseXR$" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:High"/>
+            <Cfg_TiltTouchC Template="ConfigSensitivityM" Text="" Texture="textureBlack" X="$CfgBaseXR$+($CfgSmallStepX$*4)" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:High"/>
+            <Cfg_TiltTouchD Template="ConfigSensitivityM" Text="" Texture="textureBlack" X="$CfgBaseXR$-($CfgSmallStepX$*4)" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:High"/>
+            
+            <Cfg_TiltHigh Template="ConfigSensitivityH" Text="" Texture="layerSensitivityH" X="$CfgBaseXR$" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:Low"/>
+            <Cfg_TiltTouchE Template="ConfigSensitivityH" Text="" Texture="textureBlack" X="$CfgBaseXR$+($CfgSmallStepX$*4)" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:Low"/>
+            <Cfg_TiltTouchF Template="ConfigSensitivityH" Text="" Texture="textureBlack" X="$CfgBaseXR$-($CfgSmallStepX$*4)" Y="$CfgBaseYBottom$" CmdActivate="Assignment:TiltSensitivity:Low"/>
+            
+            <CameraSpeed Template="ConfigSensitivity" Text="" LabelText="SENSITIVITY" Texture="textureBlack" Scale="$Cfg_TextSize$" X="$CfgBaseXR$" Y="$CfgBaseYBottom$+($CfgBtnSz$/4)"/>
+
+            <!-- game controls -->
+            
+            <LeftStickLookLeft Tag="Stick" Condition="((ShowLeftStickIcon)&&(InputMoveLookState==MoveRight_LookLeft))" Mask="0x01" Template="StickCtrl" X="$StickCirleXLeft" Y="$StickY" Texture="textureLook" CmdHold="Control:LeftStick" Break="xxControlDecisionRoot"/>
+            <LeftStickLookRight Tag="Stick" Condition="((ShowRightStickIcon)&&(InputMoveLookState==MoveLeft_LookRight))" Mask="0x01" Template="StickCtrl" X="$StickXLeft" Y="$StickY" Texture="textureMove" CmdHold="Control:LeftStick" Break="xxControlDecisionRoot"/>
+            <LeftStickTouchA Tag="Stick" Condition="ShowLeftStick" Mask="0x01" Template="StickCtrlTouch" X="(HCENTRE)-(HCENTRE/2)" Y="(VCENTRE)+(VCENTRE/2)" CmdHold="Control:LeftStick" Break="xxControlDecisionRoot"/>
+            <LeftStickTouchB Tag="Stick" Condition="ShowLeftStick" Mask="0x01" Template="StickCtrlTouch" X="(HCENTRE)-(HCENTRE/2)" Y="(VCENTRE)-(VCENTRE/2)+($CfgBtnSz$/3)" CmdHold="Control:LeftStick" Break="xxControlDecisionRoot"/>-->
+            
+            <LeftFly Tag="Fly" Condition="((InputMoveLookState==MoveRight_LookLeft)&&(ShowLeftFly))" Mask="0x11" Template="GameControlButton" X="$LeftButton0X" Y="$Button0Y" CmdHoldExclusive="Control:LeftBtn0" Texture="textureFly" Priority="70"/>
+            <LeftChant Tag="Chant" Condition="((InputMoveLookState==MoveRight_LookLeft)&&(ShowLeftChant))" Mask="0x21" Template="GameControlButton" X="$LeftButton0X" Y="$Button1Y" CmdHoldExclusive="Control:LeftBtn1" Texture="textureChant" Priority="70"/>
+            
+            <!--<RightStickIcon Tag="Stick" Condition="ShowRightStickIcon" Mask="0x02" Template="StickCtrl" X="$StickXRight" Y="$StickY" Texture="textureLook"/> -->
+            <RightStickLookLeft Tag="Stick" Condition="((ShowRightStickIcon)&&(InputMoveLookState==MoveRight_LookLeft))" Mask="0x02" Template="StickCtrl" X="$StickXRight" Y="$StickY" Texture="textureMove" CmdHold="Control:RightStick"/>
+            <RightStickLookRight Tag="Stick" Condition="((ShowRightStickIcon)&&(InputMoveLookState==MoveLeft_LookRight))" Mask="0x02" Template="StickCtrl" X="$StickCircleXRight" Y="$StickY" Texture="textureLook" CmdHold="Control:RightStick"/>
+            <RightStickTouchA Tag="Stick" Condition="ShowRightStick" Mask="0x02" Template="StickCtrlTouch" X="(HCENTRE)+(HCENTRE/2)" Y="(VCENTRE)+(VCENTRE/2)"  CmdHold="Control:RightStick"/>
+            <RightStickTouchB Tag="Stick" Condition="ShowRightStick" Mask="0x02" Template="StickCtrlTouch" X="(HCENTRE)+(HCENTRE/2)" Y="(VCENTRE)-(VCENTRE/2)+($CfgBtnSz$/3)"  CmdHold="Control:RightStick"/>
+            
+            <RightFly Tag="Fly" Condition="((InputMoveLookState==MoveLeft_LookRight)&&(ShowRightFly))" Mask="0x12" Template="GameControlButton" X="$RightButton0X" Y="$Button0Y" CmdHoldExclusive="Control:RightBtn0" Texture="textureFly" Priority="70"/>
+            <RightChant Tag="Chant" Condition="((InputMoveLookState==MoveLeft_LookRight)&&(ShowRightChant))" Mask="0x22" Template="GameControlButton" X="$RightButton0X" Y="$Button1Y" CmdHoldExclusive="Control:RightBtn1" Texture="textureChant" Priority="70"/>
+            
+            <!-- additional system controls for debug control state (ie, select, start, debug buttons) -->
+            
+            <System Condition="((ControlState==Debug)&&(DebugMenuEnable))" Shape="6" HoldDuration="0.0" Scale="0.6;1.0;1.0;1.0" Distance="80" Alpha="0.25;1.0" Pos="0;40" Alignment="CT" Angle="-1" Step="-1" Text="" BgColor="0xaa0000">
+                <Debug0 Text="D1" CmdReleaseExclusive="Control:Debug0"/>
+                <Select Text="SEL" CmdReleaseExclusive="Control:Select"/>
+                <Start Text="ST" CmdReleaseExclusive="Control:Start"/>
+                <Debug1 Text="D2" CmdReleaseExclusive="Control:Debug1"/>
+            </System>
+            
+            <Cam Condition="((DebugMenuEnable)&&(ControlState==Debug))" HoldDuration="0.0" Distance="80" Alpha="0.25;1.0" X="HRIGHT-50" Y="VCENTRE-50" BgColor="0xcc5555" Text="Cam" CmdReleaseExclusive="Control:Debug1"/>
+            
+            <!-- main debug menu -->
+            
+            <Menu Condition="(DebugMenuEnable)" Mask="0xffffffff" Priority="99" Shape="6" HoldDuration="0.1" Distance="80" Exclusive="TRUE"
+                Scale="0.75;1.0;1.0;1.0" Alpha="0.15;0.75;1.00;0.50" Pos="0;-90" Alignment="CB" Angle="0" Step="1" BgColor="0xaa0000" CmdActivate="Haptics:Large">
+                <Level>
+                    <Graveyard CmdRelease="LevelSelect:Level_Graveyard"/>
+                    <Barrens CmdRelease="LevelSelect:Level_Barrens"/>
+                    <More>
+                        <Cave CmdRelease="LevelSelect:Level_Cave"/>
+                        <Ruins CmdRelease="LevelSelect:Level_Ruins"/>
+                        <Mountain CmdRelease="LevelSelect:Level_Mountain"/>
+                        <Summit CmdRelease="LevelSelect:Level_Summit"/>
+                        <Credits CmdRelease="LevelSelect:Level_Credits"/>
+                    </More>
+                    <Desert CmdRelease="LevelSelect:Level_Desert"/>
+                    <Canyon CmdRelease="LevelSelect:Level_Canyon"/>
+                </Level>
+                <Cheats BgColor="0x0000aa">
+                    <Scarf>
+                        <Clear CmdRelease="Scarf:Clear"/>
+                        <Single CmdRelease="Scarf:Single"/>
+                        <Full CmdRelease="Scarf:Full"/>
+                        <Recharge CmdRelease="Scarf:Recharge"/>
+                        <White CmdRelease="Scarf:White"/>
+                    </Scarf>
+                    <Achievements>
+                        <Clear CmdRelease="Ach:Clear"/>
+                        <GiveOne CmdRelease="Ach:GiveOne"/>
+                        <GiveAll CmdRelease="Ach:GiveAll"/>
+                    </Achievements>
+                    <States>
+                        <ChapSel CmdRelease="Control:ChapterSelect"/>
+                    </States>
+                    <Remote>
+                        <Log CmdRelease="MP:Log"/>
+                    </Remote>
+                </Cheats>
+                <Debug BgColor="0x00aa00">
+                    <Log>
+                        <Triggers CmdRelease="Toggle:Triggers"/>
+                        <Camera CmdRelease="Toggle:Camera"/>
+                        <Dude CmdRelease="Toggle:Dude"/>
+                        <System CmdRelease="Toggle:SystemInfo"/>
+                    </Log>
+                    <Toggles DeltaAngle="1" Angle="-2">
+                        <Misc>
+                            <Input>
+                                <MotionInput>
+                                    <MotionDebug CmdRelease="Toggle:MotionDebug"/>
+                                    <MotionLook CmdRelease="Toggle:MotionLook"/>
+                                    <InvertPitch CmdRelease="Toggle:InvertPitch"/>
+                                    <InvertYaw CmdRelease="Toggle:InvertYaw"/>
+                                </MotionInput>
+                                <Visualizer CmdRelease="Toggle:VisualizeAccelerometer"/>
+                            </Input>
+                            <Dunes>
+                                <Info CmdRelease="Toggle:DuneInfo"/>
+                                <PartialUpdate CmdRelease="Toggle:DuneUpdate"/>
+                                <MaskLod>
+                                    <Clear CmdRelease="Toggle:DuneMaskLodClear"/>
+                                    <IncMin CmdRelease="Toggle:DuneMaskLodIncMin"/>
+                                    <DecMax CmdRelease="Toggle:DuneMaskLodDecMax"/>
+                                </MaskLod>
+                                <MaskCell>
+                                    <Clear CmdRelease="Toggle:DuneMaskCellClear"/>
+                                    <Horiz>
+                                        <Left CmdRelease="Toggle:DuneMaskCellHorizLeft"/>
+                                        <Centre CmdRelease="Toggle:DuneMaskCellHorizCentre"/>
+                                        <Right CmdRelease="Toggle:DuneMaskCellHorizRight"/>
+                                    </Horiz>
+                                    <Vert>
+                                        <Top CmdRelease="Toggle:DuneMaskCellVertTop"/>
+                                        <Centre CmdRelease="Toggle:DuneMaskCellVertCentre"/>
+                                        <Bottom CmdRelease="Toggle:DuneMaskCellVertBottom"/>
+                                    </Vert>
+                                </MaskCell>
+                            </Dunes>
+                            <DebugTex>
+                                <Dunes CmdRelease="Toggle:DebugTexDune"/>
+                                <Fluid CmdRelease="Toggle:DebugTexFluid"/>
+                            </DebugTex>
+                            <SystemFlush CmdRelease="Toggle:SystemFlush"/>
+                        </Misc>
+                        <SaveLoad Angle="0">
+                            <SaveGame CmdRelease="SaveLoad:SaveGame"/>
+                            <LoadGame CmdRelease="SaveLoad:LoadGame"/>
+                            <DeleteSave CmdRelease="SaveLoad:DeleteSave"/>
+                            <ContinueGame CmdRelease="SaveLoad:ContinueGame"/>
+                        </SaveLoad>
+                    </Toggles>
+                    <Profiler DeltaAngle="-1">
+                        <CPU CmdRelease="Profiler:CPU"/>
+                        <GPU CmdRelease="Profiler:GPU"/>
+                    </Profiler>
+                </Debug>
+                <Audio>
+                    <SoundBarn>
+                        <Streams CmdRelease="Toggle:AudioStreams"/>
+                        <s3D CmdRelease="Toggle:AudioSounds3D"/>
+                        <s2D CmdRelease="Toggle:AudioSounds2D"/>
+                        <General CmdRelease="Toggle:AudioSoundsGeneral"/>
+                        <Player CmdRelease="Toggle:AudioSoundsPlayer"/>
+                    </SoundBarn>
+                    <Misc>
+                        <Mute>
+                            <Music CmdRelease="Toggle:AudioMuteMusic"/>
+                            <SFX CmdRelease="Toggle:AudioMuteSFX"/>
+                        </Mute>
+                        <Groups CmdRelease="Toggle:AudioGroups"/>
+                        <Info CmdRelease="Toggle:AudioInfo"/>
+                    </Misc>
+                    <Visual3D Text="3D Visuals" CmdRelease="Toggle:AudioVisual3D"/>
+                </Audio>
+                <OnScr CmdRelease="Toggle:OnScrDisplay" BgColor="0xaaaaaa"/>
+            </Menu>
+            
+            <!-- audio testing tool -->
+            
+            <AudioPrevBank Template="AudioPlayer" BgColor="0xaa0000" Pos="100;100" Text="Bank-1" CmdRelease="AP:PrevBank"/>
+            <AudioNextBank Template="AudioPlayer" BgColor="0xaa0000" Pos="100;200" Text="Bank+1" CmdRelease="AP:NextBank"/>
+            <AudioStop Template="AudioPlayer" Scale="1.1;1.2" BgColor="0xaa0000" Pos="200;100" Text="Stop" CmdRelease="AP:Stop"/>
+            <AudioPlay Template="AudioPlayer" Scale="1.1;1.2" BgColor="0xaa0000" Pos="200;200" Text="Play" CmdRelease="AP:Play"/>
+            <AudioPrevSound Template="AudioPlayer" BgColor="0xaa0000" Pos="300;100" Text="Sound-1" CmdRelease="AP:PrevSound"/>
+            <AudioNextSound Template="AudioPlayer" BgColor="0xaa0000" Pos="300;200" Text="Sound+1" CmdRelease="AP:NextSound"/>
+            <AudioPrevSound16 Template="AudioPlayer" BgColor="0xaa0000" Pos="400;100" Text="Sound-16" CmdRelease="AP:PrevSound16"/>
+            <AudioNextSound16 Template="AudioPlayer" BgColor="0xaa0000" Pos="400;200" Text="Sound+16" CmdRelease="AP:NextSound16"/>
+            <AudioGlobalRegPrev Template="AudioPlayer" BgColor="0x55aa00" Pos="100;300" Text="PrevGR" CmdRelease="AP:GR_Prev"/>
+            <AudioGlobalRegNext Template="AudioPlayer" BgColor="0x55aa00" Pos="200;300" Text="NextGR" CmdRelease="AP:GR_Next"/>
+            <AudioGlobalRegDec Template="AudioPlayer" BgColor="0x55aa00" Pos="300;300" Text="--GR" CmdRelease="AP:GR_Dec"/>
+            <AudioGlobalRegInc Template="AudioPlayer" BgColor="0x55aa00" Pos="400;300" Text="++GR" CmdRelease="AP:GR_Inc"/>
+            
+            <!-- -->
+            
+        </Controls>
+    </Inputs>
+
+    <!-- input controls -->
+    <Controls Rumble="true">
+      <Move Control="AnalogueStick"/>
+      <Look Control="TiltControl"/>
+      <Chime Control="Right"/>
+      <Fly Control="Down"/>
+      <Pause Control="Start"/>
+      <Start Control="Select"/>
+    </Controls>
+
+    <!-- audio volume -->
+    <Audio Music="10" SFX="10"/>
+
+    <!-- all things graphics -->
+    <Graphics>
+
+      <!-- Fluid simulation grid count and animation detail -->
+      <Fluid Setting="Medium">
+        <Low BarnMaxGrids="3" CascadeMaxGrids="3">
+          <Grid Dim="64" MaxForces="1216"/>
+          <Force MaxMass="16" MaxPush="16" MaxRad="128" Scale="0.21" Speed="0.060"/>
+        </Low>
+        <Medium BarnMaxGrids="3" CascadeMaxGrids="3">
+          <Grid Dim="80" MaxForces="1216"/>
+          <Force MaxMass="16" MaxPush="16" MaxRad="128" Scale="0.15" Speed="0.083"/>
+        </Medium>
+        <High BarnMaxGrids="3" CascadeMaxGrids="3">
+          <Grid Dim="96" MaxForces="1216"/>
+          <Force MaxMass="16" MaxPush="16" MaxRad="128" Scale="0.12" Speed="0.106"/>
+        </High>
+        <Ultra BarnMaxGrids="3" CascadeMaxGrids="3">
+          <Grid Dim="112" MaxForces="1216"/>
+          <Force MaxMass="16" MaxPush="16" MaxRad="128" Scale="0.10" Speed="0.128"/>
+        </Ultra>
+      </Fluid>
+
+      <!-- Sand texture size and sprite composition -->
+      <SandTexture Setting="Medium">
+        <Low CubeTextureDim="16" MaxSprites="1024" MipTextureDim="64" SpriteDim="32" TextureDim="512"/>
+        <Medium CubeTextureDim="32" MaxSprites="4096" MipTextureDim="64" SpriteDim="32" TextureDim="1024"/>
+        <High CubeTextureDim="32" MaxSprites="4096" MipTextureDim="64" SpriteDim="64" TextureDim="2048"/>
+        <Ultra CubeTextureDim="64" MaxSprites="4096" MipTextureDim="64" SpriteDim="128" TextureDim="4096"/>
+      </SandTexture>
+
+      <!-- Dune cell size and LOD count -->
+      <Dune Setting="Medium">
+        <Low FadeFar="9" FadeNear="6" Interpolation="false" LodCount="4" TerrainWidth="9"/>
+        <Medium FadeFar="6" FadeNear="3" Interpolation="false" LodCount="4" TerrainWidth="6"/>
+        <High FadeFar="6" FadeNear="3" Interpolation="true" LodCount="4" TerrainWidth="6"/>
+        <Ultra FadeFar="3" FadeNear="2" Interpolation="true" LodCount="5" TerrainWidth="3"/>
+
+        <!-- sand dune sparkle parameters -->
+        <Sparkle>
+          <Level_Graveyard AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Barrens AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Desert AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Canyon AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.0" NoiseFadeScalar="-0.06" SandSpecScalar="1.0" VelvetSpecularCorrection="0.25"/>
+          <Level_Cave AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Ruins AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Mountain AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Summit AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Credits AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Matt AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+          <Level_Chris AoScalar="0.33" F0spec="0.01" MipTapBias="0.00" NoiseFadeBias="1.5" NoiseFadeScalar="-0.02" SandSpecScalar="1.6" VelvetSpecularCorrection="0.25"/>
+        </Sparkle>
+      </Dune>
+      <Cloth Factor="50" Interpolation="false"/>
+      <Screen Anisotrophy="4" FXAA="false" FullScreen="true" Height="0" MultiSampleCount="1" VSync="true" Width="0"/>
+      <System>
+        <Lock Tex2D="Staging" VB="Dynamic" IB="Dynamic"/>
+        <Cloth Method="Mixed"/>
+        <TimeSmoothing Method="Capped" Value="25"/>
+      </System>
+    </Graphics>
+
+    <!-- system configuration -->
+    <System ImmediateProcessing="true" FifoKickSize="16" FlipQueueSize="1">
+      <Threads Default="-1" MainHelps="false" Max="6" Min="2"/>
+      <Log Crash="false"/>
+      <Language ID="Default"/>
+    </System>
+
+  </Settings>
+</Root>

@@ -1,0 +1,48 @@
+#include "Migratory.sh"
+// Notes:  Occlusion is a deferred screen space effect.  This implementation
+//         expects worldspace geometry to be passed in and it will internally
+//         flatten it to screen space.
+//
+// Author: John Edwards
+// Date C: 7-24-2010
+
+// From Phyre:
+
+struct a2v
+{
+#ifdef __ORBIS__
+	float4 Position      VS_ATTR(POSITION);
+#else
+	float3 Position      VS_ATTR(POSITION);
+#endif
+	float3 tint          VS_ATTR(TEXCOORD0);
+	float4 occPosRad     VS_ATTR(TEXCOORD1);
+	float4 intShNoiseEx  VS_ATTR(TEXCOORD2);
+};
+
+struct v2f
+{
+	float4 position      FS_ATTR(POSITION);
+	float4 clip          FS_ATTR(TEXCOORD0);
+	float3 tint          FS_ATTR(TEXCOORD1);
+	float4 occPosRad     FS_ATTR(TEXCOORD2);
+	float4 intShNoiseEx  FS_ATTR(TEXCOORD3);
+};
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in p2v IN, out v2f OUT )
+//{
+
+VS_START()
+
+	// Flatten the projection so our interpolators work better.
+	output.position = MatrixMul( GET_LOCAL(modelViewProj), float4( input.Position.xyz, 1 ) );
+	output.clip = output.position;
+	output.tint = input.tint;
+	output.occPosRad = input.occPosRad;
+	output.intShNoiseEx = input.intShNoiseEx;
+
+SH_END()
+

@@ -22,7 +22,7 @@ static int jnet_freeplay_prepare(lua_State *state) {
             "{'JNTFishLong','JNTBio','fish-idle-move-long'},{'JNTFishCall','JNTBio','fish-come-here'},"
             "{'JNTWarVoice','JNTMech','GuardianCameoBy'},{'JNTWarLock','JNTMech','GuardianFinalStretchHungry1'},"
             "{'JNTWarHungry','JNTMech','GuardianFinalStretchHungry2'},{'JNTWarAway','JNTMech','GuardianFlyAway'},"
-            "{'JNTWhale','JNTBio','HappyWhale'}} "
+            "{'JNTWhale','JNTBio','HappyWhale'},{'JNTFlowSnake','JNTFlow','FlowSnakeCall'},{'JNTFlowHunter','JNTFlow','FlowHunterCall'}} "
             "local n=0 for _ in pairs(soundEffectData) do n=n+1 end if n+#rows<=160 then "
             "for _,r in ipairs(rows) do soundEffectData[r[1]]={bankName=r[2],soundName=r[3],minDist=60,maxDist=200,autoPitchBend=false} end end end "
         " end ",

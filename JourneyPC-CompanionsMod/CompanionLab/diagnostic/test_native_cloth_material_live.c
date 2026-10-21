@@ -248,7 +248,7 @@ static int gpu_fixture(void) {
     if (FAILED(device->lpVtbl->CreateSamplerState(device,&sd,&sampler)) || !sampler) goto done;
     atlas_reset();put(atlas_gpu+0x38,(uintptr_t)source);put(atlas_gpu+0x40,(uintptr_t)view);
     put(atlas_gpu+0x48,0);put(atlas_texture+0x28,(uintptr_t)sampler);
-    struct jc_cloth_atlas_native native={UINT64_C(0x140000000),read_bytes,NULL,context};
+    struct jc_cloth_atlas_native native={.image=UINT64_C(0x140000000),.read=read_bytes,.device_context=context};
     struct jc_cloth_atlas_copy_ops ops=jc_cloth_atlas_native_ops(&native);ops.hold=gpu_hold;ops.drop=gpu_drop;
     stage=3;
     if (jc_cloth_atlas_snapshot_create(read_bytes,NULL,native.image,(uintptr_t)atlas_entry,

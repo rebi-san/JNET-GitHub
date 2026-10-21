@@ -1,4 +1,8 @@
 #include "diagnostic_fault.h"
+#ifdef _WIN32
+#include <windows.h>
+#include <wchar.h>
+#endif
 #include "jnet_session_log.h"
 #include <assert.h>
 #include <stdio.h>

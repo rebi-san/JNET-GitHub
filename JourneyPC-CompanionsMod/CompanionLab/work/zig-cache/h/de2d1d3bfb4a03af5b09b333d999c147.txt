@@ -1,0 +1,2 @@
+0
+2012 65910000 1791344991895561234 594f75fcfe97e0b41d0e525ef1c7452a 1 libc/mingw/lib-common/api-ms-win-crt-runtime-l1-1-0.def.in

@@ -1,0 +1,31 @@
+/Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/work/zig-local-cache/tmp/6ad92518c3a03bad-test_diagnostic_fault.obj: \
+  /Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/diagnostic/test_diagnostic_fault.c \
+  /Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/diagnostic/diagnostic_fault.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/stdint.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/stdint.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/crtdefs.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/corecrt.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/_mingw.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/_mingw_mac.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/_mingw_secapi.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/vadefs.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/vadefs.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/sdks/_mingw_ddk.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/stddef.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/__stddef_wchar_t.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/__stddef_wint_t.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/__stddef_ptrdiff_t.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/__stddef_size_t.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/__stddef_null.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/__stddef_max_align_t.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/__stddef_offsetof.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/string.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/sec_api/string_s.h \
+  /Users/rebisan/JourneyCompanions/JourneyPC-CompanionsMod/CompanionLab/diagnostic/jnet_session_log.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/include/stdatomic.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/assert.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/stdio.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/corecrt_stdio_config.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/_mingw_off_t.h \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/swprintf.inl \
+  work/deps/zig-macos-aarch64-0.13.0/lib/libc/include/any-windows-any/sec_api/stdio_s.h

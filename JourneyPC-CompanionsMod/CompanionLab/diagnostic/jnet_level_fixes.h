@@ -1,6 +1,21 @@
 #ifndef JNET_LEVEL_FIXES_H
 #define JNET_LEVEL_FIXES_H
 #include "jnet_texture_guard.h"
+#include "jnet_resource_view.h"
+static void *jnet_resource_view_original;
+static volatile LONG jnet_resource_view_rejected;
+static uint64_t jnet_resource_view_guard(uintptr_t object,uint32_t index) {
+    unsigned failure=0;
+    uint64_t result=jnet_resource_view(own_read,NULL,object,index,&failure);
+    if(failure && InterlockedIncrement(&jnet_resource_view_rejected)<=8){
+        char line[224];
+        snprintf(line,sizeof(line),"[JNET] renderer resource view rejected stage=%u object=%llx index=%u caller=%llx frame=%lu",
+            failure,(unsigned long long)object,index,
+            (unsigned long long)(uintptr_t)__builtin_return_address(0),(unsigned long)JNETFrames);
+        message(line);
+    }
+    return result;
+}
 static uintptr_t jnet_bryan_mesh;
 static unsigned jnet_bryan_visits;
 static int jnet_bryan_ready=-1;

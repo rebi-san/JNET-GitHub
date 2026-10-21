@@ -29,14 +29,14 @@ def main():
               (0xae650,0xaeb44),(0xaedd0,0xaefe3),(0x146870,0x1468d1),
               (0x245e10,0x246125),(0x10e43b,0x10e5a8),(0x5defa8,0x5df030),(0x8ab10,0x8ad97),(0x117770,0x117785),
               (0x21d980,0x21d9ab),(0x24fa70,0x24fd1c),(0x140790,0x140a0d),(0x5cfa90,0x5cfaa0),
-              (0xc4d10,0xc4dc5),(0x24bdf0,0x24c002),(0x24c010,0x24c49b),(0x118e57,0x118e7c),(0x677870,0x677880))
+              (0xab830,0xab920),(0xc4d10,0xc4dc5),(0x24bdf0,0x24c002),(0x24c010,0x24c49b),(0x118e57,0x118e7c),(0x677870,0x677880))
     runtime = (HERE / "traveler_actor_runtime.h").read_text()
     begin = runtime.index("static void traveler_actor_visibility(")
     end = runtime.index("static void traveler_actor_render(", begin)
     runtime = runtime[:begin] + "static void traveler_actor_visibility(uintptr_t render) {(void)render;}\n" + runtime[end:]
     (work / "actor_runtime_fixture.h").write_text(runtime)
     backend = (HERE / "traveler_live_backend.h").read_text()
-    begin = backend.index("static int traveler_live_material_reset(")
+    begin = backend.index("static int traveler_live_material_rebuild(")
     end = backend.index("static int traveler_live_workers(", begin)
     (work / "material_reset_fixture.h").write_text(backend[begin:end])
     header = []

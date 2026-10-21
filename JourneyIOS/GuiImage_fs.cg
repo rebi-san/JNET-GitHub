@@ -1,0 +1,93 @@
+#include "Migratory.sh"
+
+#define ourBlendState Alpha_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+#ifndef _IOS64
+
+struct IN
+{
+	float4 position        VS_ATTR(POSITION);
+	float2 uv              VS_ATTR(TEXCOORD0);
+};
+
+struct OUT
+{
+    float4 color           : FINAL_COLOR;
+};
+
+D_DECLARE_TEXTURE2D_4(tex);
+float Alpha = 1.0;
+
+#ifdef SPECIAL
+float SpecialMask;
+
+D_DECLARE_TEXTURE2D_4(tex2);
+D_DECLARE_TEXTURE2D_4(tex3);
+
+
+#endif
+
+#endif
+
+
+#define texDisable tex2
+#define texEnable tex3
+
+//----------------------------------------------
+// Resample
+//    - This shader doesn't do any real work, it's 
+//      meant for pass-through down/upsampling 
+//
+//----------------------------------------------
+//void main( IN input, out OUT output )
+//{
+
+
+FS_START(float4,
+    TEX3(
+        2D, tex,
+        2D, tex2,
+        2D, tex3),)
+
+	output = tex2D(tex, input.uv);
+
+#ifdef SPECIAL
+    float4 textureMask = tex2D(tex, input.uv);
+
+    output.ar = textureMask.ar;
+
+	float4 texOff = tex2D(texDisable, input.uv);
+	float4 texOn = tex2D(texEnable, input.uv);
+
+	output = texOff;
+
+	const float kEpsilon = 0.5f/255.f;
+	float d = abs(GET_LOCAL(SpecialMask) - textureMask.r);
+
+	if(d<kEpsilon)
+	{
+		// enabled
+		//output.color.rgb = output.color.g;
+		output = texOn;
+	}
+	//else
+	//{
+	//	//0x6f, 0x8f ==> 111, 143 ==> 0.435; 0.561
+	//
+	//	float specialCase1 = abs(textureMask.r-0.435f);
+	//	float specialCase2 = abs(textureMask.r-0.561f);
+	//	float minSC = min(specialCase1, specialCase2);
+	//
+	//	if(minSC<kEpsilon)
+	//		output.color.a = 0;
+	//
+	//	output.color.rgb = output.color.b;
+	//}
+#endif
+
+	output.a *= GET_LOCAL(Alpha);
+
+SH_END()
+

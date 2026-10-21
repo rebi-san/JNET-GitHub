@@ -102,6 +102,22 @@ static void traveler_actor_report(int code) {
             declines,p->receiver_stage,p->detail,p->clocks[0],p->clocks[1],p->attempted_spans,
             p->restored_spans,p->quarantined,traveler_actor->state);
         message(line);
+        if(p->receiver_stage==1 && p->detail==JC_RECEIVER_VALUE) {
+            unsigned bad=0;float value=0;
+            for(unsigned offset=0x10;offset<=0x64;offset+=4) {
+                if(offset>=0x50 && offset<0x5c)continue;
+                float candidate=jc_receiver_float(p->before+offset);
+                if(!isfinite(candidate) || fabsf(candidate)>1000000.f){bad=offset;value=candidate;break;}
+            }
+            uint32_t appearance[4];memcpy(appearance,p->before+0x68,sizeof(appearance));
+            snprintf(line,sizeof(line),"[JC] actor numeric input actor=%llx peer=%llu bad_float=+%x value=%.9g appearance=%u/%u/%u/%u age=%.9g delay=%.9g cooldown=%.9g inactive=%u",
+                (unsigned long long)traveler_actor->identity.actor,(unsigned long long)traveler_actor->identity.peer,
+                bad,value,appearance[0],appearance[1],appearance[2],appearance[3],
+                jc_receiver_float(traveler_actor->receiver.image+0x28dc4),
+                jc_receiver_float(traveler_actor->receiver.image+0x28da0),
+                jc_receiver_float(p->before+0x1468),traveler_actor->input.inactive);
+            message(line);
+        }
     }
     if(traveler_stream_enabled)for(unsigned i=0;i<2;++i) {
         JNETActor[26+i*3]=(LONG)traveler_streams[i].stream.accepted;
@@ -200,8 +216,12 @@ __declspec(dllexport) int JNETActorActivate(uint64_t peer,uint64_t generation,
         !services->begin || !services->end || !services->drain || !peer || !generation ||
         !original_traveler_input || !original_traveler_update || !original_traveler_finish ||
         !traveler_actor_material_hooks_ready ||
-        JNETTraveler[0]!=3 || !traveler_context())
+        JNETTraveler[0]!=3 || !traveler_context()) {
+        char line[240];snprintf(line,sizeof(line),"[JNET] extra traveler admission declined stage=activate actor=%u peer=%u generation=%u material_hooks=%u lifecycle=%ld/%ld/%ld context=%u",
+            traveler_actor!=NULL,peer!=0,generation!=0,traveler_actor_material_hooks_ready!=0,
+            (long)JNETTraveler[0],(long)JNETTraveler[1],(long)JNETTraveler[2],traveler_context()!=0);message(line);
         return JC_ACTOR_RUNTIME_ARGUMENT;
+    }
     uint64_t glyph=0;
     if (!own_read(NULL,traveler_object+0x2240,&glyph,8))return JC_ACTOR_READ;
     struct jc_actor_identity id={(uintptr_t)GetModuleHandleW(NULL),traveler_game,traveler_barn,
@@ -268,9 +288,15 @@ __declspec(dllexport) int JNETActorTrialStop(void) {
     return (int)JNETActorTrial[1];
 }
 __declspec(dllexport) int JNETActorTrialStart(void) {
-    if((JNETActorTrial[0] && JNETActorTrial[0]!=3) ||
-        (traveler_actor && !traveler_peer_vacant()) || JNETTraveler[0]!=3 || !traveler_context() ||
-        traveler_actor_trial_serial==0xffffff)return JC_ACTOR_RUNTIME_ARGUMENT;
+    unsigned declined=((JNETActorTrial[0] && JNETActorTrial[0]!=3)?1u:0u) |
+        ((traveler_actor && !traveler_peer_vacant())?2u:0u) | (JNETTraveler[0]!=3?4u:0u) |
+        (!traveler_context()?8u:0u) | (traveler_actor_trial_serial==0xffffff?16u:0u);
+    if(declined){
+        char line[320];snprintf(line,sizeof(line),"[JNET] extra traveler admission declined stage=start reasons=%u trial=%ld lifecycle=%ld/%ld/%ld object=%u actor=%u backend=%u thread=%lu/%lu; reasons: 1 trial, 2 occupied, 4 lifecycle, 8 context, 16 serial",
+            declined,(long)JNETActorTrial[0],(long)JNETTraveler[0],(long)JNETTraveler[1],(long)JNETTraveler[2],
+            traveler_object!=0,traveler_actor!=NULL,active_cloth_backend!=NULL,(unsigned long)GetCurrentThreadId(),(unsigned long)traveler_thread);
+        message(line);return JC_ACTOR_RUNTIME_ARGUMENT;
+    }
     if(traveler_actor && !traveler_peer_restart_requested) {
         traveler_peer_restart_requested=1;return 0;
     }
@@ -357,7 +383,7 @@ static uintptr_t traveler_input_observer(uintptr_t barn,uintptr_t game) {
     uintptr_t result=original_traveler_input(barn,game);
     if(traveler_character_input)traveler_character_input(barn,game);
     if(barn==traveler_barn && game==traveler_game) {
-        if(traveler_peer_restart_requested) {
+        if(traveler_peer_restart_requested && JNETTraveler[0]!=1) {
             int code=JNETActorTrialStart();
             if(code){traveler_peer_restart_requested=0;JNETActorTrial[0]=-1;JNETActorTrial[1]=code;traveler_actor_trial_stop(code);}
         }

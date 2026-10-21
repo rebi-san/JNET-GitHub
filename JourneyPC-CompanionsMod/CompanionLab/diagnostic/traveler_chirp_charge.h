@@ -2,6 +2,7 @@
 #define JC_TRAVELER_CHIRP_CHARGE_H
 #include "native_chirp_charge.h"
 static struct jc_chirp_charge traveler_charge;
+static struct {uint32_t serial;uint64_t peer,generation;unsigned valid;} traveler_charge_refilled[16];
 static struct {uint64_t actor;unsigned char prior;unsigned applied;} traveler_charge_scope[3];
 static void traveler_charge_after_update(void) {
     for(unsigned i=0;i<3;++i)if(traveler_charge_scope[i].applied) {
@@ -13,6 +14,7 @@ static void traveler_charge_after_update(void) {
 static void traveler_charge_cleanup(uintptr_t actor) {
     if(actor!=traveler_barn+0xb0)return;
     traveler_charge_after_update();memset(&traveler_charge,0,sizeof(traveler_charge));
+    memset(traveler_charge_refilled,0,sizeof(traveler_charge_refilled));
 }
 static void traveler_charge_before_update(uintptr_t barn,uintptr_t game) {
     if(!traveler_actor || traveler_actor->state==JC_ACTOR_RUNTIME_QUARANTINED ||
@@ -37,21 +39,61 @@ static void traveler_charge_before_update(uintptr_t barn,uintptr_t game) {
             traveler_chirp_pending[i].counter==serial && traveler_chirp_pending[i].peer==id->peer &&
             traveler_chirp_pending[i].generation==id->generation)owners[i]=3;
     }
+    if(traveler_charge.generation!=id->generation) {
+        memset(traveler_charge.remaining,0,sizeof(traveler_charge.remaining));
+        traveler_charge.touch_elapsed=0;traveler_charge.generation=id->generation;
+        memset(traveler_charge_refilled,0,sizeof(traveler_charge_refilled));
+    }
+    int touch[3]={0};float local_position[3],extra_position[3],temperature;unsigned char enabled=0;
+    int extra_active=traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE && !traveler_actor->departing &&
+        traveler_actor->input_frame==(uint64_t)JNETFrames;
+    if(extra_active && own_read(NULL,barn+0xb0+0x1e69,&enabled,1) && enabled==1 &&
+        own_read(NULL,id->actor+0x10,extra_position,sizeof(extra_position))) {
+        for(unsigned i=0;i<2;++i) {
+            uint64_t target=i?barn+0x146f0:barn+0xb0;
+            if(i && (!layout.remote_gate || traveler_local_state==3))continue;
+            if(own_read(NULL,target+0x10,local_position,sizeof(local_position)) &&
+                own_read(NULL,target+0x60,&temperature,4) &&
+                jc_charge_touch(local_position,extra_position,temperature))touch[i]=touch[2]=1;
+        }
+    }
+    if(!touch[0])traveler_charge.touch_elapsed=0;
     for(unsigned i=0;i<3;++i) {
         uint64_t actor=i==0?barn+0xb0:i==1?barn+0x146f0:id->actor;
         int active=i==0 || (i==1?layout.remote_gate && traveler_local_state!=3:
-            traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE && !traveler_actor->departing);
+            extra_active);
         float position[4];unsigned char prior=0;
         if(!active || !own_read(NULL,actor+0x10,position,16) || !own_read(NULL,actor+0x50,&prior,1) || prior>1) {
             jc_chirp_charge_tick(&traveler_charge,i,id->generation,0,0,dt);continue;
         }
-        int hit=jc_chirp_charge_hit(id->image,snapshot,owners,i,position,dt);
-        if(!jc_chirp_charge_tick(&traveler_charge,i,id->generation,1,hit,dt))continue;
-        float energy,targets[2];
-        if(!own_read(NULL,actor+0x60,&energy,4) || !isfinite(energy) || energy<0 || energy>1 ||
+        int hit=extra_active?jc_chirp_charge_hit(id->image,snapshot,owners,i,position,dt):0;
+        if(!extra_active)traveler_charge.remaining[i]=0;
+        int charging=jc_chirp_charge_tick(&traveler_charge,i,id->generation,1,hit,dt);
+        if(!charging && !touch[i])continue;
+        if(i==0) {
+            unsigned refill=0;
+            if(touch[0]) {
+                traveler_charge.touch_elapsed+=dt;
+                while(traveler_charge.touch_elapsed>=.25f) {++refill;traveler_charge.touch_elapsed-=.25f;}
+            }
+            if(hit)for(unsigned j=0;j<count;++j) {
+                unsigned only[16]={0};only[j]=owners[j];uint32_t serial;
+                memcpy(&serial,snapshot+j*0x70+0x50,4);
+                if(traveler_charge_refilled[j].valid && traveler_charge_refilled[j].serial==serial &&
+                    traveler_charge_refilled[j].peer==id->peer && traveler_charge_refilled[j].generation==id->generation)continue;
+                if(!jc_chirp_charge_hit(id->image,snapshot,only,0,position,dt))continue;
+                traveler_charge_refilled[j].serial=serial;traveler_charge_refilled[j].peer=id->peer;
+                traveler_charge_refilled[j].generation=id->generation;traveler_charge_refilled[j].valid=1;++refill;
+            }
+            if(!jc_charge_refill(own_read,NULL,id->image,game,actor,refill)) {
+                traveler_peer_fault(JC_ACTOR_RUNTIME_SCOPE);return;
+            }
+        }
+        float temperature,targets[2];
+        if(!own_read(NULL,actor+0x60,&temperature,4) || !isfinite(temperature) || temperature<0 || temperature>1 ||
             !own_read(NULL,actor+0x1448,targets,4) || !own_read(NULL,actor+0x1450,targets+1,4) ||
             !isfinite(targets[0]) || !isfinite(targets[1]))continue;
-        float glow=1.f-powf(energy,.125f);unsigned char one=1;
+        float glow=touch[i]?1.f:1.f-powf(temperature,.125f);unsigned char one=1;
         if(!jc_local_windows_write(actor+0x50,&one,1)){traveler_peer_fault(JC_ACTOR_RUNTIME_SCOPE);return;}
         traveler_charge_scope[i].actor=actor;traveler_charge_scope[i].prior=prior;traveler_charge_scope[i].applied=1;
         for(unsigned j=0;j<2;++j) {

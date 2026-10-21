@@ -1,0 +1,122 @@
+#define GLOBAL_LEAN_AND_MEAN
+#include "Migratory.sh"
+
+
+#ifndef _IOS64
+
+#define LOW_RES
+
+
+#ifndef D_PREPASS_ENABLED
+
+	#ifndef PHYRE3X_ENABLED
+	float4 l_c;
+	#endif
+
+	D_DECLARE_TEXTURE2D_4(textureAtlas);
+	D_DECLARE_TEXTURE2D_4(partIrrTexture);
+
+	#ifdef SOFT
+	 #ifdef LOW_RES
+		D_DECLARE_TEXTURE2D_4(depthTexLo);
+	 #else
+		D_DECLARE_TEXTURE2D_4(depthTex);
+	 #endif
+		float depthBias;
+		float depthScale;
+		float depthExtra;
+	#endif
+
+#endif//D_PREPASS_ENABLED
+
+
+struct v2f
+{
+	float4 clipSpace VS_ATTR(POSITION);
+	HALF4  color     VS_ATTR(COLOR0);
+	float4 uv        VS_ATTR(TEXCOORD0);
+	HALF4  lUvDirAmb VS_ATTR(TEXCOORD1);
+#ifdef FOG
+	HALF4  fog       VS_ATTR(TEXCOORD2);
+#endif
+#ifdef SOFT
+	float4 pos       VS_ATTR(TEXCOORD3);
+#endif
+};
+
+struct f2f
+{
+	float4 color     : FINAL_COLOR;
+};
+
+#endif
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+#if defined( LOW_RES )
+
+FS_START(float4,
+    TEX3(
+        2D, textureAtlas,
+        2D, partIrrTexture,
+        2D, depthTexLo),)
+
+#else
+
+FS_START(float4,
+    TEX3(
+        2D, textureAtlas,
+        2D, partIrrTexture,
+        2D, depthTex),)
+
+#endif
+
+
+
+	HALF4 texColor = (HALF4)tex2D( textureAtlas, input.uv.xy );
+
+	float invOpacity = input.uv.z;
+	float intensity = input.uv.w;
+
+	HALF4 partIrrTap = (HALF4)tex2D( partIrrTexture, input.lUvDirAmb.xy );
+	HALF3 direct = HALF3(input.lUvDirAmb.z * 40.0 * GET_GLOBAL(l_c.xyz) * partIrrTap.a); // Looks better to boost the light color a lot.
+	//HALF3 direct = 40.0 * l_c.xyz * partIrrTap.a; // Looks better to boost the light color a lot.
+	HALF3 ambient = input.lUvDirAmb.w * partIrrTap.rgb;
+	HALF3 light = direct + ambient;
+
+#ifdef SOFT
+ #if defined( LOW_RES )
+	float depth = manualTexDepth2Dproj( depthTexLo, input.pos );
+ #else
+	float depth = manualTexDepth2Dproj( depthTex, input.pos );
+ #endif
+#if defined(D_PLATFORM_GCM)
+	float pdepth = depthScale / ( depth - depthBias  );
+#else
+	float pdepth = ConvertDepth(UG, depth);
+#endif
+	float ourDepth = input.pos.w;
+	input.color.a *= clamp( ( pdepth - ourDepth + GET_LOCAL(depthExtra) ), 0.0, 1.0 );
+#endif
+
+	// Multiply alpha here instead of in blend mode
+	float alpha = input.color.a * texColor.a;
+	output = float4( intensity * (float3)light * saturate( (float3)input.color.rgb * (float3)texColor.rgb * 2 ) * alpha, alpha );
+	output.a *= invOpacity;
+
+#ifdef FOG
+	output.rgb = lerp( output.rgb, (float3)input.fog.rgb * alpha * invOpacity, (float)input.fog.a );
+#endif
+
+#ifdef ALPHATESTENABLE
+	DiscardLE(output.color.a, (1.0f/255.0f));
+#endif
+
+SH_END()
+

@@ -10,14 +10,23 @@ struct jnet_lobby_view {
 };
 struct jnet_lobby_action { unsigned kind,access,mode,level,chat,cmatw,lighting,paradise;uint64_t host,room;char password[33]; };
 static _Atomic unsigned jnet_windwalls=1,jnet_sliding=1,jnet_freezing=1;
+static _Atomic unsigned jnet_fog __attribute__((used))=1;
+static _Atomic unsigned jnet_blackness=1;
 static _Atomic unsigned jnet_options_failed;
 static _Atomic unsigned jnet_credits=1;
 static _Atomic unsigned jnet_paradise_cutscene;
 static _Atomic unsigned jnet_daynight_mode,jnet_daynight_host=~0u;
-static inline int jnet_daynight_supported(unsigned level){return level<4;}
+static _Atomic unsigned jnet_daynight_elapsed;
+static _Atomic uint64_t jnet_daynight_sync;
+static inline unsigned jnet_daynight_variants(unsigned level){return level==2 || level==3 || level==7?4:3;}
+static inline const char *jnet_daynight_label(unsigned level,unsigned variant){
+    static const char *labels[]={"Day","Night","Cycle"};
+    return variant<3?labels[variant]:level==2?"Dusk":level==3?"Dawn":level==7?"Cutscene":"Day";
+}
+static inline int jnet_daynight_supported(unsigned level){return level<8;}
 static inline void jnet_daynight_enter(unsigned level){
     unsigned host=jnet_daynight_host;
-    if(host<=2 && jnet_daynight_supported(level))jnet_daynight_mode=host;
+    if(host<=3 && jnet_daynight_supported(level))jnet_daynight_mode=(host==3 && level!=2 && level!=3)?0:host;
 }
 static _Atomic unsigned jnet_character_spotlight;
 static int (*jnet_character_capture_rotation)(float *);

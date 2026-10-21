@@ -6,7 +6,7 @@ import re
 from unittest.mock import patch
 from pathlib import Path
 
-from character_resources import (CHARACTERS, LiteralReader, character_assembly,
+from character_resources import (CHARACTERS, CHARACTER_IDS, LiteralReader, character_assembly,
                                  creature_graph, members, relocate_assembly,
                                  character_resources, character_resource_name, character_visual_assembly, lua_literal,
                                  character_asset_map_header, character_runtime_header, character_resource_script,
@@ -54,7 +54,7 @@ class CharacterResourcesTest(unittest.TestCase):
         for key, desc in single.items():
             if key[0] in ('Mesh', 'Shader'):
                 self.assertEqual(triple[key]['instanceLimit'], desc['instanceLimit'] * 3)
-        private = 16 + 3 * sum(sum(row['kind'] == 'Decoration' for row in
+        private = 16 + 3 * sum((3 if c == 'War Machine' else 1) * sum(row['kind'] == 'Decoration' for row in
                                  character_visual_assembly(c, triple)['objects'].values()) for c in CHARACTERS)
         self.assertLessEqual(private, 1024)
         for suffix in ('Graveyard', 'Barrens', 'Desert', 'Canyon', 'Cave', 'Ruins',
@@ -62,14 +62,48 @@ class CharacterResourcesTest(unittest.TestCase):
             level = 'Level_' + suffix
             self.assertLessEqual(len(decorations(level)) + 3, 1024)
             native_creatures = sum(row.get('Type') == 'Creature' for row in records(level, 'DynamicNode').values())
-            self.assertLessEqual(native_creatures + 3 * len(CHARACTERS), 112)
-            private_markers = 3 * sum(sum(row['kind'] == 'Marker' for row in
+            self.assertLessEqual(native_creatures + 3 * (len(CHARACTERS) + 2), 112)
+            private_markers = 3 * sum((3 if c == 'War Machine' else 1) * sum(row['kind'] == 'Marker' for row in
                                         character_visual_assembly(c, triple)['objects'].values()) for c in CHARACTERS)
             self.assertLessEqual(len(records(level, 'Marker')) + private_markers, 1024)
         script = character_resource_script(image, participants=3).decode()
         self.assertIn('resource "Mesh"', script)
-        self.assertEqual(script.count('resource "ScreamBank"'), 2)
-        self.assertNotIn('JNTFlow', script)
+        self.assertEqual(script.count('resource "ScreamBank"'), 3)
+        self.assertIn('resource "ScreamBank" "JNTFlow"', script)
+
+    def test_sound_bank_capacity_rejects_startup_crash_regression(self):
+        from character_resources import character_sound_bank_script, CHARACTER_SOUND_BANKS
+        from inspect_build import pe_sections
+        from native_map import offset_for
+        image = (Path(__file__).resolve().parents[1].parent / 'JourneyPC/Journey.exe').read_bytes()
+        script = character_sound_bank_script(image)
+        self.assertEqual(script.count('resource "ScreamBank"'), 3)
+        with self.assertRaisesRegex(ValueError, 'capacity exceeded'):
+            character_sound_bank_script(image, CHARACTER_SOUND_BANKS + tuple(('Extra'+str(i), 'Ruins-SFX.bank') for i in range(3)))
+        sections = pe_sections(image)
+        at = offset_for(sections, 0x8ede0, 3)
+        self.assertEqual(image[at:at+3], bytes.fromhex('488b01'))
+        at = offset_for(sections, 0x2b783a, 9)
+        self.assertEqual(image[at:at+9], bytes.fromhex('488d4818e89d75ddff'))
+
+    def test_flow_chirp_aliases_preserve_original_creature_calls(self):
+        import ast
+        from lupa import LuaRuntime
+        source = (Path(__file__).resolve().parent/'diagnostic/jnet_freeplay_live.h').read_text()
+        chunks = source.split('static const char *const chunks[]={')[1].split('    };')[0]
+        script = ''.join(ast.literal_eval(s) for s in re.findall(r'"(?:\\.|[^"\\])*"', chunks))
+        lua = LuaRuntime()
+        lua.execute('soundEffectData={PlayerCoo={bankName="LvlSfx",soundName="PlayerCoo",minDist=9,autoPitchBend=false}}')
+        lua.execute(script + ' __JNETApplySounds() __JNETApplySounds()')
+        rows = lua.globals().soundEffectData
+        self.assertEqual(len(list(rows.items())), 12)
+        for name,call in (('JNTFlowSnake','FlowSnakeCall'),('JNTFlowHunter','FlowHunterCall')):
+            self.assertEqual(rows[name].bankName, 'JNTFlow')
+            self.assertEqual(rows[name].soundName, call)
+        self.assertTrue(lua.eval('soundEffectData.JNTFlowSnake~=soundEffectData.PlayerCoo'))
+        self.assertTrue(lua.eval('soundEffectData.JNTFlowHunter~=soundEffectData.JNTFlowSnake'))
+        self.assertEqual(rows.JNTWhale.bankName, 'JNTBio')
+        self.assertEqual(rows.JNTWarVoice.bankName, 'JNTMech')
 
     def test_factory_passes_native_vector_tables_and_preserves_spawn_transform(self):
         from lupa import LuaRuntime
@@ -77,8 +111,9 @@ class CharacterResourcesTest(unittest.TestCase):
         image = (lab.parent.parent / 'JourneyPC/Journey.exe').read_bytes()
         resources = character_resources(image)
         factory = (lab / 'diagnostic/jnet_character_factory.lua').read_text()
-        for character in CHARACTERS:
-            with self.subTest(character=character):
+        header = character_runtime_header(image)
+        for character, skin in [(c, s) for c in CHARACTERS for s in (range(3) if c == "War Machine" else (0,))]:
+            with self.subTest(character=character, skin=skin):
                 assembly = character_visual_assembly(character, resources)
                 spawn = [123.25, 604.5, -78.75]
                 moved = relocate_assembly(assembly, spawn)
@@ -86,7 +121,8 @@ class CharacterResourcesTest(unittest.TestCase):
                             if row['kind'] == 'Decoration']
                 lua = LuaRuntime()
                 lua.execute('''
-                    created, initialized, rides, glows = {}, {}, {}, {}
+                    created, initialized, rides, glows, rideValues, colors, materials, attacks = {}, {}, {}, {}, {}, {}, {}, {}
+                    eventCount, persistentCount = 0, 0
                     local function matrixCopy(matrix)
                         assert(#matrix == 4, 'Expected four vector tables')
                         local copy = {}
@@ -101,17 +137,48 @@ class CharacterResourcesTest(unittest.TestCase):
                     object = function()
                         return setmetatable({}, {__index = function() return function() return object() end end})
                     end
-                    creature, decorations, game = object(), object(), object()
+                    creature, decorations, game, railBarn = object(), object(), {}, object()
+                    function game:clumpBarn() return object() end
+                    function game:markerBarn() return object() end
+                    function game:resources() return object() end
                     function decorations:AddDecoration(resources, mesh, shader, matrix)
                         created[#created + 1] = matrixCopy(matrix)
-                        return object()
+                        local result = object()
+                        result.material = {shader = shader, params = {}, changes = 0}
+                        materials[#materials + 1] = result.material
+                        function result:SetShader(_, value)
+                            self.material.shader = value
+                            self.material.params = {}
+                            self.material.changes = self.material.changes + 1
+                        end
+                        function result:SetShaderTextureParam(_, name, value) self.material.params[name] = value end
+                        function result:SetShaderParamf(name, value) self.material.params[name] = value end
+                        function result:SetShaderParam4f(name, value) self.material.params[name] = value end
+                        return result
                     end
                     function DecorationInitialize(resources, mesh, desc)
                         initialized[#initialized + 1] = matrixCopy(desc.Transformation)
+                        for _, p in ipairs(desc.ShaderParams) do mesh.material.params[p.ParamName] = p.ParamVal end
                     end
                     function game:eventBarn()
                         return {MetaAddEvent = function(_, kind)
+                            eventCount = eventCount + 1
                             local event = object()
+                            if kind == 'Crea_Attack' or kind == 'Crea_AttackHandler' then
+                                attacks[kind] = event
+                                event.starts = 0
+                                for _, field in ipairs({'creature','guardianEyeSim','attackTargets','attackRail','attackRailRecover','considerShouts','useHintCam','attackTriggers'}) do
+                                    event[field] = function(self, value) self[field .. 'Value'] = value end
+                                end
+                                function event:Start() self.starts = self.starts + 1 end
+                            end
+                            if kind == 'ClothSetColors' then
+                                colors[#colors + 1] = event
+                                for _, field in ipairs({'meshes','duration','toWhite','toDefault','playerConversion','disableAfterInvis'}) do
+                                    event[field] = function(self, value) assert(not rawget(self, 'expired'), 'Expired colour event'); self[field .. 'Value'] = value end
+                                end
+                                function event:Start() assert(not rawget(self, 'expired'), 'Expired colour event'); self.starts = (rawget(self, 'starts') or 0) + 1; self.expired = true end
+                            end
                             if kind == 'ProtoClothGlow' then
                                 glows[#glows + 1] = event
                                 function event:glowMax(value) self.maximum = value end
@@ -119,23 +186,89 @@ class CharacterResourcesTest(unittest.TestCase):
                             end
                             if kind == 'CreaB_WhaleRide' or kind == 'ProtoClothMagnetize' then
                                 rides[#rides + 1] = kind
+                                for _, field in ipairs({'allignMult','magnetizeMult','pullMult','attractToCloth'}) do
+                                    event[field] = function(_, value) rideValues[field] = value end
+                                end
                             end
                             return event
                         end}
                     end
+                    levelEvents = {MetaAddEvent = function(_, kind)
+                        local event = game:eventBarn():MetaAddEvent(kind)
+                        eventCount = eventCount - 1
+                        persistentCount = persistentCount + 1
+                        return event
+                    end}
+                    function RailInitialize(rail, desc) assert(#desc.RailDataPoints >= 2) end
                     function MarkerInitialize() end
                     function TriggerInitialize() end
                     Class = {cast = function(value) return value end}
-                    CreaB_WhaleRide, ProtoClothMagnetize, ProtoClothGlow = Class, Class, Class
+                    CreaB_WhaleRide, ProtoClothMagnetize, ProtoClothGlow, ClothSetColors = Class, Class, Class, Class
+                    Crea_Attack, Crea_AttackHandler = Class, Class
                     __JNETCharacterInstances = {}
                 ''')
                 for row in assembly['objects'].values():
                     if row['kind'] == 'Trigger':
                         lua.globals()[row['Type']] = lua.globals().Class
-                lua.execute(factory, lua.globals().creature, lua.globals().decorations,
+                lua.globals()['__JNETCharacterSkin'] = skin
+                lua.globals()['__JNETCharacterOwner'] = 0
+                lua.execute(factory, lua.globals().creature, lua.globals().decorations, lua.globals().railBarn, lua.globals().levelEvents,
                             lua.execute('return ' + lua_literal(assembly)), lua.table_from(spawn))
+                self.assertTrue(lua.execute('return __JNETCharacterInstances[...] == __JNETCharacterNative', f'0|{character}|{skin}'))
+                budget = re.search(r'\{jnet_character_' + str(CHARACTER_IDS[character]) + r'_source,\{([0-9,]+)\}', header)
+                self.assertEqual(lua.globals().eventCount, int(budget[1].split(',')[3]))
+                self.assertEqual(lua.globals().persistentCount, int(character == 'War Machine'))
                 self.assertEqual(list(lua.globals().rides.values()),
-                                 ['ProtoClothMagnetize' if character == 'Longtail' else 'CreaB_WhaleRide'])
+                                 ['ProtoClothMagnetize','CreaB_WhaleRide'] if character == 'Longtail' else ['CreaB_WhaleRide'])
+                values = dict(lua.globals().rideValues.items())
+                self.assertEqual(values, {'attractToCloth': 1, 'allignMult': 1, 'magnetizeMult': 1, 'pullMult': 1} if character == 'Longtail' else
+                                 {'allignMult': 1, 'magnetizeMult': 1, 'pullMult': 1})
+                if character in ('Longtail', 'Whale'):
+                    self.assertEqual(len(lua.globals().colors), 0)
+                    for index, variant in enumerate((1, 0, 1), 1):
+                        lua.execute('__JNETCharacterNative:setAppearance(...)', variant)
+                        color = lua.globals().colors[index]
+                        self.assertIsNone(lua.eval("rawget")(color, "starts"))
+                        lua.execute('__JNETCharacterNative:finishAppearance()')
+                        self.assertEqual(color.starts, 1)
+                        self.assertEqual(color.toWhiteValue, bool(variant))
+                        self.assertEqual(color.toDefaultValue, not variant)
+                        self.assertFalse(color.playerConversionValue)
+                    self.assertEqual(len(lua.globals().colors), 3)
+                else:
+                    self.assertEqual(len(lua.globals().colors), 0)
+                if character == 'War Machine':
+                    native_rows = [r for _, r in sorted(assembly['objects'].items()) if r['kind'] == 'Decoration']
+                    lua.execute('__JNETCharacterNative:setAppearance(...)', skin)
+                    ok, _ = lua.execute('local variant=...; return pcall(function() __JNETCharacterNative:setAppearance(variant) end)', (skin + 1) % 3)
+                    self.assertFalse(ok)
+                    for index, row in enumerate(native_rows, 1):
+                        material = lua.globals().materials[index]
+                        self.assertEqual(material.changes, 0)
+                        coated = 'CoatingParams' in row and skin != 0
+                        self.assertEqual(material.shader, 'JNETCharacter_MeshSnowTopSide' if coated else row['Shader'])
+                        if coated:
+                            self.assertEqual(material.params.duneTexture, 'White' if skin == 2 else 'DuneColorShadow')
+                        params = row['CoatingParams'] if coated else row['ShaderParams']
+                        for param in params:
+                            actual = material.params[param['ParamName']]
+                            expected_value = param['ParamVal']
+                            if param['ParamType'] == 'float4':
+                                actual = list(actual.values())
+                                expected_value = list(expected_value)
+                            self.assertEqual(actual, expected_value)
+                if character == 'War Machine':
+                    attack = lua.globals().attacks.Crea_Attack
+                    handler = lua.globals().attacks.Crea_AttackHandler
+                    self.assertFalse(attack.considerShoutsValue)
+                    self.assertFalse(attack.useHintCamValue)
+                    self.assertEqual(attack.starts, 0)
+                    self.assertEqual(handler.starts, 0)
+                    lua.execute('__JNETCharacterNative:startEvents()')
+                    self.assertEqual(attack.starts, 0)
+                    self.assertEqual(handler.starts, 1)
+                else:
+                    self.assertEqual(len(list(lua.globals().attacks.items())), 0)
                 self.assertEqual(len(lua.globals().glows), 1)
                 self.assertEqual(lua.globals().glows[1].maximum, 1)
                 self.assertEqual(lua.globals().glows[1].minimum, 0)
@@ -255,8 +388,9 @@ class CharacterResourcesTest(unittest.TestCase):
         image = (Path(__file__).resolve().parents[1].parent / 'JourneyPC/Journey.exe').read_bytes()
         resources = character_resources(image)
         mapping = character_asset_map_header(resources)
-        self.assertEqual(mapping.count('/Data/Textures/Bin/JNETCharacter_'), 6)
+        self.assertEqual(mapping.count('/Data/Textures/Bin/JNETCharacter_'), 7)
         self.assertIn('WhiteWhite.dds.D3D11x64', mapping)
+        self.assertIn('GreyGrey.dds.D3D11x64', mapping)
         self.assertNotIn('JNETCharacter_P_MechHeadEye', mapping)
         script = character_resource_script(image).decode()
         self.assertNotIn('resource \"Texture\"', script)
@@ -273,7 +407,7 @@ class CharacterResourcesTest(unittest.TestCase):
         self.assertIn('jnet_character_3_source', header)
         self.assertIn('jnet_character_2_source', header)
         self.assertEqual({name for kind, name in resources if kind == 'Texture'},
-                         {'Blank', 'DesertRamp', 'GuardianMech', 'GuardianWing', 'SandMask', 'White'})
+                         {'Blank', 'DesertRamp', 'GuardianMech', 'GuardianWing', 'SandMask', 'White', 'Grey'})
         war = character_visual_assembly('War Machine', resources)
         eye = war['objects'][war['eye']]
         self.assertEqual(eye['Type'], 'GuardianEyeSim')

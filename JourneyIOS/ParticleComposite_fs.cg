@@ -1,0 +1,71 @@
+#include "Migratory.sh"
+// Notes:  Adds the low res particles to the geometry buffer.
+//
+//         Also, bloom intensity calculations are thrown in here, since it
+//         happens to be in the right place in the pipeline.  The intensity
+//         value is stored in the alpha channel.
+//
+// Author: John Edwards
+// Date C: 11-17-2009
+
+#define ourBlendState NoBlend_BlendState
+#define ourDepthStencilState NoDepthTest_NoDepthWrite_DepthState
+#define ourRasterState NoCull_RasterizerState
+
+
+#ifndef _IOS64
+
+#if defined(D_PLATFORM_GCM)
+#pragma regcount 14
+#endif
+
+D_DECLARE_TEXTURE2D_4(texHi);
+D_DECLARE_TEXTURE2D_4(texLoAdd);
+D_DECLARE_TEXTURE2D_4(texLoBlend);
+D_DECLARE_TEXTURE2D_4(texEdges);
+
+struct v2f
+{
+	float4 position VS_ATTR(POSITION);
+	float2 uv       VS_ATTR(TEXCOORD0);
+};
+
+struct f2f
+{
+    float4 color    : FINAL_COLOR;
+};
+
+#endif
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+//void main( v2f IN, out f2f OUT )
+//{
+
+FS_START(float4,
+    TEX4(
+        2D, texHi,
+        2D, texLoAdd,
+        2D, texLoBlend,
+        2D, texEdges),)
+
+
+	half3 hi = (half3)tex2D( texHi, input.uv ).rgb;
+	half3 loAdd = (half3)tex2D( texLoAdd, input.uv ).rgb;
+	half4 loBlend = (half4)tex2D( texLoBlend, input.uv );
+	half4 edges = (half4)tex2D( texEdges, input.uv );
+
+	output.rgb = (float3)(loBlend.rgb + loBlend.a * (hi + loAdd));
+
+	if( edges.a >= 1.0 )
+	{
+#if defined( DISCARD )
+		DiscardLE(-1, 0);
+#elif defined( BLACK )
+		output.color.rgb = 0;
+#endif
+	}
+
+SH_END()
+

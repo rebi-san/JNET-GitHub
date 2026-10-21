@@ -1,0 +1,254 @@
+#include "Migratory.sh"
+
+
+#ifndef _IOS64
+
+// Env params:
+HALF4 l_c,l_s;
+#ifndef PHYRE3X_ENABLED
+HALF4 l_d;
+#endif
+HALF velvetInt, velvetRatio;
+
+float4 heightBiasUv;
+float4 heightScaleUv;
+
+// Global dynamic sand params:
+D_DECLARE_TEXTURE2D_4(sandTexture);
+D_DECLARE_TEXTURE2D_4(sandMipTexture);
+D_DECLARE_TEXTURE_CUBE_4(sandHiIrrCube);
+D_DECLARE_TEXTURE2D_4(duneTexture);
+//D_DECLARE_TEXTURE2D_4(duneColorTexture);
+D_DECLARE_TEXTURE2D_4(texAo);
+
+struct v2f
+{
+	float4 position VS_ATTR(POSITION);
+#if defined(D_PLATFORM_GNM)
+	centroid HALF4 uv       VS_ATTR(TEXCOORD0)_CENTROID; // xy: whole terrain, zw: terrain cell
+	centroid HALF4  normalF  VS_ATTR(TEXCOORD1)_CENTROID; // xyz: normal, w: normal detail fade
+	centroid HALF4  eyeLd    VS_ATTR(TEXCOORD2)_CENTROID; // xyz: eye, w: log(depth)
+	centroid HALF3 sandSpec VS_ATTR(TEXCOORD3)_CENTROID; // xy: sand uvs, z: specular mult
+#else
+	HALF4 uv       VS_ATTR(TEXCOORD0)_CENTROID; // xy: whole terrain, zw: terrain cell
+	HALF4  normalF  VS_ATTR(TEXCOORD1)_CENTROID; // xyz: normal, w: normal detail fade
+	HALF4  eyeLd    VS_ATTR(TEXCOORD2)_CENTROID; // xyz: eye, w: log(depth)
+	HALF3 sandSpec VS_ATTR(TEXCOORD3)_CENTROID; // xy: sand uvs, z: specular mult
+#endif
+	float4 worldPos VS_ATTR(TEXCOORD4);
+};
+
+struct f2f
+{
+	NATIVECOLOR REGFORMAT HALF4  color    : FINAL_COLOR;
+};
+
+
+
+float duneAoScalar;
+float duneMipTapBias;
+float duneSpecularCorrection;
+
+
+#endif
+
+
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+//NATIVECOLOR
+//void main( in v2f IN, out f2f OUT )
+//{
+
+
+
+FS_START(float4,
+    TEX2(2D,sandMipTexture, 2D,duneTexture),
+    TEX3(2D,sandTexture, CUBE,sandHiIrrCube, 2D,texAo)
+)
+
+#define LOD_BIAS     , GET_GLOBAL(lodBias)
+
+	half3 Ln = (half3)normalize( GET_GLOBAL(l_d.xyz) );
+	half3 Nn = (half3)normalize( input.normalF.xyz );
+	half3 Vn = (half3)normalize( (float3)input.eyeLd.xyz );
+	half3 Hn = (half3)normalize( Vn + Ln );
+	half  specularPow = (half)GET_GLOBAL(l_s.w);
+
+	// Grab the base dune color from a texture
+	float2 colorShadowUv = input.uv.xy;
+
+	// There's an idea to use the dynamic sand texture as the edge mask.
+
+	//half duneEdgeTap = 2.0 * (tex2D( sandTexture, IN.sandSpec.xy  LOD_BIAS ) - 0.5);
+	half duneEdgeTap = 2.0 * ((half)tex2D( sandTexture, input.sandSpec.xy  LOD_BIAS ).r - 0.5);
+
+	//half4 colorShadowTap = tex2D( duneTexture, colorShadowUv  LOD_BIAS );
+	half4 colorShadowTap = (half4)tex2D( duneTexture, colorShadowUv  LOD_BIAS );
+	half3 duneColor = colorShadowTap.rgb;
+	half shadow = saturate( 10 * (colorShadowTap.a - (0.04*duneEdgeTap + 0.23) ) );
+
+	// Grab AO
+	float2 aoUv = input.uv.zw;
+	half aoTap = tex2D( texAo, aoUv  LOD_BIAS ).r;
+	half aoVal = 2.0 * aoTap;
+	
+
+	float2 sandUV = input.sandSpec.xy;
+
+	//half nx = 2.0 * (D_H1_SAMPLE_WRAP_ANISO_TEXTURE( sandTexture, sandUV + 0.000 ) - 0.5);
+	//half nz = 2.0 * (D_H1_SAMPLE_WRAP_ANISO_TEXTURE( sandTexture, sandUV + 0.125 ) - 0.5);
+	half nx = 2.0 * ((half)tex2D( sandTexture, sandUV + float2(0.125, 0.000)  LOD_BIAS).r - 0.5);
+	half nz = 2.0 * ((half)tex2D( sandTexture, sandUV + float2(0.000, 0.125)  LOD_BIAS).r - 0.5);
+
+	// Resampling the same texture works okay, except at certain angles.
+	// Our shader would be faster if we could do a single sample of a 2 channel texture, though.
+
+
+	half noiseFade = input.normalF.w;
+
+	half3 Nnt = 25.0 * Nn + noiseFade * half3( nx, 0, nz );
+	half3 Nnv =  4.0 * Nn + noiseFade * half3( nx, 0, nz );
+	half3 Nns = normalize( 1.5 * Nn + noiseFade * half3( nx, 0, nz ) );
+
+	half4 lightCubeTap = (half4)texCUBE( sandHiIrrCube, Nnt );
+	half diffuseInt = lightCubeTap.a;
+	half3 fillColor = lightCubeTap.rgb;
+
+	half velv = saturate( 1 - (saturate( dot( Vn, Nnv ) ) - 0.12) );
+    half duneColourInt = 1 + GET_LOCAL(duneAoScalar) * aoVal * velv;
+	duneColor *= duneColourInt;
+
+	// Pull the specular term from the vert shader.
+	half specInt = input.sandSpec.z;
+
+#if 1
+    // We're going to calculate a continuous lod between 0 and 6, and use that as a projection into texture space to
+    //  generate the safe areas that we can render sparkles into.  We have perspective correct texture coords, so
+    //  we're using those to generate the effective lod for what would be mipmaps directly using a modification
+    //  of the standard mipmap generation algorithm for anisotropic filtering.  Hardcoding the dims 1024 x 2048,
+    //  our future selves may want to update this.
+
+    const float2 sandTextureDims = float2( 1024.0, 2048.0 );
+    float2 scaledUV = input.uv.xy * sandTextureDims;
+
+    float2 ddx = dfdx( scaledUV ) * GET_LOCAL(duneSparkleLodScale);
+    float2 ddy = dfdy( scaledUV ) * GET_LOCAL(duneSparkleLodScale);
+
+    float rhox = sqrt( dot( ddx, ddx ) );
+    float rhoy = sqrt( dot( ddy, ddy ) );
+
+    float maxr = fmax(rhox, rhoy);
+    float minr = fmin(rhox, rhoy);
+
+    // We could use this to get the lod for texture reads from the dithered duneMipTexture.  As a warning, if you do
+    // want to use the texture, you'll need to interpolate across the texels the read gives you, as they are unfiltered,
+    // not wrapped etc... since it will be a sampler-less read.
+    // uint mipCount = sandMipTexture.tx.get_num_mip_levels();
+    // uint lod = int( fmin( fmax( log2(maxr/n), 0 ), mipCount ) );
+    // uint duneMipDims = sandMipTexture.tx.get_width(0) >> lod;
+    // uint2 duneMipUV = static_cast<uint2>( scaledUV ) % duneMipDims;
+
+    // Assuming max anisotropy is 4 and we effectively have 6 mipmap levels
+    float n = fmin( ceil(maxr/minr), 4 );
+    float lod = ( fmin( fmax( log2(maxr/n), 0 ), 6 ) );
+#endif
+
+	// Specular effects can look really bad where the texture isn't being sampled at
+	// full resolution.  This lets us mask out those areas.
+
+#if defined(D_PLATFORM_GCM)
+	half mipTap = D_H1_SAMPLE_WRAP_ANISO_TEXTURE( sandMipTexture, IN.uv.xy * float2( 2048.0, 4096.0 ) );
+#elif defined(D_PLATFORM_GXM)
+	half mipTap = 0.75;
+#else
+	//half mipTap = D_H1_SAMPLE_WRAP_ANISO_TEXTURE( sandMipTexture, IN.uv.xy * float2( 2048.0, 4096.0 ) ) + duneMipTapBias;
+
+    // This uses a mipmapped texture to get a good approximation of what the texture lod is for the given fragment.
+    //half mipTap = (half)tex2D( sandMipTexture, scaledUV ).r + GET_LOCAL(duneMipTapBias);
+
+    // You can use a uint2 pixel position and a sampler-less read to get lod.  We should prefer a continuous lod for the fragment instead though...
+    // half mipTap = (half)sandMipTexture.tx.read( duneMipUV, lod ).r + GET_LOCAL(duneMipTapBias);
+
+    // Get a continuous value for 6 mipmaps, compressed into a smaller range and offset up by 1/6th
+    half continuousLod = ( lod / 6.0 ) ;
+half powerFn = 1.f - ( continuousLod * continuousLod );
+    half mipTap = continuousLod * 0.875 + 0.125 + GET_LOCAL(duneSparkleLodOffset) * powerFn + GET_LOCAL(duneMipTapBias);
+#endif
+
+#if 1
+
+	half logDepth = input.eyeLd.w;
+	half sparkleMask = saturate( 8.0 * (logDepth - mipTap) );
+	half velvInt = sparkleMask * GET_GLOBAL(velvetInt);
+
+	half diffuseMult = shadow * diffuseInt;
+    half specularMult = diffuseMult *
+        ( specInt *  powsafe( (float)saturate( dot( Hn, Nns ) ), (float)specularPow )
+        + velvInt *  powsafe( (float)(1 - saturate( dot( Vn, normalize(Nns+GET_LOCAL(duneSpecularCorrection)*Vn) ) )), GET_GLOBAL(velvetRatio) ) );
+
+	output.rgb = (float3)duneColor * (GET_GLOBAL(l_c.rgb) * diffuseMult + GET_GLOBAL(l_s.rgb) * specularMult + (float3)(fillColor * aoVal));
+
+    // Encode occlusion in the alpha channel (offset by 1 to avoid interaction with alpha test).
+    output.a = 1 + diffuseMult;
+#endif
+
+#if 0
+    // Output the lod value directly
+    mipTap = ((float)lod) / 6.f;
+    output.rgb = mipTap;
+    output.a = 1.0f;
+#endif
+
+#if 0
+    // Output the sparklemask directly
+    output.rgb = sparkleMask;
+    output.a = 1.0f;
+#endif
+
+#if 0
+    // miptap range as intensity
+    output.rgb = mipTap;
+    output.a = 1.0f;
+#endif
+
+#if 0
+    // Visualise the miptap range.
+    if ( mipTap < 0.15f ) { output.rgb = float3(0.5, 0.0, 0.0); }
+    else if ( mipTap < 0.25f ) { output.rgb = float3(0.75, 0.0, 0.0); }
+    else if ( mipTap < 0.35f ) { output.rgb = float3(0.90, 0.0, 0.0); }
+    else if ( mipTap < 0.45f ) { output.rgb = float3(0.0, 0.5, 0.0); }
+    else if ( mipTap < 0.55f ) { output.rgb = float3(0.0, 0.75, 0.0); }
+    else if ( mipTap < 0.65f ) { output.rgb = float3(0.0, 0.9, 0.0); }
+    else if ( mipTap < 0.75f ) { output.rgb = float3(0.0, 0.0, 0.5); }
+    else if ( mipTap < 0.75f ) { output.rgb = float3(0.0, 0.0, 0.75); }
+    else if ( mipTap < 0.95f ) { output.rgb = float3(0.0, 0.0, 0.9); }
+    else if ( mipTap < 1.0f ) { output.rgb = float3(0.0, 0.0, 1.0); }
+    else
+    {
+        output.rgb = float3(1.0, 1.0, 1.0);
+    }
+    output.a = 1.0f;
+#endif
+
+#if 0
+	// helps visualizing how the sand texture works
+	bool blueCol = 0;
+	if(	(input.sandSpec.x>0.48f)
+	&&	(input.sandSpec.x<0.52f)
+	&&	(input.sandSpec.y>0.48f)
+	&&	(input.sandSpec.y<0.52f))
+	{
+		blueCol = 1;
+	}
+	output.a = 1.0f;
+    output.rg = frac(floor(4.f*input.sandSpec.xy)/4.f);
+    output.b = blueCol;
+#endif
+
+SH_END()
+
+
+

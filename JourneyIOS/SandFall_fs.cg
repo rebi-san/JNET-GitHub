@@ -1,0 +1,315 @@
+#include "Migratory.sh"
+
+#ifndef _IOS64
+
+#ifndef PHYRE3X_ENABLED
+float4 obbCenter_Width;
+float4 obbHeight_vOff;
+#endif
+
+// Global env params:
+HALF4 l_c, l_a;
+HALF4 l_s;
+HALF4 l_d;
+HALF velvetInt, velvetRatio;
+float scaledTime;
+// LOD params:
+//HALF opacity=0.0;
+float uvScrollSpeed;
+
+// Global textures
+D_DECLARE_TEXTURE2D_4(texColor);
+D_DECLARE_TEXTURE2D_4(texAlpha);
+D_DECLARE_TEXTURE2D_4(noiseWhiteTex);
+
+// Sand params
+#ifdef SAMPLETERRAIN
+ D_DECLARE_TEXTURE_CUBE_4(sandHiIrrCube);
+ D_DECLARE_TEXTURE2D_4(sandFastTexture);
+ float4 sandBias;
+ float4 sandScale;
+ D_DECLARE_TEXTURE2D_4(heightTexture);
+ float4 heightBiasUv;
+ float4 heightScaleUv;
+ float heightBiasY;
+ 
+ D_DECLARE_TEXTURE2D_4(duneTexture);
+ D_DECLARE_TEXTURE2D_4(duneColorTexture);
+#endif
+
+HALF4 gradColorTop;
+#ifdef LIT 
+ HALF4 gradShadTopBot;
+ HALF inShadow;
+#endif
+float gradCenter;
+float gradLength;
+
+#ifdef GRADIENT
+ HALF4 gradColorBot;
+#endif
+
+#ifdef LIT
+ D_DECLARE_TEXTURE2D_4(noiseMotionTex);
+ HALF sparkleMult;
+ float4 sparkleScale;
+#endif
+
+#ifdef CHAM
+ D_DECLARE_TEXTURE2D_4(texChamMask);
+#ifndef PHYRE3X_ENABLED
+ HALF4 chamValues; // { chamLevel, intensity }
+#endif
+#endif
+
+// set by SandFallBarn - these are hidden from Gardener
+D_DECLARE_TEXTURE2D_4(sfTexMask);
+
+struct f2f
+{
+	HALF4 color : FINAL_COLOR;
+};
+
+#endif
+
+
+
+
+
+//----------------------------------------------
+// Helper functions
+//----------------------------------------------
+inline half OrenNayarDiffuse( half3 light, half3 view, half3 norm, half roughness )
+{
+    half VdotN = max(-1.h,min(1.h, (dot( view, norm ))));
+    half LdotN = (dot( light, norm ));
+    half cos_theta_i = LdotN;
+    half theta_r = acos( VdotN );
+    half theta_i = acos( cos_theta_i );
+    half cos_phi_diff = saturate(dot( normalize( view - norm * VdotN ), normalize( light - norm * LdotN ) ));
+    half alpha = max( theta_i, theta_r ) ;
+    half beta = min( theta_i, theta_r ) ;
+    half sigma2 = roughness * roughness;
+    half A = 1.0 - 0.5 * sigma2 / (sigma2 + 0.33);
+    half B = 0.45 * sigma2 / (sigma2 + 0.09);
+
+    return saturate( cos_theta_i ) * (A + (B * saturate( cos_phi_diff ) * sin(alpha) * tan(beta)));
+}
+
+
+
+#undef v2f
+
+// Streams:
+struct v2f
+{
+    float4 position    VS_ATTR(POSITION);
+    half4  color       VS_ATTR(COLOR0);
+    float4 uv          VS_ATTR(TEXCOORD0);
+    float4 uv2         VS_ATTR(TEXCOORD1);
+    half3  normal      VS_ATTR(TEXCOORD2);
+    float4 loc         VS_ATTR(TEXCOORD3);
+    float4 eye         VS_ATTR(TEXCOORD4);
+#if defined(D_PLATFORM_D3D11) || defined(D_PLATFORM_GNM)
+    bool isFrontFace   : SV_IsFrontFace;
+#elif defined(_IOS64)
+    bool faceVal [[front_facing]];
+#else
+    float  faceVal     : FACE;
+#endif
+};
+
+//----------------------------------------------
+// Program entry
+//----------------------------------------------
+
+#ifdef SAMPLETERRAIN
+    FS_START(float4, TEX11(2D,texColor, 2D,texAlpha, 2D,noiseWhiteTex, 2D,sfTexMask, 2D,noiseMotionTex, 2D,texChamMask, CUBE,sandHiIrrCube, 2D,sandFastTexture, 2D,heightTexture, 2D,duneTexture, 2D,duneColorTexture),)
+#else
+    FS_START(float4, TEX6(2D,texColor, 2D,texAlpha, 2D,noiseWhiteTex, 2D,sfTexMask, 2D,noiseMotionTex, 2D,texChamMask),)
+#endif
+
+
+#if defined(D_PLATFORM_D3D11) || defined(D_PLATFORM_GNM)
+	float face = input.isFrontFace ? -1.f : 1.f;
+#else
+	float face = input.faceVal ? -1.f : 1.f;
+#endif
+    (void)face;
+
+	float sfVOffset = GET_LOCAL(obbHeight_vOff.y);
+	sfVOffset += GET_LOCAL(scaledTime);
+	float4 offsetUv = input.uv + float4( 0, sfVOffset * GET_LOCAL(uvScrollSpeed),0, sfVOffset * GET_LOCAL(uvScrollSpeed) );
+
+	half3 tColor = half3( 0, 0, 0 );
+	half tAlpha = 0;
+	half tMask = 0;
+	half tNoise = 0;
+
+	half kTapRad = 0.005;
+	int kBlurIterations = 1;
+	for( int i = 0; i < kBlurIterations; i++ )
+	{
+		tColor += (half3)tex2D( texColor, float2( offsetUv.x, offsetUv.y - i * kTapRad * ( 1 - input.uv2.y ) ) ).rgb;
+		tAlpha += (half)tex2D( texAlpha, float2( offsetUv.z, offsetUv.w - i * kTapRad * ( 1 - input.uv2.y ) ) ).a;
+	}
+	tColor /= kBlurIterations;
+	tAlpha /= kBlurIterations;
+
+	kBlurIterations = 1;
+	for( int i = 0; i < kBlurIterations; i++ )
+	{
+		const float kNoiseDensityMult = 2;
+		float2 rawNoise = tex2D( noiseWhiteTex, kNoiseDensityMult * float2( offsetUv.x, offsetUv.y - i * kTapRad ) ).xy;
+		float2 uvOffset = 0.125 * (rawNoise - 0.5);
+		tNoise += rawNoise.r;
+		tMask  += tex2D( sfTexMask, uvOffset + float2( input.uv2.x, input.uv2.y - i * kTapRad ) ).r;
+	}
+	tMask /= kBlurIterations;
+	tNoise /= kBlurIterations;
+
+    half noiseAmount = tNoise; (void)noiseAmount;
+
+#ifdef SAMPLETERRAIN
+	//------------------------------------------
+	// Calculate sand contributions.
+	float2 heightUV = (float2( input.loc.x, input.loc.z ) + GET_LOCAL(heightBiasUv.xy)) * GET_LOCAL(heightScaleUv.xy);
+	half heightTap = tex2D( heightTexture, heightUV ).r;
+	half duneHeightOff = 1.125;
+	float duneHeight = GET_LOCAL(heightBiasY) + (float)duneHeightOff + (float)heightTap;
+	half sideIntensity = saturate( 1 * (duneHeight - input.loc.y) );
+	sideIntensity *= sideIntensity;
+
+	// Read the sand grain texture.
+	half uScaleMult = 0.6;
+	half vScaleMult = 0.6;
+	float2 sandUV = 4.0 * float2( offsetUv.x * uScaleMult, offsetUv.y * vScaleMult ) + GET_LOCAL(sandBias.xy) * GET_LOCAL(sandScale.xy);
+	half sandNoise = 2.0 * (tex2D( sandFastTexture, sandUV ).r - 0.5);
+
+	// Load the pre-lit dune color and velvet.
+	float2 litUV = (float2( input.loc.x, input.loc.z ) + GET_LOCAL(heightBiasUv.xy)) * GET_LOCAL(heightScaleUv.xy);
+	half4 litTap = (half4)tex2D( duneColorTexture, litUV );
+	half3 litColor = 4.0 * litTap.rgb * litTap.rgb;
+	half velvDune = litTap.a;
+	velvDune *= 0.333 * sandNoise;
+
+	half3 duneLitColor = (1.0 + velvDune) * litColor;
+#endif
+
+	// Apply gradient
+	half3 gColorTop = (half3)GET_LOCAL(gradColorTop.rgb);
+	half3 gColorBot = gColorTop;
+#ifdef LIT
+	half gShadowTop = GET_LOCAL(gradShadTopBot[0]);
+	half gShadowBot = gShadowTop;
+#endif
+#ifdef SAMPLETERRAIN
+ #ifdef LIT
+	const float terrainScale = 0.5;
+	float2 colorShadowUv = float2( 1 - (terrainScale * input.loc.x + 0.5) / 256.0, ( terrainScale * input.loc.z + 0.5 ) / 512.0 );
+	half4 colorShadowTap = (half4)tex2D( duneTexture, colorShadowUv );
+	gColorBot = colorShadowTap.rgb;
+	gShadowBot = saturate( 10.0 * (colorShadowTap.a - 0.25) );
+ #else
+	// Bottom color is the dune color if we're sampling the terrain
+	gColorBot = duneLitColor;
+ #endif
+#endif
+#ifdef GRADIENT
+	gColorBot = (half3)GET_LOCAL(gradColorBot.rgb);
+ #ifdef LIT
+	gShadowBot = GET_LOCAL(gradShadTopBot[1]);
+ #endif
+#endif
+
+	half blend = smoothstep( GET_LOCAL(gradCenter) - GET_LOCAL(gradLength) * 0.5, GET_LOCAL(gradCenter) + GET_LOCAL(gradLength) * 0.5, input.uv2.y );
+	half3 gradColor = lerp( gColorBot, gColorTop, blend );
+#ifdef LIT
+	half gradShadow = lerp( gShadowBot, gShadowTop, blend );
+#endif
+
+	half3 color = 0;
+#ifdef LIT
+	half3 Nn = (half3)normalize( input.normal * face );
+	half3 Vn = (half3)normalize( input.eye.xyz );
+	half3 Ln = (half3)normalize( GET_GLOBAL(l_d.xyz) );
+	half3 Hn = (half3)normalize( Vn + Ln );
+    half  specularPow = GET_GLOBAL(l_s.w); (void)specularPow;
+
+	float2 noiseUv = GET_LOCAL(sparkleScale.xy) * (input.uv.xy*float2(1,0.125) + float2( 0, 0.125*sfVOffset * GET_LOCAL(uvScrollSpeed) ));
+	half3 Nnoise = (half3)(2.0 * tex2D( noiseMotionTex, noiseUv ).rgb - 1.0);
+	Nnoise = normalize( Nnoise );
+
+	half noiseFade = 1.0;
+	half3 Nnt = 24.0 * Nn + noiseFade * Nnoise;
+	half3 Nnv =  4.0 * Nn + noiseFade * Nnoise;
+	half3 Nns = normalize( 4.0 * Nn + noiseFade * Nnoise );
+
+	half diffuse = gradShadow * OrenNayarDiffuse( Ln, Vn, normalize( Nnt ), 0.5 );
+	diffuse = saturate( diffuse - GET_LOCAL(inShadow) );
+
+	half4 lightCubeTap = (half4)texCUBE( sandHiIrrCube, Nnt );
+	half3 fillColor = lightCubeTap.rgb;
+
+	half3 albedo = input.color.rgb * 2.0 * tColor * gradColor;
+
+	half velv = saturate( 1 - (saturate( dot( Vn, Nnv ) ) - 0.12) );
+	albedo *= 1 + 0.166 * velv;
+
+	half a = sqrt( 2.0 / 3.14159268 );
+	half schlickSmithShadow = 0.8 * 1.0 / ((diffuse * (1.0 - a) + a) * (dot( Nns, Vn ) * (1.0 - a) + a));
+
+schlickSmithShadow = max(0.h, schlickSmithShadow);
+
+	half base = saturate( 1.0 - dot( Vn, Hn ) );
+	half exponential = (half)powsafe( (float)base, 5.f );
+	half F0spec = 0.04; // Skin is 0.028;
+	half fresnelSpec = exponential + F0spec * (1.0 - exponential);	
+
+	half specPow = 0.0;
+	half specular = fresnelSpec * schlickSmithShadow * (8.0+specPow)/25.0 * (half)powsafe( (float)saturate( dot( Hn, Nns ) ), (float)specPow );
+
+	color = (half3)(albedo * ((half3)GET_GLOBAL(l_c.xyz) * diffuse + fillColor) + 3.0*(half3)GET_GLOBAL(l_c.rgb) * diffuse * specular);
+
+	half sparkleFade = 1.0 - saturate( length( input.eye.xyz ) * 0.01 );
+	sparkleFade *= sparkleFade;
+	half3 Nna = normalize( 0.9 * Nn + noiseFade * Nnoise );
+	color += albedo * (half3)GET_GLOBAL(l_s.rgb) *
+		sparkleFade * (half3)GET_LOCAL(sparkleMult) * (half3)GET_GLOBAL(velvetInt) * powsafe( 1.0 - saturate( dot( Vn, normalize(Nna+0.8*Vn) ) ), 64.0/*velvetRatio*/ );
+#else
+	color = (half3)input.color.rgb * 2 * tColor * gradColor * (half3)( GET_GLOBAL(l_c.xyz) + GET_GLOBAL(l_a.xyz) );
+#endif
+
+#ifdef SAMPLETERRAIN
+	// Incorporate dune color
+	color = lerp( color, duneLitColor, sideIntensity );
+#endif
+	
+	// Alpha
+	float baseAlpha = input.color.a;
+
+	float alpha = baseAlpha * tAlpha * ( 1 - ( tMask ) + tNoise * 0.25 );
+	
+#ifdef CHAM
+	half chamMaskTap = (half)tex2D( texChamMask, input.uv2.xy * 6 ).a;
+	half chamBase = input.loc.w;
+	float uvArc = abs(input.uv2.x - 0.5) * 5.75;
+	half chamAmount = saturate( (chamBase - uvArc * uvArc) - chamMaskTap * (1 + GET_LOCAL(chamValues.y) * 4) );
+
+	alpha = lerp( alpha, 0.f, (float)chamAmount );
+	
+#endif
+	output.rgb = (float3)color;
+	output.a = alpha;
+
+#ifdef ALPHATESTENABLE
+	DiscardLE(output.a, 0.5f);
+#endif
+
+#ifdef PREPASS
+	output.rgb = 1;
+#endif
+
+SH_END()
+
+
