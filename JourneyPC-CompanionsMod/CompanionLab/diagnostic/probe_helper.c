@@ -1183,7 +1183,7 @@ static INT_PTR CALLBACK result_dialog(HWND window, UINT message, WPARAM wparam, 
     if (message == WM_INITDIALOG) {
         const wchar_t *text = (const wchar_t *)lparam;
         SetWindowLongPtrW(window, GWLP_USERDATA, lparam);
-        SetWindowTextW(window, L"JNET " JC_HELPER_VERSION);
+        SetWindowTextW(window, L"JNET");
         HDC dc=GetDC(window);
         result_theme.dpi=dc ? (unsigned)GetDeviceCaps(dc,LOGPIXELSY) : 96;
         if (dc) ReleaseDC(window,dc);
@@ -1286,7 +1286,7 @@ static INT_PTR CALLBACK result_dialog(HWND window, UINT message, WPARAM wparam, 
         SetDlgItemTextW(window,101,L"Copy Log");
         if (!again && exited) {
             KillTimer(window,1);SetDlgItemTextW(window,117,L"Exit report ready");
-            SetWindowTextW(window,L"JNET " JC_HELPER_VERSION L" - Journey closed");
+            SetWindowTextW(window,L"JNET");
         }
         return TRUE;
     }
@@ -1304,7 +1304,7 @@ static INT_PTR CALLBACK result_dialog(HWND window, UINT message, WPARAM wparam, 
         preview_owned=preview_process!=NULL;preview_polls=0;
         SetWindowLongPtrW(window,GWLP_USERDATA,(LONG_PTR)launch_report);
         SetDlgItemTextW(window,100,launch_report);
-        SetWindowTextW(window,L"JNET " JC_HELPER_VERSION);
+        SetWindowTextW(window,L"JNET");
         SetDlgItemTextW(window,117,L"");
         launch_buttons(window,1);
         if(preview_process && !SetTimer(window,1,1000,NULL))SetDlgItemTextW(window,117,L"Automatic refresh unavailable");
@@ -1342,13 +1342,13 @@ static INT_PTR CALLBACK result_dialog(HWND window, UINT message, WPARAM wparam, 
             preview_owned=0;preview_process=NULL;preview_base=0;
             launch_preview=NULL;launch_preview_base=0;launch_report[0]=0;
             InterlockedExchange(&launch_cancel,0);
-            SetWindowTextW(window,L"JNET " JC_HELPER_VERSION L" - Starting Journey");
+            SetWindowTextW(window,L"JNET");
             SetDlgItemTextW(window,117,L"");
             launch_buttons(window,0);SetDlgItemTextW(window,100,L"Launching Journey...");
             launch_thread=CreateThread(NULL,0,launch_in_place,window,0,NULL);
             if(!launch_thread){
                 DWORD error=GetLastError();launch_buttons(window,1);
-                SetWindowTextW(window,L"JNET " JC_HELPER_VERSION);
+                SetWindowTextW(window,L"JNET");
                 swprintf(launch_report,JC_REPORT_CAP,L"Launch could not start.\r\nWindows error: %lu.",(unsigned long)error);
                 SetDlgItemTextW(window,100,launch_report);
                 SetWindowLongPtrW(window,GWLP_USERDATA,(LONG_PTR)launch_report);
@@ -1409,7 +1409,7 @@ static void show_result(const wchar_t *text, int code) {
     result_theme_clear();
     if(preview_owned && preview_process){CloseHandle(preview_process);preview_process=NULL;preview_owned=0;}
     if (shown == -1)
-        MessageBoxW(NULL, text, L"JNET " JC_HELPER_VERSION, MB_OK | (code ? MB_ICONWARNING : MB_ICONINFORMATION));
+        MessageBoxW(NULL, text, L"JNET", MB_OK | (code ? MB_ICONWARNING : MB_ICONINFORMATION));
 }
 
 static int finish(int code, const wchar_t *text) {
@@ -1516,7 +1516,7 @@ static INT_PTR CALLBACK startup_wait_dialog(HWND window, UINT message, WPARAM wp
         restore_result_position(window);
         state=(struct startup_wait *)lp;
         SetWindowLongPtrW(window,GWLP_USERDATA,lp);
-        SetWindowTextW(window,L"JNET " JC_HELPER_VERSION L" - Starting Journey");
+        SetWindowTextW(window,L"JNET");
         CreateWindowExW(0,L"STATIC",L"Waiting for Journey (up to 60 seconds).\nClose this window to cancel.",WS_CHILD|WS_VISIBLE,
             12,12,440,75,window,NULL,GetModuleHandleW(NULL),NULL);
         if (!SetTimer(window,1,100,NULL)) EndDialog(window,-1);
@@ -1763,7 +1763,7 @@ static int run_action(const wchar_t *mode) {
     DWORD pid = 0;
     HANDLE process = find_game(game, &pid, !wcscmp(mode, L"--inspect") || !wcscmp(mode, L"--status") || !wcscmp(mode, L"--layout"));
     if (!process && !wcscmp(mode,L"--status"))
-        return finish(0,L"Click Launch to start Journey.");
+        return finish(0,L"Open Steam and click Launch to start Journey.");
     if (!process)
         return finish(1, L"Could not find a single accessible Journey session.\nClose extra Journey sessions and try again.");
     if (startup_pid && pid!=startup_pid) {
