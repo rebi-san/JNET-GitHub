@@ -203,16 +203,21 @@ static inline int jc_cloth_subscribers_read(jc_layout_reader read,void *ctx,uint
 }
 static inline int jc_cloth_storage_read(jc_layout_reader read,void *ctx,uint64_t material,
         struct jc_cloth_storage *out) {
-    struct jc_cloth_storage s; uint64_t collections[2],again; int32_t active;
+    struct jc_cloth_storage s; uint64_t collections[2],again,slot,link; int32_t active;
+    unsigned char header[20];
     memset(&s,0,sizeof(s));
-    if (jc_material_ready(read,ctx,material,&s.payload) ||
-        !jc_layout_field(read,ctx,s.payload,0x80,collections,sizeof(collections)) ||
-        !jc_layout_field(read,ctx,s.payload,0x90,&active,4) || active<0 || active>1) return 1;
+    if (!jc_layout_field(read,ctx,material,0x30,&slot,8) ||
+        !jc_layout_field(read,ctx,slot,0x10,&link,8) ||
+        !jc_layout_field(read,ctx,link,0x18,&s.payload,8) ||
+        !jc_layout_field(read,ctx,s.payload,0x80,header,sizeof(header))) return 1;
+    memcpy(collections,header,sizeof(collections));memcpy(&active,header+16,4);
+    if(active<0 || active>1)return 1;
     for (unsigned variant=0;variant<2;++variant) {
         uint32_t count; uint64_t members[16],table;
         if (!collections[variant]) { if ((int)variant==active) return 1; else continue; }
-        if (!jc_layout_field(read,ctx,collections[variant],0,&count,4) ||
-            !jc_layout_field(read,ctx,collections[variant],8,&table,8)) return 1;
+        unsigned char collection[16];
+        if (!jc_layout_field(read,ctx,collections[variant],0,collection,sizeof(collection))) return 1;
+        memcpy(&count,collection,4);memcpy(&table,collection+8,8);
         count&=0x7fffffff;
         if (count>16 || (!count && (int)variant==active)) return 1;
         if (count==1) members[0]=table;
@@ -227,7 +232,9 @@ static inline int jc_cloth_storage_read(jc_layout_reader read,void *ctx,uint64_t
             s.spans[s.count].begin=buffer; s.spans[s.count++].bytes=bytes;
         }
     }
-    if (!s.count || jc_material_ready(read,ctx,material,&again) || again!=s.payload) return 1;
+    if (!s.count || jc_material_ready(read,ctx,material,&again) || again!=s.payload ||
+        !jc_layout_field(read,ctx,material,0x30,&again,8) || again!=slot ||
+        !jc_layout_field(read,ctx,slot,0x10,&again,8) || again!=link) return 1;
     *out=s; return 0;
 }
 static inline int jc_cloth_storage_disjoint(const struct jc_cloth_storage *a,const struct jc_cloth_storage *b) {

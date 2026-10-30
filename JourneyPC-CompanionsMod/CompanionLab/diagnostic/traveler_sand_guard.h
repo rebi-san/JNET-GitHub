@@ -19,6 +19,16 @@ __attribute__((naked,used)) static void traveler_sand_inline(void) {
         "1: lock incl " JC_SAND_SYMBOL(traveler_sand_inline_dropped) "(%rip)\n"
         "jmp *" JC_SAND_SYMBOL(sand_inline_resume) "(%rip)\n");
 }
+static void *original_effect_append __attribute__((used));
+static void *effect_append_resume __attribute__((used));
+static atomic_uint traveler_effect_dropped __attribute__((used));
+__attribute__((naked,used)) static void traveler_effect_append(void) {
+    __asm__("cmpl $80,0xf10(%r9)\n"
+        "jae 1f\n"
+        "jmp *" JC_SAND_SYMBOL(original_effect_append) "(%rip)\n"
+        "1: lock incl " JC_SAND_SYMBOL(traveler_effect_dropped) "(%rip)\n"
+        "jmp *" JC_SAND_SYMBOL(effect_append_resume) "(%rip)\n");
+}
 #undef JC_SAND_SYMBOL
 typedef void (JC_SAND_ABI *jc_sand_append_fn)(uintptr_t,unsigned,const void *,const void *,
     float,float,float,float,float,float);
@@ -34,7 +44,7 @@ static void JC_SAND_ABI traveler_sand_append(uintptr_t renderer,unsigned kind,
             unsigned unreadable=atomic_fetch_add(&traveler_sand_unreadable,!read)+!read;
             if (dropped<=4 || dropped%300==0) {
                 char line[192];
-                snprintf(line,sizeof(line),"[JC] sand capacity kind=%u count=%u dropped=%u unreadable=%u",
+                snprintf(line,sizeof(line),"[JNET] sand capacity kind=%u count=%u dropped=%u unreadable=%u",
                     kind,count,dropped,unreadable);message(line);
             }
             return;
@@ -49,8 +59,8 @@ static uintptr_t JC_SAND_ABI traveler_sand_consume(uintptr_t renderer,uintptr_t 
         uintptr_t c,uintptr_t d) {
     static unsigned reported_inline;
     unsigned dropped=atomic_load(&traveler_sand_inline_dropped);
-    if(dropped && (!reported_inline || dropped-reported_inline>=300)) {
-        char line[144];snprintf(line,sizeof(line),"[JC] sand inline producer bounded before write; dropped loops=%u",dropped);
+    if(dropped && (!reported_inline || (jnet_diagnostic_logs && dropped-reported_inline>=300))) {
+        char line[144];snprintf(line,sizeof(line),"[JNET] sand inline producer bounded before write; dropped loops=%u",dropped);
         message(line);reported_inline=dropped;
     }
     for(unsigned kind=8;kind<=9;++kind) {
@@ -61,7 +71,7 @@ static uintptr_t JC_SAND_ABI traveler_sand_consume(uintptr_t renderer,uintptr_t 
             if(!jc_local_windows_write(address,&limit,4))return 0;
             unsigned trimmed=atomic_fetch_add(&traveler_sand_trimmed,1)+1;
             if(trimmed<=4 || trimmed%300==0) {
-                char line[160];snprintf(line,sizeof(line),"[JC] sand consumer bounded kind=%u count=%u batches=%u",kind,count,trimmed);
+                char line[160];snprintf(line,sizeof(line),"[JNET] sand consumer bounded kind=%u count=%u batches=%u",kind,count,trimmed);
                 message(line);
             }
         }

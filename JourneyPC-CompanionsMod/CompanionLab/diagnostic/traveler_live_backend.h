@@ -135,11 +135,11 @@ static int traveler_body_prepare(const struct jc_actor_identity *id) {
     stage=5;code=jc_body_appearance_prepare(own_read,NULL,&traveler_body_ops,definition,materials,&traveler_body_lease);
     if(!code)code=jc_actor_material_independent(own_read,NULL,id,&traveler_actor_materials);
     if(!jc_cloth_live_graphics_leave(&traveler_live->backend,&token))code=JC_FRAME_OWNERSHIP;
-    snprintf(line,sizeof(line),"[JC] body appearance code=%d stage=%u held=%u applied=%u outfits=%u/%u",
+    snprintf(line,sizeof(line),"[JNET] body appearance code=%d stage=%u held=%u applied=%u outfits=%u/%u",
         code,traveler_body_lease.stage,traveler_body_lease.held,traveler_body_lease.applied,outfits[0],outfits[1]);message(line);
     return !code;
 declined:
-    snprintf(line,sizeof(line),"[JC] body preparation declined preflight=%u code=%d outfits=%u/%u lease-stage=%u",
+    snprintf(line,sizeof(line),"[JNET] body preparation declined preflight=%u code=%d outfits=%u/%u lease-stage=%u",
         stage,code,outfits[0],outfits[1],traveler_body_lease.stage);message(line);
     return 0;
 }
@@ -166,7 +166,7 @@ static int traveler_body_select(const struct jc_actor_identity *id) {
         if(jc_cloth_texture_bound(own_read,NULL,id->actor+0x1e0,i?"textureAtlasB":"textureAtlasA",
                 traveler_body_outfit.pairs[outfit>3][i][0]))code=JC_FRAME_MATERIAL;
     if(!jc_cloth_live_graphics_leave(&traveler_live->backend,&token))code=JC_FRAME_OWNERSHIP;
-    char line[160];snprintf(line,sizeof(line),"[JC] body outfit=%u color=%s result=%d",outfit,outfit>3?"white":"red",code);message(line);
+    char line[160];snprintf(line,sizeof(line),"[JNET] body outfit=%u color=%s result=%d",outfit,outfit>3?"white":"red",code);message(line);
     return !code;
 }
 static int traveler_body_release(uint64_t actor) {
@@ -177,7 +177,7 @@ static int traveler_body_release(uint64_t actor) {
         !own_read(NULL,actor+0x210,&material,8) || material)return 0;
     int code=jc_body_appearance_release(NULL,&traveler_body_ops,actor+0x1e0,1,&traveler_body_lease);
     if(!code)code=jc_body_outfit_release(NULL,&traveler_body_ops,1,&traveler_body_outfit);
-    if(!code)message("[JC] body texture references released after native material destruction");
+    if(!code)message("[JNET] body texture references released after native material destruction");
     return !code;
 }
 static int traveler_live_begin(void *context,const struct jc_actor_identity *id,
@@ -221,7 +221,7 @@ static int traveler_live_material_rebuild(struct jc_cloth_live_material *m) {
     if(!code)code=jc_cloth_live_material_create(own_read,NULL,image,barn,manager,role,peer,generation,m);
     if(!jc_cloth_live_graphics_leave(&traveler_live->backend,&token))code=JC_FRAME_OWNERSHIP;
     if(code)traveler_live->backend.failed=1;
-    char line[160];snprintf(line,sizeof(line),"[JC] retired cloth material rebuilt role=%u generation=%llu result=%d",
+    char line[160];snprintf(line,sizeof(line),"[JNET] retired cloth material rebuilt role=%u generation=%llu result=%d",
         role,(unsigned long long)generation,code);message(line);
     return code;
 }

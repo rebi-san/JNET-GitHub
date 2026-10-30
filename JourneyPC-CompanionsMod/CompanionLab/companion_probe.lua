@@ -1,10 +1,10 @@
 if _VERSION ~= "Lua 5.3" then
-    print("[JC] unsupported Lua runtime; probe not installed")
+    print("[JNET] unsupported Lua runtime; probe not installed")
     return
 end
 
-if rawget(_G, "JourneyCompanionProbe") ~= nil then
-    print("[JC] probe already loaded; uninstall before reloading")
+if rawget(_G, "scarfhelper") ~= nil then
+    print("[JNET] probe already loaded; uninstall before reloading")
     return
 end
 
@@ -17,7 +17,7 @@ local originalTick, wrapper
 local enabled, single = false, false
 local unpackValues = table.unpack
 local function observation(state)
-    print("[JC] observation_state=" .. state)
+    print("[JNET] observation_state=" .. state)
 end
 
 local function call(object, name)
@@ -59,7 +59,7 @@ local function slot(object, label, status)
     end
     if not present[label] then episodes[label] = episodes[label] + 1 end
     present[label] = true
-    print("[JC] sample_stage=" .. (label == "local_slot" and "15" or "16"))
+    print("[JNET] sample_stage=" .. (label == "local_slot" and "15" or "16"))
     local pos, format = position(object)
     local old = lastPositions[label]
     local movement, step = "unknown", "unknown"
@@ -100,12 +100,12 @@ function probe.sample(gameObject)
         return false
     end
     if gameObject == nil then
-        print("[JC] no Tick game argument; sample skipped")
+        print("[JNET] no Tick game argument; sample skipped")
         return false
     end
-    print("[JC] sample_stage=10")
+    print("[JNET] sample_stage=10")
     local gameValue = gameObject
-    print("[JC] sample_stage=11")
+    print("[JNET] sample_stage=11")
     local level = call(gameValue, "GetCurrentLevelNumber")
     if type(level) ~= "number" or level ~= math.floor(level) or level < 0 or level > 255 then
         level = "unknown"
@@ -113,23 +113,23 @@ function probe.sample(gameObject)
     if lastLevel ~= nil and level ~= lastLevel then
         probe.stop()
         observation(8)
-        print("[JC] chapter changed; observation stopped before traveler getters; rearm after loading")
+        print("[JNET] chapter changed; observation stopped before traveler getters; rearm after loading")
         return true
     end
     lastLevel = level
-    print("[JC] sample_stage=12")
+    print("[JNET] sample_stage=12")
     local barn, barnStatus = call(gameValue, "playerBarn")
-    print("[JC] sample_stage=13")
+    print("[JNET] sample_stage=13")
     local localDude, localStatus = call(barn, "GetLocalDude")
-    print("[JC] sample_stage=14")
+    print("[JNET] sample_stage=14")
     local remoteDude, remoteStatus = call(barn, "GetRemoteDude")
     if barnStatus ~= "ok" then localStatus, remoteStatus = "unavailable", "unavailable" end
     total, windowSamples = total + 1, windowSamples + 1
-    local row = "[JC] sample=" .. total .. " window=" .. windows .. " level=" .. level .. " barn=" .. barnStatus
+    local row = "[JNET] sample=" .. total .. " window=" .. windows .. " level=" .. level .. " barn=" .. barnStatus
         .. " local=" .. slot(localDude, "local_slot", localStatus)
         .. " remote=" .. slot(remoteDude, "remote_slot", remoteStatus)
 
-    print("[JC] sample_stage=17")
+    print("[JNET] sample_stage=17")
     if #rows == 120 then table.remove(rows, 1) end
     rows[#rows + 1] = row
     print(row)
@@ -137,25 +137,25 @@ function probe.sample(gameObject)
     if total >= LIMIT or windowSamples >= WINDOW then
         probe.stop()
         observation(total >= LIMIT and 5 or 4)
-        print("[JC] observation window complete; use --status; rearm with --watch if budget remains")
+        print("[JNET] observation window complete; use --status; rearm with --watch if budget remains")
     end
-    print("[JC] sample_stage=18")
+    print("[JNET] sample_stage=18")
     return true
 end
 
 local function arm(oneSample)
     if total >= LIMIT or windows >= MAX_WINDOWS then
         observation(5)
-        print("[JC] session observation budget exhausted; restart Journey for a fresh session")
+        print("[JNET] session observation budget exhausted; restart Journey for a fresh session")
         return false
     end
     if wrapper then
-        print("[JC] Tick wrapper already present; pause before starting another observation")
+        print("[JNET] Tick wrapper already present; pause before starting another observation")
         return false
     end
     local tick = rawget(_G, "Tick")
     if type(tick) ~= "function" then
-        print("[JC] Tick is unavailable; no observation installed")
+        print("[JNET] Tick is unavailable; no observation installed")
         return false
     end
     windows, windowSamples = windows + 1, 0
@@ -170,7 +170,7 @@ local function arm(oneSample)
                 if not ok or not sampled then
                     probe.stop()
                     observation(6)
-                    print("[JC] Tick observation failed; sampling stopped; error text omitted")
+                    print("[JNET] Tick observation failed; sampling stopped; error text omitted")
                 elseif single then
                     probe.stop()
                 end
@@ -180,7 +180,7 @@ local function arm(oneSample)
     end
     rawset(_G, "Tick", wrapper)
     observation(1)
-    print("[JC] observation armed; awaiting Tick game argument")
+    print("[JNET] observation armed; awaiting Tick game argument")
     return true
 end
 
@@ -206,24 +206,24 @@ function probe.bindings()
                 if count > 256 then break end
                 if type(key) == "string" and #key <= 64 and key:match("^[%a_][%w_]*$")
                     and type(value) == "function" then
-                    print("[JC] binding=" .. name .. "." .. key)
+                    print("[JNET] binding=" .. name .. "." .. key)
                 end
             end
         end
-        print("[JC] class=" .. name .. " type=" .. type(class))
+        print("[JNET] class=" .. name .. " type=" .. type(class))
     end
 end
 
 function probe.uninstall()
     if not probe.stop() then
-        print("[JC] Tick ownership changed; sampling stopped; restart to remove hooks")
+        print("[JNET] Tick ownership changed; sampling stopped; restart to remove hooks")
         return false
     end
-    if rawget(_G, "JourneyCompanionProbe") == probe then
-        rawset(_G, "JourneyCompanionProbe", nil)
+    if rawget(_G, "scarfhelper") == probe then
+        rawset(_G, "scarfhelper", nil)
     end
     return true
 end
 
-rawset(_G, "JourneyCompanionProbe", probe)
-print("[JC] observational probe loaded; manual sampling; no private transport")
+rawset(_G, "scarfhelper", probe)
+print("[JNET] observational probe loaded; manual sampling; no private transport")

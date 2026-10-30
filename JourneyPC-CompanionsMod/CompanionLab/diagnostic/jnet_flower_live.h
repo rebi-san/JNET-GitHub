@@ -232,7 +232,7 @@ static void jnet_flower_tick(uintptr_t game) {
     if(now>=jnet_flower_camera_log_next){
         jnet_flower_camera_log_next=now+30000;char line[260];
         snprintf(line,sizeof(line),"[JNET] flower trail camera ok (%s): position %.1f %.1f %.1f player %.1f %.1f %.1f fov %.1f aspect %.3f near %.3g far %.4g flowers %u",
-            jnet_flower_calibrated==1?"calibrated":"unverified +0x1a0",
+            jnet_flower_calibrated==1?"calibrated":"not calibrated",
             (double)camera.position[0],(double)camera.position[1],(double)camera.position[2],
             (double)jnet_flower_player[0],(double)jnet_flower_player[1],(double)jnet_flower_player[2],(double)camera.fov,
             (double)camera.aspect,(double)camera.near_plane,(double)camera.far_plane,count);

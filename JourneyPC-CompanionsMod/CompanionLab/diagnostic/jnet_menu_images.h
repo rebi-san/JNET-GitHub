@@ -182,16 +182,16 @@ static int jnet_image_initialize(ID3D11Device *device) {
     D3D11_SUBRESOURCE_DATA vertex_data={corners,0,0};
     if(jnet_image_failed(device->lpVtbl->CreateBuffer(device,&vertices,&vertex_data,&jnet_image_gpu.vertices)))goto done;
     jnet_image_stage(5,"[JNET] images: creating atlas");
-    pixels=HeapAlloc(GetProcessHeap(),0,1024*1024*4);if(!pixels)goto done;
+    pixels=HeapAlloc(GetProcessHeap(),0,1024*2048*4);if(!pixels)goto done;
     size_t used=0;
     for(size_t i=0;i<sizeof(jnet_atlas_rle);i+=6) {
         if(i+6>sizeof(jnet_atlas_rle))goto done;
         unsigned count=jnet_atlas_rle[i]|((unsigned)jnet_atlas_rle[i+1]<<8);
-        if(!count || count>1024*1024-used)goto done;
+        if(!count || count>1024*2048-used)goto done;
         for(unsigned j=0;j<count;++j)memcpy(pixels+4*(used++),jnet_atlas_rle+i+2,4);
     }
-    if(used!=1024*1024)goto done;
-    D3D11_TEXTURE2D_DESC td={.Width=1024,.Height=1024,.MipLevels=1,.ArraySize=1,.Format=DXGI_FORMAT_R8G8B8A8_UNORM,
+    if(used!=1024*2048)goto done;
+    D3D11_TEXTURE2D_DESC td={.Width=1024,.Height=2048,.MipLevels=1,.ArraySize=1,.Format=DXGI_FORMAT_R8G8B8A8_UNORM,
         .SampleDesc={1,0},.Usage=D3D11_USAGE_IMMUTABLE,.BindFlags=D3D11_BIND_SHADER_RESOURCE};
     D3D11_SUBRESOURCE_DATA initial={pixels,4096,0};
     if(jnet_image_failed(device->lpVtbl->CreateTexture2D(device,&td,&initial,&texture)) ||
@@ -291,12 +291,12 @@ static void jnet_image_draw(uintptr_t renderer) {
     context->lpVtbl->VSSetConstantBuffers(context,0,1,&jnet_image_gpu.constants);context->lpVtbl->PSSetConstantBuffers(context,0,1,&jnet_image_gpu.constants);
     context->lpVtbl->PSSetShaderResources(context,0,1,&jnet_image_gpu.atlas);context->lpVtbl->PSSetSamplers(context,0,1,&jnet_image_gpu.sampler);
     for(unsigned i=0;i<frame.count;++i) {
-        struct jnet_image_item *item=&frame.items[i];if(item->asset>=42)continue;
+        struct jnet_image_item *item=&frame.items[i];if(item->asset>=sizeof(jnet_assets)/sizeof(jnet_assets[0]))continue;
         const struct jnet_asset_rect *r=&jnet_assets[item->asset];
         float box[4];
         if(!jnet_menu_image_fit(box,item->box,r->w*item->fraction,(float)r->h,desc.Width,desc.Height))continue;
         float constants[12]={box[0],box[1],box[2],box[3],
-            (r->x+.5f)/1024.f,(r->y+.5f)/1024.f,(r->x+r->w*item->fraction-.5f)/1024.f,(r->y+r->h-.5f)/1024.f,1,1,1,frame.opacity};
+            (r->x+.5f)/1024.f,(r->y+.5f)/2048.f,(r->x+r->w*item->fraction-.5f)/1024.f,(r->y+r->h-.5f)/2048.f,1,1,1,frame.opacity};
         context->lpVtbl->UpdateSubresource(context,(ID3D11Resource *)jnet_image_gpu.constants,0,NULL,constants,0,0);
         context->lpVtbl->Draw(context,4,0);
     }
@@ -305,8 +305,8 @@ static void jnet_image_draw(uintptr_t renderer) {
         if(frame.owner)jnet_menu_read(frame.owner+0xc48,&size,4);
         if(!isfinite(size) || size<=0 || size>.15f)size=.07f;
         float height=384.f*size/40.f,width=1024.f*size/40.f*(float)desc.Height/(float)desc.Width;
-        float left=.96f-width;
-        float bottom=-.94f;
+        float left=.985f-width;
+        float bottom=-.98f;
         float constants[12]={left,bottom+height,left+width,bottom,0,0,1,1,1,1,1,jnet_chat_opacity};
         context->lpVtbl->PSSetShaderResources(context,0,1,&jnet_chat_resource);
         context->lpVtbl->UpdateSubresource(context,(ID3D11Resource *)jnet_image_gpu.constants,0,NULL,constants,0,0);
@@ -322,12 +322,10 @@ static void jnet_image_draw(uintptr_t renderer) {
 done:
     JNET_RELEASE(target);JNET_RELEASE(back);JNET_RELEASE(device);
 }
-#include "jnet_flower_render.h"
 static unsigned char jnet_present(uintptr_t renderer) {
-    jnet_flower_draw(renderer);
     jnet_image_draw(renderer);
     LONG fps=jnet_fps_limit;
-    jnet_frame_wait(fps==1?30:fps==2?60:0);
+    jnet_frame_wait(fps==1?30:fps==2?55:0);
     return jnet_original_present(renderer);
 }
 #undef JNET_RELEASE

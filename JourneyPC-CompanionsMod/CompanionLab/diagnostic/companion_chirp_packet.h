@@ -12,7 +12,7 @@ struct jc_chirp_inbox {
 static inline int jc_chirp_packet_encode(const unsigned char build[16],uint32_t chapter,
         const struct jc_chirp_event *e,jc_actor_packet_mac mac,void *ctx,unsigned char out[JC_CHIRP_PACKET_BYTES]) {
     if(!build || chapter>31 || !jc_chirp_event_valid(e) || !mac || !out)return 0;
-    memset(out,0,JC_CHIRP_PACKET_BYTES);memcpy(out,"JCC1",4);
+    memset(out,0,JC_CHIRP_PACKET_BYTES);memcpy(out,"JNC1",4);
     jc_packet_put(out+4,1,2);jc_packet_put(out+6,JC_CHIRP_PACKET_BYTES,2);memcpy(out+8,build,16);
     jc_packet_put(out+24,e->participant,8);jc_packet_put(out+32,e->epoch,8);jc_packet_put(out+40,e->sequence,8);
     jc_packet_put(out+48,chapter,4);jc_packet_put(out+52,e->sound,4);
@@ -22,7 +22,7 @@ static inline int jc_chirp_packet_encode(const unsigned char build[16],uint32_t 
 }
 static inline int jc_chirp_packet_receive(struct jc_chirp_inbox *in,const struct jc_actor_stream *stream,
         const unsigned char build[16],const unsigned char *p,size_t bytes,uint64_t now,jc_actor_packet_mac mac,void *ctx) {
-    if(!in || !stream || !build || !p || bytes!=JC_CHIRP_PACKET_BYTES || memcmp(p,"JCC1",4) ||
+    if(!in || !stream || !build || !p || bytes!=JC_CHIRP_PACKET_BYTES || memcmp(p,"JNC1",4) ||
         jc_packet_get(p+4,2)!=1 || jc_packet_get(p+6,2)!=bytes || memcmp(p+8,build,16) || !mac)return JC_STREAM_ARGUMENT;
     unsigned char tag[32];if(!mac(ctx,p,JC_CHIRP_PACKET_BODY,tag))return JC_STREAM_ARGUMENT;
     unsigned difference=0;for(unsigned i=0;i<32;++i)difference|=tag[i]^p[JC_CHIRP_PACKET_BODY+i];

@@ -11,7 +11,7 @@ static int jnet_daynight_checkpoint(lua_State *state) {
     return 0;
 }
 static int jnet_daynight_loaded(lua_State *state) {
-    (void)state;++jnet_daynight_visit;jnet_daynight_failed=0;jnet_daynight_last=0;jnet_daynight_part=0;return 0;
+    (void)state;jnet_menu_restart_pending=1;++jnet_daynight_visit;jnet_daynight_failed=0;jnet_daynight_last=0;jnet_daynight_part=0;return 0;
 }
 static int jnet_daynight_call(lua_State *state,const char *source) {
     int top=gettop(state);
@@ -34,7 +34,8 @@ static void jnet_daynight_install(lua_State *state) {
     } else if(!jnet_daynight_call(state,"__JNETDayNightInstall()"))jnet_daynight_failed=1;
 }
 static void jnet_daynight_game(uintptr_t game) {
-    static uint64_t next;
+    static uint64_t next,save_retry;
+    static unsigned save_choice=~0u,save_failed;
     unsigned char pending=1;int mode=0,resume=0;lua_State *state=NULL;
     uint64_t now=GetTickCount64();
     uint64_t sync=atomic_exchange(&jnet_daynight_sync,0);
@@ -71,7 +72,15 @@ static void jnet_daynight_game(uintptr_t game) {
     jnet_daynight_last=now;
     if(now<next)return;next=now+50;
     unsigned saved=lighting>2?0:lighting;
-    if(jnet_saved_lighting!=saved && !jnet_settings_apply(4))message("[JNET] lighting preference could not be saved; will retry");
+    if(saved!=save_choice || jnet_saved_lighting==saved){save_choice=saved;save_retry=0;save_failed=0;}
+    if(jnet_saved_lighting!=saved && now>=save_retry){
+        if(jnet_settings_apply(4)){save_retry=0;save_failed=0;}
+        else {
+            save_retry=now+5000;
+            if(!save_failed)message("[JNET] lighting preference could not be saved; will retry");
+            save_failed=1;
+        }
+    }
     char command[160];snprintf(command,sizeof(command),"__JNETDayNightUpdate(%.3f,%u,%u)",(double)jnet_daynight_elapsed/1000.,level,lighting);
     if(!jnet_daynight_call(state,command))jnet_daynight_failed=1;
 }

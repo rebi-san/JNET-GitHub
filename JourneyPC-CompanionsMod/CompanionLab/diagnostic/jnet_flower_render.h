@@ -30,7 +30,7 @@ static struct {
     ID3D11Texture2D *depth_texture;
     ID3D11DepthStencilView *depth_view;
     UINT depth_width,depth_height,depth_samples,depth_quality;
-    int failed;
+    int failed,compatible_pixel;
 } jnet_flower_gpu;
 struct jnet_flower_constants {float matrix[16],turn[4],anim[4],light[4],depth[4];};
 
@@ -80,6 +80,13 @@ done:
     CloseHandle(file);
     return view;
 }
+static void jnet_flower_compile_error(ID3DBlob *errors) {
+    if(!errors)return;
+    char line[1024];SIZE_T size=errors->lpVtbl->GetBufferSize(errors);
+    snprintf(line,sizeof(line),"[JNET] flower shader compiler: %.*s",
+        (int)(size<900?size:900),(const char *)errors->lpVtbl->GetBufferPointer(errors));
+    message(line);
+}
 static int jnet_flower_initialize(ID3D11Device *device) {
     /* Vertex kind rides in the colour alpha: 0 stem, 0.5 grass, 1 petal. Every vertex also carries its closed-bud position and colour; the
        flower's bloom (cbuffer anim.x) morphs between them, the glow (anim.y) brightens and shivers petals, and grass sways with time. */
@@ -119,15 +126,44 @@ static int jnet_flower_initialize(ID3D11Device *device) {
         "float lum=dot(s,float3(.30,.59,.11));float3 tint=lerp(float3(1,1,1),s/max(lum,.04),.5);colour*=tint*lerp(.2,1.25,saturate(lum*1.6));}\n"
         "colour+=float3(1,.9,.6)*glow*.25;\n"
         "return float4(colour,turn.z);}\n";
+    static const char vertex_fallback[]=
+        "cbuffer C:register(b0){float4 transform0;float4 transform1;float4 transform2;float4 transform3;float4 turn;float4 anim;float4 light;float4 depth;}"
+        "struct V{float3 p:POSITION0;float3 n:NORMAL;float2 u:TEXCOORD0;float4 c:COLOR0;float3 p0:POSITION1;float4 c0:COLOR1;};"
+        "struct O{float4 p:SV_POSITION;float3 n:TEXCOORD1;float2 u:TEXCOORD0;float4 c:COLOR0;};"
+        "O main(V i){O o;float3 p=i.p0+(i.p-i.p0)*anim.x;o.p=p.x*transform0+p.y*transform1+p.z*transform2+transform3;"
+        "o.n=float3(i.n.x*turn.x+i.n.z*turn.y,i.n.y,i.n.z*turn.x-i.n.x*turn.y);"
+        "o.u=i.u;o.c=(i.c0+(i.c-i.c0)*anim.x);o.c.rgb*=1+anim.y*.9;return o;}";
+    static const char pixel_fallback[]=
+        "cbuffer C:register(b0){float4 transform0;float4 transform1;float4 transform2;float4 transform3;float4 turn;float4 anim;float4 light;float4 depth;}"
+        "Texture2D atlasTexture:register(t0);Texture2D grassTexture:register(t1);SamplerState atlasSampler:register(s0);"
+        "struct O{float4 p:SV_POSITION;float3 n:TEXCOORD1;float2 u:TEXCOORD0;float4 c:COLOR0;};"
+        "float4 main(O i):SV_TARGET{float4 t=float4(1,1,1,1);"
+        "if(i.c.a>.8)t=atlasTexture.Sample(atlasSampler,i.u);"
+        "else if(i.c.a>.2)t=grassTexture.Sample(atlasSampler,i.u);"
+        "float alpha=turn.z;if(t.a<.5)alpha=0;float ny=i.n.y;if(ny<0)ny=0;if(ny>1)ny=1;return float4(i.c.rgb*t.rgb*(.8+.4*ny),alpha);}";
     ID3DBlob *vs=NULL,*ps=NULL,*errors=NULL;int ok=0;
+    jnet_flower_gpu.compatible_pixel=0;
     HMODULE compiler=LoadLibraryW(L"d3dcompiler_47.dll");
     HRESULT (WINAPI *compile)(LPCVOID,SIZE_T,LPCSTR,const D3D_SHADER_MACRO *,ID3DInclude *,LPCSTR,LPCSTR,UINT,UINT,ID3DBlob **,ID3DBlob **)=
         compiler?(void *)GetProcAddress(compiler,"D3DCompile"):NULL;
     HRESULT result;
     if(!compile){jnet_flower_fail("shader compiler",HRESULT_FROM_WIN32(GetLastError()));goto done;}
-    if(FAILED(result=compile(vertex_source,sizeof(vertex_source)-1,"Flower vertex",NULL,NULL,"main","vs_4_0",0,0,&vs,&errors))){jnet_flower_fail("vertex shader compile",result);goto done;}
+    if(FAILED(result=compile(vertex_source,sizeof(vertex_source)-1,"Flower vertex",NULL,NULL,"main","vs_4_0",0,0,&vs,&errors))){
+        jnet_flower_compile_error(errors);JNET_RELEASE(errors);JNET_RELEASE(vs);
+        if(FAILED(result=compile(vertex_fallback,sizeof(vertex_fallback)-1,"Flower vertex fallback",NULL,NULL,"main","vs_4_0",0,0,&vs,&errors))){
+            jnet_flower_compile_error(errors);jnet_flower_fail("vertex shader compile",result);goto done;
+        }
+        message("[JNET] flower trail using compatible vertex shader; wind sway disabled");
+    }
     JNET_RELEASE(errors);
-    if(FAILED(result=compile(pixel_source,sizeof(pixel_source)-1,"Flower pixel",NULL,NULL,"main","ps_4_1",0,0,&ps,&errors))){jnet_flower_fail("pixel shader compile",result);goto done;}
+    if(FAILED(result=compile(pixel_source,sizeof(pixel_source)-1,"Flower pixel",NULL,NULL,"main","ps_4_1",0,0,&ps,&errors))){
+        jnet_flower_compile_error(errors);JNET_RELEASE(errors);JNET_RELEASE(ps);
+        if(FAILED(result=compile(pixel_fallback,sizeof(pixel_fallback)-1,"Flower pixel fallback",NULL,NULL,"main","ps_4_0",0,0,&ps,&errors))){
+            jnet_flower_compile_error(errors);jnet_flower_fail("pixel shader compile",result);goto done;
+        }
+        jnet_flower_gpu.compatible_pixel=1;
+        message("[JNET] flower trail using compatible pixel shader; scene lighting and depth sampling disabled");
+    }
     if(FAILED(result=device->lpVtbl->CreateVertexShader(device,vs->lpVtbl->GetBufferPointer(vs),vs->lpVtbl->GetBufferSize(vs),NULL,&jnet_flower_gpu.vs)) ||
        FAILED(result=device->lpVtbl->CreatePixelShader(device,ps->lpVtbl->GetBufferPointer(ps),ps->lpVtbl->GetBufferSize(ps),NULL,&jnet_flower_gpu.ps))){jnet_flower_fail("shader creation",result);goto done;}
     D3D11_INPUT_ELEMENT_DESC elements[]={
@@ -152,7 +188,7 @@ static int jnet_flower_initialize(ID3D11Device *device) {
     blend.RenderTarget[0]=(D3D11_RENDER_TARGET_BLEND_DESC){TRUE,D3D11_BLEND_SRC_ALPHA,D3D11_BLEND_INV_SRC_ALPHA,D3D11_BLEND_OP_ADD,
         D3D11_BLEND_ONE,D3D11_BLEND_INV_SRC_ALPHA,D3D11_BLEND_OP_ADD,D3D11_COLOR_WRITE_ENABLE_ALL};
     D3D11_RASTERIZER_DESC raster={.FillMode=D3D11_FILL_SOLID,.CullMode=D3D11_CULL_NONE,.DepthClipEnable=TRUE};
-    D3D11_DEPTH_STENCIL_DESC depth={.DepthEnable=TRUE,.DepthWriteMask=D3D11_DEPTH_WRITE_MASK_ALL,.DepthFunc=D3D11_COMPARISON_LESS,
+    D3D11_DEPTH_STENCIL_DESC depth={.DepthEnable=TRUE,.DepthWriteMask=jnet_flower_gpu.compatible_pixel?D3D11_DEPTH_WRITE_MASK_ZERO:D3D11_DEPTH_WRITE_MASK_ALL,.DepthFunc=D3D11_COMPARISON_LESS,
         .StencilReadMask=D3D11_DEFAULT_STENCIL_READ_MASK,.StencilWriteMask=D3D11_DEFAULT_STENCIL_WRITE_MASK,
         .FrontFace={D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_COMPARISON_ALWAYS},
         .BackFace={D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_STENCIL_OP_KEEP,D3D11_COMPARISON_ALWAYS}};
@@ -164,7 +200,7 @@ static int jnet_flower_initialize(ID3D11Device *device) {
        !(jnet_flower_gpu.grass=jnet_flower_load_texture(device,JNET_FLOWER_GRASS_FILE,JNET_FLOWER_GRASS_SIZE,JNET_FLOWER_GRASS_SIZE)))goto done;
     ok=1;
     /* The scene probe is optional: without it flowers still draw, just without depth occlusion. */
-    jnet_flower_scene_initialize(device,compile);
+    if(!jnet_flower_gpu.compatible_pixel)jnet_flower_scene_initialize(device,compile);
 done:
     JNET_RELEASE(vs);JNET_RELEASE(ps);JNET_RELEASE(errors);
     if(compiler)FreeLibrary(compiler);
@@ -260,7 +296,7 @@ static void jnet_flower_draw_pass(uintptr_t renderer) {
     struct jnet_image_saved saved;
     jnet_image_save(context,&saved);
     if(!jnet_image_saved_valid(&saved)){jnet_image_saved_release(&saved);goto done;}
-    unsigned scene=jnet_flower_scene_prepare(device,context,back,&desc,now);
+    unsigned scene=jnet_flower_gpu.compatible_pixel?0:jnet_flower_scene_prepare(device,context,back,&desc,now);
     jnet_flower_scene.busy=1;
     context->lpVtbl->GSSetShader(context,NULL,NULL,0);
     context->lpVtbl->HSSetShader(context,NULL,NULL,0);

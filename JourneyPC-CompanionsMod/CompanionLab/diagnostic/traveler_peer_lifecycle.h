@@ -64,7 +64,7 @@ static int traveler_peer_admit_service(void *ctx,const struct jc_peer_identity *
             !jc_local_windows_write(actor->glyph+0x70c,&traveler_peer_glyph_resume.enabled,1) ||
             !own_read(NULL,actor->glyph+0x70c,&gate,1) || gate!=traveler_peer_glyph_resume.enabled)return 0;
         traveler_peer_glyph_resume.valid=0;
-        message("[JC] rejoined actor restored its owned floating glyph gate");
+        message("[JNET] rejoined actor restored its owned floating glyph gate");
     }
     return 1;
 }
@@ -181,7 +181,7 @@ static int traveler_peer_before_input(void) {
     int code=jc_peer_lifecycle_tick(&traveler_peer,GetTickCount64());
     if(code && code!=JC_PEER_BUSY)return traveler_peer_fault(code);
     if(before!=traveler_peer.phase) {
-        char line[160];snprintf(line,sizeof(line),"[JC] peer lifecycle phase=%u generation=%llu admissions=%llu departures=%llu",
+        char line[160];snprintf(line,sizeof(line),"[JNET] peer lifecycle phase=%u generation=%llu admissions=%llu departures=%llu",
             traveler_peer.phase,(unsigned long long)traveler_peer.identity.generation,
             (unsigned long long)traveler_peer.admissions,(unsigned long long)traveler_peer.departures);message(line);
     }
@@ -291,7 +291,7 @@ static void traveler_repeat_tick(void) {
     if(traveler_peer.identity.generation!=traveler_repeat.generation) {
         traveler_repeat.generation=traveler_peer.identity.generation;
         ++traveler_repeat.completed;traveler_repeat.ready_at=now;
-        char line[160];snprintf(line,sizeof(line),"[JC] repeat clean cycles=%u/%u actor=%llx glyph=%llx",
+        char line[160];snprintf(line,sizeof(line),"[JNET] repeat clean cycles=%u/%u actor=%llx glyph=%llx",
             traveler_repeat.completed,traveler_repeat.target,(unsigned long long)traveler_object,
             (unsigned long long)traveler_actor->identity.glyph);message(line);
     }

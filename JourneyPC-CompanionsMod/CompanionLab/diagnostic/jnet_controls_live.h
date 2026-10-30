@@ -5,8 +5,8 @@
 static int jnet_bindings[3][8]={{'C','B','V','G',0,0,0,16},{0},{0,0,0,0,0,0,0,7}};
 static int jnet_bindings_saved[3][8];
 static int jnet_creature_bindings[JNET_CHARACTER_COUNT][3][8],jnet_creature_saved[JNET_CHARACTER_COUNT][3][8];
-static unsigned jnet_control_character,jnet_creature_down[8],jnet_flower_trail_down;
-static unsigned jnet_grab_down,jnet_fly_up_down,jnet_fly_down_down,jnet_level_down,jnet_tilt_left_down,jnet_tilt_right_down;
+static unsigned jnet_control_character,jnet_creature_down[8],jnet_attack_down;
+static unsigned jnet_grab_down,jnet_fly_up_down,jnet_fly_down_down,jnet_level_down;
 static unsigned jnet_binding_down[8],jnet_sprint_down,jnet_spotlight_down,jnet_crouch_active,jnet_controls_ready;
 static wchar_t jnet_controls_path[MAX_PATH];
 static uintptr_t (*jnet_menu_xml_original)(const char *);
@@ -101,7 +101,7 @@ static void jnet_controls_initialize(void) {
         if(value<=(unsigned)jnet_controls_limit(device))jnet_bindings[device][action]=(int)value;
     }
     for(unsigned kind=1;kind<JNET_CHARACTER_COUNT;++kind)if(jnet_character_is_creature(kind)){
-        const int defaults[3][8]={{32,'C','L','Q','E','G',16,'F'},{0},{11,12,10,9,14,13,7,8}};
+        const int defaults[3][8]={{32,'C','L',0,0,'G',16,'F'},{0},{11,12,10,0,0,13,7,8}};
         for(unsigned device=0;device<3;++device)for(unsigned action=0;action<8;++action){
             wchar_t key[32];swprintf(key,32,L"Creature%u%u%u",kind,device,action);
             int fallback=action==5?jnet_bindings[device][3]:action==6?jnet_bindings[device][7]:defaults[device][action];
@@ -169,22 +169,30 @@ static uintptr_t jnet_setting(uintptr_t context,uintptr_t out,uintptr_t name) {
 }
 static unsigned jnet_controls_playstation_buttons(void) {
     static const unsigned order[]={12,14,15,13,9,8,10,11,4,5,1,2,0,3,6,7};
-    unsigned buttons=0;
+    unsigned buttons=0;uintptr_t devices[4];
+    if(!jnet_menu_read(fault_image+0x403e400,devices,sizeof(devices)))return 0;
     for(unsigned slot=0;slot<4;++slot){
-        uintptr_t device=0,type=0,again=0;unsigned char connected=0,state[16];
+        uintptr_t device=devices[slot],type=0,again=0;unsigned char connected=0,still_connected=0,state[16];
         uintptr_t entry=fault_image+0x403e400+8*slot;
-        if(!jnet_menu_read(entry,&device,8) || !device ||
+        if(!device ||
            !jnet_menu_read(device,&type,8) || type!=fault_image+0x682b78 ||
            !jnet_menu_read(device+0xc5,&connected,1) || connected!=1 ||
            !jnet_menu_read(device+0x454,state,sizeof(state)) ||
-           !jnet_menu_read(entry,&again,8) || again!=device)continue;
+           !jnet_menu_read(entry,&again,8) || again!=device ||
+           !jnet_menu_read(device+0xc5,&still_connected,1) || still_connected!=1)continue;
         unsigned valid=1;
         for(unsigned i=0;i<16;++i)if(state[i]>1)valid=0;
         if(valid)for(unsigned i=0;i<16;++i)if(state[order[i]])buttons|=1u<<i;
     }
     return buttons;
 }
-static unsigned jnet_controls_buttons(void) {
+struct jnet_controls_pad_state {unsigned buttons,motion;};
+static struct jnet_controls_pad_state jnet_controls_pad(void) {
+    static struct jnet_controls_pad_state sampled;
+    static LONG sampled_frame;static unsigned sampled_valid;
+    LONG frame=JNETFrames;
+    if(sampled_valid && sampled_frame==frame)return sampled;
+    sampled_valid=1;sampled_frame=frame;sampled=(struct jnet_controls_pad_state){0};
     static DWORD (WINAPI *get_state)(DWORD,XINPUT_STATE *);
     static unsigned checked;
     if(!checked){
@@ -197,26 +205,43 @@ static unsigned jnet_controls_buttons(void) {
     static unsigned connected;static uint64_t scan_at;
     uint64_t now=GetTickCount64();unsigned scan=now>=scan_at;
     if(scan)scan_at=now+1000;
-    unsigned buttons=jnet_controls_playstation_buttons();
+    sampled.buttons=jnet_controls_playstation_buttons();
     if(get_state)for(unsigned i=0;i<4;++i){
         if(!scan && !(connected&(1u<<i)))continue;
         XINPUT_STATE state={0};
         if(get_state(i,&state)==ERROR_SUCCESS){
             connected|=1u<<i;
             static const unsigned masks[]={1,2,4,8,16,32,64,128,256,512,4096,8192,16384,32768};
-            for(unsigned bit=0;bit<14;++bit)if(state.Gamepad.wButtons&masks[bit])buttons|=1u<<bit;
-            if(state.Gamepad.bLeftTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)buttons|=1u<<14;
-            if(state.Gamepad.bRightTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)buttons|=1u<<15;
+            for(unsigned bit=0;bit<14;++bit)if(state.Gamepad.wButtons&masks[bit])sampled.buttons|=1u<<bit;
+            if(state.Gamepad.bLeftTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)sampled.buttons|=1u<<14;
+            if(state.Gamepad.bRightTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)sampled.buttons|=1u<<15;
+            sampled.motion|=state.Gamepad.sThumbLX>16000 || state.Gamepad.sThumbLX<-16000 ||
+                state.Gamepad.sThumbLY>16000 || state.Gamepad.sThumbLY<-16000 ||
+                state.Gamepad.sThumbRX>16000 || state.Gamepad.sThumbRX<-16000 ||
+                state.Gamepad.sThumbRY>16000 || state.Gamepad.sThumbRY<-16000;
         } else connected&=~(1u<<i);
     }
-    return buttons;
+    return sampled;
 }
+static unsigned jnet_controls_buttons(void){return jnet_controls_pad().buttons;}
 static uintptr_t jnet_crouch_controller;
 static unsigned jnet_controls_queuing;
+static unsigned char (*jnet_controls_passive_original)(uintptr_t);
+static const char *(*jnet_controls_current_action)(uintptr_t);
+static unsigned char jnet_controls_passive(uintptr_t dude) {
+    unsigned char native=jnet_controls_passive_original(dude);
+    if(native)return native;
+    const char *name=jnet_controls_current_action(dude+0xa390);
+    char action[10];
+    return name && own_read(NULL,(uintptr_t)name,action,sizeof(action)) &&
+        !memcmp(action,"Crouching",sizeof(action));
+}
 static void (*jnet_controls_queue_original)(uintptr_t,const char *);
 static void jnet_controls_queue(uintptr_t controller,const char *name) {
     if(jnet_crouch_active && controller==jnet_crouch_controller && !jnet_controls_queuing &&
-       name && strcmp(name,"Crouch") && strcmp(name,"Crouching"))return;
+       name){
+        if(strcmp(name,"Crouch") && strcmp(name,"Crouching"))jnet_crouch_active=0;
+    }
     jnet_controls_queue_original(controller,name);
 }
 static int jnet_controls_action(uintptr_t dude,const char *name) {
@@ -234,54 +259,61 @@ static int jnet_controls_action(uintptr_t dude,const char *name) {
 }
 static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
     uintptr_t local=0;unsigned char menu=0;DWORD process=0;
-    jnet_sprint_down=jnet_spotlight_down=jnet_flower_trail_down=0;
-    jnet_fly_up_down=jnet_fly_down_down=jnet_level_down=jnet_tilt_left_down=jnet_tilt_right_down=0;
-    if(!jnet_controls_ready)return;
-    if(!own_read(NULL,game+0x1e0,&local,8) || local!=barn)return;
-    if(jnet_menu_last && !own_read(NULL,jnet_menu_last+0xd68,&menu,1))return;
+    static unsigned resume;
+    jnet_sprint_down=jnet_spotlight_down=jnet_attack_down=jnet_grab_down=0;
+    jnet_fly_up_down=jnet_fly_down_down=jnet_level_down=0;
+    if(!jnet_controls_ready){resume=1;return;}
+    if(!own_read(NULL,game+0x1e0,&local,8) || local!=barn){resume=1;return;}
+    if(jnet_menu_last && !own_read(NULL,jnet_menu_last+0xd68,&menu,1)){resume=1;return;}
     menu=menu || jnet_chat_focus;
     GetWindowThreadProcessId(GetForegroundWindow(),&process);
     static uintptr_t crouch_barn;
     if(crouch_barn!=barn || kind!=0){jnet_crouch_active=0;crouch_barn=barn;}
     jnet_crouch_controller=barn+0xb0+0xa390;
-    if(jnet_crouch_active && !menu && process==GetCurrentProcessId()){
+    if(menu || process!=GetCurrentProcessId()){
+        resume=1;
+        return;
+    }
+    if(jnet_crouch_active){
         float axes[2]={0};
         if(own_read(NULL,barn+0x30,axes,sizeof(axes)) && isfinite(axes[0]) && isfinite(axes[1]) &&
            (fabsf(axes[0])>.01f || fabsf(axes[1])>.01f) && jnet_controls_action(barn+0xb0,"CrouchToIdle"))jnet_crouch_active=0;
     }
     static unsigned spin_variant;
-    unsigned buttons=jnet_controls_buttons();
-    jnet_grab_down=0;
+    if(kind==JNET_CHARACTER_FLOW_2)kind=JNET_CHARACTER_FLOW_1;
+    const int (*bindings)[8]=jnet_character_is_creature(kind)?jnet_creature_bindings[kind]:jnet_bindings;
+    unsigned buttons=0;
+    for(unsigned action=0;action<(jnet_character_is_creature(kind)?8u:7u);++action)
+        if(bindings[2][action]>0 && bindings[2][action]<=16){buttons=jnet_controls_buttons();break;}
     static const unsigned mouse[]={0,VK_LBUTTON,VK_RBUTTON,VK_MBUTTON,VK_XBUTTON1,VK_XBUTTON2};
     if(jnet_character_is_creature(kind)){
-        if(kind==JNET_CHARACTER_FLOW_2)kind=JNET_CHARACTER_FLOW_1;
         unsigned held[8]={0};
         for(unsigned action=0;action<8;++action){
             int key=jnet_creature_bindings[kind][0][action],m=jnet_creature_bindings[kind][1][action],pad=jnet_creature_bindings[kind][2][action];
             unsigned down=(key>0 && key<256 && (GetAsyncKeyState(key)&0x8000)) ||
                 (m>0 && m<6 && (GetAsyncKeyState(mouse[m])&0x8000)) ||
                 (pad>0 && pad<=16 && (buttons&(1u<<(pad-1))));
-            held[action]=!menu && process==GetCurrentProcessId() && down;
+            held[action]=down;
+            if(resume)jnet_creature_down[action]=down;
             if(action==5)jnet_spotlight_down=held[action] && !jnet_creature_down[action];
             jnet_creature_down[action]=down;
         }
         jnet_fly_up_down=held[0];jnet_fly_down_down=held[1];jnet_level_down=held[2];
-        if(kind==JNET_CHARACTER_WHALE || kind==JNET_CHARACTER_WAR_MACHINE){jnet_tilt_left_down=held[3];jnet_tilt_right_down=held[4];}
         jnet_grab_down=kind==JNET_CHARACTER_LONGTAIL && held[5];
         jnet_sprint_down=held[6];
-        jnet_flower_trail_down=kind==JNET_CHARACTER_FLOW_1 && held[7];
-        return;
+        jnet_attack_down=kind==JNET_CHARACTER_WAR_MACHINE && held[7];
+        resume=0;return;
     }
     for(unsigned action=0;action<8;++action){
         int key=jnet_bindings[0][action],m=jnet_bindings[1][action],pad=jnet_bindings[2][action];
         unsigned down=(key>0 && key<256 && (GetAsyncKeyState(key)&0x8000)) ||
             (m>0 && m<6 && (GetAsyncKeyState(mouse[m])&0x8000)) ||
             (pad>0 && pad<=16 && (buttons&(1u<<(pad-1))));
-        if(action==7)jnet_sprint_down=!menu && process==GetCurrentProcessId() && jnet_character_is_creature(kind) && down;
-        if(action==3)jnet_spotlight_down=!menu && process==GetCurrentProcessId() && down && !jnet_binding_down[action];
-        if(!menu && process==GetCurrentProcessId() && kind==0){
+        if(resume)jnet_binding_down[action]=down;
+        if(action==3)jnet_spotlight_down=down && !jnet_binding_down[action];
+        if(kind==0){
             static const char *const names[]={"Crouch","SlideJump2","SlideJump1",NULL,"RollF","JNETFlipL","JNETFlipR"};
-            if(action<7 && action!=3 && down && !jnet_binding_down[action] && (!jnet_crouch_active || action==0)){
+            if(action<7 && action!=3 && down && !jnet_binding_down[action]){
                 const char *name=action==0 && jnet_crouch_active?"CrouchToIdle":
                     action==2?(spin_variant?"JNETSpin3":"SlideJump1"):names[action];
                 int queued=jnet_controls_action(barn+0xb0,name);
@@ -291,5 +323,6 @@ static void jnet_controls_tick(uintptr_t barn,uintptr_t game,unsigned kind) {
         }
         jnet_binding_down[action]=down;
     }
+    resume=0;
 }
 #endif

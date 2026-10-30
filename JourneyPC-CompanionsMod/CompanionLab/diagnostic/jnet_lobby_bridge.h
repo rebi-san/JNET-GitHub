@@ -5,7 +5,7 @@ struct jnet_lobby_row { uint64_t room,host; unsigned players,access; };
 struct jnet_lobby_view {
     struct jnet_lobby_row rows[3];unsigned count,identity,ready;
     uint64_t room,self,host,members[3];unsigned member_count,level;char status[80];
-    unsigned online,busy,total,page,population;char names[3][33],code[5];
+    unsigned online,busy,searching,total,page,population;char names[3][33],code[5];
     char member_names[3][33],host_name[33];unsigned chat,cmatw,anonymous;
 };
 struct jnet_lobby_action { unsigned kind,access,mode,level,chat,cmatw,lighting,paradise;uint64_t host,room;char password[33]; };
@@ -30,6 +30,10 @@ static inline void jnet_daynight_enter(unsigned level){
 }
 static _Atomic unsigned jnet_character_spotlight;
 static int (*jnet_character_capture_rotation)(float *);
+struct jnet_game_record;
+static void (*jnet_character_capture_war)(struct jnet_game_record *);
+static void (*jnet_character_capture_ride)(struct jnet_game_record *);
+static int (*jnet_character_resolve_ride)(const struct jnet_game_record *,float *);
 static _Atomic unsigned jnet_current_level=2;
 static _Atomic unsigned jnet_mepal_play;
 static _Atomic unsigned jnet_save_requested;
@@ -38,11 +42,10 @@ static _Atomic unsigned jnet_travel_busy,jnet_travel_target;
 static int (*jnet_travel_request)(unsigned);
 static int (*jnet_travel_receive)(unsigned,const unsigned char *,size_t);
 static void (*jnet_travel_poll)(void);
+static int (*jnet_travel_peer_wait)(uint64_t,uint64_t);
 static void (*jnet_travel_session_reset)(void);
 static int (*jnet_rocket_receive)(unsigned,const unsigned char *,size_t);
 static void (*jnet_rocket_poll)(void);
-static int (*jnet_flower_receive)(unsigned,const unsigned char *,size_t);
-static void (*jnet_flower_poll)(void);
 static int (*jnet_chat_receive)(unsigned,const unsigned char *,size_t);
 static void (*jnet_chat_poll)(struct jnet_lobby_view *);
 static void (*jnet_member_view)(struct jnet_lobby_view *);

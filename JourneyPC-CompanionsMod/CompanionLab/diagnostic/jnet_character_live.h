@@ -1,7 +1,7 @@
 #ifndef JNET_CHARACTER_LIVE_H
 #define JNET_CHARACTER_LIVE_H
 #include "jnet_character_native.h"
-#include "jnet_flower_trail.h"
+#include "jnet_remote_pose.h"
 #include "jnet_character_audio.h"
 #include "jnet_level_fixes.h"
 #include "jnet_character_payloads.h"
@@ -17,11 +17,14 @@ struct jnet_character_state {
     unsigned activation_reported;
     unsigned visual_samples,input_frames,follow_frames;
     uint64_t teleport_event,eye_event,ride_event,grab_event,ride_peer,ride_epoch,ride_tick,ride_active;
-    uint64_t attack_event,attack_handler;
-    unsigned attack_busy;
+    uint64_t attack_event,attack_handler,attack_report_tick;
+    unsigned attack_busy,grab_blocked;
+    uint64_t attack_target,attack_target_lease,attack_actor;
+    struct jnet_war_hit war_hits[2];float remote_anger;
+    struct jnet_remote_pose remote_pose;
     uint32_t teleport_identity;
     unsigned eye_ready,eye_warned,chirp_variant,variant,variant_applied;
-    float saved_dissolve[2],motion[3],follow_position[3],sprint,roll;
+    float saved_dissolve[2],motion[3],follow_position[3],sprint;
     unsigned follow_position_valid;
     unsigned char saved_visibility[2];
 };
@@ -319,6 +322,11 @@ static inline int jnet_character_prepare_native(uintptr_t game,uintptr_t barn,un
             else goto failed;
             continue;
         }
+        if(type==fault_image+0x671358){
+            if(kind!=JNET_CHARACTER_LONGTAIL || jnet_character_instance.grab_event)goto failed;
+            jnet_character_instance.grab_event=event;
+            continue;
+        }
         if(type==fault_image+0x6718b0){
             static const unsigned char entry[]={0x48,0x89,0x5c,0x24,0x08,0x48,0x89,0x74,0x24,0x10,0x57,0x48,0x83,0xec,0x20,0x48};
             unsigned char actual[sizeof(entry)];
@@ -405,7 +413,7 @@ static void jnet_character_fail(struct jnet_character_state *instance) {
         jnet_menu_edit.applied.character=JNET_CHARACTER_WAYFARER;
         jnet_menu_edit.applied.variant=0;
         jnet_appearance_applied_at=0;
-        snprintf(jnet_appearance_status,sizeof(jnet_appearance_status),"Character stopped: %.55s",instance->failure_stage?instance->failure_stage:"activation failed");
+        strcpy(jnet_appearance_status,"Character unavailable");
     }
 }
 static void jnet_character_restore_previous(const struct jnet_character_state *previous) {
@@ -423,6 +431,21 @@ static void jnet_character_restore_previous(const struct jnet_character_state *p
     if(!ok || !jc_local_windows_write(previous->binding.creature+9,&stopped,1) ||
        !jnet_character_visibility(&jnet_character_instance,previous->initialized))
         jnet_character_fail(&jnet_character_instance);
+}
+static void jnet_character_reactivate_state(struct jnet_character_state *instance) {
+    instance->activation_started=GetTickCount64();
+    instance->activation_reported=0;
+    instance->initialized=0;
+    instance->visual_samples=0;
+    instance->input_frames=instance->follow_frames=0;
+    instance->follow_position_valid=0;
+    instance->sprint=0;
+    instance->grab_blocked=0;
+    instance->ride_peer=instance->ride_epoch=instance->ride_tick=instance->ride_active=0;
+    instance->attack_busy=0;
+    instance->attack_target=instance->attack_target_lease=instance->attack_actor=0;
+    memset(instance->motion,0,sizeof(instance->motion));
+    memset(&instance->remote_pose,0,sizeof(instance->remote_pose));
 }
 static int jnet_character_reposition_cached(uintptr_t game,unsigned kind) {
     struct jnet_character_pools pools;lua_State *state=NULL;char command[256];
@@ -445,12 +468,7 @@ static int jnet_character_reposition_cached(uintptr_t game,unsigned kind) {
     if(!ok)return 0;
     unsigned char start[2]={1,0};
     if(!jc_local_windows_write(jnet_character_instance.binding.creature+8,start,2))return 0;
-    jnet_character_instance.activation_started=GetTickCount64();
-    jnet_character_instance.activation_reported=0;
-    jnet_character_instance.initialized=0;
-    jnet_character_instance.visual_samples=0;
-    jnet_character_instance.input_frames=jnet_character_instance.follow_frames=0;
-    memset(jnet_character_instance.motion,0,sizeof(jnet_character_instance.motion));
+    jnet_character_reactivate_state(&jnet_character_instance);
     return 1;
 }
 static int jnet_character_switch_native(uintptr_t game,uintptr_t barn,unsigned kind,unsigned variant) {
@@ -459,6 +477,11 @@ static int jnet_character_switch_native(uintptr_t game,uintptr_t barn,unsigned k
     unsigned cache=kind+JNET_CHARACTER_COUNT*skin;
     if((kind!=JNET_CHARACTER_WAYFARER && !jnet_character_is_creature(kind)) ||
        (kind && (!(jnet_menu_supported_characters&(1u<<kind)) || (jnet_character_failed_mask&(1u<<kind)))))return 0;
+    if(jnet_character_instance.binding.creature &&
+       (jnet_character_instance.game!=game || jnet_character_instance.binding.generation!=jnet_character_generation))return 0;
+    if(kind && jnet_character_cached[cache].binding.creature &&
+       (jnet_character_cached[cache].game!=game || jnet_character_cached[cache].binding.generation!=jnet_character_generation ||
+        jnet_character_cached[cache].failed))return 0;
     if(!jnet_character_instance.failed && (jnet_character_instance.kind!=kind || jnet_character_instance.skin!=skin) &&
        jnet_character_attack_locked(own_read,NULL,fault_image,jnet_character_instance.attack_event,jnet_character_instance.binding.creature)!=0)return 0;
     struct jnet_character_state previous=jnet_character_instance;
@@ -477,8 +500,10 @@ static int jnet_character_switch_native(uintptr_t game,uintptr_t barn,unsigned k
            !jnet_character_restore_wayfarer(&previous)){
             jnet_character_restore_previous(&previous);return 0;
         }
-        memcpy(dissolve,previous.saved_dissolve,sizeof(dissolve));
-        memcpy(visibility,previous.saved_visibility,sizeof(visibility));
+        if(previous.barn==barn){
+            memcpy(dissolve,previous.saved_dissolve,sizeof(dissolve));
+            memcpy(visibility,previous.saved_visibility,sizeof(visibility));
+        }
         if(valid && !previous.failed)jnet_character_cached[previous.kind+JNET_CHARACTER_COUNT*previous.skin]=previous;
     }
     memset(&jnet_character_instance,0,sizeof(jnet_character_instance));
@@ -565,14 +590,56 @@ static void jnet_character_eye(uintptr_t event,uintptr_t game) {
         ++checked;
     }
     if(checked!=2)return;
-    unsigned requested=active && instance->initialized && !instance->failed && instance->control.spotlight;
+    unsigned requested=active && instance->initialized && !instance->failed && instance->control.spotlight==2;
     if(!instance->attack_busy && !jc_local_windows_write(event+0x7c,&requested,4))return;
     instance->eye_ready=1;
+    unsigned dim=instance->control.spotlight==1 && !instance->attack_busy;
+    const unsigned offsets[]={0xcc,0xdc,0x10c,0x11c};
+    float saved[4],zero=0;
+    if(dim){
+        for(unsigned i=0;i<4;++i)if(!own_read(NULL,event+offsets[i],&saved[i],4))return;
+        unsigned written=0;
+        for(;written<4;++written)if(!jc_local_windows_write(event+offsets[written],&zero,4))break;
+        if(written!=4){
+            for(unsigned i=0;i<written;++i)jc_local_windows_write(event+offsets[i],&saved[i],4);
+            return;
+        }
+    }
+    if(instance->owner && instance->kind==JNET_CHARACTER_WAR_MACHINE){
+        unsigned char angry=instance->remote_anger>0;
+        jc_local_windows_write(event+0x88,&instance->remote_anger,4);
+        jc_local_windows_write(event+0xa0,&angry,1);
+    }
     jnet_character_eye_original(event,game);
+    for(unsigned i=0;i<spec->mesh_count;++i){
+        if(strcmp(spec->meshes[i].mesh,"JNETCharacter_P_MechHeadGlowMask"))continue;
+        uint64_t mesh=instance->pools.decorations+0x10+(uint64_t)(instance->pools.decoration_count+i)*0x10d0;
+        unsigned char visible=instance->control.spotlight!=0 || instance->attack_busy;
+        if(!jc_local_windows_write(mesh+0x70c,&visible,1))jnet_character_fail(instance);
+    }
+    if(dim){
+        for(unsigned i=0;i<4;++i)if(!jc_local_windows_write(event+offsets[i],&saved[i],4))jnet_character_fail(instance);
+        uint64_t sound=0,handle=0;
+        if(own_read(NULL,game+0x150,&sound,8) && sound && own_read(NULL,event+0xa4,&handle,8)){
+            void (*volume)(uintptr_t,uint64_t,float,float)=(void *)(fault_image+0x1468e0);
+            volume(sound,handle,0,0);
+        }
+    }
 }
 static unsigned char (*jnet_character_jump_original)(uintptr_t,unsigned char);
 static unsigned char jnet_character_jump(uintptr_t pad,unsigned char cheats) {
     unsigned char pressed=jnet_character_jump_original(pad,cheats);
+    uintptr_t rider_input=0,rider_pad=0;
+    if(pressed && traveler_game && jnet_menu_edit.applied.character==JNET_CHARACTER_WAYFARER &&
+       own_read(NULL,traveler_game+0x40,&rider_input,8) && rider_input &&
+       own_read(NULL,rider_input+8,&rider_pad,8) && rider_pad==pad){
+        for(unsigned owner=1;owner<3;++owner){
+            struct jnet_character_state *holder=&jnet_character_instances[owner];uint64_t attached=0;
+            if(holder->initialized && !holder->failed && holder->game==traveler_game && holder->grab_event &&
+               own_read(NULL,holder->grab_event+0x90,&attached,8) && attached==holder->binding.creature)
+                holder->grab_blocked=1;
+        }
+    }
     struct jnet_character_state *instance=&jnet_character_instance;
     uintptr_t input=0,local_pad=0;
     if(instance->initialized && !instance->failed && instance->kind!=JNET_CHARACTER_WAYFARER &&
@@ -612,17 +679,52 @@ static int jnet_character_attack_sync(struct jnet_character_state *instance) {
         instance->follow_position_valid=0;
         message("[JNET] native war machine attack complete; movement released");
     }else if(!instance->attack_busy && locked){
-        memset(instance->motion,0,sizeof(instance->motion));instance->sprint=instance->roll=0;
+        memset(instance->motion,0,sizeof(instance->motion));instance->sprint=0;
         message("[JNET] native war machine attack started; controls locked");
     }
     instance->attack_busy=(unsigned)locked;
     return 1;
+}
+static __thread uintptr_t jnet_character_attack_scope;
+static unsigned char (*jnet_character_authority_original)(uintptr_t,uintptr_t);
+static unsigned char jnet_character_authority(uintptr_t creature,uintptr_t barn) {
+    if(creature && creature==jnet_character_attack_scope)return 0;
+    return jnet_character_authority_original(creature,barn);
 }
 static void (*jnet_character_attack_original)(uintptr_t,uintptr_t);
 static void (*jnet_character_attack_handler_original)(uintptr_t,uintptr_t);
 static int jnet_character_attack_active(struct jnet_character_state *instance,uintptr_t game,unsigned active) {
     return active && !instance->owner && instance->initialized && !instance->failed && instance->game==game &&
         jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation);
+}
+static void (*jnet_character_hit_original)(uintptr_t,uintptr_t,uintptr_t,uintptr_t,uintptr_t);
+static void (*jnet_character_collision_original)(uintptr_t,uintptr_t,uintptr_t,uintptr_t,uintptr_t,uintptr_t);
+static uint64_t jnet_character_hit_sequence;
+static void jnet_character_hit(uintptr_t event,uintptr_t dude,uintptr_t a,uintptr_t b,uintptr_t events) {
+    unsigned active=0;struct jnet_character_state *instance=jnet_character_attack_instance(event,0,&active);
+    if(!instance){jnet_character_hit_original(event,dude,a,b,events);return;}
+    if(!active || instance->owner || !instance->attack_target || dude!=instance->attack_actor)return;
+    unsigned slot=0;
+    if(instance->war_hits[0].victim && instance->war_hits[0].victim!=instance->attack_target)slot=1;
+    struct jnet_war_hit *hit=&instance->war_hits[slot];
+    uint64_t sequence=++jnet_character_hit_sequence;
+    *hit=(struct jnet_war_hit){instance->attack_target,instance->attack_target_lease,sequence,GetTickCount64()};
+}
+static void jnet_character_collision(uintptr_t event,uintptr_t local,uintptr_t companion,
+        uintptr_t camera,uintptr_t events,uintptr_t sounds) {
+    unsigned active=0;struct jnet_character_state *instance=jnet_character_attack_instance(event,0,&active);
+    if(!instance){jnet_character_collision_original(event,local,companion,camera,events,sounds);return;}
+    if(!jnet_character_attack_active(instance,traveler_game,active) ||
+       jnet_travel_busy || traveler_network.paused || !instance->attack_actor || !instance->attack_target)return;
+    unsigned admitted=0;
+    for(unsigned slot=0;slot<2;++slot){
+        const struct jc_network_peer *peer=&traveler_network.peers[slot];
+        unsigned ready=slot?traveler_local_state==2:traveler_actor && traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE;
+        uintptr_t actor=slot?traveler_barn+0x146f0:traveler_object;
+        if(ready && actor && actor==instance->attack_actor && peer->connection.admitted && peer->connection.peer==instance->attack_target &&
+           peer->connection.remote_epoch==instance->attack_target_lease)admitted=1;
+    }
+    if(admitted)jnet_character_collision_original(event,instance->attack_actor,0,camera,events,sounds);
 }
 static void jnet_character_attack(uintptr_t event,uintptr_t game) {
     unsigned active=0;
@@ -631,7 +733,10 @@ static void jnet_character_attack(uintptr_t event,uintptr_t game) {
     if(!jnet_character_attack_active(instance,game,active))return;
     instance->failure_stage="native attack update";
     if(!jnet_character_attack_sync(instance)){jnet_character_fail(instance);return;}
+    uintptr_t previous_scope=jnet_character_attack_scope;
+    jnet_character_attack_scope=instance->binding.creature;
     jnet_character_attack_original(event,game);
+    jnet_character_attack_scope=previous_scope;
     if(!jnet_character_attack_sync(instance))jnet_character_fail(instance);
 }
 static void jnet_character_attack_handler(uintptr_t event,uintptr_t game) {
@@ -643,6 +748,8 @@ static void jnet_character_attack_handler(uintptr_t event,uintptr_t game) {
     if(!jnet_character_attack_ready(own_read,NULL,fault_image,instance->attack_event,instance->attack_handler,
             instance->binding.creature,instance->eye_event)){jnet_character_fail(instance);return;}
     if(!jnet_character_attack_sync(instance)){jnet_character_fail(instance);return;}
+    uint64_t target_ids[3]={0},target_leases[3]={0},target_actors[3]={0};
+    unsigned was_busy=instance->attack_busy;
     if(!instance->attack_busy){
         uint64_t actors[3]={0,0,0};
         struct jnet_game_record records[JNET_STEAM_CAPACITY];uint64_t room=0;
@@ -657,12 +764,14 @@ static void jnet_character_attack_handler(uintptr_t event,uintptr_t game) {
             for(unsigned i=0;i<JNET_STEAM_CAPACITY;++i)
                 if(records[i].id==peer->connection.peer && records[i].lease==peer->connection.remote_epoch &&
                    records[i].sample.chapter==jnet_current_level && records[i].sequence &&
-                   records[i].character_known && records[i].character==JNET_CHARACTER_WAYFARER &&
+                   records[i].character_known && records[i].character<JNET_CHARACTER_COUNT &&
                    now>=records[i].seen && now-records[i].seen<2000)
-                    actors[slot+1]=slot?traveler_barn+0x146f0:traveler_object;
+                    {actors[slot+1]=slot?traveler_barn+0x146f0:traveler_object;
+                     target_ids[slot+1]=records[i].id;target_leases[slot+1]=records[i].lease;
+                     target_actors[slot+1]=actors[slot+1];}
         }
         if(!jnet_character_attack_targets(own_read,jnet_character_write_memory,NULL,instance->attack_event,
-                actors,instance->control.spotlight && instance->eye_ready)){jnet_character_fail(instance);return;}
+                actors,jnet_attack_down && instance->control.spotlight==2 && instance->eye_ready)){jnet_character_fail(instance);return;}
         uint64_t merged=0,rails=0,count=0;
         if(!own_read(NULL,instance->attack_event+0x128,&merged,8) ||
            (!merged && (!own_read(NULL,game+0x168,&rails,8) || !rails ||
@@ -670,17 +779,41 @@ static void jnet_character_attack_handler(uintptr_t event,uintptr_t game) {
             instance->failure_stage="native attack rail capacity";jnet_character_fail(instance);return;
         }
     }
+    uintptr_t previous_scope=jnet_character_attack_scope;
+    jnet_character_attack_scope=instance->binding.creature;
     jnet_character_attack_handler_original(event,game);
+    jnet_character_attack_scope=previous_scope;
     if(!jnet_character_attack_sync(instance))jnet_character_fail(instance);
+    if(!was_busy && instance->attack_busy){
+        uint32_t selected=3;own_read(NULL,instance->attack_event+0xe4,&selected,4);
+        if(selected<3)jc_local_windows_write(instance->attack_event+0xe0,&selected,4);
+        instance->attack_target=selected<3?target_ids[selected]:0;
+        instance->attack_target_lease=selected<3?target_leases[selected]:0;
+        instance->attack_actor=selected<3?target_actors[selected]:0;
+        unsigned char clear[2]={0};jc_local_windows_write(instance->attack_event+0xf8,clear,2);
+    }
+    if(jnet_attack_down && GetTickCount64()>=instance->attack_report_tick){
+        uint32_t eye_state=0,target_index=0;float acquired=0;
+        own_read(NULL,instance->eye_event+0x78,&eye_state,4);
+        own_read(NULL,instance->attack_event+0xe4,&target_index,4);
+        own_read(NULL,event+0x6c,&acquired,4);
+        char line[192];snprintf(line,sizeof(line),"[JNET] held Attack: spotlight=%u eye=%u target=%u acquisition=%.3f active=%u",
+            instance->control.spotlight,eye_state,target_index,acquired,instance->attack_busy);message(line);
+        instance->attack_report_tick=GetTickCount64()+2000;
+    }
 }
-static void jnet_flower_after_motion(unsigned kind,const float position[3],float dt,jnet_flower_floor_function floor,void *context);
 static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     jnet_controls_tick(barn,game,jnet_menu_edit.applied.character);
+    if(jnet_menu_edit.applied.character==JNET_CHARACTER_WAYFARER && !jnet_travel_busy && !traveler_network.paused){
+        uintptr_t input=0,pad=0;
+        if(own_read(NULL,game+0x40,&input,8) && input && own_read(NULL,input+8,&pad,8) && pad)
+            jnet_character_jump(pad,1);
+    }
     struct jnet_character_state *instance=&jnet_character_instance;
     if(!instance->initialized || instance->failed || instance->game!=game || instance->barn!=barn)return;
     int attacking=jnet_character_attack_locked(own_read,NULL,fault_image,instance->attack_event,instance->binding.creature);
     if(attacking<0){instance->failure_stage="attack state";jnet_character_fail(instance);return;}
-    if(attacking){memset(instance->motion,0,sizeof(instance->motion));instance->sprint=instance->roll=0;return;}
+    if(attacking){memset(instance->motion,0,sizeof(instance->motion));instance->sprint=0;return;}
     ++instance->input_frames;
     unsigned char menu=0;
     if(jnet_menu_last && !own_read(NULL,jnet_menu_last+0xd68,&menu,1))return;
@@ -715,16 +848,10 @@ static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     }
     float ramp=1-expf(-fminf(jnet_character_frame_dt,.05f)/.28f);
     instance->sprint+=ramp*((float)jnet_sprint_down-instance->sprint);
-    float roll_target=((float)jnet_tilt_right_down-(float)jnet_tilt_left_down)*1.57079632679f;
-    instance->roll+=ramp*(roll_target-instance->roll);
-    intent.roll=instance->roll;
     instance->failure_stage="target binding/pose";
     int result=jnet_character_target_step(own_read,jnet_character_write_memory,instance,&instance->binding,
         jnet_character_generation,&intent,jnet_character_speed(instance->kind)*(1+instance->sprint),jnet_character_frame_dt,jnet_character_ground);
     if(result){instance->failure_detail=result;jnet_character_fail(instance);return;}
-    float flower_position[3];
-    if(own_read(NULL,instance->binding.target+0x10,flower_position,sizeof(flower_position)))
-        jnet_flower_after_motion(instance->kind,flower_position,jnet_character_frame_dt,jnet_character_ground,instance);
 }
 static void jnet_character_after_player(uintptr_t barn,uintptr_t game) {
     struct jnet_character_state *instance=&jnet_character_instance;
@@ -910,6 +1037,29 @@ static void jnet_character_tick_native(uintptr_t game) {
     }
     else jnet_character_fail(instance);
 }
+static void jnet_character_war_capture(struct jnet_game_record *out) {
+    struct jnet_character_state *instance=&jnet_character_instances[0];
+    if(out->character!=JNET_CHARACTER_WAR_MACHINE || !instance->initialized || instance->failed)return;
+    out->war_active=instance->attack_busy;
+    if(out->war_active){
+        float position[3];uint64_t clump=0,items=0,head=0;
+        if(jnet_character_head_position(own_read,NULL,&instance->binding,jnet_character_generation,position))
+            memcpy(out->sample.state.bytes,position,sizeof(position));
+        if(own_read(NULL,instance->binding.creature+0x18,&clump,8) && clump &&
+           own_read(NULL,clump+8,&items,8) && items && own_read(NULL,items,&head,8) && head){
+            float rotation[4],norm=0;
+            if(own_read(NULL,head+0x20,rotation,sizeof(rotation))){
+                for(unsigned k=0;k<4;++k)norm+=rotation[k]*rotation[k];
+                if(isfinite(norm) && norm>=.99f && norm<=1.01f){
+                    memcpy(out->rotation,rotation,sizeof(rotation));out->rotation_known=1;
+                }
+            }
+        }
+    }
+    float anger=0;
+    if(own_read(NULL,instance->eye_event+0x88,&anger,4) && isfinite(anger))out->war_anger=fmaxf(0,fminf(1,anger));
+    memcpy(out->war_hits,instance->war_hits,sizeof(out->war_hits));
+}
 static int jnet_character_rotation(float *rotation) {
     struct jnet_character_state *instance=&jnet_character_instances[0];
     if(!instance->initialized || instance->failed || instance->kind!=jnet_menu_edit.applied.character ||
@@ -917,11 +1067,78 @@ static int jnet_character_rotation(float *rotation) {
     float norm=0;for(unsigned i=0;i<4;++i){if(!isfinite(rotation[i]))return 0;norm+=rotation[i]*rotation[i];}
     return isfinite(norm) && norm>=.99f && norm<=1.01f;
 }
+static int jnet_character_ride_pose(struct jnet_character_state *instance,float position[3],float rotation[4]) {
+    uint64_t clump=0,items=0,head=0;
+    if(!instance->initialized || instance->failed || instance->kind!=JNET_CHARACTER_LONGTAIL ||
+       !jnet_character_head_position(own_read,NULL,&instance->binding,jnet_character_generation,position) ||
+       !own_read(NULL,instance->binding.creature+0x18,&clump,8) || !clump ||
+       !own_read(NULL,clump+8,&items,8) || !items || !own_read(NULL,items,&head,8) || !head ||
+       !own_read(NULL,head+0x20,rotation,16))return 0;
+    float norm=0;
+    for(unsigned k=0;k<4;++k){if(!isfinite(rotation[k]))return 0;norm+=rotation[k]*rotation[k];}
+    return norm>=.99f && norm<=1.01f;
+}
+static void jnet_character_ride_capture(struct jnet_game_record *out) {
+    out->carrier=out->carrier_lease=0;
+    memset(out->ride_offset,0,sizeof(out->ride_offset));
+    if(out->character!=JNET_CHARACTER_WAYFARER || traveler_network.paused || jnet_travel_busy)return;
+    for(unsigned owner=1;owner<3;++owner){
+        struct jnet_character_state *holder=&jnet_character_instances[owner];
+        struct jc_network_peer *peer=&traveler_network.peers[owner-1];
+        uint64_t attached=0;float position[3],rotation[4],rider[3],offset[3];
+        if(!peer->connection.admitted || holder->grab_blocked || holder->game!=traveler_game ||
+           !holder->grab_event || !own_read(NULL,holder->grab_event+0x90,&attached,8) ||
+           attached!=holder->binding.creature || !jnet_character_ride_pose(holder,position,rotation))continue;
+        memcpy(rider,out->sample.state.bytes,sizeof(rider));
+        for(unsigned k=0;k<3;++k)offset[k]=rider[k]-position[k];
+        rotation[0]=-rotation[0];rotation[1]=-rotation[1];rotation[2]=-rotation[2];
+        jnet_character_ride_rotate(rotation,offset,out->ride_offset);
+        float distance=0;for(unsigned k=0;k<3;++k)distance+=out->ride_offset[k]*out->ride_offset[k];
+        if(!isfinite(distance) || distance>400){memset(out->ride_offset,0,sizeof(out->ride_offset));return;}
+        out->carrier=peer->connection.peer;out->carrier_lease=peer->connection.remote_epoch;return;
+    }
+}
+static int jnet_character_ride_resolve(const struct jnet_game_record *r,float position[3]) {
+    uint64_t now=GetTickCount64(),identity=0;int fresh=0;
+    if(!r->carrier || r->character!=JNET_CHARACTER_WAYFARER || traveler_network.paused || jnet_travel_busy ||
+       now<r->seen || now-r->seen>=500)return 0;
+    AcquireSRWLockExclusive(&jnet_sg_lock);
+    identity=jnet_sg_mail.identity;
+    if(jnet_sg_mail.room)for(unsigned i=0;i<JNET_STEAM_CAPACITY;++i){
+        const struct jnet_game_record *carrier=&jnet_sg_mail.records[i];
+        if(carrier->id==r->carrier && carrier->lease==r->carrier_lease && carrier->sequence &&
+           carrier->character_known && carrier->character==JNET_CHARACTER_LONGTAIL && carrier->grab &&
+           carrier->sample.chapter==r->sample.chapter && now>=carrier->seen && now-carrier->seen<500)fresh=1;
+    }
+    ReleaseSRWLockExclusive(&jnet_sg_lock);
+    if(!fresh)return 0;
+    unsigned owner=3;
+    if(r->carrier==identity){if(!jnet_grab_down)return 0;owner=0;}
+    else for(unsigned slot=0;slot<2;++slot){
+        struct jc_network_peer *peer=&traveler_network.peers[slot];
+        if(peer->connection.admitted && peer->connection.peer==r->carrier &&
+           peer->connection.remote_epoch==r->carrier_lease)owner=slot+1;
+    }
+    if(owner==3)return 0;
+    float rotation[4],offset[3];
+    if(!jnet_character_ride_pose(&jnet_character_instances[owner],position,rotation))return 0;
+    jnet_character_ride_rotate(rotation,r->ride_offset,offset);
+    for(unsigned k=0;k<3;++k)position[k]+=offset[k];
+    return 1;
+}
 static void jnet_character_remote_tick(uintptr_t game) {
-    static uint64_t identities[2],leases[2],retry[2];
+    static uint64_t identities[2],leases[2],retry[2],hit_received[2];
     struct jnet_game_record records[JNET_STEAM_CAPACITY];uint64_t room=0;
     AcquireSRWLockExclusive(&jnet_sg_lock);
     room=jnet_sg_mail.room;memcpy(records,jnet_sg_mail.records,sizeof(records));
+    for(unsigned i=0;i<JNET_STEAM_CAPACITY;++i)for(unsigned e=0;e<JNET_STEAM_CAPACITY;++e){
+        const struct jnet_game_record *event=&jnet_sg_mail.war_events[e];
+        if(records[i].id && event->id==records[i].id && event->lease==records[i].lease &&
+           event->sample.chapter==records[i].sample.chapter && records[i].character==JNET_CHARACTER_WAR_MACHINE){
+            for(unsigned h=0;h<2;++h)if(event->war_hits[h].sequence>records[i].war_hits[h].sequence)
+                records[i].war_hits[h]=event->war_hits[h];
+        }
+    }
     ReleaseSRWLockExclusive(&jnet_sg_lock);
     uint64_t now=GetTickCount64();
     for(unsigned slot=0;slot<2;++slot){
@@ -939,14 +1156,23 @@ static void jnet_character_remote_tick(uintptr_t game) {
         jnet_character_owner=slot+1;
         struct jnet_character_state *instance=&jnet_character_instance;
         unsigned kind=record && jnet_character_is_creature(record->character)?record->character:0;
-        uint64_t identity=record?record->id:0,lease=record?record->lease:0;
+        uint64_t identity=peer->connection.admitted?peer->connection.peer:0;
+        uint64_t lease=peer->connection.admitted?peer->connection.remote_epoch:0;
         if(identities[slot]!=identity || leases[slot]!=lease){
+            instance->grab_blocked=0;hit_received[slot]=0;
+            memset(&instance->remote_pose,0,sizeof(instance->remote_pose));
+            for(unsigned cached=0;cached<JNET_CHARACTER_COUNT*3;++cached){
+                jnet_character_cached[cached].grab_blocked=0;
+                memset(&jnet_character_cached[cached].remote_pose,0,sizeof(jnet_character_cached[cached].remote_pose));
+            }
             if(instance->binding.creature){
                 unsigned char stopped=1;
-                jnet_character_visibility(instance,0);
-                jc_local_windows_write(instance->binding.creature+9,&stopped,1);
-                if(dude==instance->barn+0xb0)jnet_character_restore_wayfarer(instance);
-                if(!instance->failed)jnet_character_cached[instance->kind+JNET_CHARACTER_COUNT*instance->skin]=*instance;
+                if(instance->game==game && jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation)){
+                    jnet_character_visibility(instance,0);
+                    jc_local_windows_write(instance->binding.creature+9,&stopped,1);
+                    if(dude==instance->barn+0xb0)jnet_character_restore_wayfarer(instance);
+                    if(!instance->failed)jnet_character_cached[instance->kind+JNET_CHARACTER_COUNT*instance->skin]=*instance;
+                }
                 memset(instance,0,sizeof(*instance));
             }
             identities[slot]=identity;leases[slot]=lease;retry[slot]=0;
@@ -955,17 +1181,55 @@ static void jnet_character_remote_tick(uintptr_t game) {
             if(instance->binding.creature)jnet_character_switch_native(game,instance->barn,0,0);
             continue;
         }
-        if((!instance->binding.creature || instance->kind!=kind || instance->barn!=dude-0xb0) && now<retry[slot])continue;
-        if(!jnet_character_switch_native(game,dude-0xb0,kind,record->variant)){retry[slot]=now+1000;continue;}
+        if((!instance->binding.creature || instance->failed || instance->kind!=kind ||
+            instance->skin!=(kind==JNET_CHARACTER_WAR_MACHINE?record->variant:0) ||
+            instance->game!=game || instance->binding.generation!=jnet_character_generation ||
+            instance->barn!=dude-0xb0) && now<retry[slot])continue;
+        if(!jnet_character_switch_native(game,dude-0xb0,kind,record->variant)){
+            retry[slot]=now+1000;
+            if(instance->binding.creature && !instance->failed)
+                jnet_character_switch_native(game,instance->barn,JNET_CHARACTER_WAYFARER,0);
+            continue;
+        }
         instance->variant=record->variant;
-        jnet_character_tick_native(game);
         instance->control.spotlight=record->spotlight;
+        instance->remote_anger=record->war_anger;
+        instance->attack_busy=record->war_active;
+        if(!jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation)){
+            instance->failure_stage="remote creature binding";jnet_character_fail(instance);continue;
+        }
+        jnet_character_tick_native(game);
+        if(instance->initialized && !instance->failed && kind==JNET_CHARACTER_WAR_MACHINE){
+            uint64_t local_id=0,local_lease=0,events=0;
+            AcquireSRWLockExclusive(&jnet_sg_lock);local_id=jnet_sg_mail.identity;ReleaseSRWLockExclusive(&jnet_sg_lock);
+            for(unsigned i=0;i<JNET_STEAM_CAPACITY;++i)if(records[i].id==local_id)local_lease=records[i].lease;
+            for(unsigned i=0;i<2;++i){const struct jnet_war_hit *hit=&record->war_hits[i];
+                if(hit->victim!=local_id || hit->lease!=local_lease || !local_lease ||
+                   hit->sequence<=hit_received[slot] || now<hit->seen || now-hit->seen>=2000)continue;
+                hit_received[slot]=hit->sequence;
+                if(jnet_menu_edit.applied.character!=JNET_CHARACTER_WAYFARER ||
+                   (jnet_character_instances[0].binding.creature && !jnet_character_instances[0].failed))continue;
+                if(!own_read(NULL,game+0x250,&events,8) || !events)continue;
+                jnet_character_hit_original(instance->attack_event,traveler_barn+0xb0,0,0,events);
+                float velocity[4],impulse[4];
+                if(own_read(NULL,traveler_barn+0xb0+0x1d80,velocity,sizeof(velocity)) &&
+                   own_read(NULL,fault_image+0x68bab0,impulse,sizeof(impulse))){
+                    for(unsigned k=0;k<4;++k)velocity[k]+=impulse[k];
+                    jc_local_windows_write(traveler_barn+0xb0+0x1d80,velocity,sizeof(velocity));
+                }
+            }
+        }
         if(!instance->initialized || instance->failed)continue;
         float position[3],yaw=0,rotation[4];
         if(!own_read(NULL,dude+0x10,position,sizeof(position)) || !own_read(NULL,dude+0x30,&yaw,4) || !isfinite(yaw))continue;
         int finite=1;for(unsigned i=0;i<3;++i)finite&=isfinite(position[i]);if(!finite)continue;
         rotation[0]=rotation[2]=0;rotation[1]=sinf(yaw*.5f);rotation[3]=cosf(yaw*.5f);
         if(record->rotation_known)memcpy(rotation,record->rotation,sizeof(rotation));
+        if(record->war_active)memcpy(position,record->sample.state.bytes,sizeof(position));
+        if(kind==JNET_CHARACTER_WAR_MACHINE){
+            memcpy(position,record->sample.state.bytes,sizeof(position));
+            if(!jnet_remote_pose_update(&instance->remote_pose,record->sequence,record->seen,now,position,rotation))continue;
+        }
         float hidden=1;unsigned char no_feet=0;
         if(!jc_local_windows_write(instance->binding.target+0x10,position,sizeof(position)) ||
            !jc_local_windows_write(instance->binding.target+0x20,rotation,sizeof(rotation)) ||
@@ -973,6 +1237,15 @@ static void jnet_character_remote_tick(uintptr_t game) {
            !jc_local_windows_write(dude+0x2000,&hidden,4) ||
            !jc_local_windows_write(dude+0x9c34,&no_feet,1) ||
            !jc_local_windows_write(dude+0x9cc4,&no_feet,1))jnet_character_fail(instance);
+    }
+    for(unsigned slot=0;slot<2;++slot){
+        struct jc_network_peer *peer=&traveler_network.peers[slot];
+        if(!peer->connection.admitted)continue;
+        uintptr_t rider=slot?traveler_barn+0x146f0:traveler_object;
+        for(unsigned i=0;i<JNET_STEAM_CAPACITY;++i){float attached[3];
+            if(records[i].id==peer->connection.peer && records[i].lease==peer->connection.remote_epoch &&
+               jnet_character_ride_resolve(records+i,attached))jc_local_windows_write(rider+0x10,attached,sizeof(attached));
+        }
     }
     jnet_character_owner=0;
 }
@@ -1008,21 +1281,84 @@ static unsigned char jnet_character_touch(uintptr_t event,float dt,uintptr_t dud
     if(jnet_character_creature_for_dude(dude))return 0;
     return jnet_character_touch_original(event,dt,dude,sounds,fifth,sixth,cloth);
 }
+static void (*jnet_character_grab_original)(uintptr_t,uintptr_t);
+static void jnet_character_grab(uintptr_t event,uintptr_t game) {
+    struct jnet_character_state *instance=NULL;unsigned active=0;
+    for(unsigned owner=0;owner<3;++owner){
+        if(jnet_character_instances[owner].grab_event==event){instance=&jnet_character_instances[owner];active=owner;break;}
+        for(unsigned kind=1;kind<JNET_CHARACTER_COUNT*3;++kind)
+            if(jnet_character_caches[owner][kind].grab_event==event)instance=&jnet_character_caches[owner][kind];
+    }
+    if(!instance){jnet_character_grab_original(event,game);return;}
+    if(instance->game!=game || !instance->initialized || instance->failed ||
+       !jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation) ||
+       !jnet_character_grab_ready(own_read,NULL,fault_image,event,instance->binding.creature))return;
+    int held=0;
+    uint64_t now=GetTickCount64();
+    if(active && game==traveler_game && traveler_barn && !traveler_network.paused &&
+       !jnet_travel_busy && jnet_menu_edit.applied.character==JNET_CHARACTER_WAYFARER){
+        unsigned slot=active-1;
+        struct jc_network_peer *peer=&traveler_network.peers[slot];
+        unsigned ready=slot?traveler_local_state==2:
+            traveler_actor && traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE;
+        AcquireSRWLockExclusive(&jnet_sg_lock);
+        if(ready && peer->connection.admitted && jnet_sg_mail.room)
+            for(unsigned i=0;i<JNET_STEAM_CAPACITY;++i){
+                const struct jnet_game_record *r=&jnet_sg_mail.records[i];
+                if(r->id==peer->connection.peer && r->lease==peer->connection.remote_epoch &&
+                   r->character_known && r->character==JNET_CHARACTER_LONGTAIL && r->sequence &&
+                   r->sample.chapter==jnet_current_level && now>=r->seen && now-r->seen<500){
+                    if(!r->grab)instance->grab_blocked=0;
+                    held=r->grab && !instance->grab_blocked;
+                }
+            }
+        ReleaseSRWLockExclusive(&jnet_sg_lock);
+        for(unsigned owner=1;owner<3 && held;++owner){
+            struct jnet_character_state *other=&jnet_character_instances[owner];uint64_t attached=0;
+            if(other!=instance && other->grab_event && other->initialized && !other->failed &&
+               other->game==game && own_read(NULL,other->grab_event+0x90,&attached,8) && attached)held=0;
+        }
+    }
+    if(held){jnet_character_grab_original(event,game);return;}
+    uint64_t attached=0,clump=0,count=0;unsigned char enforce=0;
+    if(!own_read(NULL,event+0x90,&attached,8) || !attached)return;
+    if(!own_read(NULL,event+0x48,&clump,8) || !clump ||
+       !own_read(NULL,clump+0x10,&count,8) || count!=1 || !own_read(NULL,event+0x84,&enforce,1))return;
+    uint64_t empty=0;unsigned char released=0;
+    if(!jc_local_windows_write(event+0x84,&released,1))return;
+    if(jc_local_windows_write(clump+0x10,&empty,8)){
+        jnet_character_grab_original(event,game);
+        if(!jc_local_windows_write(clump+0x10,&count,8))jnet_character_fail(instance);
+    }
+    if(!jc_local_windows_write(event+0x84,&enforce,1))jnet_character_fail(instance);
+}
 static void (*jnet_character_ride_original)(uintptr_t,uintptr_t);
 static void (*jnet_character_cloth_ride_original)(uintptr_t,uintptr_t);
+static int jnet_character_ride_owner(uintptr_t event,uintptr_t game) {
+    for(unsigned owner=0;owner<3;++owner){
+        const struct jnet_character_state *instance=&jnet_character_instances[owner];
+        if(instance->ride_event==event || instance->grab_event==event)
+            return owner && instance->initialized && !instance->failed && instance->game==game;
+    }
+    for(unsigned owner=0;owner<3;++owner)
+        for(unsigned kind=1;kind<JNET_CHARACTER_COUNT*3;++kind)
+            if(jnet_character_caches[owner][kind].ride_event==event || jnet_character_caches[owner][kind].grab_event==event)return 0;
+    return -1;
+}
 static void jnet_character_ride(uintptr_t event,uintptr_t game) {
+    if(jnet_menu_edit.applied.character!=JNET_CHARACTER_WAYFARER)return;
     uint64_t event_type=0;
     if(!own_read(NULL,event,&event_type,8))return;
     void (*original)(uintptr_t,uintptr_t)=event_type==fault_image+0x679ed8?
         jnet_character_cloth_ride_original:jnet_character_ride_original;
-    int private_event=0;
-    for(unsigned owner=0;owner<3;++owner){
-        private_event|=jnet_character_instances[owner].ride_event==event || jnet_character_instances[owner].grab_event==event;
-        for(unsigned kind=1;kind<JNET_CHARACTER_COUNT*3;++kind)
-            private_event|=jnet_character_caches[owner][kind].ride_event==event || jnet_character_caches[owner][kind].grab_event==event;
+    int owner=jnet_character_ride_owner(event,game);
+    if(owner<0){original(event,game);return;}
+    if(!owner)return;
+    for(unsigned owner=1;owner<3;++owner){
+        struct jnet_character_state *holder=&jnet_character_instances[owner];uint64_t attached=0;
+        if(holder->initialized && !holder->failed && holder->game==game && holder->grab_event &&
+           own_read(NULL,holder->grab_event+0x90,&attached,8) && attached)return;
     }
-    if(jnet_menu_edit.applied.character!=JNET_CHARACTER_WAYFARER)return;
-    if(!private_event){original(event,game);return;}
     if(game!=traveler_game || !traveler_barn || traveler_network.paused)return;
     struct jnet_game_record records[JNET_STEAM_CAPACITY];uint64_t room,now=GetTickCount64();
     AcquireSRWLockExclusive(&jnet_sg_lock);

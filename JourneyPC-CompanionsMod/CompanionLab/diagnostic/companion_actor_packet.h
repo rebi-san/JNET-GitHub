@@ -14,7 +14,7 @@ static inline int jc_actor_packet_encode(const unsigned char build[16],uint64_t 
         uint64_t sequence,const struct jc_actor_sender *s,jc_actor_packet_mac mac,void *ctx,
         unsigned char out[JC_ACTOR_PACKET_BYTES]) {
     if(!build || !peer || !generation || !sequence || !jc_actor_sender_valid(s) || !mac || !out)return 0;
-    memset(out,0,JC_ACTOR_PACKET_BYTES);memcpy(out,"JCA1",4);
+    memset(out,0,JC_ACTOR_PACKET_BYTES);memcpy(out,"JNA1",4);
     jc_packet_put(out+4,1,2);jc_packet_put(out+6,JC_ACTOR_PACKET_BYTES,2);memcpy(out+8,build,16);
     jc_packet_put(out+24,peer,8);jc_packet_put(out+32,generation,8);jc_packet_put(out+40,sequence,8);
     jc_packet_put(out+48,s->chapter,4);
@@ -29,7 +29,7 @@ static inline int jc_actor_packet_encode(const unsigned char build[16],uint64_t 
 }
 static inline int jc_actor_packet_decode(struct jc_actor_sender *out,const unsigned char build[16],
         const unsigned char *p,size_t bytes,uint64_t now,jc_actor_packet_mac mac,void *ctx) {
-    if(!out || !build || !p || bytes!=JC_ACTOR_PACKET_BYTES || memcmp(p,"JCA1",4) ||
+    if(!out || !build || !p || bytes!=JC_ACTOR_PACKET_BYTES || memcmp(p,"JNA1",4) ||
         jc_packet_get(p+4,2)!=1 || jc_packet_get(p+6,2)!=bytes || memcmp(p+8,build,16) || !mac)return JC_STREAM_ARGUMENT;
     unsigned char tag[32];if(!mac(ctx,p,JC_ACTOR_PACKET_BODY,tag))return JC_STREAM_ARGUMENT;
     unsigned difference=0;for(unsigned i=0;i<32;++i)difference|=tag[i]^p[JC_ACTOR_PACKET_BODY+i];

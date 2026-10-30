@@ -489,11 +489,16 @@ int main(void) {
         .Flush=flush_context};
     ID3D11DeviceContext context={&cv}; struct jc_live_retirement r={0};
     uint64_t t=jc_live_retirement_arm(&r,1,0x1000,0x1100); assert(t);
+    assert(!jc_live_retirement_needs_poll(&r));
     assert(jc_live_retirement_result(&r,t,0)==0 && !ends);
     unsigned mask=jc_live_retirement_enter(&r,1,0x1000,0x1100); assert(mask==1);
     assert(!jc_live_retirement_cancel(&r,t));
     query_result=1; query_complete=1;
     jc_live_retirement_leave(&r,mask,0,&context);
+    assert(jc_live_retirement_needs_poll(&r));
+    r.state.entries[0].thread=43;
+    assert(!jc_live_retirement_needs_poll(&r));
+    r.state.entries[0].thread=GetCurrentThreadId();
     assert(ends==1 && polls==1 && context_refs==1 && query_refs==1 && !device_refs);
     assert(jc_live_retirement_result(&r,t,0)==0);
     assert(jc_live_retirement_pending_executor(&r)==1);
@@ -502,6 +507,7 @@ int main(void) {
     query_result=0; query_complete=0; jc_live_retirement_poll(&r);
     assert(jc_live_retirement_result(&r,t,0)==0);
     query_complete=1; jc_live_retirement_poll(&r);
+    assert(!jc_live_retirement_needs_poll(&r));
     assert(jc_live_retirement_result(&r,t,0)==1 && !context_refs && !query_refs);
     assert(!jc_live_retirement_pending_executor(&r));
     assert(jc_live_retirement_result(&r,t,1)==1 && jc_live_retirement_result(&r,t,0)==-1);

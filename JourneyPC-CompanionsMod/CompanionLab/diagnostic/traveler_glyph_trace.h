@@ -59,7 +59,7 @@ static void traveler_glyph_trace_built(int n,uint32_t result,uint64_t before,uin
 }
 static void traveler_glyph_trace_report(void) {
     char line[384];
-    snprintf(line,sizeof(line),"[JC] floating ownership guard/detail/pool=%u/%u/%u first-detail/pool=%u/%u slots=%u retries/recovered=%u/%u slot/link/head/tail=%llx/%llx/%llx/%llx",
+    snprintf(line,sizeof(line),"[JNET] floating ownership guard/detail/pool=%u/%u/%u first-detail/pool=%u/%u slots=%u retries/recovered=%u/%u slot/link/head/tail=%llx/%llx/%llx/%llx",
         traveler_glyph_init.failed,traveler_glyph_init.slot_detail,traveler_glyph_init.slot_result,
         traveler_glyph_init.first_detail,traveler_glyph_init.first_pool,traveler_glyph_init.live_slots,
         traveler_glyph_init.retries,traveler_glyph_init.recovered,
@@ -67,7 +67,7 @@ static void traveler_glyph_trace_report(void) {
         (unsigned long long)traveler_glyph_init.head,(unsigned long long)traveler_glyph_init.tail);
     message(line);
     for(unsigned n=0;n<2;++n) {
-        snprintf(line,sizeof(line),"[JC] floating pipeline actor=%u commit/denied/queued/dispatch/build/commands=%ld/%ld/%ld/%ld/%ld/%ld results=%ld/%ld passes=%ld glyph-guard=%u",
+        snprintf(line,sizeof(line),"[JNET] floating pipeline actor=%u commit/denied/queued/dispatch/build/commands=%ld/%ld/%ld/%ld/%ld/%ld results=%ld/%ld passes=%ld glyph-guard=%u",
             n,(long)InterlockedCompareExchange(&traveler_glyph_trace[n].commits,0,0),
             (long)InterlockedCompareExchange(&traveler_glyph_trace[n].denied,0,0),
             (long)InterlockedCompareExchange(&traveler_glyph_trace[n].queued,0,0),

@@ -43,8 +43,15 @@ int main(void){
     assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,6.4224e-06f));
     assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,1.78814e-07f));
     assert(!pool[0x10+0x94]);
-    assert(!jc_scarf_growth_step(read_memory,write_memory,NULL,&g,.9f));
+    assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,.9f));
+    assert(g.deferred==1 && !g.active && !pool[0x10+0x94]);
     position[3]=1;memcpy(actor+0x2290,position,16);
+    assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,.9f));
+    assert(g.active && pool[0x10+0x94] && !memcmp(pool+0x10+0x30,position,16));
+    direction[0]=INFINITY;memcpy(actor+0x14270,direction,16);
+    assert(jc_scarf_growth_step(read_memory,write_memory,NULL,&g,.0204551f));
+    assert(g.deferred==2 && !g.active && !pool[0x10+0x94]);
+    direction[0]=0;memcpy(actor+0x14270,direction,16);
     assert(!jc_scarf_growth_step(read_memory,write_memory,NULL,&g,NAN));
     g.active=1;put(g.native,0x18,2);assert(jc_scarf_growth_stop(read_memory,write_memory,NULL,&g));assert(stops==1);
     _Alignas(16) unsigned char first[32],second[32];
@@ -71,6 +78,6 @@ int main(void){
     struct jc_scarf_growth other={0};
     assert(!jc_scarf_growth_prepare(read_memory,NULL,(uintptr_t)image,(uintptr_t)game,(uintptr_t)actor,&other));
     free(pool);free(sounds);free(actor);assert(!munmap(image,0x740000));
-    puts("Native CapeGrow: seven admissions reuse one emitter; position, direction, enable, stop, capacity and ownership checks passed. Audio calls intercepted.");
+    puts("Native CapeGrow: seven admissions reuse one emitter; invalid position/direction defer and stop only the effect, valid vectors resume it; capacity and ownership checks retained. Audio calls intercepted.");
     return 0;
 }

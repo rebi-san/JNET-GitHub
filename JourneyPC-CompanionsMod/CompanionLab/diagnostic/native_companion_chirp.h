@@ -31,11 +31,8 @@ static inline const char *jc_chirp_sound_name(unsigned sound,int companion) {
         {"Player2Coo","Player2Chirp","Player2Call","Player2Shout"}};
     static const char *const creatures[]={"FishComeHere","Guardian_OutOfSnowVO","HappyWhale",
         "FishIdleMoveShort","FishIdleMoveMedium","FishIdleMoveLong","ClothGuardianShout", "JNTFishShort", "JNTFishMedium", "JNTFishLong", "JNTFishCall",
-        "JNTWarVoice", "JNTWarLock", "JNTWhale", "JNTWarHungry", "JNTWarAway", "JNTFlowSnake", "JNTFlowHunter",
-        "Flower"};
-    /* 23 is Journey's own Flower response sound (the Desert flower's shout), played locally by Flower Trail; it is never captured
-       from native shouts, so jc_chirp_sound_kind stops at 22. */
-    if(sound>=5 && sound<=23)return creatures[sound-5];
+        "JNTWarVoice", "JNTWarLock", "JNTWhale", "JNTWarHungry", "JNTWarAway", "JNTFlowSnake", "JNTFlowHunter"};
+    if(sound>=5 && sound<=22)return creatures[sound-5];
     return sound>=1 && sound<=4 ? names[companion!=0][sound-1] : NULL;
 }
 static inline unsigned jc_chirp_sound_kind(const unsigned char name[32]) {
@@ -76,6 +73,21 @@ static inline int jc_chirp_capture_local(jc_layout_reader read,void *ctx,uint64_
     unsigned char slots[JC_CHIRP_BARN_BYTES]; uint32_t sound_count; int code;
     if (!capture || !batch || !participant || !epoch || !frame) return JC_CHIRP_ARGUMENT;
     memset(batch,0,sizeof(*batch)); batch->frame=frame;
+    if(capture->primed){
+        uint64_t barn=0,sounds=0,check=0,sound_check=0;uint32_t next=0,next_check=0;
+        if(!jc_layout_field(read,ctx,game,0x1b8,&barn,8) ||
+           !jc_layout_field(read,ctx,game,0x150,&sounds,8))return JC_CHIRP_READ;
+        if(barn==capture->barn && barn && !((barn|sounds)&15) && sounds){
+            if(!jc_layout_field(read,ctx,barn,0x714,&next,4) ||
+               !jc_layout_field(read,ctx,game,0x1b8,&check,8) ||
+               !jc_layout_field(read,ctx,barn,0x714,&next_check,4) ||
+               !jc_layout_field(read,ctx,game,0x150,&sound_check,8))return JC_CHIRP_READ;
+            if(check!=barn || sound_check!=sounds || next!=next_check)return JC_CHIRP_CHANGED;
+            if(frame>=capture->frame && next==capture->next){
+                capture->frame=frame;batch->barn=barn;batch->sounds=sounds;return 0;
+            }
+        }
+    }
     code=jc_chirp_snapshot(read,ctx,game,&batch->barn,&batch->sounds,slots); if (code) return code;
     uint32_t next=jc_chirp_u32(slots+0x714),delta=next-capture->next;
     if (!capture->primed || capture->barn!=batch->barn) {

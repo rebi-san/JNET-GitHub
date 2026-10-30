@@ -56,19 +56,27 @@ static uintptr_t jnet_environment_endpoint(uintptr_t environment,float z) {
 static void (*jnet_environment_update_original)(uintptr_t,uintptr_t,uintptr_t,float,uintptr_t,uintptr_t,uintptr_t,uintptr_t);
 static void jnet_environment_update(uintptr_t environment,uintptr_t resources,uintptr_t lua,float dt,
         uintptr_t position,uintptr_t camera,uintptr_t terrain,uintptr_t extra) {
-    uintptr_t endpoint=0;float z=0,bounds[2];unsigned char reload[2]={0},dirty=0;
+    uintptr_t endpoint=0;float z=0,bounds[2],radius=0;unsigned char reload[2]={0},dirty=0;
     if(!jnet_blackness && position && own_read(NULL,position+8,&z,4) && isfinite(z) &&
        own_read(NULL,environment+8,reload,2) && !reload[0] && !reload[1] &&
        own_read(NULL,environment+0x60,&dirty,1) && !dirty){
         endpoint=jnet_environment_endpoint(environment,z);
         if(endpoint && own_read(NULL,endpoint+0x148,bounds,sizeof(bounds))){
-            float radius=fabsf(z-bounds[0])+fmaxf(1.f,fabsf(z)*.00001f);
+            radius=fabsf(z-bounds[0])+fmaxf(1.f,fabsf(z)*.00001f);
             if(!isfinite(radius) || !jc_local_windows_write(endpoint+0x14c,&radius,4))endpoint=0;
         }else endpoint=0;
     }
     jnet_environment_update_original(environment,resources,lua,dt,position,camera,terrain,extra);
-    if(endpoint && !jc_local_windows_write(endpoint+0x14c,bounds+1,4)){
-        jnet_options_failed=1;message("[JNET] Blackness environment radius restoration failed; restart Journey");
+    if(endpoint){
+        uintptr_t type=0;float current[2];
+        int unchanged=own_read(NULL,environment,&type,8) && type==fault_image+0x5d7b60 &&
+            own_read(NULL,endpoint,&type,8) && type==fault_image+0x5d7bb0 &&
+            own_read(NULL,endpoint+0x148,current,sizeof(current)) &&
+            !memcmp(current,bounds,4) && !memcmp(current+1,&radius,4);
+        if(!unchanged || !jc_local_windows_write(endpoint+0x14c,bounds+1,4)){
+            jnet_blackness=1;jnet_options_failed=1;
+            message("[JNET] Blackness override stopped: environment changed or radius restoration failed");
+        }
     }
 }
 static void jnet_options_apply(void) {

@@ -82,14 +82,36 @@ static int traveler_actor_sampler_write_allowed(uintptr_t material,const uint64_
         own_read(NULL,material+0x30,&slot,8) && !slot)return 1;
     return traveler_actor_material_write_allowed(material,0);
 }
-__declspec(dllexport) volatile LONG JNETActor[32];
+__declspec(dllexport) volatile LONG JNETActor[47];
+static uint64_t traveler_actor_cost_begin(void) {
+#ifdef _WIN32
+    LARGE_INTEGER tick;
+    if(traveler_actor && traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE &&
+       ((unsigned)JNETFrames%16)==0 && QueryPerformanceCounter(&tick))return (uint64_t)tick.QuadPart;
+#endif
+    return 0;
+}
+static void traveler_actor_cost_end(unsigned index,uint64_t started) {
+#ifdef _WIN32
+    static LARGE_INTEGER frequency;LARGE_INTEGER tick;
+    if(!started || !QueryPerformanceCounter(&tick))return;
+    if(!frequency.QuadPart && !QueryPerformanceFrequency(&frequency))return;
+    if(frequency.QuadPart<=0 || (uint64_t)tick.QuadPart<started)return;
+    uint64_t elapsed=((uint64_t)tick.QuadPart-started)*1000000/(uint64_t)frequency.QuadPart;
+    LONG cost=(LONG)(elapsed>INT32_MAX?INT32_MAX:elapsed);
+    JNETActor[index]=cost;if(cost>JNETActor[index+1])JNETActor[index+1]=cost;
+    if(index==32)++JNETActor[42];
+#else
+    (void)index;(void)started;
+#endif
+}
 static void traveler_actor_scope_failure(unsigned phase,unsigned step,int code,uint64_t frame) {
     if(JNETActor[13])return;
     InterlockedExchange(&JNETActor[12],(LONG)phase);
     InterlockedExchange(&JNETActor[13],(LONG)step);
     InterlockedExchange(&JNETActor[14],(LONG)code);
     InterlockedExchange(&JNETActor[15],(LONG)frame);
-    char line[160];snprintf(line,sizeof(line),"[JC] actor scope failed phase=%u step=%u code=%d frame=%llu",
+    char line[160];snprintf(line,sizeof(line),"[JNET] actor scope failed phase=%u step=%u code=%d frame=%llu",
         phase,step,code,(unsigned long long)frame);message(line);
 }
 static void traveler_actor_report(int code) {
@@ -98,7 +120,7 @@ static void traveler_actor_report(int code) {
     if (!traveler_actor) return;
     if ((code==JC_ACTOR_RECEIVER || code==JC_ACTOR_WRITE) && (++declines<=8 || declines%300==0)) {
         char line[384];struct jc_actor_publication *p=&traveler_actor->publication;
-        snprintf(line,sizeof(line),"[JC] actor numeric rejected count=%u stage=%u detail=%u dt=%.6f/%.6f attempted/restored=%u/%u quarantine=%u state=%u",
+        snprintf(line,sizeof(line),"[JNET] actor numeric rejected count=%u stage=%u detail=%u dt=%.6f/%.6f attempted/restored=%u/%u quarantine=%u state=%u",
             declines,p->receiver_stage,p->detail,p->clocks[0],p->clocks[1],p->attempted_spans,
             p->restored_spans,p->quarantined,traveler_actor->state);
         message(line);
@@ -110,7 +132,7 @@ static void traveler_actor_report(int code) {
                 if(!isfinite(candidate) || fabsf(candidate)>1000000.f){bad=offset;value=candidate;break;}
             }
             uint32_t appearance[4];memcpy(appearance,p->before+0x68,sizeof(appearance));
-            snprintf(line,sizeof(line),"[JC] actor numeric input actor=%llx peer=%llu bad_float=+%x value=%.9g appearance=%u/%u/%u/%u age=%.9g delay=%.9g cooldown=%.9g inactive=%u",
+            snprintf(line,sizeof(line),"[JNET] actor numeric input actor=%llx peer=%llu bad_float=+%x value=%.9g appearance=%u/%u/%u/%u age=%.9g delay=%.9g cooldown=%.9g inactive=%u",
                 (unsigned long long)traveler_actor->identity.actor,(unsigned long long)traveler_actor->identity.peer,
                 bad,value,appearance[0],appearance[1],appearance[2],appearance[3],
                 jc_receiver_float(traveler_actor->receiver.image+0x28dc4),
@@ -163,7 +185,7 @@ static int traveler_actor_ready(void *context,const struct jc_actor_identity *id
         traveler_actor_services.ready(context,id) &&
         !jc_actor_material_independent(own_read,NULL,id,&traveler_actor_materials);
 }
-static int traveler_actor_begin(void *context,const struct jc_actor_identity *id,
+static int traveler_actor_begin_inner(void *context,const struct jc_actor_identity *id,
         unsigned phase,uint64_t frame,uint64_t render) {
     if (!traveler_actor_services.begin(context,id,phase,frame,render)) {
         traveler_actor_scope_failure(phase,1,JC_ACTOR_RUNTIME_SCOPE,frame);return 0;
@@ -191,7 +213,7 @@ static int traveler_actor_begin(void *context,const struct jc_actor_identity *id
     traveler_actor_material_failed=0;traveler_actor_material_scope=phase;
     return 1;
 }
-static int traveler_actor_end(void *context,const struct jc_actor_identity *id,
+static int traveler_actor_end_inner(void *context,const struct jc_actor_identity *id,
         unsigned phase,uint64_t frame,int success) {
     int scope_code=phase==JC_ACTOR_PHASE_UPDATE?cloth_actor_scope_end(id->peer,id->generation,success):0;
     int scope=!scope_code;
@@ -206,6 +228,18 @@ static int traveler_actor_end(void *context,const struct jc_actor_identity *id,
     int services=traveler_actor_services.end(context,id,phase,frame,success && scope && materials && world);
     if(!services)traveler_actor_scope_failure(phase,8,JC_ACTOR_RUNTIME_SCOPE,frame);
     return scope && services && materials && world;
+}
+static int traveler_actor_begin(void *context,const struct jc_actor_identity *id,
+        unsigned phase,uint64_t frame,uint64_t render) {
+    uint64_t started=phase==JC_ACTOR_PHASE_UPDATE?traveler_actor_cost_begin():0;
+    int result=traveler_actor_begin_inner(context,id,phase,frame,render);
+    traveler_actor_cost_end(43,started);return result;
+}
+static int traveler_actor_end(void *context,const struct jc_actor_identity *id,
+        unsigned phase,uint64_t frame,int success) {
+    uint64_t started=phase==JC_ACTOR_PHASE_UPDATE?traveler_actor_cost_begin():0;
+    int result=traveler_actor_end_inner(context,id,phase,frame,success);
+    traveler_actor_cost_end(45,started);return result;
 }
 /* Services are an in-process backend contract, never packet data. Retirement
    must cover torso/glyph/animation/cloth/GPU consumers. Missing services keep
@@ -392,18 +426,24 @@ static uintptr_t traveler_input_observer(uintptr_t barn,uintptr_t game) {
     traveler_actor_trial_tick(barn,game);
     if (traveler_actor && barn==traveler_barn && game==traveler_game &&
         traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE) {
+        uint64_t started=traveler_actor_cost_begin();
         traveler_actor_report(jc_actor_runtime_after_input(traveler_actor,(uint32_t)JNETFrames));
+        traveler_actor_cost_end(34,started);
         if(traveler_actor->input_frame==(uint32_t)JNETFrames)traveler_peer_after_input();
     }
     return result;
 }
 static uintptr_t traveler_update_observer(uintptr_t barn,uintptr_t game) {
     traveler_charge_before_update(barn,game);
+    uint64_t started=traveler_actor_cost_begin();
     uintptr_t result=original_traveler_update(barn,game);
+    traveler_actor_cost_end(32,started);
     if(traveler_character_updated)traveler_character_updated(barn,game);
     if (traveler_actor && barn==traveler_barn && game==traveler_game &&
         traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE && traveler_actor->input_frame==(uint32_t)JNETFrames) {
+        started=traveler_actor_cost_begin();
         traveler_actor_report(jc_actor_runtime_after_update(traveler_actor,(uint32_t)JNETFrames));
+        traveler_actor_cost_end(36,started);
         traveler_peer_after_update();
         if(!traveler_actor->departing)traveler_actor_chirp_tick();
     }
@@ -426,7 +466,7 @@ static void traveler_actor_visibility(uintptr_t render) {
     ReleaseSRWLockShared(&jc_cloth_render_lock);
     char line[480];
     for (unsigned role=4;role<6;++role) {
-        snprintf(line,sizeof(line),"[JC] visibility cloth role=%u stock registered/dispatch/built/forwarded=%llu/%llu/%llu/%llu private=%llu/%llu/%llu/%llu",
+        snprintf(line,sizeof(line),"[JNET] visibility cloth role=%u stock registered/dispatch/built/forwarded=%llu/%llu/%llu/%llu private=%llu/%llu/%llu/%llu",
             role,(unsigned long long)counts[0][role][0],(unsigned long long)counts[0][role][1],
             (unsigned long long)counts[0][role][2],(unsigned long long)counts[0][role][3],
             (unsigned long long)counts[1][role][0],(unsigned long long)counts[1][role][1],
@@ -440,7 +480,7 @@ static void traveler_actor_visibility(uintptr_t render) {
         own_read(NULL,traveler_object+0x2000,effects,16) && own_read(NULL,traveler_object+0x10,position,16) &&
         own_read(NULL,traveler_object+0x50,flags,12) && own_read(NULL,traveler_object+0x1468,&cooldown,4) &&
         own_read(NULL,traveler_object+0x1430,&body_scale,4) && own_read(NULL,traveler_object+0xd40,symbols,1) && own_read(NULL,traveler_object+0x13e0,symbols+1,1);
-    snprintf(line,sizeof(line),"[JC] visibility actor sample=%llu read=%d xyz=%.3f/%.3f/%.3f dissolve/glow/snap/level=%.5f/%.5f/%.5f/%.5f symbols=%u/%u flags50=%02x%02x%02x%02x flags54=%02x%02x%02x%02x cooldown=%.4f scale=%.5f mask=%x/%x",
+    snprintf(line,sizeof(line),"[JNET] visibility actor sample=%llu read=%d xyz=%.3f/%.3f/%.3f dissolve/glow/snap/level=%.5f/%.5f/%.5f/%.5f symbols=%u/%u flags50=%02x%02x%02x%02x flags54=%02x%02x%02x%02x cooldown=%.4f scale=%.5f mask=%x/%x",
         (unsigned long long)samples,readable,position[0],position[1],position[2],effects[0],effects[1],effects[2],effects[3],
         symbols[0],symbols[1],flags[0],flags[1],flags[2],flags[3],flags[4],flags[5],flags[6],flags[7],cooldown,body_scale,mask,expected);
     message(line);
@@ -463,7 +503,7 @@ static void traveler_actor_visibility(uintptr_t render) {
             if (jc_appearance_kind(i)==0 && (bindings.found&(1u<<i)))
                 own_read(NULL,bindings.buffer+bindings.offsets[i],values+i,4);
         int glow_read=own_read(NULL,actor+0x1448,glow,sizeof(glow));
-        snprintf(line,sizeof(line),"[JC] appearance actor=%u code/field/parameter=%d/%d/%d found/zero=%x/%x atlas-handles=%llx/%llx detail/mask=%llx/%llx hardness/deco/hsv=%.4f/%.4f/%.4f/%.4f/%.4f glow-read=%d targets=%.4f/%.4f/%.4f current=%.4f/%.4f/%.4f",
+        snprintf(line,sizeof(line),"[JNET] appearance actor=%u code/field/parameter=%d/%d/%d found/zero=%x/%x atlas-handles=%llx/%llx detail/mask=%llx/%llx hardness/deco/hsv=%.4f/%.4f/%.4f/%.4f/%.4f glow-read=%d targets=%.4f/%.4f/%.4f current=%.4f/%.4f/%.4f",
             n,code,detail.field,detail.parameter,bindings.found,bindings.zero,
             (unsigned long long)bindings.textures[4].handle,(unsigned long long)bindings.textures[5].handle,
             (unsigned long long)bindings.textures[6].handle,(unsigned long long)bindings.textures[8].handle,
@@ -481,14 +521,14 @@ static void traveler_actor_visibility(uintptr_t render) {
         int read=own_read(NULL,actor+0xdd0,attachment,64) && own_read(NULL,actor+0xe10,relative,64) &&
             own_read(NULL,actor+0x2240,&glyph,8) && own_read(NULL,actor+0x64,&level,4) &&
             own_read(NULL,actor+0x1dfc,&pulse,1);
-        snprintf(line,sizeof(line),"[JC] glyph actor=%u read=%d pose=%d singular=%u definition=%llx glow=%.4f pulse=%u attachment-diag=%.4f/%.4f/%.4f relative-diag=%.4f/%.4f/%.4f",
+        snprintf(line,sizeof(line),"[JNET] glyph actor=%u read=%d pose=%d singular=%u definition=%llx glow=%.4f pulse=%u attachment-diag=%.4f/%.4f/%.4f relative-diag=%.4f/%.4f/%.4f",
             n,read,code,quality.singular,(unsigned long long)glyph,level,pulse,
             attachment[0],attachment[5],attachment[10],relative[0],relative[5],relative[10]);message(line);
         uint32_t identity=0,parameters=0,group=0;unsigned char gates[4]={0};
         int gates_read=own_read(NULL,actor+0x74,&identity,4) &&
             own_read(NULL,glyph+0xf20,&parameters,4) && own_read(NULL,glyph+0x704,&group,4) &&
             own_read(NULL,glyph+0x70c,gates,4);
-        snprintf(line,sizeof(line),"[JC] glyph gates actor=%u read=%d symbol=%u parameters=%u group=%u flags=%u/%u/%u/%u",
+        snprintf(line,sizeof(line),"[JNET] glyph gates actor=%u read=%d symbol=%u parameters=%u group=%u flags=%u/%u/%u/%u",
             n,gates_read,identity,parameters,group,gates[0],gates[1],gates[2],gates[3]);message(line);
         float world[16]={0},shape[2]={0};uint32_t draw_state=0,category=0;unsigned invalid=0;
         int world_read=own_read(NULL,glyph+0x540,world,64) && own_read(NULL,actor+0x1470,shape,4) &&
@@ -499,7 +539,7 @@ static void traveler_actor_visibility(uintptr_t render) {
         struct callback_read_budget floating_budget={.deadline=GetTickCount64()+5};
         int floating_code=jc_pose_storage_read(callback_read,&floating_budget,image,glyph+0x10,&floating_pose);
         if(!floating_code)floating_code=jc_pose_quality_read(callback_read,&floating_budget,floating_pose.model,&floating_quality);
-        snprintf(line,sizeof(line),"[JC] floating glyph actor=%u read=%d shape=%.5g/%.5g world-invalid=%u xyz=%.3f/%.3f/%.3f draw=%u/%u pose=%d matrices/invalid/singular=%u/%u/%u",
+        snprintf(line,sizeof(line),"[JNET] floating glyph actor=%u read=%d shape=%.5g/%.5g world-invalid=%u xyz=%.3f/%.3f/%.3f draw=%u/%u pose=%d matrices/invalid/singular=%u/%u/%u",
             n,world_read,shape[0],shape[1],invalid,world[12],world[13],world[14],draw_state,category,
             floating_code,floating_quality.count,floating_quality.nonfinite,floating_quality.singular);message(line);
         const uint64_t materials[3]={actor+0x830,actor+0xed0,glyph+0x90};
@@ -507,7 +547,7 @@ static void traveler_actor_visibility(uintptr_t render) {
             struct jc_shader_inputs storage={0};
             struct callback_read_budget budget={.deadline=GetTickCount64()+5};
             int result=jc_shader_storage_read(callback_read,&budget,materials[role],&storage);
-            snprintf(line,sizeof(line),"[JC] glyph material actor=%u role=%u code=%d shader=%llx bytes=%u",
+            snprintf(line,sizeof(line),"[JNET] glyph material actor=%u role=%u code=%d shader=%llx bytes=%u",
                 n,role,result,(unsigned long long)storage.shader,storage.bytes);message(line);
             if(role==2 && !floating_code && !result)
                 traveler_glyph_trace_bind(n,materials[role],floating_pose.model,storage.shader,render);
@@ -533,7 +573,7 @@ static void traveler_actor_visibility(uintptr_t render) {
 
                 }
             }
-            snprintf(line,sizeof(line),"[JC] glyph values actor=%u role=%u found=%x alpha/opacity/fade/scatter/soft/colour=%.5g/%.5g/%.5g/%.5g/%.5g/%.5g tex=%llx budget=%d",
+            snprintf(line,sizeof(line),"[JNET] glyph values actor=%u role=%u found=%x alpha/opacity/fade/scatter/soft/colour=%.5g/%.5g/%.5g/%.5g/%.5g/%.5g tex=%llx budget=%d",
                 n,role,found,scalars[0],scalars[1],scalars[2],scalars[3],scalars[4],scalars[5],
                 (unsigned long long)texture,budget.expired);message(line);
         }
@@ -552,7 +592,7 @@ static void traveler_actor_visibility(uintptr_t render) {
             if (!callback_read(&budget,queue+0x80+16*i,&model,8)) {qr=0;break;}
             hits+=model==pose.model;
         }
-        snprintf(line,sizeof(line),"[JC] visibility mesh=%u layout=%d model=%llx queue-read/count/hits=%d/%u/%u visibility=%d parts/extent/mask/cull=%u/%u/%d/%d pose=%d matrices/nonfinite/singular=%u/%u/%u budget=%d",
+        snprintf(line,sizeof(line),"[JNET] visibility mesh=%u layout=%d model=%llx queue-read/count/hits=%d/%u/%u visibility=%d parts/extent/mask/cull=%u/%u/%d/%d pose=%d matrices/nonfinite/singular=%u/%u/%u budget=%d",
             n,code,(unsigned long long)pose.model,qr,queued,hits,visible,visibility.parts,visibility.nondegenerate,
             visibility.mask_pass,visibility.culling,bones,quality.count,quality.nonfinite,quality.singular,budget.expired);
         message(line);
@@ -567,7 +607,7 @@ static void traveler_actor_visibility(uintptr_t render) {
         struct jc_render_visibility visibility={0};struct jc_shader_inputs inputs={0};
         int visible=jc_render_visibility_read(callback_read,&budget,m->model,mask,expected,&visibility);
         int shader=jc_shader_inputs_read(callback_read,&budget,(uintptr_t)m->subscriber+0x88,&inputs);
-        snprintf(line,sizeof(line),"[JC] visibility private role=%u model=%llx visibility=%d parts/extent/mask/cull=%u/%u/%d/%d shader-first-binding=%d found/finite/zero=%x/%x/%x dissolve-milli=%ld budget=%d",
+        snprintf(line,sizeof(line),"[JNET] visibility private role=%u model=%llx visibility=%d parts/extent/mask/cull=%u/%u/%d/%d shader-first-binding=%d found/finite/zero=%x/%x/%x dissolve-milli=%ld budget=%d",
             role,(unsigned long long)m->model,visible,visibility.parts,visibility.nondegenerate,visibility.mask_pass,
             visibility.culling,shader,inputs.found,inputs.finite,inputs.zero,(long)inputs.dissolve_milli,budget.expired);
         message(line);
@@ -578,15 +618,20 @@ static void traveler_actor_visibility(uintptr_t render) {
 static void traveler_actor_render(uintptr_t barn,uintptr_t render) {
     if (traveler_actor && barn==traveler_barn && traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE &&
         traveler_actor->update_frame==(uint32_t)JNETFrames) {
+        uint64_t started=traveler_actor_cost_begin();
         traveler_actor_report(jc_actor_runtime_after_render(traveler_actor,(uint32_t)JNETFrames,render));
+        traveler_actor_cost_end(38,started);
         traveler_actor_visibility(render);
     }
 }
 static uintptr_t traveler_finish_observer(uintptr_t barn) {
     uintptr_t result=original_traveler_finish(barn);
     if(traveler_actor && barn==traveler_barn && traveler_actor->state==JC_ACTOR_RUNTIME_ACTIVE &&
-        traveler_actor->update_frame==(uint32_t)JNETFrames)
+        traveler_actor->update_frame==(uint32_t)JNETFrames){
+        uint64_t started=traveler_actor_cost_begin();
         traveler_actor_report(jc_actor_runtime_after_finish(traveler_actor,(uint32_t)JNETFrames));
+        traveler_actor_cost_end(40,started);
+    }
     return result;
 }
 #endif

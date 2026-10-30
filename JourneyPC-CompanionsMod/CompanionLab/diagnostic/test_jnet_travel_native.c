@@ -21,12 +21,33 @@ static unsigned jnet_windwalls=1,jnet_sliding=1,jnet_freezing=1,jnet_blackness=1
 static unsigned jnet_fog __attribute__((used))=1;
 static int jc_local_windows_write(uintptr_t at,const void *data,size_t bytes){memcpy((void *)at,data,bytes);return 1;}
 #include "jnet_options_live.h"
+typedef struct {int top;} lua_State;
+static int fade_failure,fade_calls;
+static int gettop(lua_State *s){return s->top;}
+static void settop(lua_State *s,int top){s->top=top;}
+static int original_loadbuffer(lua_State *s,const char *code,size_t size,const char *name,const char *mode){
+    assert(size==strlen(code) && !strcmp(name,"JNET-travel-fade") && !strcmp(mode,"t"));
+    assert(strstr(code,"e:fadeIn(1)") && strstr(code,"e:duration(2)") && strstr(code,"e:texName('Black')"));
+    ++s->top;return fade_failure==1;
+}
+static int pcallfn(lua_State *s,int a,int b,int c,int d,void *e){
+    (void)a;(void)b;(void)c;(void)d;(void)e;++fade_calls;--s->top;return fade_failure==2;
+}
 #include "chapter_code.h"
 static void menu_frame_fixture(uintptr_t menu,uintptr_t game){(void)menu;(void)game;}
+static void menu_initialize_native(uintptr_t menu,uintptr_t game){
+    void (__attribute__((ms_abi)) *native)(uintptr_t,uintptr_t)=(void *)(fault_image+0x21a9b0);
+    native(menu,game);
+}
 static void environment_native(uintptr_t env,uintptr_t resources,uintptr_t lua,float dt,
         uintptr_t position,uintptr_t camera,uintptr_t terrain,uintptr_t extra) {
     void (__attribute__((ms_abi)) *native)(uintptr_t,uintptr_t,uintptr_t,float,uintptr_t,uintptr_t,uintptr_t,uintptr_t)=(void *)(fault_image+0xc69b0);
     native(env,resources,lua,dt,position,camera,terrain,extra);
+}
+static void environment_changed(uintptr_t env,uintptr_t resources,uintptr_t lua,float dt,
+        uintptr_t position,uintptr_t camera,uintptr_t terrain,uintptr_t extra) {
+    (void)resources;(void)lua;(void)dt;(void)position;(void)camera;(void)terrain;(void)extra;
+    float replacement=77;memcpy((void *)(env+0x70+0x14c),&replacement,4);
 }
 static void test_blackness(void) {
     unsigned char *env=calloc(1,0x8090);assert(env);pointer(env,(void *)(fault_image+0x5d7b60));
@@ -58,6 +79,13 @@ static void test_blackness(void) {
     env[0x70+0x144]=0;assert(jnet_environment_endpoint((uintptr_t)env,-1000)==north);
     assert(!jnet_environment_endpoint((uintptr_t)env,NAN));
     count=33;memcpy(env+0x3c70,&count,4);assert(!jnet_environment_endpoint((uintptr_t)env,-1000));
+    count=2;memcpy(env+0x3c70,&count,4);env[0x70+0x144]=1;
+    _Alignas(16) float outside[4]={0,0,-1000,1};
+    jnet_blackness=0;jnet_options_failed=0;jnet_environment_update_original=environment_changed;
+    jnet_environment_update((uintptr_t)env,0,0,.016f,(uintptr_t)outside,0,0,0);
+    float replacement=0;memcpy(&replacement,env+0x70+0x14c,4);
+    assert(replacement==77 && jnet_blackness==1 && jnet_options_failed);
+    jnet_environment_update_original=environment_native;jnet_options_failed=0;
     free(env);jnet_blackness=1;
     puts("Blackness: pinned native environment sampler reproduces Barrens cutoff; Off preserves endpoint colors, On restores clearing, in-range blend unchanged, node radii and sample position restored. GPU rendering not exercised.");
 }
@@ -70,6 +98,7 @@ int main(void) {
     image[0xc588a]=0xff;image[0xc588b]=0xe0;
     jnet_environment_copy_original=(void *)(image+0x108000);
     assert(!mprotect(image+0x274000,0x1000,PROT_READ|PROT_EXEC));
+    assert(!mprotect(image+0x21a000,0x1000,PROT_READ|PROT_EXEC));
     assert(!mprotect(image,0x110000,PROT_READ|PROT_EXEC));
     unsigned char *game=calloc(1,0x1c1000),*sound=calloc(1,0x7c800),*match=calloc(1,0x12000);
     assert(game && sound && match);pointer(game+0x150,sound);pointer(game+0x180,match);
@@ -81,8 +110,17 @@ int main(void) {
         queue(game,names[i],1,1);float delay;memcpy(&delay,game+0x1c0370,4);
         assert(!strcmp((char *)game+0x1c0330,names[i]) && delay==-1.f && game[0x2a6]==1);
         assert(!strcmp((char *)game+0x1c02f0,"Level_Desert") && game[0x1c0374]==0x5a);
+        queue(game,names[i],0,i!=0);
+        memcpy(&delay,game+0x1c0370,4);
+        float native_delay=0;memcpy(&native_delay,image+0xd7fc34,4);
+        assert(delay==native_delay && delay>0 && game[0x2a6]==(i!=0));
     }
     fault_image=(uintptr_t)image;
+    lua_State lua={7};pointer(game+0x20,&lua);
+    assert(jnet_travel_fade((uintptr_t)game) && lua.top==7 && fade_calls==1);
+    fade_failure=1;assert(!jnet_travel_fade((uintptr_t)game) && lua.top==7 && fade_calls==1);
+    fade_failure=2;assert(!jnet_travel_fade((uintptr_t)game) && lua.top==7 && fade_calls==2);
+    fade_failure=0;pointer(game+0x20,NULL);assert(!jnet_travel_fade((uintptr_t)game));
     test_blackness();
     _Alignas(16) unsigned char environment[0x1e0]={0},other[0x1e0]={0};
     float close_alpha=.7f,far_alpha=.9f,actual=0;
@@ -115,6 +153,20 @@ int main(void) {
     unsigned char *save=malloc(0x1bc0),menu[0xf0];assert(save);
     memset(save,0xa5,0x1bc0);memset(menu,0xa5,sizeof(menu));
     pointer(save,image+0x5e3178);pointer(menu,image+0x679c18);pointer(game+0x170,save);
+    jnet_menu_initialize_original=menu_initialize_native;
+    for(unsigned repeat=0;repeat<3;++repeat){
+        uint64_t entry=1;memcpy(menu+0xe8,&entry,8);
+        jnet_chapter_entry_game=0;
+        jnet_menu_initialize((uintptr_t)menu,(uintptr_t)game);
+        memcpy(&entry,menu+0xe8,8);assert(entry==UINT64_C(0x100000002));
+        entry=1;memcpy(menu+0xe8,&entry,8);
+        jnet_chapter_entry_game=(uintptr_t)game;
+        jnet_menu_initialize((uintptr_t)menu,(uintptr_t)game);
+        memcpy(&entry,menu+0xe8,8);assert(entry==1 && !menu[0x20] && menu[0x21]==1);
+        assert(!jnet_chapter_entry_game);
+    }
+    puts("Chapter Select initialization: original native counter increments reproduced; requested hub entry restored after initialization; unrelated initialization unchanged.");
+    menu[0x20]=1;
     jnet_menu_frame_original=menu_frame_fixture;
     jnet_menu_frame((uintptr_t)menu,(uintptr_t)game);
     assert(!jnet_travel_playable_menu());
@@ -126,7 +178,7 @@ int main(void) {
     for(unsigned level=0;level<12;++level) {
         assert(jnet_travel_entry_chapter(level,0,0,0)==(level==0));
         assert(!jnet_travel_entry_chapter(level,0,0,1));
-        assert(!jnet_travel_entry_chapter(level,1,0,0));
+        assert(jnet_travel_entry_chapter(level,1,0,0)==(level==0?2:0));
     }
     assert(jnet_travel_entry_chapter(0,1,1,0));
     assert(!jnet_travel_menu_prepare((uintptr_t)game+1,1));
@@ -137,13 +189,18 @@ int main(void) {
         strcpy((char *)game+0x1c02f0,"Level_Graveyard");
         queue(game,names[0],0,0);
         assert(!strcmp((char *)game+0x1c0330,"Level_Graveyard") && !game[0x2a6]);
-        assert(save[0x50]==1 && !menu[0x20] && menu[0x21]==1);
-        uint64_t value=0;memcpy(&value,menu+0xe8,4);assert(!value && menu[0xec]==0xa5);
+        assert(save[0x50]==1 && !menu[0x20] && !menu[0x21]);
+        uint64_t value=0;memcpy(&value,menu+0xe8,8);assert(value==1);
         for(unsigned i=0;i<13;++i){memcpy(&value,save+0x60+i*0x158,8);assert(!value);}
         assert(save[0x10]==0xa5 && save[0x18]==0xa5 && save[0x20]==0xa5 && save[0x54]==0xa5);
         assert(!game[0x1c0374] && !game[0x1c037f]);
     }
     memset(save+8,0xa5,0x1ba8);
+    memset(game+0x1c0374,0xa5,12);
+    assert(jnet_travel_menu_prepare((uintptr_t)game,2));
+    uint32_t new_journey=1;memcpy(&new_journey,menu+0xe8,4);assert(!new_journey);
+    for(unsigned i=0;i<12;++i)assert(!game[0x1c0374+i]);
+    for(unsigned i=8;i<0x1bb0;++i)assert(save[i]==0xa5);
     for(unsigned level=1;level<12;++level){
         menu[0x20]=1;menu[0x21]=0;
         assert(jnet_travel_menu_prepare((uintptr_t)game,0));
@@ -151,7 +208,7 @@ int main(void) {
         for(unsigned i=8;i<0x1bb0;++i)assert(save[i]==0xa5);
     }
     free(save);
-    puts("Chapter Select: guarded native entry state, playable entry event instead of boot event, gameplay menu flags, preserved outfit/scarf/progression, repeated Graveyard queue verified in isolation.");
+    puts("Chapter Select: native boot entry and both event counters restored, preserved outfit/scarf/progression, repeated Graveyard queue verified in isolation.");
     const size_t sites[]={0x187f67,0x170e22,0x170e9c,0x17dab7},sizes[]={6,6,4,11};
     const unsigned char off[4][16]={{0x66,0xc7,0x41,8,1,1},{0x66,0xc7,0x42,9,0,1},{0xc6,0x43,0x0a,1},{0x0f,0x92,0xc0,0x88,0x43,9,0x48,0x8b,0x5c,0x24,0x30}};
     const unsigned char on[4][16]={{0x66,0xc7,0x41,8,0,0},{0x66,0xc7,0x42,9,0,0},{0xc6,0x43,0x0a,0},{0x31,0xc0,0x88,0x43,9,0x90,0x48,0x8b,0x5c,0x24,0x30}};

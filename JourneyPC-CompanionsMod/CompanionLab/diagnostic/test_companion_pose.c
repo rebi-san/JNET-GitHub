@@ -169,6 +169,12 @@ int main(void) {
     animation_packets(build); appearance_packets(build);
     struct jc_pose_sample sample={.identity={2},.sequence=1,.chapter=2,.transform={1,0,0,0,0,1,0,0,0,0,1,0,30,40,50,1}};
     assert(jc_pose_encode(build,&sample,mac,NULL,packet)); socket_roundtrip(packet,build);
+    assert(!memcmp(packet,"JNP5",4) && sizeof(packet)==568 && jc_session_get(packet+4,2)==5);
+    memcpy(other,packet,sizeof(packet));memcpy(other,"JCP5",4);
+    assert(mac(NULL,other,JC_POSE_BODY,other+JC_POSE_BODY));
+    struct jc_pose_receiver legacy_receiver={0};
+    assert(jc_pose_receive(&legacy_receiver,build,other,sizeof(other),2,1000,mac,NULL)==3);
+    assert(!legacy_receiver.paired && !legacy_receiver.sample.sequence);
     struct jc_pose_receiver receiver={0},saved;
     assert(!jc_pose_receive(&receiver,build,packet,sizeof(packet),2,1000,mac,NULL));
     assert(jc_pose_fresh(&receiver,2,5999) && !jc_pose_fresh(&receiver,2,6000));

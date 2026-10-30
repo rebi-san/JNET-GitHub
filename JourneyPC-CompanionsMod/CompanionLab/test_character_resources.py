@@ -185,11 +185,11 @@ class CharacterResourcesTest(unittest.TestCase):
                                 function event:glowMax(value) self.maximum = value end
                                 function event:glowMin(value) self.minimum = value end
                             end
-                            if kind == 'CreaB_WhaleRide' or kind == 'ProtoClothMagnetize' then
+                            if kind == 'CreaB_WhaleRide' or kind == 'ProtoClothMagnetize' or kind == 'CreaB_Rideable' then
                                 rides[#rides + 1] = kind
                                 local settings = {}
                                 rideSettings[#rideSettings + 1] = settings
-                                for _, field in ipairs({'allignMult','magnetizeMult','pullMult','attractToCloth','alignToDirection','bridgeStiffness','clothStiffness','magnetizeToPlayer','snapToCenter'}) do
+                                for _, field in ipairs({'allignMult','magnetizeMult','pullMult','attractToCloth','alignToDirection','bridgeStiffness','clothStiffness','magnetizeToPlayer','snapToCenter','dirSpeedMult','dudeSpeedMult','nearestSegVelMax','nearestSegVelMult','rideYOffsetMultHorz','rideYOffsetMultVert','canJumpOff','canMoveOff','disableAfterDrop','ignoreCreatureOwner','enforcePickup'}) do
                                     event[field] = function(_, value) rideValues[field] = value; settings[field] = value end
                                 end
                             end
@@ -207,7 +207,7 @@ class CharacterResourcesTest(unittest.TestCase):
                     function TriggerInitialize() end
                     Class = {cast = function(value) return value end}
                     CreaB_WhaleRide, ProtoClothMagnetize, ProtoClothGlow, ClothSetColors = Class, Class, Class, Class
-                    Crea_Attack, Crea_AttackHandler = Class, Class
+                    Crea_Attack, Crea_AttackHandler, CreaB_Rideable = Class, Class, Class
                     __JNETCharacterInstances = {}
                 ''')
                 for row in assembly['objects'].values():
@@ -222,10 +222,10 @@ class CharacterResourcesTest(unittest.TestCase):
                 self.assertEqual(lua.globals().eventCount, int(budget[1].split(',')[3]))
                 self.assertEqual(lua.globals().persistentCount, int(character == 'War Machine'))
                 self.assertEqual(list(lua.globals().rides.values()),
-                                 ['ProtoClothMagnetize','ProtoClothMagnetize'] if character == 'Longtail' else ['CreaB_WhaleRide'])
+                                 ['ProtoClothMagnetize','CreaB_Rideable'] if character == 'Longtail' else ['CreaB_WhaleRide'])
                 values = dict(lua.globals().rideValues.items())
-                self.assertEqual(values, {'attractToCloth': 1, 'alignToDirection': 1, 'bridgeStiffness': 1, 'clothStiffness': 1, 'magnetizeToPlayer': 1, 'snapToCenter': 1} if character == 'Longtail' else
-                                 {'allignMult': 1, 'magnetizeMult': 1, 'pullMult': 1})
+                if character != 'Longtail':
+                    self.assertEqual(values, {'allignMult': 1, 'magnetizeMult': 1, 'pullMult': 1})
                 if character == 'Longtail':
                     root = assembly['objects'][assembly['root']]
                     self.assertEqual(len(assembly['objects'][root['Vars']['segments']['ref']]['Objects']), 1)
@@ -234,8 +234,10 @@ class CharacterResourcesTest(unittest.TestCase):
                     self.assertEqual(normal['alignToDirection'], .5)
                     self.assertEqual(normal['bridgeStiffness'], .5)
                     self.assertEqual(normal['snapToCenter'], 0)
-                    self.assertEqual(held['alignToDirection'], 1)
-                    self.assertEqual(held['snapToCenter'], 1)
+                    self.assertEqual(held, {'dirSpeedMult': .25, 'dudeSpeedMult': .5,
+                        'nearestSegVelMax': 2, 'nearestSegVelMult': 1, 'rideYOffsetMultHorz': .25,
+                        'rideYOffsetMultVert': 1, 'canJumpOff': False, 'canMoveOff': False,
+                        'disableAfterDrop': False, 'ignoreCreatureOwner': True, 'enforcePickup': True})
                 if character in ('Longtail', 'Whale'):
                     self.assertEqual(len(lua.globals().colors), 0)
                     for index, variant in enumerate((1, 0, 1), 1):
@@ -266,6 +268,8 @@ class CharacterResourcesTest(unittest.TestCase):
                         for param in params:
                             actual = material.params[param['ParamName']]
                             expected_value = param['ParamVal']
+                            if row['Mesh'] == 'JNETCharacter_P_MechHeadGlowMask' and param['ParamName'] == 'alphaFade':
+                                expected_value = 0
                             if param['ParamType'] == 'float4':
                                 actual = list(actual.values())
                                 expected_value = list(expected_value)
@@ -329,7 +333,7 @@ class CharacterResourcesTest(unittest.TestCase):
         self.assertNotIn('.gz', header)
         for name, payload in files.items():
             self.assertTrue(name.startswith('JNET_'))
-            key = 'JC_' + name.removeprefix('JNET_').removesuffix('.D3D11x64')
+            key = character_resource_name('MeshAnimation', name.removeprefix('JNET_').removesuffix('.D3D11x64'))
             self.assertLess(len(key),16)
             self.assertIn('"' + key + '","' + name + '"', header)
             with tarfile.open(fileobj=io.BytesIO(bundles[key + '.Phyre.D3D11x64.gz'])) as archive:
@@ -359,12 +363,23 @@ class CharacterResourcesTest(unittest.TestCase):
     def test_native_animation_slot_does_not_overwrite_index(self):
         old = b'JNETCharacter_WingSpin\0'
         self.assertEqual(int.from_bytes(old[16:20], 'little'), 0x7053676e)
-        alias = character_resource_name('MeshAnimation', 'WingSpin').encode() + b'\0'
-        slot = bytearray(16) + b'\xff' * 4
-        slot[:len(alias)] = alias
-        self.assertEqual(slot[16:20], b'\xff' * 4)
+        image = (Path(__file__).resolve().parents[1].parent / 'JourneyPC/Journey.exe').read_bytes()
+        names = [name for kind, name in character_resources(image) if kind == 'MeshAnimation']
+        self.assertEqual(len(names), 10)
+        aliases = {character_resource_name('MeshAnimation', name) for name in names}
+        self.assertEqual(len(aliases), len(names))
+        self.assertEqual(character_resource_name('MeshAnimation', 'FlatFishFlip'), 'JNET_FishFlip')
+        self.assertEqual(character_resource_name('MeshAnimation', 'FlatFishSwim'), 'JNET_FishSwim')
+        for alias in aliases:
+            self.assertTrue(alias.startswith('JNET_'))
+            slot = bytearray(16) + b'\xff' * 4
+            data = alias.encode() + b'\0'
+            slot[:len(data)] = data
+            self.assertEqual(len(slot), 20)
+            self.assertEqual(slot[16:20], b'\xff' * 4)
+        self.assertEqual(len(character_resource_name('MeshAnimation', 'A' * 10)), 15)
         with self.assertRaisesRegex(ValueError, '16-byte slot'):
-            character_resource_name('MeshAnimation', 'A' * 13)
+            character_resource_name('MeshAnimation', 'A' * 11)
 
     def test_private_resources_and_animation_references(self):
         image = (Path(__file__).resolve().parents[1].parent / 'JourneyPC/Journey.exe').read_bytes()
@@ -432,6 +447,8 @@ class CharacterResourcesTest(unittest.TestCase):
         resources = character_resources(image)
         bundles = character_animation_bundles(image)
         header = character_animation_bundle_header(image)
+        sources = {character_resource_name(kind, name): desc['source']
+                   for (kind, name), desc in resources.items() if kind == 'MeshAnimation'}
         expected = {character_resource_name(kind, name) for kind, name in resources if kind == 'MeshAnimation'}
         self.assertEqual({name.removesuffix('.Phyre.D3D11x64.gz') for name in bundles}, expected)
         self.assertEqual(bundles, character_animation_bundles(image))
@@ -443,7 +460,7 @@ class CharacterResourcesTest(unittest.TestCase):
                 listing = archive.extractfile(archive.getmembers()[0]).read().decode('ascii').splitlines()
                 self.assertEqual(listing[0], key)
                 animation = archive.extractfile(listing[1]).read()
-                source = resources['MeshAnimation', key.removeprefix('JC_')]['source']
+                source = sources[key]
                 original = Path(__file__).resolve().parents[1].parent / 'JourneyPC/Data/Meshes' / (Path(source).stem + '.D3D11x64')
                 native = original.read_bytes()
                 self.assertEqual(len(animation), len(native))

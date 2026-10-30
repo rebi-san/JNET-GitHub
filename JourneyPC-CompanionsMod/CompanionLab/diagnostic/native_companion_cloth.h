@@ -198,6 +198,22 @@ static inline int jc_cloth_atlas_loaded(jc_layout_reader read,void *ctx,uint64_t
 }
 /* The steady appearance branch of 24c010, limited to our two owned descriptors.
    No global appearance state, effects, resizing or native-player flags are used. */
+static inline int jc_cloth_scarf_resize(jc_layout_reader read,jc_cloth_writer write,
+        void *ctx,uint64_t image,uint64_t dude) {
+    uint32_t capacity,maximum,rows;unsigned char pending;
+    if (!jc_layout_field(read,ctx,dude,0x6c,&capacity,4) ||
+        !jc_layout_field(read,ctx,image,0x731fb0,&maximum,4) ||
+        !jc_layout_field(read,ctx,dude,0x1460,&rows,4) ||
+        !jc_layout_field(read,ctx,dude,0x9ba0,&pending,1)) return JC_CLOTH_READ;
+    if (!maximum || maximum>4096 || capacity>4096) return JC_CLOTH_PROPERTIES;
+    unsigned wanted=(unsigned)((float)capacity/(float)maximum*73.f+1.5f);
+    if(wanted<2)wanted=2;
+    if(wanted>73)wanted=73;
+    if(rows==wanted || pending)return JC_CLOTH_OK;
+    pending=1;
+    return write(ctx,dude+0x9ba0,&pending,1)?JC_CLOTH_OK:JC_CLOTH_CALL;
+}
+
 static inline int jc_cloth_scarf_step(jc_layout_reader read,jc_cloth_writer write,void *ctx,
         struct jc_cloth_lease *lease,uint64_t timer) {
     uint32_t scarf[3],maximum; float dt;

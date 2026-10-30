@@ -401,6 +401,20 @@ static void test_color_preparation(void) {
     value=image+0x664168;memcpy(f.bytes+event,&value,8);
     assert(!jnet_character_color_ready(visual_read,&f,image,event,mesh,1,1));
 }
+static void test_grab_preparation(void) {
+    struct fixture f={0};uint64_t event=0x10000,creature=0x20000,clump=0x30000,items=0x40000;
+    put(&f,event,image+0x671358,8);put(&f,creature,image+0x5ce668,8);
+    put(&f,event+0x48,clump,8);put(&f,clump+8,items,8);put(&f,clump+0x10,1,8);
+    put(&f,items,creature,8);put(&f,creature+0xb10,1,4);put(&f,event+0x90,0,8);
+    assert(jnet_character_grab_ready(read_cell,&f,image,event,creature));
+    put(&f,event+0x90,creature,8);assert(jnet_character_grab_ready(read_cell,&f,image,event,creature));
+    put(&f,event+0x90,creature+1,8);assert(!jnet_character_grab_ready(read_cell,&f,image,event,creature));
+    put(&f,event+0x90,0,8);put(&f,creature+0xb10,0,4);
+    assert(!jnet_character_grab_ready(read_cell,&f,image,event,creature));
+    put(&f,creature+0xb10,17,4);assert(!jnet_character_grab_ready(read_cell,&f,image,event,creature));
+    put(&f,creature+0xb10,1,4);put(&f,items,creature+1,8);
+    assert(!jnet_character_grab_ready(read_cell,&f,image,event,creature));
+}
 static void test_ride_preparation(void) {
     struct visual_fixture f={0};uint64_t event=0x100,creature=0x1000,value;
     const uint64_t addresses[]={event,creature,event+0x68,0x2010,0x2008,0x2100,creature+0xe8,0x2208};
@@ -470,6 +484,13 @@ static void test_attack_state_and_targets(void) {
     assert(!jnet_character_attack_ready(visual_read,&f,image,event,handler,creature,eye));
 }
 int main(void) {
+    {
+        float q[4]={0,.70710678f,0,.70710678f},v[3]={3,2,0},rotated[3],back[3];
+        jnet_character_ride_rotate(q,v,rotated);
+        assert(fabsf(rotated[0])<.00001f && fabsf(rotated[1]-2)<.00001f && fabsf(rotated[2]+3)<.00001f);
+        q[1]=-q[1];jnet_character_ride_rotate(q,rotated,back);
+        for(unsigned k=0;k<3;++k)assert(fabsf(back[k]-v[k])<.00001f);
+    }
     test_attack_state_and_targets();
     {
         struct visual_fixture f={0};uint64_t dude=0x100;
@@ -486,7 +507,7 @@ int main(void) {
         f.denied=dude+0x10;
         assert(!jnet_character_ride_glow(visual_read,visual_write,&f,dude,before));
     }
-    test_ride_preparation();test_cloth_ride_preparation();test_glow_preparation();test_color_preparation();
+    test_grab_preparation();test_ride_preparation();test_cloth_ride_preparation();test_glow_preparation();test_color_preparation();
     test_animation_preparation();
     test_vortex_and_teleport();
     test_teleport_reuse();

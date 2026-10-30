@@ -57,6 +57,27 @@ def profiles():
         values = params(row)
         if values.get('tex') in ('Sun', 'Moon'):
             summit['suns'][name] = dict(day=values, night=values, separate=values['tex'])
+    for name, phase in (('6138d402a31a69498e14158615877fc5', 'Sun'),
+                        ('50806e6c9116663ca29ca8ba955813ef', 'Moon')):
+        row = decorations('Level_Summit')[name]
+        if row['Mesh'] != 'P_SkyRamp':
+            raise ValueError('Summit sky ramp mismatch')
+        values = params(row)
+        summit['clouds'].pop(name, None)
+        summit['suns'][name] = dict(day=values, night=values, separate=phase)
+    for name in ('c8a3854cb941f5b7bd82df63e0142f5a',
+                 'f281fa80e26c5507b8be57bb6c447200',
+                 '5fd6b7b0c8eef88daaeda898ce399893',
+                 '570c221cd2f9048548590784dd5b92ff',
+                 'd0bcda556118028a6ff1dd52de6ea5b1',
+                 '34b9219071a7c1eaa85c2bae204f2e98',
+                 '9467edcaf435a69e22e2d37d2a189076'):
+        row = decorations('Level_Summit')[name]
+        if row['Mesh'] != 'P_ShadowPlane':
+            raise ValueError('Summit shadow plane mismatch')
+        values = params(row)
+        summit['clouds'].pop(name, None)
+        summit['suns'][name] = dict(day=values, night=values, separate='Sun')
     return output
 
 

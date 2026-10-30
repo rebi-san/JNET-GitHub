@@ -12,9 +12,9 @@ int main(void) {
     assert(cloth.draft.character==JNET_CHARACTER_WHALE);
     assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX) && cloth.draft.variant==1);
     cloth.draft.character=JNET_CHARACTER_WAR_MACHINE;
-    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX) && cloth.draft.variant==2);
-    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX) && cloth.draft.variant==0);
-    assert(!jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,-1,JNET_SCARF_MAX) && cloth.draft.variant==2);
+    assert(jnet_appearance_row_count(JNET_CHARACTER_WAR_MACHINE)==6);
+    assert(jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX)==JNET_MENU_UNAVAILABLE);
+    cloth.draft.variant=2;
     cloth.draft.character=JNET_CHARACTER_WAYFARER;
     assert(jnet_appearance_apply(&cloth,JNET_SCARF_MAX,0)==JNET_MENU_INVALID);
     assert(jnet_appearance_step(&cloth,JNET_SELECT_VARIANT,1,JNET_SCARF_MAX)==JNET_MENU_UNAVAILABLE);

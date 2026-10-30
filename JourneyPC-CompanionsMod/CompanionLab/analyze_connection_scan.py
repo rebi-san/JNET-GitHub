@@ -181,7 +181,7 @@ def clock_valid(frame, duration, bounds):
 
 
 def summarize(records):
-    if not records or records[0].get("format") != "jc-native-connection-1":
+    if not records or records[0].get("format") not in ("jnet-native-connection-1", "jc-native-connection-1"):
         raise ValueError("Unsupported connection capture")
     if records[0].get("game_sha256") != EXPECTED_EXE:
         raise ValueError("Unrecognized executable fingerprint")

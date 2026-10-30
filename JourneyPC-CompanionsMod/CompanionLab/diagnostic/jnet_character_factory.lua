@@ -67,6 +67,11 @@ for _, name in ipairs(names) do
             desc.ShaderParams = resolve(row.CoatingParams)
             desc.ShaderParams[#desc.ShaderParams + 1] = {ParamType="texture", ParamName="duneTexture", ParamVal=skin == 2 and "White" or "DuneColorShadow"}
         end
+        if row.Mesh == 'JNETCharacter_P_MechHeadGlowMask' then
+            for _, param in ipairs(desc.ShaderParams) do
+                if param.ParamName == 'alphaFade' then param.ParamVal = 0 end
+            end
+        end
         local matrix = desc.Transformation
         desc.Transformation = {
             {matrix[1], matrix[2], matrix[3], matrix[4]},
@@ -138,14 +143,22 @@ else
 end
 events[#events + 1] = ride
 if assembly.character == 'Longtail' then
-    local grab = ProtoClothMagnetize.cast(game:eventBarn():MetaAddEvent('ProtoClothMagnetize'))
-    grab:cloth(cloth)
-    grab:alignToDirection(1)
-    grab:bridgeStiffness(1)
-    grab:clothStiffness(1)
-    grab:magnetizeToPlayer(1)
-    grab:snapToCenter(1)
-    grab:attractToCloth(1)
+    local grab = CreaB_Rideable.cast(game:eventBarn():MetaAddEvent('CreaB_Rideable'))
+    grab:creatures(selfClump)
+    grab:dropRegions(nil)
+    grab:fxOnPickup(nil)
+    grab:fxOnDrop(nil)
+    grab:dirSpeedMult(0.25)
+    grab:dudeSpeedMult(0.5)
+    grab:nearestSegVelMax(2)
+    grab:nearestSegVelMult(1)
+    grab:rideYOffsetMultHorz(0.25)
+    grab:rideYOffsetMultVert(1)
+    grab:canJumpOff(false)
+    grab:canMoveOff(false)
+    grab:disableAfterDrop(false)
+    grab:ignoreCreatureOwner(true)
+    grab:enforcePickup(true)
     events[#events + 1] = grab
 end
 local attack, handler

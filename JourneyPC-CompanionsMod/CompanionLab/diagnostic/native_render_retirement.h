@@ -109,6 +109,15 @@ static inline void jc_live_retirement_poll(struct jc_live_retirement *r) {
     }
     ReleaseSRWLockExclusive(&r->lock);
 }
+static inline int jc_live_retirement_needs_poll(struct jc_live_retirement *r) {
+    int pending=0;
+    AcquireSRWLockExclusive(&r->lock);
+    for (unsigned i=0;i<JC_RETIRE_SLOTS;++i)
+        if (r->state.entries[i].phase==JC_RETIRE_GPU &&
+            r->state.entries[i].thread==GetCurrentThreadId()) {pending=1;break;}
+    ReleaseSRWLockExclusive(&r->lock);
+    return pending;
+}
 static inline void jc_live_retirement_progress(struct jc_live_retirement *r) {
     AcquireSRWLockExclusive(&r->lock);
     for (unsigned i=0;i<JC_RETIRE_SLOTS;++i) {

@@ -101,7 +101,7 @@ static inline int jc_session_encode(const unsigned char room[16],const struct jc
     size_t size=v->type==JC_SESSION_STATE ? JC_SESSION_STATE_BYTES : JC_SESSION_HEADER;
     if (capacity<size) return JC_SESSION_ARGUMENT;
     if (v->type==JC_SESSION_STATE && !jc_motion_valid(&v->motion)) return JC_SESSION_VALUE;
-    memset(data,0,size); memcpy(data,"JCS1",4);
+    memset(data,0,size); memcpy(data,"JNS1",4);
     jc_session_put(data+4,1,2); jc_session_put(data+6,v->type,2);
     jc_session_put(data+8,size,2); memcpy(data+12,room,16);
     jc_session_put(data+28,v->id,8); jc_session_put(data+36,v->lease,8);
@@ -123,7 +123,7 @@ static inline int jc_session_receive(struct jc_session *s,uint64_t bound_id,uint
     if (m->attempts>=JC_SESSION_BURST) return JC_SESSION_RATE;
     ++m->attempts;
     if (!data || (size!=JC_SESSION_HEADER && size!=JC_SESSION_STATE_BYTES)) return JC_SESSION_FORMAT;
-    if (memcmp(data,"JCS1",4) || jc_session_get(data+8,2)!=size || jc_session_get(data+10,2))
+    if (memcmp(data,"JNS1",4) || jc_session_get(data+8,2)!=size || jc_session_get(data+10,2))
         return JC_SESSION_FORMAT;
     if (jc_session_get(data+4,2)!=1) return JC_SESSION_VERSION;
     if (memcmp(s->room,data+12,16)) return JC_SESSION_ROOM;

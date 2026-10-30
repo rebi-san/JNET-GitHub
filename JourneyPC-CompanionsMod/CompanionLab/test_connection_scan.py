@@ -17,7 +17,16 @@ def sample(ms, connected=0, gate=0, clock=0):
 
 class ConnectionScanTests(unittest.TestCase):
     def header(self):
-        return dict(format="jc-native-connection-1", game_sha256=EXPECTED_EXE, version="0.73")
+        return dict(format="jnet-native-connection-1", game_sha256=EXPECTED_EXE, version="0.73")
+
+    def test_current_and_historical_capture_names(self):
+        records = [self.header(), sample(0), sample(250, 1, 1), dict(end=True, error=0)]
+        current = summarize(records)
+        records[0]["format"] = "jc-native-connection-1"
+        self.assertEqual(summarize(records), current)
+        records[0]["format"] = "unsupported"
+        with self.assertRaises(ValueError):
+            summarize(records)
 
     def test_native_clock_below_asset_start(self):
         for clock in (0, .004938841):

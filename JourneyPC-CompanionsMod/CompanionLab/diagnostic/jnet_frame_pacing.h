@@ -6,7 +6,7 @@ static void jnet_frame_wait(unsigned fps) {
     static unsigned timer_active;
     static unsigned previous_fps;
     if(fps!=previous_fps){previous=0;previous_fps=fps;}
-    if(fps!=30 && fps!=60){
+    if(fps!=30 && fps!=55){
         previous=0;
         if(timer_active){timeEndPeriod(1);timer_active=0;}
         return;

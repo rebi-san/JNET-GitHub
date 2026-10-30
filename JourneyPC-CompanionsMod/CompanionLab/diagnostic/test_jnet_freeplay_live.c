@@ -19,12 +19,12 @@ static void jnet_daynight_install(lua_State *s){(void)s;}
 int main(void){
     lua_State s={7};jnet_script_execute_original=original;
     jnet_script_execute_at(42,&s,fault_image+0x14dd12);assert(calls==1 && !loads);
-    jnet_mepal_play=1;jnet_script_execute_at(42,&s,fault_image+0x14dd12);assert(calls==1 && loads==1 && s.top==7);
-    jnet_script_execute_at(42,&s,fault_image+0xd8c8a);assert(calls==2 && loads==1);
-    fail=1;jnet_script_execute_at(42,&s,fault_image+0x14dd12);assert(calls==3 && s.top==7);
-    jnet_script_execute(42,&s);assert(calls==4);
+    jnet_mepal_play=1;jnet_script_execute_at(42,&s,fault_image+0x14dd12);assert(calls==2 && loads==1 && s.top==7);
+    jnet_script_execute_at(42,&s,fault_image+0xd8c8a);assert(calls==3 && loads==1);
+    fail=1;jnet_script_execute_at(42,&s,fault_image+0x14dd12);assert(calls==4 && s.top==7);
+    jnet_script_execute(42,&s);assert(calls==5);
     fail=0;jnet_mepal_play=0;jnet_credits=0;
-    unsigned before=loads;jnet_script_execute_at(42,&s,fault_image+0xd95a8);assert(loads==before+1 && s.top==7);
+    unsigned before=loads;jnet_script_execute_at(42,&s,fault_image+0xd95a8);assert(loads==before && s.top==7);
     before=loads;jnet_credits=1;jnet_script_execute_at(42,&s,fault_image+0xd95a8);assert(loads==before && s.top==7);
     puts("Free-play adapter: native timeline caller interception, normal/unrelated passthrough, stack restoration and failure fallback passed with mocked Lua.");
 }

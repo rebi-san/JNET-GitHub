@@ -112,6 +112,14 @@ int main(void) {
     symbol=1;memcpy(extra+0x74,&symbol,4);traveler_local_after_update();assert(traveler_local_overlap==1 && !JNETActor[23]);
     match[0x11db4]=1;before=writes;traveler_local_before_input(traveler_barn,traveler_game);
     assert(traveler_local_state==5 && JNETActor[17]==1 && writes==before && cancels && stops);
+    setup();assert(!traveler_local_start());
+    traveler_network_active=traveler_stream_enabled=1;forced_sample_chapter=4;
+    barn[0x64]=2;before=writes;
+    traveler_local_before_input(traveler_barn,traveler_game);
+    assert(traveler_local_state==1 && writes==before);
+    forced_sample_chapter=2;traveler_local_before_input(traveler_barn,traveler_game);
+    assert(traveler_local_state==2 && writes>before && barn[0xa2]==1 && !barn[0xa3] && !barn[0xa4]);
+    forced_sample_chapter=32;
     setup();assert(!traveler_local_start());barn[0xa2]=1;before=writes;traveler_local_before_input(traveler_barn,traveler_game);
     assert(traveler_local_state==1 && writes==before);
     barn[0xa2]=0;traveler_local_before_input(traveler_barn,traveler_game);

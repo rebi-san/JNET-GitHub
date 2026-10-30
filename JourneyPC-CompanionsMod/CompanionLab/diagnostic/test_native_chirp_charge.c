@@ -14,6 +14,7 @@ static int traveler_context(void){return 1;}
 static int own_read(void *ctx,uint64_t address,void *out,size_t n){(void)ctx;memcpy(out,(void *)(uintptr_t)address,n);return 1;}
 static int jc_local_windows_write(uint64_t address,const void *value,size_t n){memcpy((void *)(uintptr_t)address,value,n);return 1;}
 static int traveler_peer_fault(int code){assert(!code);return 0;}
+static unsigned jnet_diagnostic_logs;
 static void message(const char *s){assert(s && *s);}
 #include "traveler_chirp_charge.h"
 static void put(void *p,unsigned offset,uint64_t value){memcpy((unsigned char *)p+offset,&value,8);}

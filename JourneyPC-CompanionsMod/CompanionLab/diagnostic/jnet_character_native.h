@@ -101,6 +101,20 @@ static inline int jnet_character_ride_ready(jnet_character_read read,void *ctx,
     unsigned char state[48];
     return storage && !(storage&15) && read(ctx,storage,state,sizeof(state));
 }
+static inline int jnet_character_grab_ready(jnet_character_read read,void *ctx,
+        uint64_t image,uint64_t event,uint64_t creature) {
+    uint64_t type=0,clump=0,items=0,count=0,value=0,attached=0;
+    uint32_t segments=0;
+    return read && event && creature &&
+        read(ctx,event,&type,8) && type==image+0x671358 &&
+        read(ctx,creature,&type,8) && type==image+0x5ce668 &&
+        read(ctx,event+0x48,&clump,8) && clump &&
+        read(ctx,clump+0x10,&count,8) && count==1 &&
+        read(ctx,clump+8,&items,8) && items &&
+        read(ctx,items,&value,8) && value==creature &&
+        read(ctx,creature+0xb10,&segments,4) && segments>0 && segments<=16 &&
+        read(ctx,event+0x90,&attached,8) && (!attached || attached==creature);
+}
 static inline int jnet_character_cloth_ride_ready(jnet_character_read read,void *ctx,
         uint64_t image,uint64_t event,uint64_t first_mesh,unsigned meshes) {
     uint64_t type=0,clump=0,items=0,count=0,mesh=0;
@@ -278,6 +292,12 @@ static inline int jnet_character_head_position(jnet_character_read read,void *ct
        !read(ctx,head+0x10,position,sizeof(position)))return 0;
     for(unsigned i=0;i<3;++i)if(!isfinite(position[i]) || fabsf(position[i])>1000000)return 0;
     memcpy(out,position,sizeof(position));return 1;
+}
+static inline void jnet_character_ride_rotate(const float q[4],const float v[3],float out[3]) {
+    float t[3]={2*(q[1]*v[2]-q[2]*v[1]),2*(q[2]*v[0]-q[0]*v[2]),2*(q[0]*v[1]-q[1]*v[0])};
+    out[0]=v[0]+q[3]*t[0]+q[1]*t[2]-q[2]*t[1];
+    out[1]=v[1]+q[3]*t[1]+q[2]*t[0]-q[0]*t[2];
+    out[2]=v[2]+q[3]*t[2]+q[0]*t[1]-q[1]*t[0];
 }
 struct jnet_character_visual_snapshot {
     float matrix[16],fade[2],cloth_fade;

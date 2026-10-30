@@ -1,5 +1,7 @@
 {
-  "version": "0.263",
+  "version": "0.357",
+  "display_version": "0.357 alpha",
+  "platform": "Windows x64",
   "automatic_diagnostic_logs": false,
   "session_report_export": true,
   "meet_everywhere_always": true,
@@ -8,7 +10,7 @@
   "optional_sound_fix_sha256": "0a73c2fb3a2e5b33f6c38082b966160cd54882fac9efbe09c3ea8dde6fc037ca",
   "sound_fix_version": "0.3.1",
   "optional_drop_in_executable": true,
-  "build_id": "4574c04d3ab35bfb2889da8d65883444de31bd8f7d9f21bb472bcc61fa5d1462",
+  "build_id": "7d49b322cc8812cb959e011cce30a13c07059b3f95fb5ea431cc24b342cc6ea5",
   "runtime_verified": false,
   "three_player_supported": false,
   "local_diagnostic_only": false,
@@ -19,8 +21,16 @@
   "native_character_candidates": [
     "Longtail",
     "Whale",
-    "War Machine"
+    "War Machine",
+    "fl0w"
   ],
+  "flow_skins": [
+    "Snake",
+    "Hunter"
+  ],
+  "flow_shared_controls": true,
+  "flow_shared_chirps": true,
+  "war_machine_cached_skins": true,
   "native_character_preload": true,
   "native_character_asset_mapping": false,
   "native_character_resident_textures": true,
@@ -34,11 +44,17 @@
   "character_animation_stage_trace": true,
   "native_characters_runtime_verified": false,
   "war_machine_available": true,
-  "war_machine_attacks": false,
+  "war_machine_attacks": true,
+  "war_machine_attacks_runtime_verified": false,
+  "war_machine_attack_controls_locked": true,
+  "war_machine_attack_targets": "confirmed_wayfarer_only",
   "war_machine_spotlight": true,
   "creature_camera_candidate": true,
   "war_machine_resources_packaged": true,
   "character_visibility_snapshots": true,
+  "war_machine_remote_pose_buffer_ms": 100,
+  "war_machine_remote_pose_recovery_ms": 50,
+  "war_machine_collision_actor_revalidated": true,
   "creature_appearance_replication": true,
   "rocket_character": true,
   "rocket_relay_participants": 3,
@@ -53,9 +69,14 @@
   "creature_motion_smoothed": true,
   "creature_speed": {
     "Longtail": 10.8,
-    "Whale": 6.9,
-    "War Machine": 6.9
+    "Whale": 8.28,
+    "War Machine": 8.28,
+    "fl0w": 10.8
   },
+  "fog_toggle": true,
+  "blackness_menu": true,
+  "blackness_cutoff_implemented": true,
+  "blackness_runtime_verified": false,
   "menu_option_wrap": true,
   "intro_skip_visible": false,
   "creature_vortex_decay": true,
@@ -64,7 +85,7 @@
   "intro_skip_any_input_twice": true,
   "fps_choices": [
     30,
-    60,
+    55,
     "Default"
   ],
   "intro_mapped_loading_input": true,
@@ -74,8 +95,51 @@
   "bryan_texture_replaced": false,
   "creature_private_sound_banks": [
     "Summit",
-    "Cave"
+    "Cave",
+    "Ruins"
   ],
+  "native_sound_bank_capacity": 8,
+  "remote_chirp_sound_names_preserved": true,
+  "graphics_device_loss_report": true,
+  "canyon_surface_collision_instances": 84,
+  "canyon_surface_collision_runtime_verified": false,
+  "surface_collision_levels": {
+    "Canyon": {
+      "level_id": 3,
+      "instances": 84,
+      "triangles": 398918,
+      "nodes": 131071,
+      "runtime_verified": false
+    },
+    "Barrens": {
+      "level_id": 1,
+      "instances": 6,
+      "triangles": 16769,
+      "nodes": 4865,
+      "runtime_verified": false
+    },
+    "Desert": {
+      "level_id": 2,
+      "instances": 9,
+      "triangles": 19070,
+      "nodes": 8191,
+      "runtime_verified": false
+    },
+    "Cave": {
+      "level_id": 4,
+      "instances": 11,
+      "triangles": 34512,
+      "nodes": 11679,
+      "runtime_verified": false
+    },
+    "Mountain": {
+      "level_id": 6,
+      "instances": 10,
+      "triangles": 29942,
+      "nodes": 8191,
+      "runtime_verified": false
+    }
+  },
   "startup_changes": [
     {
       "resource": "BlendNinja",
@@ -147,73 +211,73 @@
     "api-ms-win-crt-time-l1-1-0.dll"
   ],
   "exports": {
-    "JNETActor": 3641984,
-    "JNETActorActivate": 30480,
-    "JNETActorPrepare": 41424,
-    "JNETActorReceive": 38096,
-    "JNETActorStop": 38480,
-    "JNETActorTrial": 3641936,
-    "JNETActorTrialStart": 39120,
-    "JNETActorTrialStop": 38784,
-    "JNETAnimation": 3588976,
-    "JNETAppearance": 3588784,
-    "JNETBodies": 3640320,
-    "JNETBuildId": 861136,
-    "JNETBuilder": 3639936,
-    "JNETCallbacks": 3588128,
-    "JNETClothAdoptMappedPass": 55456,
+    "JNETActor": 6349632,
+    "JNETActorActivate": 32240,
+    "JNETActorPrepare": 44720,
+    "JNETActorReceive": 41216,
+    "JNETActorStop": 41600,
+    "JNETActorTrial": 6349584,
+    "JNETActorTrialStart": 42240,
+    "JNETActorTrialStop": 41904,
+    "JNETAnimation": 6296432,
+    "JNETAppearance": 6296240,
+    "JNETBodies": 6347968,
+    "JNETBuildId": 972432,
+    "JNETBuilder": 6347584,
+    "JNETCallbacks": 6295584,
+    "JNETClothAdoptMappedPass": 58192,
     "JNETClothApplyAnimatedAppearance": 9072,
-    "JNETClothBindNativeMaps": 54240,
+    "JNETClothBindNativeMaps": 56976,
     "JNETClothInitialize": 5664,
-    "JNETClothPublish": 49504,
-    "JNETClothStageStockBatch": 50880,
-    "JNETCommand": 3639768,
-    "JNETCommit": 3589100,
-    "JNETCompanionFeatures": 3640032,
+    "JNETClothPublish": 52240,
+    "JNETClothStageStockBatch": 53616,
+    "JNETCommand": 6347416,
+    "JNETCommit": 6296556,
+    "JNETCompanionFeatures": 6347680,
     "JNETControl": 5568,
-    "JNETDual": 3640512,
-    "JNETEvaluation": 3589472,
-    "JNETFlight": 3639984,
-    "JNETFrames": 3639780,
-    "JNETGame": 3639968,
-    "JNETGeometry": 3589120,
-    "JNETIdle": 3588944,
-    "JNETInitialize": 65936,
-    "JNETLifecycle": 3644016,
-    "JNETLifetime": 3639788,
-    "JNETLink": 3589168,
-    "JNETLinkConfig": 3640272,
-    "JNETMaterial": 3639832,
-    "JNETMenu": 4169088,
-    "JNETMesh": 3639808,
-    "JNETMeshLife": 3588176,
-    "JNETMotion": 3589232,
-    "JNETNativeOutputs": 3640864,
-    "JNETNativePlayback": 3640672,
-    "JNETNetwork": 4169168,
-    "JNETObservation": 3639772,
-    "JNETPeerLifecycle": 4169296,
-    "JNETPerformance": 3589344,
-    "JNETPhase": 3639776,
-    "JNETPool": 3588096,
-    "JNETPose": 3589088,
-    "JNETPoseWrites": 3589056,
-    "JNETReaderCheck": 74256,
-    "JNETRender": 3639840,
-    "JNETResource": 3639792,
-    "JNETRoom": 3640192,
-    "JNETSkeleton": 3640544,
-    "JNETStartup": 3639744,
-    "JNETStatus": 3639764,
-    "JNETSteam": 4168480,
-    "JNETSteamGame": 4171088,
-    "JNETSteamLobby": 4169360,
-    "JNETSteamLobbyText": 4169600,
-    "JNETSteamP2P": 4169728,
-    "JNETSteamP2PText": 4170960,
-    "JNETSteamServiceText": 4168576,
-    "JNETTraveler": 3589632,
-    "JNETTrial": 3639784
+    "JNETDual": 6348160,
+    "JNETEvaluation": 6296928,
+    "JNETFlight": 6347632,
+    "JNETFrames": 6347428,
+    "JNETGame": 6347616,
+    "JNETGeometry": 6296576,
+    "JNETIdle": 6296400,
+    "JNETInitialize": 68736,
+    "JNETLifecycle": 6351712,
+    "JNETLifetime": 6347436,
+    "JNETLink": 6296624,
+    "JNETLinkConfig": 6347920,
+    "JNETMaterial": 6347480,
+    "JNETMenu": 6876784,
+    "JNETMesh": 6347456,
+    "JNETMeshLife": 6295632,
+    "JNETMotion": 6296688,
+    "JNETNativeOutputs": 6348512,
+    "JNETNativePlayback": 6348320,
+    "JNETNetwork": 6876864,
+    "JNETObservation": 6347420,
+    "JNETPeerLifecycle": 6877008,
+    "JNETPerformance": 6296800,
+    "JNETPhase": 6347424,
+    "JNETPool": 6295552,
+    "JNETPose": 6296544,
+    "JNETPoseWrites": 6296512,
+    "JNETReaderCheck": 78240,
+    "JNETRender": 6347488,
+    "JNETResource": 6347440,
+    "JNETRoom": 6347840,
+    "JNETSkeleton": 6348192,
+    "JNETStartup": 6347392,
+    "JNETStatus": 6347412,
+    "JNETSteam": 6876176,
+    "JNETSteamGame": 6878800,
+    "JNETSteamLobby": 6877072,
+    "JNETSteamLobbyText": 6877312,
+    "JNETSteamP2P": 6877440,
+    "JNETSteamP2PText": 6878672,
+    "JNETSteamServiceText": 6876272,
+    "JNETTraveler": 6297088,
+    "JNETTrial": 6347432
   },
   "source_entry_points": {
     "GameUpdate": {
@@ -243,6 +307,14 @@
     "lua_pushcclosure": {
       "file_offset": 3255584,
       "rva": 3258656
+    },
+    "EnvironmentCopy": {
+      "rva": 809088,
+      "file_offset": 806016
+    },
+    "EnvironmentUpdate": {
+      "rva": 813488,
+      "file_offset": 810416
     },
     "CharacterMeshUpdate": {
       "rva": 645840,
@@ -276,6 +348,14 @@
       "rva": 648104,
       "file_offset": 645032
     },
+    "ResourceView": {
+      "rva": 3615440,
+      "file_offset": 3612368
+    },
+    "ResourceBuffer": {
+      "rva": 3615120,
+      "file_offset": 3612048
+    },
     "CharacterBank": {
       "rva": 2919200,
       "file_offset": 2916128
@@ -284,9 +364,49 @@
       "rva": 677024,
       "file_offset": 673952
     },
+    "CharacterLinkEmitter": {
+      "rva": 2346864,
+      "file_offset": 2343792
+    },
+    "CharacterWhaleRide": {
+      "rva": 1846352,
+      "file_offset": 1843280
+    },
+    "CharacterClothTouch": {
+      "rva": 1545776,
+      "file_offset": 1542704
+    },
+    "CharacterClothRide": {
+      "rva": 2314768,
+      "file_offset": 2311696
+    },
+    "CharacterGrab": {
+      "rva": 1834144,
+      "file_offset": 1831072
+    },
     "CharacterEye": {
       "rva": 1856480,
       "file_offset": 1853408
+    },
+    "CharacterAttack": {
+      "rva": 1673872,
+      "file_offset": 1670800
+    },
+    "CharacterHit": {
+      "rva": 1680608,
+      "file_offset": 1677536
+    },
+    "CharacterCollision": {
+      "rva": 1680736,
+      "file_offset": 1677664
+    },
+    "CharacterAuthority": {
+      "rva": 636384,
+      "file_offset": 633312
+    },
+    "CharacterAttackHandler": {
+      "rva": 1683920,
+      "file_offset": 1680848
     },
     "CharacterJump": {
       "rva": 632976,
@@ -347,6 +467,10 @@
     "MenuFrameDrawSite": {
       "rva": 2206817,
       "file_offset": 2203745
+    },
+    "CanyonHullQuery": {
+      "rva": 957872,
+      "file_offset": 954800
     },
     "MenuMap": {
       "rva": 2522384,
@@ -782,11 +906,18 @@
     }
   },
   "artifacts": {
-    "JNET.dll": "b7ddb3fb8e3424794664c74c19a1f52e9d2622d22da4439df1530ae46f8fe47c",
-    "JNET.exe": "2ac57626bd53320fd7dc3ebb0582b87cb9a96dccfcef6191896cec71bd184389",
-    "README.txt": "212b83809f380a7dc99dd2e9d6cce5e808423ad6ee4bc7dd271ea0ac125fc0b6",
-    "JNETMenu.xme": "01423219975270a93d427e10642a7858960ce4f24fcaab4678d297e3a6410abb",
+    "JNET.dll": "a16214abec9aad28da803e6532bf2ab9b34788b48a696aaafb448bd6ce9c1d54",
+    "JNET.exe": "951bff04546c6b092579f6bc56d8395659ab5d18b84cb9dd4108d21027546951",
+    "README.txt": "d376ae60223d5f3c09651366e67991870c78cbf6e3876b0f16fa9f873f7e4d0b",
+    "JNETMenu.xme": "545ef6dcbc89026bbe4914b8f8f206ea311ef38f5919c3bc12dca3be5dfa2a51",
+    "JNET-canyon-collision.bin": "5ac624ee839e34a458eb8da737e12ca4797540f10e845621483777c80be25108",
+    "JNET-barrens-collision.bin": "8967e9812a02c512a796de549d29fcafa54d79bcc603e7d43ad92c8cdda814a1",
+    "JNET-desert-collision.bin": "f13a969772212a87f0648d348a1960b9bb8b895735a55c681c5515cebd509158",
+    "JNET-cave-collision.bin": "b898ade59db8bda9217f27f7727dd624583ef5e0be28bc44a04407ebf733aab3",
+    "JNET-mountain-collision.bin": "d627f95132e84df6243b40831d58261080f6969783a733251b8c03763fe0eab1",
     "JNETSpin3.D3D11x64": "5d4af83666f1377817948db9cc96c943b81182da043bf6e305bc5d2696d71b3f",
+    "JNETFlipL.D3D11x64": "ba05025abbe18ed2743be5efc6abb1aff945d9b5badad42fd0838368228609d2",
+    "JNETFlipR.D3D11x64": "8f295d1c36c1390ff4a9865bf6ebf31f54417d2280a1ad865a0b21ff99602e69",
     "JNET_FlatFishFlip.D3D11x64": "35e20069e83257faf77a3f0d49abe3cbbb35946d311bd15f4f6864d6df84e5d5",
     "JNET_FlatFishSwim.D3D11x64": "5f719daf6da627cf2112b96094c43af47afd2d7f73d897fcb6d39ce7df39a254",
     "JNET_HeadBankL.D3D11x64": "2bbfcf3b62940a465ccfd11c1c9381ca90acd6e8741d943ec919bd700a208b3a",
@@ -802,6 +933,15 @@
     "JNETCharacter_P_ClothGuardianTail.D3D11x64": "8816e1a43343de74ede5101fe8838fefbc6067b9deb5ef65983fea3d66ae85a9",
     "JNETCharacter_P_ClothGuardianWing.D3D11x64": "f001138983e0ab4934857f23591ae4223cd0160865f00b4ed1782b228ec9275f",
     "JNETCharacter_P_FishFlat_A_Test.D3D11x64": "8ce3831df900e7260115a0afa4584f76f685e9a27e831b81ba83e6f739f14c4e",
+    "JNETCharacter_P_FlowCreature_Body.D3D11x64": "0e4f8e957bbd635e198fa08d5560ccbfd61f67f827942e4d0256cd62427277ab",
+    "JNETCharacter_P_FlowCreature_Fins.D3D11x64": "ddc2b95ea37b1bf4a49263a7158a6708c13200950927a982fd34fc48861490c5",
+    "JNETCharacter_P_FlowCreature_Head.D3D11x64": "a8ead11f71fd31503327ebc8c1e9e2c4d3e48950a4607767391f4dbda0ad0b0a",
+    "JNETCharacter_P_FlowCreature_Tail.D3D11x64": "4b62f836bd9b0a3a87f4496984c4795af790f22c7f7a902fd50b2324b017de2c",
+    "JNETCharacter_P_FlowHunter_Body.D3D11x64": "9048a530189c0af6783e62b8ff8cd76677dc3aaf0f69c2a2927e7f06d1295e18",
+    "JNETCharacter_P_FlowHunter_Fins.D3D11x64": "dbc264f736258ca6578f31f1f55ef280b44fb671d062005c39156bf5a9e191d6",
+    "JNETCharacter_P_FlowHunter_FinsLarge.D3D11x64": "a8a544db34ac393a86f00644c599602addfc7744b3b3f7376f509c1b6d5f3b42",
+    "JNETCharacter_P_FlowHunter_Head.D3D11x64": "52d644a3aa87dd8601484007b8fe24bdf76789f74db422805cc70a319a7de30d",
+    "JNETCharacter_P_FlowHunter_Tail.D3D11x64": "9f59990c8d6453ec969f88d6e431331189810cbec200dd9f3eb0b4d91a8d3b6e",
     "JNETCharacter_P_Guardian.D3D11x64": "dc9d8396ec22c1badb25b634d64a6132c19c6632bb15f598877c25c356074c67",
     "JNETCharacter_P_GuardianWingL.D3D11x64": "e8dc7c9cff7700e09927b431a8b76f6cc3ef62e0c1484613027effb9ad536b86",
     "JNETCharacter_P_GuardianWingR.D3D11x64": "3224993281ede5195738f518b558562a4ef4f8499a5ec86710087f9c7495e703",

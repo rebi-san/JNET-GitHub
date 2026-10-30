@@ -2142,3 +2142,8 @@
 "/Rocket Death Match Mod/Journey(RocketDeathMatch).exe.txt" filter=lfs diff=lfs merge=lfs -text
 "/Rocket Death Match Mod/Rocket Death Match v0.1.0.CT" filter=lfs diff=lfs merge=lfs -text
 "/journey_detour-main/journey_detour_v4/include/steam/lib/osx32/libsdkencryptedappticket.dylib" filter=lfs diff=lfs merge=lfs -text
+/WorldLevelPictures/*.png filter=lfs diff=lfs merge=lfs -text
+/JourneyPC-CompanionsMod/CompanionLab/work/*-collision-meshes.json.gz filter=lfs diff=lfs merge=lfs -text
+/JourneyPC-CompanionsMod/CompanionLab/work/JNET/JNET-*-collision.bin filter=lfs diff=lfs merge=lfs -text
+/JourneyPC-CompanionsMod/CompanionLab/work/JNET.zip filter=lfs diff=lfs merge=lfs -text
+/JourneyPC-CompanionsMod/CompanionLab/work/diagnostic-evidence-before-0.357.zip filter=lfs diff=lfs merge=lfs -text

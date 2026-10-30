@@ -15,15 +15,15 @@ static int BCryptGenRandom(void *algorithm,unsigned char *out,unsigned bytes,uns
 #define JC_BUILD_ID_HEX "fixture-build"
 #include "jnet_steam_lobby.h"
 #include "jnet_steam_transport.h"
-static struct {uint64_t id,host,people[3];unsigned count,limit,joinable,type,local_member;char keys[16][32],values[16][80];unsigned fields;} rooms[8];
+static struct {uint64_t id,host,people[3];unsigned count,limit,joinable,type,local_member;char keys[20][32],values[20][80];unsigned fields;} rooms[8];
 static unsigned maintenance_getters;
 static unsigned room_count,leave_count,search_count,create_count,join_count,filters,worldwide,closed_count;
 static uint64_t selected[50];static unsigned selected_count;
 static struct {uint64_t handle;unsigned kind,done,failed;union {struct jnet_steam_created created;struct jnet_steam_entered entered;uint32_t count;} result;} pending;
-static uint64_t next_call=100;
+static uint64_t next_call=100;static unsigned reject_requests;
 static unsigned room_index(uint64_t id){for(unsigned i=0;i<room_count;++i)if(rooms[i].id==id)return i;assert(!"unknown room");return 0;}
 static const char *data(void *mm,uint64_t id,const char *key){++maintenance_getters;assert(mm);unsigned r=room_index(id);for(unsigned i=0;i<rooms[r].fields;++i)if(!strcmp(rooms[r].keys[i],key))return rooms[r].values[i];return "";}
-static unsigned char set_data(void *mm,uint64_t id,const char *key,const char *value){assert(mm);unsigned r=room_index(id),i;for(i=0;i<rooms[r].fields;++i)if(!strcmp(rooms[r].keys[i],key))break;if(i==rooms[r].fields)++rooms[r].fields;assert(i<16);snprintf(rooms[r].keys[i],32,"%s",key);snprintf(rooms[r].values[i],80,"%s",value);return 1;}
+static unsigned char set_data(void *mm,uint64_t id,const char *key,const char *value){assert(mm);unsigned r=room_index(id),i;for(i=0;i<rooms[r].fields;++i)if(!strcmp(rooms[r].keys[i],key))break;if(i==rooms[r].fields)++rooms[r].fields;assert(i<20);snprintf(rooms[r].keys[i],32,"%s",key);snprintf(rooms[r].values[i],80,"%s",value);return 1;}
 static uint64_t owner(void *mm,uint64_t id){++maintenance_getters;assert(mm);unsigned r=room_index(id);return rooms[r].local_member?rooms[r].host:0;}
 static int members(void *mm,uint64_t id){++maintenance_getters;assert(mm);return (int)rooms[room_index(id)].count;}
 static int limit(void *mm,uint64_t id){++maintenance_getters;assert(mm);return (int)rooms[room_index(id)].limit;}
@@ -36,7 +36,7 @@ static uint64_t by_index(void *mm,int i){assert(mm && i>=0 && (unsigned)i<select
 static void string_filter(void *mm,const char *key,const char *value,int compare){assert(mm && key && value && compare==0 && jnet_sl_owned);++filters;}
 static void distance_filter(void *mm,int value){assert(mm && value==3 && jnet_sl_owned);++worldwide;}
 static void count_filter(void *mm,int value){assert(mm && value==50 && jnet_sl_owned);}
-static uint64_t start(unsigned kind){assert(!jnet_sl.call);memset(&pending,0,sizeof(pending));pending.handle=++next_call;pending.kind=kind;return pending.handle;}
+static uint64_t start(unsigned kind){assert(!jnet_sl.call);memset(&pending,0,sizeof(pending));if(reject_requests)return 0;pending.handle=++next_call;pending.kind=kind;return pending.handle;}
 static uint64_t search(void *mm){assert(mm && jnet_sl_owned);++search_count;return start(510);}
 static uint64_t create(void *mm,int type,int capacity){assert(mm && type==0 && capacity==3 && jnet_sl_owned);++create_count;return start(513);}
 static uint64_t join(void *mm,uint64_t room){assert(mm && room && jnet_sl_owned);++join_count;return start(504);}
@@ -63,6 +63,23 @@ static void action(unsigned kind,unsigned access,const char *code,uint64_t room,
     struct jnet_lobby_action a={.kind=kind,.access=access,.room=room,.host=host};if(code)snprintf(a.password,sizeof(a.password),"%s",code);
     assert(jnet_lobby_submit(&a));jnet_sl_tick();
 }
+static void status_test(uint64_t room) {
+    reject_requests=1;
+    action(1,0,NULL,0,0);assert(!jnet_sl.call && !strcmp(jnet_sl.status,"Steam rejected the request"));
+    action(2,0,"ABCD",0,0);assert(!jnet_sl.call && !strcmp(jnet_sl.status,"Steam rejected the request"));
+    action(2,0,NULL,room,42);assert(!jnet_sl.call && !strcmp(jnet_sl.status,"Steam rejected the request"));
+    action(5,0,NULL,0,0);assert(!jnet_lobby_view.searching && !strcmp(jnet_sl.status,"Steam rejected the request"));
+    reject_requests=0;
+    action(5,0,NULL,0,0);assert(jnet_lobby_view.searching && !jnet_lobby_view.busy);
+    finish_search(0);jnet_sl_tick();assert(!jnet_lobby_view.searching && !jnet_lobby_view.count);
+    action(2,0,NULL,room,42);assert(!strcmp(jnet_sl.status,"Joining lobby"));
+    action(3,0,NULL,0,0);assert(!strcmp(jnet_sl.status,"Request cancelled"));
+    finish_join(room,1);assert(!jnet_sl.room && !strcmp(jnet_sl.status,"Request cancelled"));
+    action(1,0,NULL,0,0);finish_create(room);assert(!strcmp(jnet_sl.status,"Lobby created"));
+    jnet_sl_status("Connected");JNETSteam[0]=0;jnet_sl_tick();
+    assert(!jnet_sl.room && !strcmp(jnet_sl.status,"Steam offline"));JNETSteam[0]=5;
+    puts("Lobby statuses: rejected requests, pending/completed search, cancellation, exact Lobby created and lost Steam connection passed.");
+}
 static unsigned char close_connection(void *self,uint32_t connection,int reason,const char *text,unsigned char linger){assert(self && connection && reason && text && !linger);++closed_count;return 1;}
 static unsigned char set_userdata(void *self,uint32_t connection,int64_t generation){assert(self && connection && generation);return 1;}
 static int accept_connection(void *self,uint32_t connection){assert(self && connection);return 1;}
@@ -72,12 +89,13 @@ static unsigned rocket_sends;static unsigned char rocket_sent[128];
 static unsigned chat_sends;
 static unsigned char chat_sent[184];
 static unsigned char travel_sent[104];
+static int game_send_result=1;
 static unsigned char sent[72],game_sent[JNET_GAME_BYTES];static unsigned sent_type,game_sent_flags;
-static int send_message(void *self,uint32_t connection,const void *data,uint32_t bytes,int flags,int64_t *number){assert(self && connection && !number);if(bytes==128){assert(flags==9);memcpy(rocket_sent,data,128);++rocket_sends;return 1;}if(bytes==184){assert(flags==9);memcpy(chat_sent,data,bytes);++chat_sends;return 1;}if(bytes==104){assert(!memcmp(data,"JNT3",4) && flags==9);memcpy(travel_sent,data,104);return 1;}if(bytes==JNET_GAME_BYTES){assert(!memcmp(data,"JNG1",4) && (flags==1 || flags==9));memcpy(game_sent,data,bytes);game_sent_flags=(unsigned)flags;return 1;}assert(bytes==72);memcpy(sent,data,72);sent_type=sent[4];assert(flags==(sent_type<=2?9:1));return 1;}
+static int send_message(void *self,uint32_t connection,const void *data,uint32_t bytes,int flags,int64_t *number){assert(self && connection && !number);if(bytes==128){assert(flags==9);memcpy(rocket_sent,data,128);++rocket_sends;return 1;}if(bytes==184){assert(flags==9);memcpy(chat_sent,data,bytes);++chat_sends;return 1;}if(bytes==104){assert(!memcmp(data,"JNT3",4) && flags==9);memcpy(travel_sent,data,104);return 1;}if(bytes==JNET_GAME_BYTES){assert(!memcmp(data,"JNG1",4) && (flags==1 || flags==9));memcpy(game_sent,data,bytes);game_sent_flags=(unsigned)flags;return game_send_result;}assert(bytes==72);memcpy(sent,data,72);sent_type=sent[4];assert(flags==(sent_type<=2?9:1));return 1;}
 static unsigned char incoming[72];static unsigned incoming_count,releases;
 static struct jnet_sn_message incoming_message;
 static void release_message(struct jnet_sn_message *m){assert(m==&incoming_message);++releases;}
-static int receive_messages(void *self,uint32_t connection,struct jnet_sn_message **out,int count){assert(self && connection && count==16);if(!incoming_count)return 0;incoming_count=0;*out=&incoming_message;return 1;}
+static int receive_messages(void *self,uint32_t connection,struct jnet_sn_message **out,int count){assert(self && connection && count==16);if(!incoming_count)return 0;unsigned n=incoming_count>16?16:incoming_count;incoming_count-=n;for(unsigned i=0;i<n;++i)out[i]=&incoming_message;return (int)n;}
 static void input(unsigned slot,unsigned type,uint64_t sequence) {
     memset(incoming,0,72);memcpy(incoming,"JNS1",4);incoming[4]=(unsigned char)type;
     memcpy(incoming+8,&jnet_sl.room,8);memcpy(incoming+16,&jnet_sn.peers[slot].identity,8);memcpy(incoming+24,&jnet_sl.identity,8);memcpy(incoming+32,jnet_sl.nonce,32);memcpy(incoming+64,&sequence,8);
@@ -128,6 +146,11 @@ static void transport_test(uint64_t room) {
     unsigned r=room_index(room);rooms[r].people[1]=43;rooms[r].count=2;membership_changed(room,43,1);jnet_sn_tick();assert(!jnet_sn.peers[0].admitted);
     set_data((void *)1,room,"journet.nonce",jnet_sl.nonce);jnet_sn_tick();assert(jnet_sn.peers[0].admitted && JNETSteamLobby[12]==1);
     input(0,3,1);jnet_sn_receive(0);assert(sent_type==4 && releases==2);
+    {unsigned before=releases;input(0,4,1);incoming_count=80;
+     jnet_sn_receive(0);assert(releases==before+64 && incoming_count==16);
+     jnet_sn_receive(0);assert(releases==before+80 && !incoming_count);
+     releases=2;jnet_sn.peers[0].last_received[1]=0;}
+
     input(0,4,1);jnet_sn_receive(0);assert(jnet_sn.peers[0].last_received[0]==1 && jnet_sn.peers[0].last_received[1]==1);
     LONG received=JNETSteamLobby[14];input(0,3,1);jnet_sn_receive(0);assert(JNETSteamLobby[14]==received);
     input(0,3,2);incoming[32]^=1;jnet_sn_receive(0);assert(JNETSteamLobby[14]==received && JNETSteamLobby[15]==-103);
@@ -136,6 +159,8 @@ static void transport_test(uint64_t room) {
     event.connection=103;guest=45;memcpy(event.info.remote.value,&guest,8);jnet_sn_event(&event);assert(closed_count==2 && strstr(JNETSteamP2PText,"capacity"));
     rooms[r].count=1;membership_changed(room,43,2);jnet_sn_tick();assert(!jnet_sn.peers[0].handle);
     clock_ms+=30001;jnet_sn_tick();assert(!jnet_sn.peers[1].handle);
+    jnet_sl_status("Connected");jnet_sn_tick();assert(!strcmp(jnet_sl.status,"Waiting for players"));
+    jnet_sn_tick();assert(!strcmp(jnet_sl.status,"Waiting for players"));
     jnet_sn_reset();assert(!jnet_sn.listener && !registered_callback && !registered_members && unregistrations==1 && !JNETSteamP2P[8]);
     assert(jnet_sn_register() && registrations==2);
     assert(JNETSteamP2P[1]==4 && JNETSteamP2P[2]==2 && JNETSteamP2P[3]==2);
@@ -156,7 +181,7 @@ static void transport_test(uint64_t room) {
     dispatch_registered(&event);jnet_sn_tick();
     assert(unregistrations==2 && !registered_callback && !registered_members);
     assert(!jnet_sl.room && !jnet_sn.peers[0].handle && JNETSteamP2P[6]==5003);
-    assert(strstr(jnet_sl.status,"Host connection ended") && strstr(JNETSteamP2PText,"remote acceptance"));
+    assert(strstr(jnet_sl.status,"Host disconnected") && strstr(JNETSteamP2PText,"remote acceptance"));
     jnet_sl_transport_reset=NULL;
 }
 static struct jnet_game_record game_record(uint64_t id,uint64_t sequence) {
@@ -376,7 +401,7 @@ static void gameplay_test(uint64_t room) {
     rejected=JNETSteamGame[3];jnet_sg_receive(0,snapshot,sizeof(snapshot));assert(JNETSteamGame[3]==rejected+1);
     jnet_sg_receive(0,chirp_packet,sizeof(chirp_packet));assert(jnet_sg_mail.event_count==0);
     jc_packet_put(chirp_packet+64,44,8);jnet_sg_receive(0,chirp_packet,sizeof(chirp_packet));assert(jnet_sg_mail.event_count==1);
-    jnet_sg_mail.outgoing=game_record(43,1);jnet_sg_tick();LONG sent=JNETSteamGame[1];
+    jnet_sg_mail.outgoing=game_record(43,1);clock_ms+=34;jnet_sg_tick();LONG sent=JNETSteamGame[1];
     uint64_t previous_send=jnet_sg.last_send;
     clock_ms+=34;jnet_sg_tick();assert(JNETSteamGame[1]==sent && JNETSteamGame[40] && jnet_sg.last_send==previous_send);
     jnet_sg_mail.outgoing=game_record(43,2);jnet_sg_tick();assert(JNETSteamGame[1]==sent+1);
@@ -414,6 +439,89 @@ static void gameplay_test(uint64_t room) {
     jnet_sg.last_send=clock_ms-6000;jnet_sg_tick();assert(!jnet_sg.last_send);
     jnet_sg_reset();assert(!jnet_sg_mail.room && !jnet_sg_mail.records[0].id);
     puts("Steam gameplay: authenticated host fanout, three identities, reliable individual chirps, nonce/owner/replay rejection, renewed leases, invalid floats, expiry, duplicate-send suppression, reconnect resend and mailbox reset passed.");
+}
+static void coalescing_test(uint64_t room) {
+    setup();jnet_sg_reset();memset(jnet_sn.peers,0,sizeof(jnet_sn.peers));
+    unsigned ri=room_index(room);rooms[ri].count=3;
+    for(unsigned i=0;i<3;++i)rooms[ri].people[i]=42+i;
+    jnet_sl.room=room;jnet_sl.host=42;jnet_sn_members.loaded=0;
+    for(unsigned i=0;i<2;++i){jnet_sn.peers[i].handle=800+i;jnet_sn.peers[i].identity=43+i;jnet_sn.peers[i].connected=jnet_sn.peers[i].admitted=1;}
+    jnet_sg_tick();jnet_sg_mail.outgoing=game_record(42,1);
+    unsigned char packet[JNET_GAME_BYTES];
+    for(unsigned i=0;i<2;++i){struct jnet_game_record r=game_record(43+i,1);game_packet(packet,1,1,&r);assert(jnet_sg_receive(i,packet,sizeof(packet)));}
+    jnet_sg_tick();uint64_t start=clock_ms+16,seq[3]={1,1,1},pending_at[3]={0};
+    LONG before=JNETSteamGame[1];unsigned batches=0,max_wait=0;
+    uint64_t last=0;
+    for(unsigned elapsed=0;elapsed<990;++elapsed){
+        clock_ms=start+elapsed;unsigned phase=elapsed%33;
+        unsigned source=phase==0?0:phase==8?1:phase==20?2:3;
+        if(source<3){
+            struct jnet_game_record r=game_record(42+source,++seq[source]);pending_at[source]=clock_ms;
+            if(!source)jnet_sg_mail.outgoing=r;
+            else {game_packet(packet,1,seq[source],&r);assert(jnet_sg_receive(source-1,packet,sizeof(packet)));}
+        }
+        LONG sent=JNETSteamGame[1];jnet_sg_tick();
+        if(sent!=JNETSteamGame[1]){
+            assert(JNETSteamGame[1]==sent+2 && (!last || clock_ms-last>=16));last=clock_ms;++batches;
+            for(unsigned i=0;i<3;++i){
+                struct jnet_game_record decoded;assert(jnet_sg_decode_record(&decoded,game_sent+64+i*JNET_GAME_RECORD,clock_ms));
+                assert(decoded.sequence==seq[i]);
+                if(pending_at[i]){unsigned wait=(unsigned)(clock_ms-pending_at[i]);assert(wait<16);if(wait>max_wait)max_wait=wait;pending_at[i]=0;}
+            }
+        }
+    }
+    assert(batches<=62 && JNETSteamGame[1]-before==(LONG)batches*2);
+    printf("State coalescing: 90 staggered source updates over 990 ms produced %u host batches / %u datagrams; worst relay wait %u ms.\n",batches,batches*2,max_wait);
+    clock_ms=last+1;
+    struct jnet_game_record event=game_record(42,seq[0]);event.chirp=(struct jc_chirp_event){.participant=42,.epoch=99,.sequence=1,.sound=1,.radius=1,.duration=1};event.chirp_seen=clock_ms;
+    before=JNETSteamGame[1];jnet_sg_event_send(&event,1);assert(JNETSteamGame[1]==before+2 && game_sent_flags==9);
+    jnet_sn.peers[1].handle=802;jnet_sg_tick();assert(JNETSteamGame[1]==before+3 && !jnet_sg.peers[1].sequence);
+    struct jnet_game_record fresh=game_record(44,1);game_packet(packet,1,1,&fresh);
+    assert(jnet_sg_receive(1,packet,sizeof(packet)));jnet_sg_tick();assert(JNETSteamGame[1]==before+5);
+    ++jnet_sl.generation;jnet_sg_tick();assert(!jnet_sg.local.sequence && !jnet_sg.peers[0].sequence);
+    before=JNETSteamGame[1];jnet_sg_mail.outgoing=game_record(42,1);jnet_sg_tick();assert(JNETSteamGame[1]==before+2);
+    jnet_sg_reset();memset(jnet_sn.peers,0,sizeof(jnet_sn.peers));jnet_sl.identity=43;
+    jnet_sn.peers[0].handle=900;jnet_sn.peers[0].identity=42;jnet_sn.peers[0].connected=jnet_sn.peers[0].admitted=1;
+    jnet_sg_tick();jnet_sg_mail.outgoing=game_record(43,1);jnet_sg_tick();before=JNETSteamGame[1];
+    for(unsigned i=2;i<=33;++i){++clock_ms;jnet_sg_mail.outgoing=game_record(43,i);jnet_sg_tick();assert(JNETSteamGame[1]==before);}
+    ++clock_ms;jnet_sg_tick();assert(JNETSteamGame[1]==before+1 && jc_packet_get(game_sent+64+16,8)==33);
+    ++clock_ms;jnet_sn.peers[0].handle=901;jnet_sg_tick();assert(JNETSteamGame[1]==before+2);
+    clock_ms+=2000;before=JNETSteamGame[1];jnet_sg_tick();assert(JNETSteamGame[1]==before);
+    jnet_sg_reset();memset(jnet_sn.peers,0,sizeof(jnet_sn.peers));jnet_sl.identity=42;
+    puts("State cadence: latest guest sample, immediate first state/reconnect, generation reset, stale-state suppression and reliable chirp bypass passed.");
+}
+static void war_delivery_test(uint64_t room) {
+    jnet_sg_reset();memset(jnet_sn.peers,0,sizeof(jnet_sn.peers));jnet_sl.room=room;jnet_sl.identity=jnet_sl.host=42;
+    for(unsigned i=0;i<2;++i){jnet_sn.peers[i].handle=910+i;jnet_sn.peers[i].identity=43+i;jnet_sn.peers[i].connected=jnet_sn.peers[i].admitted=1;}
+    struct jnet_game_record records[2]={game_record(42,1),game_record(43,1)};
+    for(unsigned i=0;i<2;++i){records[i].character_known=1;records[i].character=JNET_CHARACTER_WAR_MACHINE;records[i].war_hits[0]=(struct jnet_war_hit){.victim=44,.lease=10,.sequence=1,.seen=clock_ms};}
+    LONG before=JNETSteamGame[1];uint64_t seq=jnet_sg.sequence;
+    for(unsigned n=0;n<100;++n){jnet_sg_war_send(records,1);jnet_sg_war_send(records+1,1);}
+    assert(JNETSteamGame[1]==before+3 && jnet_sg.sequence==seq+2);
+    ++records[0].war_hits[0].sequence;game_send_result=2;jnet_sg_war_send(records,1);assert(JNETSteamGame[1]==before+3);
+    game_send_result=1;jnet_sg_war_send(records,1);assert(JNETSteamGame[1]==before+5);
+    jnet_sg_war_send(records+1,1);assert(JNETSteamGame[1]==before+5);
+    ++records[1].lease;jnet_sg_war_send(records+1,1);assert(JNETSteamGame[1]==before+6);
+    jnet_sn.peers[1].handle=912;jnet_sg_war_send(records,1);jnet_sg_war_send(records+1,1);assert(JNETSteamGame[1]==before+8);
+    jnet_sg_war_send(records,1);jnet_sg_war_send(records+1,1);assert(JNETSteamGame[1]==before+8);
+    records[0].war_hits[1]=(struct jnet_war_hit){.victim=99,.lease=10,.sequence=2,.seen=clock_ms};
+    jnet_sg_war_send(records,1);assert(JNETSteamGame[1]==before+8);
+    ++records[0].war_hits[0].sequence;jnet_sg_war_send(records,1);assert(JNETSteamGame[1]==before+10);
+    struct jnet_game_record decoded;assert(jnet_sg_decode_record(&decoded,game_sent+64,clock_ms));
+    assert(decoded.war_hits[0].victim==44 && !decoded.war_hits[1].victim);
+    jnet_sg_tick();struct jnet_game_record incoming_hit=game_record(43,10);
+    incoming_hit.character_known=1;incoming_hit.character=JNET_CHARACTER_WAR_MACHINE;
+    incoming_hit.war_hits[0]=(struct jnet_war_hit){.victim=42,.lease=jnet_sg.local.lease,.sequence=10,.seen=clock_ms};
+    incoming_hit.war_hits[1]=(struct jnet_war_hit){.victim=99,.lease=10,.sequence=11,.seen=clock_ms};
+    unsigned char packet[JNET_GAME_BYTES];game_packet(packet,5,10,&incoming_hit);jc_packet_put(packet+56,jnet_travel_epoch,8);
+    LONG rejected=JNETSteamGame[3];assert(jnet_sg_receive(0,packet,sizeof(packet)) && JNETSteamGame[3]==rejected);
+    assert(jnet_sg_mail.war_events[0].id==43 && jnet_sg_mail.war_events[0].war_hits[0].victim==42 && !jnet_sg_mail.war_events[0].war_hits[1].victim);
+    incoming_hit.war_hits[0].victim=98;game_packet(packet,5,11,&incoming_hit);jc_packet_put(packet+56,jnet_travel_epoch,8);
+    assert(jnet_sg_receive(0,packet,sizeof(packet)) && JNETSteamGame[3]==rejected+1);
+    before=JNETSteamGame[1];seq=jnet_sg.sequence;clock_ms+=2000;jnet_sg_war_send(records,1);
+    assert(JNETSteamGame[1]==before && jnet_sg.sequence==seq);
+    jnet_sg_reset();memset(jnet_sn.peers,0,sizeof(jnet_sn.peers));
+    puts("Reliable War Machine hits: alternating attackers send once per recipient, failed sends retry, new hits/leases/reconnections resend; departed victims preserve other valid hits and expired hits do not send.");
 }
 #include "jnet_menu_model.h"
 static struct jnet_appearance_edit jnet_menu_edit;
@@ -503,22 +611,53 @@ static void game_bridge_test(void) {
     assert(!traveler_network.peers[0].connection.peer && traveler_network.peers[1].connection.peer==44);
     assert(traveler_network.peers[1].connection.admitted);
     LONG retained_extra_samples=JNETSteamGame[27];
+    fake_chirps=0;clock_ms+=100;jnet_sg_game_phase(1,0);
+    LONG cadence_captures=JNETSteamGame[6];
+    for(unsigned frame=0;frame<10;++frame){clock_ms+=31;jnet_sg_game_phase(1,0);}
+    assert(JNETSteamGame[6]-cadence_captures==9);
     memset(&jnet_lobby_view,0,sizeof(jnet_lobby_view));
     jnet_sg_reset();jnet_sg_game_tick(1);assert(traveler_network.paused && !JNETSteamGame[26] && !JNETSteamGame[34] && JNETSteamGame[27]==retained_extra_samples);
     jnet_travel_epoch=original_epoch;
     puts("Steam native bridge fixture: state capture, ordered chirp bursts, stable independent slots, cleanup before replacement, return after separation, stable lobby identity without invented expiry, explicit leave release and stale state expiry passed; no game engine calls.");
 }
-#define JNET_REALTIME_FIXTURE
+typedef unsigned DWORD;
+typedef void *HANDLE;
+#define WINAPI
+#define FALSE 0
+#define WAIT_OBJECT_0 0
+#define WAIT_FAILED UINT32_MAX
+#define INFINITE UINT32_MAX
+static SRWLOCK jnet_maintenance_lifetime,*failed_try_lock;
+static volatile LONG jnet_maintenance_stopping;
+static unsigned realtime_signals,realtime_releases,realtime_waits;
+static DWORD realtime_wait_timeout[4];
+static int TryAcquireSRWLockExclusive(SRWLOCK *lock){return lock!=failed_try_lock;}
+static void jnet_maintenance_release(void){++realtime_releases;}
+static HANDLE CreateEventW(void *attributes,int manual,int initial,const void *name){assert(!attributes && !manual && !initial && !name);return (void *)1;}
+static HANDLE CreateThread(void *attributes,size_t stack,DWORD (*entry)(void *),void *argument,DWORD flags,DWORD *id){assert(!attributes && !stack && entry && !argument && !flags && !id);return (void *)2;}
+static int SetEvent(HANDLE event){assert(event==(void *)1);++realtime_signals;return 1;}
+static int CloseHandle(HANDLE handle){assert(handle==(void *)1 || handle==(void *)2);return 1;}
+static DWORD WaitForSingleObject(HANDLE handle,DWORD timeout){assert(handle);if(timeout==INFINITE)return WAIT_OBJECT_0;assert(realtime_waits<4);realtime_wait_timeout[realtime_waits++]=timeout;return realtime_waits==2?WAIT_FAILED:WAIT_OBJECT_0;}
 #include "jnet_steam_realtime.h"
 static void realtime_test(uint64_t room) {
+    jnet_realtime_enter();assert(jnet_realtime_depth==1);jnet_realtime_leave();
+    (void)jnet_realtime_poll;
     setup();jnet_sg_reset();memset(&jnet_sn,0,sizeof(jnet_sn));
     jnet_sl.room=room;jnet_sl.kind=0;jnet_sn.room=room;jnet_sn.generation=jnet_sl.generation;
     unsigned ri=room_index(room);rooms[ri].count=2;rooms[ri].people[0]=42;rooms[ri].people[1]=43;
     jnet_sn.peers[0].handle=500;jnet_sn.peers[0].identity=43;jnet_sn.peers[0].connected=jnet_sn.peers[0].admitted=1;
     jnet_sn_api.self=(void *)1;jnet_sn_api.receive=receive_messages;jnet_sn_api.send=send_message;
     jnet_sn_members.active=1;jnet_sn_members.loaded=0;jnet_sn_members_dirty=jnet_sl_metadata_dirty=0;
-    assert(jnet_sn_member(43));jnet_sg_tick();jnet_sg_mail.outgoing=game_record(42,1);
+    assert(jnet_sn_member(43));jnet_sg_tick();clock_ms+=16;jnet_sg_mail.outgoing=game_record(42,1);
     unsigned reads=maintenance_getters;LONG sends=JNETSteamGame[1];
+    assert(jnet_realtime_flush());
+    assert(maintenance_getters==reads && JNETSteamGame[1]>sends);
+    sends=JNETSteamGame[1];
+    assert(!jnet_realtime_flush() && JNETSteamGame[1]==sends);
+    jnet_sg_mail.outgoing=game_record(42,2);
+    jnet_sn_members_dirty=1;
+    assert(!jnet_realtime_flush() && JNETSteamGame[1]==sends);
+    jnet_sn_members_dirty=0;clock_ms+=16;
     assert(jnet_realtime_service());assert(maintenance_getters==reads && JNETSteamGame[1]>sends);
     struct jnet_game_record record=game_record(43,1);unsigned char packet[JNET_GAME_BYTES];
     game_packet(packet,1,1,&record);input(0,3,1);
@@ -532,7 +671,27 @@ static void realtime_test(uint64_t room) {
     ++jnet_sn.generation;assert(!jnet_realtime_service());--jnet_sn.generation;
     jnet_sn.peers[0].admitted=0;assert(!jnet_realtime_service());jnet_sn.peers[0].admitted=1;
     assert(jnet_realtime_service() && !incoming_count && maintenance_getters==reads);
+    clock_ms=jnet_sg.next_send-1;jnet_sg_mail.outgoing=game_record(42,3);sends=JNETSteamGame[1];
+    assert(jnet_realtime_flush() && jnet_sg.pending_state && JNETSteamGame[1]==sends);
+    assert(!jnet_realtime_flush() && JNETSteamGame[1]==sends);
+    ++clock_ms;assert(jnet_realtime_flush() && !jnet_sg.pending_state && JNETSteamGame[1]>sends);
+    assert(jc_packet_get(game_sent+64+16,8)==3 && !jnet_realtime_flush());
+    clock_ms+=16;jnet_sg_mail.outgoing=game_record(42,4);sends=JNETSteamGame[1];
+    failed_try_lock=&jnet_realtime_owner;jnet_realtime_after_capture();
+    assert(JNETSteamGame[1]==sends && !jnet_realtime_depth);
+    failed_try_lock=NULL;jnet_realtime_after_capture();assert(JNETSteamGame[1]>sends && !jnet_realtime_depth);
+    clock_ms+=16;jnet_sg_mail.outgoing=game_record(42,5);sends=JNETSteamGame[1];
+    jnet_realtime_event=(void *)1;JNETSteamGame[62]=1;JNETSteamLobby[12]=1;
+    failed_try_lock=&jnet_maintenance_lifetime;jnet_realtime_after_capture();assert(!realtime_signals && JNETSteamGame[1]==sends);
+    failed_try_lock=NULL;jnet_realtime_after_capture();assert(realtime_signals==1 && JNETSteamGame[1]==sends);
+    jnet_maintenance_stopping=1;jnet_realtime_after_capture();assert(realtime_signals==1);jnet_maintenance_stopping=0;
+    realtime_waits=0;assert(jnet_realtime_worker(NULL)==1);
+    assert(realtime_waits==2 && realtime_wait_timeout[0]==8 && realtime_wait_timeout[1]==8 && realtime_releases==1);
     jnet_sg_reset();assert(!jnet_realtime_service());
+    realtime_waits=0;assert(jnet_realtime_worker(NULL)==1);
+    assert(realtime_waits==2 && realtime_wait_timeout[1]==250 && realtime_releases==1);
+    jnet_realtime_event=NULL;JNETSteamGame[62]=0;
+    puts("Transport handoff: contended frame flush defers, worker flush signals without sending, shutdown handle guard, active 8 ms / idle 250 ms waits and idle Steam-call suppression passed with deterministic Win32 stubs.");
     puts("Frame-independent service: receive/publish and send without callback frames; stale/dirty membership, generation and admission gates; no synchronous roster APIs passed.");
 }
 static float motion_x(const struct jc_actor_sender *sample){float x;memcpy(&x,sample->state.bytes,4);return x;}
@@ -570,10 +729,10 @@ static void travel_test(uint64_t room) {
         assert(!jnet_travel_native_loaded(level,(level+1)%12,0,1,1));
     }
     jnet_travel_reset();jnet_queue_level_original=queue_fixture;
-    jnet_sl.room=0;jnet_sl_status("Loading destination - other players can continue");
+    jnet_sl.room=0;jnet_sl_status("Loading");
     jnet_travel_busy=1;jnet_travel_complete();
     assert(!jnet_travel_busy && jnet_travel.local_loaded && JNETSteamGame[95]==1);
-    assert(!strcmp(jnet_sl.status,"Destination loaded - ready to travel"));
+    assert(!strcmp(jnet_sl.status,"Level loaded"));
     JNETSteamLobby[10]=0;assert(jnet_travel_begin(3));jnet_travel_reset();
     assert(jnet_travel_begin(0) && jnet_travel.chapter_select);jnet_travel_reset();
     assert(jnet_travel_begin_mode(0,0,0,0) && !jnet_travel.chapter_select);jnet_travel_reset();
@@ -623,9 +782,13 @@ static void travel_test(uint64_t room) {
     jc_packet_put(proposal+4,1,4);jnet_travel_message(0,proposal,95);assert(!jnet_travel_busy);
     jnet_travel_message(1,proposal,104);assert(!jnet_travel_busy);
     jnet_travel_message(0,proposal,104);assert(jnet_travel_busy && jnet_travel.level==8);
+    assert(jnet_travel_peer_loading(42,clock_ms) && jnet_travel_peer_loading(44,clock_ms));
+    assert(!jnet_travel_peer_loading(99,clock_ms));
     jc_packet_put(proposal+56,9,4);jnet_travel_message(0,proposal,104);assert(jnet_travel.level==8);jc_packet_put(proposal+56,8,4);
     jc_packet_put(proposal+4,3,4);jnet_travel_message(0,proposal,104);assert(jnet_travel_busy);
     jnet_travel.local_loaded=1;jnet_travel_poll_live();assert(!jnet_travel_busy);
+    assert(jnet_travel_peer_loading(44,clock_ms));
+    assert(!jnet_travel_peer_loading(44,clock_ms+2000));
     jnet_travel_message(0,proposal,104);assert(!jnet_travel_busy);
     jnet_travel_reset();jc_packet_put(proposal+4,1,4);jc_packet_put(proposal+56,7,4);jc_packet_put(proposal+88,0,4);jc_packet_put(proposal+92,6,4);
     jnet_travel_message(0,proposal,104);assert(jnet_travel_busy && jnet_travel.paradise && jnet_travel.level==7);
@@ -641,6 +804,7 @@ static void travel_test(uint64_t room) {
     jnet_travel_reset();assert(!jnet_travel_epoch);jnet_sl.identity=42;
     jnet_sn.peers[0].identity=43;assert(jnet_travel_begin(9));clock_ms=jnet_travel.deadline+1;
     jnet_travel_poll_live();assert(!jnet_travel_busy && jnet_sl.room==room);
+    assert(!strcmp(jnet_sl.status,"Loading timed out"));
     jnet_travel_reset();jnet_current_level=6;JNETSteamLobby[9]=1;
     memset(jnet_sg.peers,0,sizeof(jnet_sg.peers));
     jnet_sn.peers[1].admitted=jnet_sn.peers[1].connected=0;
@@ -676,6 +840,38 @@ static void travel_test(uint64_t room) {
     jnet_daynight_mode=3;assert(jnet_travel_native_request(3,0));
     assert(jnet_travel.lighting==0 && !jnet_travel.cycle_ms && !jnet_daynight_mode);
     jnet_travel_reset();jnet_daynight_host=~0u;
+    jnet_travel_peer_wait=jnet_travel_peer_loading;
+    jnet_daynight_mode=0;
+    for(unsigned origin=0;origin<12;++origin)for(unsigned destination=0;destination<12;++destination) {
+        jnet_travel_reset();jnet_sl.identity=42;jnet_sn.peers[0].identity=43;
+        jnet_current_level=origin;
+        assert(jnet_travel_begin(destination));
+        unsigned char request[104];memcpy(request,travel_sent,sizeof(request));
+        uint64_t epoch=jnet_travel_epoch,deadline=jnet_travel.deadline;
+        assert(jnet_travel_peer_loading(43,clock_ms));
+        assert(!jnet_travel_peer_loading(99,clock_ms));
+        jnet_travel.loaded=1;jnet_travel_complete();
+        assert(!jnet_travel_busy && jnet_travel_peer_loading(43,clock_ms));
+        clock_ms+=1001;memset(travel_sent,0,sizeof(travel_sent));jnet_travel_poll_live();
+        assert(jnet_travel_epoch==epoch && !memcmp(request,travel_sent,sizeof(request)));
+        assert(!jnet_travel_peer_loading(43,deadline));
+        jc_packet_put(request+4,2,4);request[92]^=2;
+        jnet_travel_message(0,request,sizeof(request));assert(jnet_travel_peer_loading(43,clock_ms));
+        request[92]^=2;jnet_travel_message(0,request,sizeof(request));
+        assert(jnet_travel_peer_loading(43,clock_ms));
+        assert(!jnet_travel_peer_loading(43,jnet_travel.resume_until));
+        jnet_travel_reset();jnet_sl.identity=43;jnet_sn.peers[0].identity=42;
+        jc_packet_put(request+4,1,4);jnet_travel_message(0,request,sizeof(request));
+        assert(jnet_travel_busy && jnet_travel.level==destination);
+        jnet_travel.queued=1;jnet_travel_complete();
+        memset(travel_sent,0,sizeof(travel_sent));jnet_travel_message(0,request,sizeof(request));
+        assert(!jnet_travel_busy && jnet_travel.queued==1 && jc_packet_get(travel_sent+4,4)==2);
+        assert(jc_packet_get(travel_sent+48,8)==epoch);
+        request[16]^=1;memset(travel_sent,0,sizeof(travel_sent));
+        jnet_travel_message(0,request,sizeof(request));assert(!travel_sent[0]);
+    }
+    jnet_travel_reset();jnet_sl.identity=42;jnet_sn.peers[0].identity=43;
+    puts("Travel recovery: all 144 source/destination pairs, same-level reloads, slow guest grace, bounded timeout, retry, duplicate acknowledgement without reload and mismatched request rejection passed with fake Steam.");
     (void)jnet_travel_levels;
     puts("Live travel protocol with fake Steam: host authority, independent local completion, authenticated nonce, replay, invalid destination, ignored legacy resume, local timeout without lobby loss and session reset passed. Native loading not exercised.");
 }
@@ -744,7 +940,13 @@ int JNET_LOBBY_TEST_MAIN(void) {
     assert(jnet_sl_equal(public_room,"journet.chat","0") && jnet_sl_equal(public_room,"journet.cmatw","0"));
     assert(jnet_sl_equal(public_room,"journet.visibility","public") && !strcmp(data((void *)1,public_room,"journet.code"),""));
     selected[0]=public_room;selected_count=1;jnet_sl_search(1);finish_search(1);assert(jnet_sl.count==1 && worldwide==1 && filters==4);
-    assert(!strcmp(jnet_sl.names[0],"Random's Lobby"));
+    assert(!strcmp(jnet_sl.names[0],"Random"));
+    set_data((void *)1,public_room,"journet.cmatw","1");
+    set_data((void *)1,public_room,"journet.host_name","devishaz");
+    jnet_sl_search(1);finish_search(1);assert(!strcmp(jnet_sl.names[0],"devishaz"));
+    char unknown_name[33];jnet_sl_copy_name(unknown_name,"[Unknown]");
+    assert(!strcmp(unknown_name,"Steam player"));
+    set_data((void *)1,public_room,"journet.cmatw","0");
     action(3,0,NULL,0,0);assert(!jnet_sl.room && leave_count==1);
     action(1,1,NULL,0,0);assert(jnet_sl.kind==2 && strlen(jnet_sl.code)==4);finish_search(0);assert(jnet_sl.kind==4);
     uint64_t private_room=add_room(42);finish_create(private_room);assert(jnet_sl.kind==6 && jnet_sl_equal(private_room,"journet.visibility","code_only"));
@@ -752,17 +954,17 @@ int JNET_LOBBY_TEST_MAIN(void) {
     selected[0]=private_room;jnet_sl_search(1);finish_search(1);assert(jnet_sl.count==0);
     action(3,0,NULL,0,0);
     set_data((void *)1,private_room,"journet.code","ABCD");
-    action(2,0,"ABCD",0,0);finish_search(0);assert(strstr(jnet_sl.status,"No joinable"));
-    action(2,0,"ABCD",0,0);selected_count=2;selected[0]=private_room;selected[1]=public_room;finish_search(2);assert(strstr(jnet_sl.status,"Ambiguous") && !join_count);
+    action(2,0,"ABCD",0,0);finish_search(0);assert(strstr(jnet_sl.status,"No lobby found"));
+    action(2,0,"ABCD",0,0);selected_count=2;selected[0]=private_room;selected[1]=public_room;finish_search(2);assert(strstr(jnet_sl.status,"Code matches multiple lobbies") && !join_count);
     action(2,0,"ABCD",0,0);selected_count=1;selected[0]=private_room;finish_search(1);assert(jnet_sl.kind==5);finish_join(private_room,4);assert(!jnet_sl.room && JNETSteamLobby[4]==4);
     action(2,0,NULL,public_room,42);action(3,0,NULL,0,0);unsigned before=leave_count;finish_join(public_room,1);assert(!jnet_sl.room && leave_count==before+1);
     action(1,0,NULL,0,0);clock_ms+=30001;jnet_sl_poll_result();assert(jnet_sl.cancelled && jnet_sl.call);before=leave_count;finish_create(public_room);assert(!jnet_sl.room && leave_count==before+1);
-    action(1,0,NULL,0,0);finish_create(public_room);rooms[0].host=99;clock_ms+=1000;jnet_sl_tick();assert(!jnet_sl.room && strstr(jnet_sl.status,"Host left"));rooms[0].host=42;
+    action(1,0,NULL,0,0);finish_create(public_room);rooms[0].host=99;clock_ms+=1000;jnet_sl_tick();assert(!jnet_sl.room && strstr(jnet_sl.status,"Lobby ended"));rooms[0].host=42;
     if(!jnet_sl.call)jnet_sl_search(1);action(1,0,NULL,0,0);assert(jnet_sl.deferred.kind==1);pending.result.count=0;pending.done=1;jnet_sl_tick();assert(jnet_sl.kind==4 && !jnet_sl.deferred.kind);finish_create(public_room);action(3,0,NULL,0,0);
-    JNETSteamLobby[9]=0;before=create_count;action(1,0,NULL,0,0);assert(create_count==before && strstr(jnet_sl.status,"Finish loading"));JNETSteamLobby[9]=1;
-    JNETSteamLobby[10]=1;action(1,0,NULL,0,0);assert(create_count==before && strstr(jnet_sl.status,"Native companion"));JNETSteamLobby[10]=0;
+    JNETSteamLobby[9]=0;before=create_count;action(1,0,NULL,0,0);assert(create_count==before && strstr(jnet_sl.status,"Load a level first"));JNETSteamLobby[9]=1;
+    JNETSteamLobby[10]=1;action(1,0,NULL,0,0);assert(create_count==before && strstr(jnet_sl.status,"Companion unavailable"));JNETSteamLobby[10]=0;
     uint64_t ordinary=add_room(55);set_data((void *)1,ordinary,"level","2");
-    before=join_count;action(2,0,NULL,ordinary,55);assert(join_count==before && !jnet_sl.call && strstr(jnet_sl.status,"not a compatible"));
+    before=join_count;action(2,0,NULL,ordinary,55);assert(join_count==before && !jnet_sl.call && strstr(jnet_sl.status,"Incompatible lobby"));
     JNETSteamLobby[9]=0;before=join_count;
     action(2,0,NULL,public_room,42);assert(join_count==before+1);finish_join(public_room,1);
     assert(jnet_sl.room==public_room);clock_ms+=501;jnet_sl_tick();assert(jnet_sl.room==public_room);
@@ -806,14 +1008,17 @@ int JNET_LOBBY_TEST_MAIN(void) {
     set_data((void *)1,public_room,"journet.nonce",jnet_sl.nonce);jnet_sl_metadata_events=0;
     puts("Session metadata: notifications, unrelated/member events, missed-event fallback, generation invalidation, owner transfer, nonce changes and uncached admission verified.");
     action(3,0,NULL,0,0);
-    action(2,0,NULL,public_room,42);assert(jnet_sl.kind==5);rooms[0].host=77;finish_join(public_room,1);assert(!jnet_sl.room && strstr(jnet_sl.status,"incompatible"));rooms[0].host=42;
+    action(2,0,NULL,public_room,42);assert(jnet_sl.kind==5);rooms[0].host=77;finish_join(public_room,1);assert(!jnet_sl.room && strstr(jnet_sl.status,"Lobby unavailable"));rooms[0].host=42;
     selected[0]=ordinary;jnet_sl_search(1);finish_search(1);assert(!jnet_sl.count && JNETSteamLobby[18]==1 && JNETSteamLobby[19]==1);
     before=search_count;action(5,0,NULL,0,0);assert(search_count==before+1 && jnet_sl.kind==1);finish_search(0);
     clock_ms+=60000;before=search_count;jnet_sl_tick();assert(search_count==before);
+    status_test(public_room);
     rooms[0].local_member=1;
     transport_test(public_room);
     membership_poll_test(public_room);
     gameplay_test(public_room);
+    coalescing_test(public_room);
+    war_delivery_test(public_room);
     character_switch_matrix(public_room);
     game_bridge_test();
     metrics_test();

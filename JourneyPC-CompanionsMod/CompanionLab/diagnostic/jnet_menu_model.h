@@ -35,7 +35,7 @@ struct jnet_appearance_edit {
     unsigned awaiting;
 };
 static inline unsigned jnet_appearance_row_count(unsigned character) {
-    return 6u+(jnet_character_variant_limit(character)!=0 || jnet_character_is_flow(character));
+    return 6u+(character!=JNET_CHARACTER_WAR_MACHINE && (jnet_character_variant_limit(character)!=0 || jnet_character_is_flow(character)));
 }
 static inline void jnet_appearance_observe(struct jnet_appearance_edit *edit,unsigned outfit,unsigned scarf,unsigned symbol,int initial) {
     if(!edit || outfit>6 || scarf>JNET_SCARF_MAX || symbol>20 || edit->awaiting)return;
@@ -142,6 +142,7 @@ static inline int jnet_appearance_step(struct jnet_appearance_edit *edit,unsigne
                 edit->draft.character=edit->draft.character==JNET_CHARACTER_FLOW_1?JNET_CHARACTER_FLOW_2:JNET_CHARACTER_FLOW_1;
                 edit->draft.variant=0;return JNET_MENU_OK;
             }
+            if(edit->draft.character==JNET_CHARACTER_WAR_MACHINE)return JNET_MENU_UNAVAILABLE;
             value=&edit->draft.variant;
             limit=jnet_character_variant_limit(edit->draft.character);
             if(!limit)return JNET_MENU_UNAVAILABLE;

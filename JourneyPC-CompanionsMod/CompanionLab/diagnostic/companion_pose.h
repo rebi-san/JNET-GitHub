@@ -38,7 +38,7 @@ static inline int jc_pose_encode(const unsigned char build[16],const struct jc_p
     unsigned any=0; for (unsigned i=0;i<16;++i) any|=s->identity[i];
     if (!any || !s->sequence || s->chapter<1 || s->chapter>6 || (s->flags&~JC_POSE_FLAGS) || !jc_pose_transform_valid(s->transform) || !jc_anim_valid(&s->animation) || !jc_pose_appearance_valid(s->flags,s->appearance)) return 0;
     if ((s->flags&JC_POSE_LEAVE) && !(s->flags&JC_POSE_ROOM)) return 0;
-    memset(out,0,JC_POSE_BYTES); memcpy(out,"JCP5",4); jc_session_put(out+4,5,2);
+    memset(out,0,JC_POSE_BYTES); memcpy(out,"JNP5",4); jc_session_put(out+4,5,2);
     jc_session_put(out+6,JC_POSE_BYTES,2); memcpy(out+8,build,16); memcpy(out+24,s->identity,16);
     jc_session_put(out+40,s->sequence,8); jc_session_put(out+48,s->chapter,4);
     jc_session_put(out+52,s->flags,4);
@@ -62,7 +62,7 @@ static inline int jc_pose_receive(struct jc_pose_receiver *r,const unsigned char
     if (now-r->rate_start>=1000) { r->attempts=0; r->rate_start=now; }
     if (r->attempts>=32) return 2;
     ++r->attempts;
-    if (!packet || length!=JC_POSE_BYTES || memcmp(packet,"JCP5",4) ||
+    if (!packet || length!=JC_POSE_BYTES || memcmp(packet,"JNP5",4) ||
         jc_session_get(packet+4,2)!=5 || jc_session_get(packet+6,2)!=JC_POSE_BYTES ||
         memcmp(packet+8,build,16) || (jc_session_get(packet+52,4)&~JC_POSE_FLAGS)) return 3;
     unsigned char tag[32]; unsigned difference=0;

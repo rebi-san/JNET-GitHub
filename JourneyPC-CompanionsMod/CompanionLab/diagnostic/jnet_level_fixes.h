@@ -3,6 +3,7 @@
 #include "jnet_texture_guard.h"
 #include "jnet_resource_view.h"
 static void *jnet_resource_view_original;
+static uint64_t (*jnet_resource_buffer_original)(uintptr_t,uint32_t,unsigned char);
 static volatile LONG jnet_resource_view_rejected;
 static uint64_t jnet_resource_view_guard(uintptr_t object,uint32_t index) {
     unsigned failure=0;
@@ -15,6 +16,10 @@ static uint64_t jnet_resource_view_guard(uintptr_t object,uint32_t index) {
         message(line);
     }
     return result;
+}
+static uint64_t jnet_resource_buffer_guard(uintptr_t object,uint32_t index,unsigned char writable) {
+    if(writable)return jnet_resource_buffer_original(object,index,writable);
+    return jnet_resource_view_guard(object,index);
 }
 static uintptr_t jnet_bryan_mesh;
 static unsigned jnet_bryan_visits;

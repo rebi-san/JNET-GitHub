@@ -10,7 +10,7 @@ struct jc_connection {
 static inline int jc_connection_hello(const struct jc_connection *c,const unsigned char build[16],
         jc_actor_packet_mac mac,void *ctx,unsigned char out[JC_CONNECTION_HELLO_BYTES]) {
     if(!c || !c->local || !c->peer || c->local==c->peer || !c->epoch || !mac)return 0;
-    memset(out,0,JC_CONNECTION_HELLO_BYTES);memcpy(out,"JCH1",4);
+    memset(out,0,JC_CONNECTION_HELLO_BYTES);memcpy(out,"JNH1",4);
     jc_packet_put(out+4,JC_CONNECTION_HELLO_BYTES,4);memcpy(out+8,build,16);
     jc_packet_put(out+24,c->local,8);jc_packet_put(out+32,c->peer,8);jc_packet_put(out+40,c->epoch,8);
     memcpy(out+48,c->nonce,16);memcpy(out+64,c->candidate_nonce,16);
@@ -18,7 +18,7 @@ static inline int jc_connection_hello(const struct jc_connection *c,const unsign
 }
 static inline int jc_connection_receive(struct jc_connection *c,const unsigned char build[16],
         const unsigned char *p,size_t bytes,jc_actor_packet_mac mac,void *ctx) {
-    if(!c || !p || bytes!=JC_CONNECTION_HELLO_BYTES || memcmp(p,"JCH1",4) ||
+    if(!c || !p || bytes!=JC_CONNECTION_HELLO_BYTES || memcmp(p,"JNH1",4) ||
         jc_packet_get(p+4,4)!=bytes || memcmp(p+8,build,16) || !mac)return JC_STREAM_ARGUMENT;
     unsigned char tag[32];if(!mac(ctx,p,80,tag))return JC_STREAM_ARGUMENT;
     unsigned diff=0,any=0;for(unsigned i=0;i<32;++i)diff|=tag[i]^p[80+i];
@@ -38,7 +38,7 @@ static inline int jc_connection_receive(struct jc_connection *c,const unsigned c
 }
 static inline int jc_connection_key(const struct jc_connection *c,jc_actor_packet_mac mac,
         void *ctx,unsigned char key[32]) {
-    unsigned char context[68]={0};memcpy(context,"JCK1",4);
+    unsigned char context[68]={0};memcpy(context,"JNK1",4);
     unsigned local_first=c->local<c->peer;
     jc_packet_put(context+4,local_first?c->local:c->peer,8);
     jc_packet_put(context+12,local_first?c->peer:c->local,8);

@@ -149,14 +149,15 @@ local function apply(profile,enabled,amount,trace)
         local emitter=barn:GetEmitter(i)
         local name=emitter:GetName()
         if state.effects and state.effects[name] and emitterData[name] then
-            emitter:GetBlueprint():intensity((emitterData[name].intensity or 1)*stars)
+            emitter:GetBlueprint():intensity((emitterData[name].intensity or 1)*(enabled and stars or 1))
         end
     end
     for _,row in pairs(state.effects or {}) do
         local effect=Names[row.name]
         if effect then
-            effect:killParticlesOnDisable(profile.moon or row.kill)
-            effect:SetEnabled(stars>0)
+            effect:killParticlesOnDisable((enabled and profile.moon) or row.kill)
+            if enabled then effect:SetEnabled(stars>0)
+            else effect:SetEnabled(row.enabled) end
 
         end
     end
@@ -167,6 +168,7 @@ function __JNETDayNightUpdate(elapsed,level,mode)
     local profile=base
     if base.alternate and mode==3 then profile=base.alternate end
     local enabled=mode~=0
+    if not enabled and not state.active then return end
     state.mode=mode
 
     local phase=mode==2 and (elapsed%1800)/900 or 0

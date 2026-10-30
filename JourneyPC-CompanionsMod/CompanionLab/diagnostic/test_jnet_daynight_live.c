@@ -11,6 +11,7 @@ static unsigned char pending;
 static int game_mode=1,fail_part;
 static unsigned calls,updates;
 static unsigned jnet_saved_lighting;
+static unsigned settings_calls,settings_fail,settings_failure_messages;
 static char command[200];
 static int gettop(lua_State *s){(void)s;return 0;}
 static void settop(lua_State *s,int n){(void)s;(void)n;}
@@ -22,9 +23,9 @@ static int original_loadbuffer(lua_State *s,const char *p,size_t n,const char *n
 }
 static int pcallfn(lua_State *s,int a,int b,int c,int d,void *p){(void)s;(void)a;(void)b;(void)c;(void)d;(void)p;return 0;}
 static void pushclosure(lua_State *s,int (*fn)(lua_State *),int n){(void)s;(void)fn;(void)n;}
-static void message(const char *s){(void)s;}
+static void message(const char *s){if(strstr(s,"lighting preference could not be saved"))++settings_failure_messages;}
 static uint64_t GetTickCount64(void){return clock_ms;}
-static int jnet_settings_apply(unsigned group){assert(group==4);jnet_saved_lighting=jnet_daynight_mode>2?0:jnet_daynight_mode;return 1;}
+static int jnet_settings_apply(unsigned group){assert(group==4);++settings_calls;if(settings_fail)return 0;jnet_saved_lighting=jnet_daynight_mode>2?0:jnet_daynight_mode;return 1;}
 static int own_read(void *ctx,uintptr_t at,void *out,size_t n){
     (void)ctx;
     if(at==0x1c0330 && n==1)memcpy(out,&pending,n);
@@ -33,6 +34,7 @@ static int own_read(void *ctx,uintptr_t at,void *out,size_t n){
     else return 0;
     return 1;
 }
+static unsigned jnet_menu_restart_pending;
 #include "jnet_daynight_live.h"
 int main(void){
     for(unsigned level=0;level<8;++level){
@@ -63,5 +65,27 @@ int main(void){
     jnet_daynight_game(0);assert(jnet_daynight_failed && updates==before && !jnet_daynight_part);
     fail_part=0;jnet_daynight_loaded(&lua);assert(!jnet_daynight_failed);
     jnet_current_level=7;jnet_paradise_cutscene=1;before=calls;jnet_daynight_game(0);assert(calls==before);
+    jnet_paradise_cutscene=0;jnet_daynight_host=~0u;
+    jnet_daynight_mode=jnet_saved_lighting=1;
+    for(unsigned level=0;level<2;++level){
+        jnet_current_level=level;jnet_daynight_loaded(&lua);
+        while(jnet_daynight_part<jnet_daynight_data[level].count){clock_ms+=50;jnet_daynight_game(0);}
+        assert(jnet_daynight_mode==1 && jnet_saved_lighting==1);
+    }
+    assert(strstr(command,"0.000,1,1"));
+    settings_fail=1;before=settings_calls;jnet_daynight_mode=2;
+    clock_ms+=50;jnet_daynight_game(0);assert(settings_calls==before+1 && settings_failure_messages==1);
+    for(unsigned frame=0;frame<99;++frame){clock_ms+=50;jnet_daynight_game(0);}
+    assert(settings_calls==before+1 && settings_failure_messages==1);
+    clock_ms+=50;jnet_daynight_game(0);assert(settings_calls==before+2 && settings_failure_messages==1);
+    jnet_daynight_mode=0;clock_ms+=50;jnet_daynight_game(0);
+    assert(settings_calls==before+3 && settings_failure_messages==2);
+    settings_fail=0;clock_ms+=5000;jnet_daynight_game(0);
+    assert(settings_calls==before+4 && jnet_saved_lighting==0);
+    for(unsigned frame=0;frame<100;++frame){clock_ms+=50;jnet_daynight_game(0);}
+    assert(settings_calls==before+4 && settings_failure_messages==2);
+    jnet_daynight_mode=1;clock_ms+=50;jnet_daynight_game(0);
+    assert(settings_calls==before+5 && jnet_saved_lighting==1);
     puts("Lighting clock: bounded loading, partial-data gate, preserved return phase, loading pause, host phase, wrap, Day reset, failure recovery and Cutscene bypass passed; fixture only.");
+    puts("Lighting persistence: 20 Hz callbacks retry failed saves at 5-second intervals; changed choices and successful retries reset the delay; repeat failures do not spam logs.");
 }

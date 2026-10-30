@@ -27,14 +27,19 @@ local baseline = function(...)
 end
 env.Tick = baseline
 assert(loadfile('CompanionLab/companion_probe.lua', 't', env))()
-local p = env.JourneyCompanionProbe
+local p = env.scarfhelper
 local function samples()
     local rows = {}
-    for _, line in ipairs(output) do if line:match('^%[JC%] sample=') then rows[#rows+1] = line end end
+    for _, line in ipairs(output) do if line:match('^%[JNET%] sample=') then rows[#rows+1] = line end end
     return rows
 end
 local function latest() local rows = samples(); return rows[#rows] end
 assert(p and env.Tick == baseline)
+assert(loadfile('CompanionLab/companion_probe.lua', 't', env))()
+assert(env.scarfhelper == p and env.Tick == baseline)
+env.Game = { GetCurrentLevelNumber = function() return level end }
+p.bindings()
+assert(table.concat(output, '\n'):match('%[JNET%] binding=Game.GetCurrentLevelNumber'))
 env.game = { playerBarn = function() error('wrong global') end }
 assert(not p.sample())
 assert(p.start())
@@ -123,11 +128,11 @@ assert(#samples() <= 120)
 local count, retained = #output, math.min(120, #samples())
 p.dump()
 assert(#output - count == retained)
-assert(p.uninstall() and env.JourneyCompanionProbe == nil)
+assert(p.uninstall() and env.scarfhelper == nil)
 -- A fresh session reaches the sample cap in eight windows, without invoking __eq.
 output = {}
 assert(loadfile('CompanionLab/companion_probe.lua', 't', env))()
-p = env.JourneyCompanionProbe
+p = env.scarfhelper
 for w=1,8 do
     assert(p.start())
     local n = #samples()

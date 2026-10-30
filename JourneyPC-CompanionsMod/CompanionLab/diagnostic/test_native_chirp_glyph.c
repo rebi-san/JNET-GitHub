@@ -18,7 +18,9 @@ static int traveler_context(void) {return 1;}
 static int jc_actor_material_independent(jc_layout_reader r,void *p,const struct jc_actor_identity *id,unsigned *o) {
     (void)r;(void)p;(void)id;(void)o;return alias;
 }
-static void message(const char *s) {assert(s && *s);}
+static char audio_log[512];
+static int jc_local_windows_write(uint64_t at,const void *value,size_t bytes) {memcpy((void *)(uintptr_t)at,value,bytes);return 1;}
+static void message(const char *s) {assert(s && *s);snprintf(audio_log,sizeof(audio_log),"%s",s);}
 #include "traveler_chirp_glyph.h"
 static void put(void *p,size_t at,uint64_t n) {memcpy((char *)p+at,&n,8);}
 static void number(void *p,size_t at,float n) {memcpy((char *)p+at,&n,4);}
@@ -31,6 +33,25 @@ static void JC_GLYPH_ABI mock(uintptr_t e,float dt,uintptr_t barn,uintptr_t came
 }
 static int JC_GLYPH_ABI native_strcmp(const char *a,const char *b) {return strcmp(a,b);}
 static uintptr_t JC_GLYPH_ABI sound_lookup(void) {return 0;}
+static uint64_t audio_handle;
+static unsigned fallback_calls;
+static uintptr_t JC_GLYPH_ABI fallback_mock(uintptr_t sounds,uint64_t *out,const char *bank,const char *cue,
+    const float *position,float near_distance,float far_distance,float gain,unsigned char flags,float parameter,
+    unsigned char a,unsigned char b) {
+    assert(!strcmp(bank,"Shared") && !strcmp(cue,"PlayerChirp"));
+    assert(position[0]==3 && position[1]==4 && position[2]==5 && position[3]==1);
+    assert(near_distance==10 && far_distance==60 && gain==1 && !flags && !parameter && !a && !b);
+    ++fallback_calls;*out=(UINT64_C(9)<<32)|3;
+    put((void *)sounds,3*0x200+0x214,9);*(unsigned char *)(sounds+3*0x200+0x218)=1;
+    return (uintptr_t)out;
+}
+static void JC_GLYPH_ABI audio_mock(uintptr_t event,float dt,uintptr_t barn,uintptr_t camera,
+    uintptr_t a5,uintptr_t a6,uintptr_t sounds,uintptr_t a8,uintptr_t a9,
+    uintptr_t terrain,uintptr_t physics,unsigned char display,uintptr_t a13,uintptr_t chirps) {
+    (void)dt;(void)barn;(void)camera;(void)a5;(void)a6;(void)sounds;(void)a8;(void)a9;
+    (void)terrain;(void)physics;(void)display;(void)a13;(void)chirps;
+    memcpy((void *)(event+0x60),&audio_handle,8);*(unsigned char *)(event+0x68)=0;
+}
 static float JC_GLYPH_ABI terrain_height(void) {return -100.0f;}
 static _Alignas(16) unsigned char ground_hit[32];
 static uintptr_t JC_GLYPH_ABI ground_probe(void) {return (uintptr_t)ground_hit;}
@@ -110,6 +131,39 @@ int main(void) {
     traveler_glyph_update((uintptr_t)pool+0x10,.125f,(uintptr_t)barn,(uintptr_t)camera,0,0,
         (uintptr_t)sounds,0,0,0,0,0,0,(uintptr_t)pool);
     memcpy(&alpha,glyph+0x730+6*128,4);assert(alpha==0 && pool[0x68]==0);
+    original_glyph_update=audio_mock;traveler_chirp_glyph.valid=0;
+    audio_handle=(UINT64_C(7)<<32)|2;
+    put(sounds,2*0x200+0x214,7);sounds[2*0x200+0x218]=1;
+    number(sounds,2*0x200+0x16c,.5f);number(sounds,2*0x200+0x1ec,1);
+    uint32_t sound_count=1;memcpy(sounds+0x7c7b4,&sound_count,4);
+    for(unsigned test=0;test<3;++test){
+        pool[0x78]=1;traveler_chirp_audio_mark(&bridge);
+        if(test==1)sounds[2*0x200+0x218]=0;
+        if(test==2)put(sounds,2*0x200+0x214,8);
+        traveler_glyph_update((uintptr_t)pool+0x10,.125f,(uintptr_t)barn,(uintptr_t)camera,0,0,
+            (uintptr_t)sounds,0,0,0,0,0,0,(uintptr_t)pool);
+        assert(strstr(audio_log,test==0?"voice-read=1 active=1":test==1?"voice-read=1 active=0":"voice-read=0"));
+    }
+    traveler_chirp_play=fallback_mock;
+    number(pool,0x20,3);number(pool,0x24,4);number(pool,0x28,5);
+    strcpy((char *)sounds+0x70234+0x13c,"PlayerChirp");
+    strcpy((char *)sounds+0x70254+0x13c,"Shared");
+    strcpy((char *)sounds+0x7025d+0x13c,"PlayerChirp");
+    sound_count=2;memcpy(sounds+0x7c7b4,&sound_count,4);
+    number(sounds,2*0x200+0x208,10);number(sounds,2*0x200+0x20c,60);
+    put(sounds,2*0x200+0x214,7);sounds[2*0x200+0x218]=0;
+    pool[0x78]=1;traveler_chirp_audio_mark(&bridge);
+    traveler_glyph_update((uintptr_t)pool+0x10,.125f,(uintptr_t)barn,(uintptr_t)camera,0,0,
+        (uintptr_t)sounds,0,0,0,0,0,0,(uintptr_t)pool);
+    assert(fallback_calls==1 && strstr(audio_log,"fallback-active=1"));
+    uint64_t replacement=0;memcpy(&replacement,pool+0x70,8);assert(replacement==((UINT64_C(9)<<32)|3));
+    sounds[2*0x200+0x218]=1;pool[0x78]=1;traveler_chirp_audio_mark(&bridge);
+    traveler_glyph_update((uintptr_t)pool+0x10,.125f,(uintptr_t)barn,(uintptr_t)camera,0,0,
+        (uintptr_t)sounds,0,0,0,0,0,0,(uintptr_t)pool);
+    assert(fallback_calls==1);
+    assert(!traveler_chirp_audio_fallback((uintptr_t)sounds,(uintptr_t)pool+0x10,"JNTWarVoice",10,60,&replacement));
+    assert(!traveler_chirp_audio_fallback((uintptr_t)sounds,(uintptr_t)pool+0x10,"Player2Chirp",NAN,60,&replacement));
+    assert(fallback_calls==1);
     free(sounds);
     free(actor);free(barn);free(game);munmap(image,0x4000000);
     puts("Chirp glyph: production routing/14-argument ABI, reused slots, wrong thread, alias and identity rejection passed. Zero chirp multiplier reproduced nonfinite native glyph geometry; valid multiplier restored finite geometry. Original native display pass added alpha and positioned owned glyph; first-use, ongoing display and retirement fade executed; audio/terrain lookups intercepted.");

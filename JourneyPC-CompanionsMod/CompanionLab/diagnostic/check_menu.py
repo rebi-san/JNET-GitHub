@@ -9,12 +9,21 @@ sys.path.insert(0, str(HERE.parent))
 from inspect_menu import menu_contract, font_contract
 from inspect_build import ROOT, LAB, pe_sections
 from native_map import offset_for, runtime_functions
+from hull_resources import runtime_header as hull_runtime_header
 
 
 def main():
     data = (ROOT / "JourneyPC/Journey.exe").read_bytes()
     sections = pe_sections(data)
     source = (HERE / "probe_dll.c").read_text()
+    for label,rva in (("menu_initialize_entry",0x21a9b0),("save_serialize_entry",0x1386c0),("controls_passive_entry",0xa5240),("controls_current_entry",0xaedd0)):
+        signature=re.search(label+r"\[\]=\{([^}]+)\}",source)
+        expected=bytes(int(v.strip(),16) for v in signature[1].split(','))
+        at=offset_for(sections,rva,len(expected))
+        assert data[at:at+len(expected)]==expected,label
+    for rva,code in ((0x1030c2,"c785940000001b000000"),(0x103175,"c7859400000008000000")):
+        at=offset_for(sections,rva,10)
+        assert data[at:at+10]==bytes.fromhex(code),"Native menu keyboard binding changed"
     signature = re.search(r"queue_entry\[\]=\{([^}]+)\}", source)
     if signature is None:
         raise ValueError("QueueLevel startup signature missing")
@@ -139,6 +148,18 @@ def main():
         if data[at:at + len(expected)] != expected:
             raise ValueError(f"Native matchmaking isolation contract changed at {rva:x}")
     print("Pinned native isolation: decimal level search, private-first publication, legacy P2P send/accept call sites verified offline. Live isolation not exercised.")
+    mouse_contract = {
+        0x106332: "0fb686400d00003886410d0000740884c00f85",
+        0x1065bd: "f30f7e8e780c0000",
+        0x107a60: "8b0512c46503f30f5ed8f3480f2ac88b05ffc365030f57c0f3480f2ac00f5bd2f30f5ec8",
+        0x107ac7: "0fb686400d00008886410d00000fb687940200002287900200004122c48886400d0000",
+    }
+    for rva, expected in mouse_contract.items():
+        expected = bytes.fromhex(expected)
+        at = offset_for(sections, rva, len(expected))
+        if data[at:at + len(expected)] != expected:
+            raise ValueError(f"Native menu mouse contract changed at {rva:x}")
+    print("Pinned native menu cursor, aspect conversion and button transitions verified.")
     menu_contract(data)
     font_contract(ROOT / "JourneyPC/font2.fnt")
     sections = pe_sections(data)
@@ -150,17 +171,19 @@ def main():
     travel_source = (HERE / "jnet_travel_live.h").read_text()
     chapter_start = travel_source.index("static uintptr_t jnet_chapter_menu,")
     chapter_end = travel_source.index("static int jnet_travel_level_ready(", chapter_start)
-    (work / "chapter_code.h").write_text(travel_source[chapter_start:chapter_end])
+    fade_start = travel_source.index("static int jnet_travel_fade(")
+    fade_end = travel_source.index("static void jnet_travel_game(", fade_start)
+    (work / "chapter_code.h").write_text(travel_source[chapter_start:chapter_end]+travel_source[fade_start:fade_end])
     patch_start = travel_source.index("static int jnet_mepal_site(")
     patch_end = travel_source.index("\n#endif", patch_start)
     (work / "mepal_code.h").write_text(travel_source[patch_start:patch_end])
     lines = ["static void load_menu_code(unsigned char *image) {"]
-    for rva, length in ((0x372ad0, 0x50), (0x1024a0, 0x1fe), (0x1042b5, 0xd1), (0x68b24c, 4), (0xda6c0, 0x14e), (0xd7fc34, 4), (0x1468e0, 0x94)):
+    for rva, length in ((0x21a9b0,0xb2), (0x372ad0, 0x50), (0x372990, 0xf0), (0x1024a0, 0x1fe), (0x1042b5, 0xd1), (0x68b24c, 4), (0xda6c0, 0x14e), (0xd7fc34, 4), (0x1468e0, 0x94)):
         at = offset_for(sections, rva, length)
         code = ",".join(str(b) for b in data[at:at + length])
         lines.append("{ static const unsigned char code[]={" + code + "};")
         lines.append(f"memcpy(image+{rva},code,sizeof(code));}}")
-    lines.append("image[0x104386]=0xc3;}")
+    lines.append("image[0x104386]=0xc3;image[0x21a890]=0xc3;}")
     (work / "menu_code.h").write_text("\n".join(lines) + "\n")
     functions={start:end-start for start,end,_ in runtime_functions(data,sections)}
     lines=["static void load_environment_code(unsigned char *image) {"]
@@ -179,7 +202,42 @@ def main():
     save_start=appearance_source.index("static int jnet_appearance_local_saved(")
     save_end=appearance_source.index("static int jnet_appearance_boot(",save_start)
     (work / "save_poll_code.h").write_text(appearance_source[save_start:save_end])
+    commit_start=appearance_source.index("static void (*jnet_save_serialize_original)")
+    commit_end=appearance_source.index("static void (*jnet_save_poll_original)",commit_start)
+    newer_start=appearance_source.index("static int jnet_save_newer(")
+    newer_end=appearance_source.index("static unsigned jnet_appearance_initialized",newer_start)
+    restore_start=appearance_source.index("static int jnet_save_restore_local(")
+    restore_end=appearance_source.index("static void (*jnet_save_load_original)",restore_start)
+    (work / "save_commit_code.h").write_text(appearance_source[newer_start:newer_end]+appearance_source[restore_start:restore_end]+appearance_source[commit_start:commit_end])
     character_source=(HERE / "jnet_character_live.h").read_text()
+    switch_state_start=character_source.index("struct jnet_character_state {")
+    switch_state_end=character_source.index("static struct jnet_character_state jnet_character_instances[3];",switch_state_start)
+    (work / "character_switch_state.h").write_text(character_source[switch_state_start:switch_state_end])
+    reactivate_start=character_source.index("static void jnet_character_reactivate_state(")
+    reactivate_end=character_source.index("static int jnet_character_reposition_cached(",reactivate_start)
+    (work / "character_reactivate_code.h").write_text(character_source[reactivate_start:reactivate_end])
+    switch_start=character_source.index("static int jnet_character_switch_native(")
+    switch_end=character_source.index("static int jnet_character_ground(",switch_start)
+    (work / "character_switch_code.h").write_text(character_source[switch_start:switch_end])
+    remote_start=character_source.index("static void jnet_character_remote_tick(")
+    remote_end=character_source.index("static struct jnet_character_state *jnet_character_creature_for_dude(",remote_start)
+    (work / "character_remote_code.h").write_text(character_source[remote_start:remote_end])
+    ride_owner_start=character_source.index("static int jnet_character_ride_owner(")
+    ride_owner_end=character_source.index("static void jnet_character_ride(",ride_owner_start)
+    (work / "character_ride_owner_code.h").write_text(character_source[ride_owner_start:ride_owner_end])
+    grab_start=character_source.index("static void (*jnet_character_grab_original)")
+    grab_end=character_source.index("static void (*jnet_character_ride_original)",grab_start)
+    (work / "character_grab_code.h").write_text(character_source[grab_start:grab_end])
+    hit_start=character_source.index("static void (*jnet_character_hit_original)")
+    hit_end=character_source.index("static void jnet_character_attack(",hit_start)
+    (work / "character_hit_code.h").write_text(character_source[hit_start:hit_end])
+    ride_start=character_source.index("static int jnet_character_ride_pose(")
+    ride_end=character_source.index("static void jnet_character_remote_tick(",ride_start)
+    (work / "character_ride_code.h").write_text(character_source[ride_start:ride_end])
+    authority_start=character_source.index("static __thread uintptr_t jnet_character_attack_scope;")
+    authority_end=character_source.index("static void (*jnet_character_attack_original)",authority_start)
+    (work / "character_authority_code.h").write_text(character_source[authority_start:authority_end])
+
     eye_start=character_source.index("static void (*jnet_character_eye_original)")
     eye_end=character_source.index("static unsigned char (*jnet_character_jump_original)",eye_start)
     (work / "character_eye_code.h").write_text(character_source[eye_start:eye_end])
@@ -188,7 +246,8 @@ def main():
     body_start=character_source.index("static struct jnet_character_state *jnet_character_creature_for_dude(")
     body_end=character_source.index("static unsigned char (*jnet_character_touch_original)",body_start)
     (work / "character_body_code.h").write_text(character_source[restore_start:restore_end]+character_source[body_start:body_end])
-    for name in ("test_jnet_resource_view", "test_jnet_character_body", "test_jnet_character_eye", "test_jnet_save_status", "test_jnet_frame_pacing", "test_jnet_texture_guard", "test_jnet_intro", "test_jnet_character_volume", "test_jnet_character_assets", "test_jnet_character_native", "test_jnet_character", "test_jnet_chat_input", "test_jnet_menu_draw", "test_jnet_menu_live", "test_jnet_menu_model", "test_jnet_lobby_runtime", "test_jnet_steam_probe", "test_jnet_steam_lobby", "test_jnet_rocket", "test_jnet_group_travel", "test_jnet_travel_native", "test_jnet_appearance_live", "test_jnet_freeplay_live", "test_jnet_flower_trail", "test_jnet_flower_view", "test_jnet_flower_dds", "test_jnet_flower_net"):
+    (work / "jnet_hull_payload.h").write_text(hull_runtime_header())
+    for name in ("test_jnet_character_switch", "test_jnet_character_remote", "test_jnet_remote_pose", "test_jnet_resource_view", "test_jnet_character_body", "test_jnet_character_eye", "test_jnet_character_grab", "test_jnet_character_ride_sync", "test_jnet_character_hit", "test_jnet_save_status", "test_jnet_save_commit", "test_jnet_save_profile", "test_jnet_frame_pacing", "test_jnet_texture_guard", "test_jnet_intro", "test_jnet_character_volume", "test_jnet_character_assets", "test_jnet_character_native", "test_jnet_character", "test_jnet_chat_input", "test_jnet_menu_draw", "test_jnet_menu_live", "test_jnet_menu_model", "test_jnet_lobby_runtime", "test_jnet_steam_probe", "test_jnet_steam_lobby", "test_jnet_rocket", "test_jnet_group_travel", "test_jnet_travel_native", "test_jnet_appearance_live", "test_jnet_freeplay_live"):
         binary = work / name
         subprocess.run(["clang", "-arch", "x86_64", "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
                     "-fsanitize=address,undefined", "-I", str(work), "-I", str(HERE),

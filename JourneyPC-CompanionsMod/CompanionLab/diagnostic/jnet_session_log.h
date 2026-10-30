@@ -49,8 +49,9 @@ static inline size_t jnet_log_tail(struct jnet_memory_log *log,char *out,size_t 
     for(uint32_t i=count;i>start && used<cap-1;--i){
         size_t n=jnet_log_read_row(log,i-1,bytes);
         size_t take=n<cap-1-used?n:cap-1-used;
-        memmove(out+take,out,used);memcpy(out,bytes+n-take,take);used+=take;
+        memcpy(out+cap-1-used-take,bytes+n-take,take);used+=take;
     }
+    memmove(out,out+cap-1-used,used);
     out[used]=0;return used;
 }
 #if defined(_WIN32)

@@ -1,0 +1,13 @@
+test_built_package_contains_only_listed_diagnostic_files (test_diagnostic.DiagnosticTests.test_built_package_contains_only_listed_diagnostic_files) ... ok
+test_built_startup_orders_spin_before_wayfarer (test_diagnostic.DiagnosticTests.test_built_startup_orders_spin_before_wayfarer) ... ok
+test_chirp_fingerprint_matches_original_executable (test_diagnostic.DiagnosticTests.test_chirp_fingerprint_matches_original_executable) ... ok
+test_cloth_resource_contract_matches_pinned_executable (test_diagnostic.DiagnosticTests.test_cloth_resource_contract_matches_pinned_executable) ... ok
+test_export_data_and_rva_translation (test_diagnostic.DiagnosticTests.test_export_data_and_rva_translation) ... ok
+test_invalid_ordinals_forwarders_and_missing_terminators (test_diagnostic.DiagnosticTests.test_invalid_ordinals_forwarders_and_missing_terminators) ... ok
+test_public_payload_scan_covers_binary_string_encodings (test_diagnostic.DiagnosticTests.test_public_payload_scan_covers_binary_string_encodings) ... ok
+test_unknown_reference_rejected (test_diagnostic.DiagnosticTests.test_unknown_reference_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 1.024s
+
+OK

@@ -45,6 +45,11 @@ class FlowerShaderTest(unittest.TestCase):
         result, message = compile_shader(c_source('jnet_flower_render.h', 'pixel_source'), 'ps_4_1')
         self.assertEqual(result, 0, message)
 
+    def test_compatible_shaders_compile(self):
+        for variable, target in (("vertex_fallback", "vs_4_0"), ("pixel_fallback", "ps_4_0")):
+            result, message = compile_shader(c_source("jnet_flower_render.h", variable), target)
+            self.assertEqual(result, 0, message)
+
     def test_depth_probe_shaders_compile(self):
         for variable, target in (('vertex_source', 'vs_4_0'), ('pixel_source', 'ps_4_1')):
             result, message = compile_shader(c_source('jnet_flower_scene.h', variable), target)

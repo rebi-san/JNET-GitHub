@@ -129,6 +129,9 @@ static void direct_events(void) {
     puts("Shared companion events: source-independent delivery, native ownership, identity and duplicate guards passed.");
 }
 int main(void) {
+    fixture();assert(!poll(1));reads=0;
+    assert(!poll(2) && !batch.count && reads==6);
+    shout(0,0,1,0,1);assert(!poll(3) && batch.count==1);
     hooked_events();
     fixture();assert(!poll(1));reads=0;
     assert(!poll(2) && !batch.count && reads==6 && capture.frame==2);

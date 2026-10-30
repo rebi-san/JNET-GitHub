@@ -19,8 +19,8 @@ static int flush_record(void *context) {
 }
 static void appearance_records(void) {
     char line[512]; unsigned attempts=0; struct sink sink={0};
-    int n=snprintf(line,sizeof(line),"[JC] appearance source reason=0 parameter=-1 code=0 found=8191 trial_found=8191 definition_match=8191 missing_source=0 missing_trial=0 definition_difference=4096");
-    assert(n==161);
+    int n=snprintf(line,sizeof(line),"[JNET] appearance source reason=0 parameter=-1 code=0 found=8191 trial_found=8191 definition_match=8191 missing_source=0 missing_trial=0 definition_difference=4096");
+    assert(n==163);
     assert(jc_checkpoint_record(&attempts,line,(size_t)n,&sink,write_record,flush_record)==JC_CHECKPOINT_SIZE);
     assert(!attempts && !sink.writes);
     for (unsigned scenario=0;scenario<3;++scenario) {
@@ -37,7 +37,7 @@ static void appearance_records(void) {
         }
     }
     assert(attempts==15 && sink.flushes==15);
-    puts("appearance checkpoints: reproduced 161-byte rejection; all five production formats fit for 891/8191 masks and full signed/unsigned extremes");
+    puts("appearance checkpoints: reproduced 163-byte rejection; all five production formats fit for 891/8191 masks and full signed/unsigned extremes");
 }
 int main(void) {
     appearance_records();

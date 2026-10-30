@@ -3,11 +3,11 @@
 #include <stddef.h>
 #define JC_CHECKPOINT_LIMIT 128u
 #define JC_CHECKPOINT_LENGTH 160u
-#define JC_CP_APPEARANCE_RESULT "[JC] appearance rc=%d stage=%u calls=%u orig=%d check=%u src=%u before=%u after=%u"
-#define JC_CP_APPEARANCE_SOURCE "[JC] appearance source reason=%d param=%d rc=%d found=%u trial=%u match=%u"
-#define JC_CP_APPEARANCE_TEXTURES "[JC] appearance textures missing_src=%u missing_trial=%u different=%u refreshed=%u"
-#define JC_CP_APPEARANCE_LAYOUT "[JC] appearance layout field=%d param=%d variant=%u count=%u bytes=%u"
-#define JC_CP_APPEARANCE_WIDTH "[JC] appearance descriptor table=%d row=%d offset=%u declared=%u needed=%u"
+#define JC_CP_APPEARANCE_RESULT "[JNET] appearance rc=%d stage=%u calls=%u orig=%d check=%u src=%u before=%u after=%u"
+#define JC_CP_APPEARANCE_SOURCE "[JNET] appearance source reason=%d param=%d rc=%d found=%u trial=%u match=%u"
+#define JC_CP_APPEARANCE_TEXTURES "[JNET] appearance textures missing_src=%u missing_trial=%u different=%u refreshed=%u"
+#define JC_CP_APPEARANCE_LAYOUT "[JNET] appearance layout field=%d param=%d variant=%u count=%u bytes=%u"
+#define JC_CP_APPEARANCE_WIDTH "[JNET] appearance descriptor table=%d row=%d offset=%u declared=%u needed=%u"
 enum { JC_CHECKPOINT_OK=0, JC_CHECKPOINT_BUSY=1, JC_CHECKPOINT_HANDLE=2,
        JC_CHECKPOINT_CAP=3, JC_CHECKPOINT_SIZE=4, JC_CHECKPOINT_LINE=5,
        JC_CHECKPOINT_NEWLINE=6, JC_CHECKPOINT_FLUSH=7 };

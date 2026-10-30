@@ -61,7 +61,6 @@ struct jnet_character_control {
 };
 struct jnet_character_intent {
     float direction[3],strength;
-    float roll;
     unsigned spotlight,spotlight_changed;
 };
 struct jnet_character_pose {
@@ -119,14 +118,14 @@ static inline int jnet_character_control_step(struct jnet_character_control *con
         out->strength=1;
     }
     if(control->kind==JNET_CHARACTER_WAR_MACHINE && pressed){
-        control->spotlight=!control->spotlight;
+        control->spotlight=(control->spotlight+1)%3;
         out->spotlight_changed=1;out->spotlight=control->spotlight;
     }
     return 1;
 }
 static inline int jnet_character_smooth(float motion[3],struct jnet_character_intent *intent,float dt,int enabled) {
     if(!motion || !intent || !isfinite(dt) || dt<0 || !isfinite(intent->strength) ||
-       intent->strength<0 || intent->strength>1 || !isfinite(intent->roll))return 0;
+       intent->strength<0 || intent->strength>1)return 0;
     float next[3],length=0,alpha=1-expf(-fminf(dt,.05f)/.28f);
     for(unsigned i=0;i<3;++i){
         if(!isfinite(motion[i]) || !isfinite(intent->direction[i]))return 0;
@@ -144,7 +143,7 @@ static inline int jnet_character_motion_step(const struct jnet_character_pose *c
         struct jnet_character_pose *next) {
     if(!current || !intent || !next || !isfinite(speed) || speed<0 ||
        !isfinite(dt) || dt<0 || !isfinite(intent->strength) ||
-       intent->strength<0 || intent->strength>1 || !isfinite(intent->roll))return 0;
+       intent->strength<0 || intent->strength>1)return 0;
     for(unsigned i=0;i<3;++i)if(!isfinite(current->position[i]))return 0;
     float norm=0;
     for(unsigned i=0;i<4;++i){
@@ -172,9 +171,7 @@ static inline int jnet_character_motion_step(const struct jnet_character_pose *c
         float yaw=atan2f(direction[0],direction[2])*0.5f;
         float pitch=-asinf(fmaxf(-1,fminf(1,direction[1])))*0.5f;
         float sy=sinf(yaw),cy=cosf(yaw),sp=sinf(pitch),cp=cosf(pitch);
-        float sr=sinf(intent->roll*.5f),cr=cosf(intent->roll*.5f);
-        float target[4]={sp*cy*cr+cp*sy*sr,cp*sy*cr-sp*cy*sr,
-            cp*cy*sr-sp*sy*cr,cp*cy*cr+sp*sy*sr};
+        float target[4]={sp*cy,cp*sy,-sp*sy,cp*cy};
         float dot=0,blend=1-expf(-fminf(dt,.05f)/.4f),scale=1/sqrtf(norm);
         for(unsigned i=0;i<4;++i)dot+=current->rotation[i]*target[i];
         float magnitude=0;

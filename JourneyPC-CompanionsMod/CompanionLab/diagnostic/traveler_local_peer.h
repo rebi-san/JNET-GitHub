@@ -65,7 +65,7 @@ static void traveler_local_network_guard(void) {
     if(!JNETNetwork[23]) {
         char line[160];
         JNETNetwork[23]=(LONG)traveler_local_guard;
-        snprintf(line,sizeof(line),"[JC] network ownership guard reason=%u native-state=%u; restart required",
+        snprintf(line,sizeof(line),"[JNET] network ownership guard reason=%u native-state=%u; restart required",
             traveler_local_guard,traveler_local_state);message(line);
     }
     traveler_network.paused=1;JNETNetwork[0]=-1;JNETNetwork[2]=123;
@@ -151,14 +151,14 @@ static void traveler_local_before_input(uintptr_t barn,uintptr_t game) {
                 (traveler_game,(uintptr_t)traveler_local_departure);
         } else if(!traveler_local_dust_finished) {
             traveler_local_dust_finished=GetTickCount64();
-            message("[JC] local native companion meditation/dust finished; allowing effects to fade");
+            message("[JNET] local native companion meditation/dust finished; allowing effects to fade");
         } else if(GetTickCount64()-traveler_local_dust_finished>=2000) {
             unsigned char gates[3]={0,0,0};
             if(!jc_local_windows_write(barn+0xa2,gates,3)){traveler_local_fail(8);return;}
             ++traveler_local_completed;
             traveler_local_state=!traveler_network_active && traveler_repeat.state!=3 && traveler_repeat.state!=-1 && traveler_local_completed<7 ? 1 : 4;
             JNETActor[21]=0;traveler_local_report(0);
-            message("[JC] local native companion departure complete without chapter change");
+            message("[JNET] local native companion departure complete without chapter change");
         }
         return;
     }
@@ -198,7 +198,11 @@ static void traveler_local_before_input(uintptr_t barn,uintptr_t game) {
             layout.gates[0]==1 && !layout.gates[1] && !layout.gates[2] &&
             !layout.blocked && sender.chapter==layout.local_chapter &&
             (traveler_stream_enabled || layout.local_chapter==layout.remote_chapter);
-        if(!retained && (layout.remote_gate || layout.gates[0] || (layout.gates[2] && traveler_local_completed) || (layout.blocked && !traveler_local_completed))){
+        unsigned inactive=traveler_network_active && traveler_stream_enabled &&
+            !traveler_local_completed && !traveler_local_owned_barn &&
+            !layout.gates[0] && layout.gates[1]==1 && layout.gates[2]==1 &&
+            !layout.blocked && sender.chapter==layout.local_chapter;
+        if(!retained && !inactive && (layout.remote_gate || layout.gates[0] || (layout.gates[2] && traveler_local_completed) || (layout.blocked && !traveler_local_completed))){
             static uint64_t last_wait;
             static uintptr_t last_barn;
             static unsigned previous[8];
@@ -206,7 +210,7 @@ static void traveler_local_before_input(uintptr_t barn,uintptr_t game) {
                 layout.blocked,layout.local_chapter,layout.remote_chapter,traveler_local_completed};
             uint64_t now=GetTickCount64();
             if(JNETActor[17]!=5 || last_barn!=barn || memcmp(previous,snapshot,sizeof(snapshot)) ||
-                now<last_wait || now-last_wait>=5000){
+                now<last_wait || now-last_wait>=30000){
                 unsigned reasons=(layout.remote_gate?1u:0u) | (layout.gates[0]?2u:0u) |
                     (layout.gates[2] && traveler_local_completed?4u:0u) |
                     (layout.blocked && !traveler_local_completed?8u:0u);
@@ -263,7 +267,7 @@ static void traveler_local_before_input(uintptr_t barn,uintptr_t game) {
     if(first && !traveler_local_completed && !traveler_network_active) {
         code=traveler_repeat_start(1);
         if(code){traveler_local_fail(20+code);}
-        message("[JC] local three-traveler trial: native receive feed started; no online transport");
+        message("[JNET] local three-traveler trial: native receive feed started; no online transport");
     }
 }
 static int traveler_local_start(void) {

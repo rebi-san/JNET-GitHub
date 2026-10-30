@@ -18,30 +18,30 @@ static int traveler_result(int state,int stage,int code) {
     InterlockedExchange(&JNETTraveler[2],code);
     InterlockedExchange(&JNETTraveler[0],state);
     char line[160];
-    snprintf(line,sizeof(line),"[JC] traveler state=%d stage=%d code=%d context=%ld guard=%ld",
+    snprintf(line,sizeof(line),"[JNET] traveler state=%d stage=%d code=%d context=%ld guard=%ld",
         state,stage,code,(long)JNETTraveler[15],(long)JNETTraveler[16]);
     int logged=boundary_checkpoint(line);
-    snprintf(line,sizeof(line),"[JC] traveler init=%ld cleanup=%ld delete=%ld glyph=%ld/%ld sounds=%ld",
+    snprintf(line,sizeof(line),"[JNET] traveler init=%ld cleanup=%ld delete=%ld glyph=%ld/%ld sounds=%ld",
         (long)JNETTraveler[4],(long)JNETTraveler[5],(long)JNETTraveler[6],
         (long)JNETTraveler[7],(long)JNETTraveler[8],(long)JNETTraveler[9]);
     logged=logged && boundary_checkpoint(line);
-    snprintf(line,sizeof(line),"[JC] traveler geometry cleanup before/after=%ld/%ld check=%ld phase=%ld",
+    snprintf(line,sizeof(line),"[JNET] traveler geometry cleanup before/after=%ld/%ld check=%ld phase=%ld",
         (long)JNETTraveler[40],(long)JNETTraveler[41],(long)JNETTraveler[42],(long)JNETTraveler[43]);
     logged=logged && boundary_checkpoint(line);
-    snprintf(line,sizeof(line),"[JC] traveler callbacks scan=%ld before=%ld/%ld after=%ld/%ld extra=%ld source-match=%ld detail=%ld",
+    snprintf(line,sizeof(line),"[JNET] traveler callbacks scan=%ld before=%ld/%ld after=%ld/%ld extra=%ld source-match=%ld detail=%ld",
         (long)JNETTraveler[32],(long)JNETTraveler[33],(long)JNETTraveler[34],
         (long)JNETTraveler[35],(long)JNETTraveler[36],(long)JNETTraveler[37],
         (long)JNETTraveler[38],(long)JNETTraveler[39]);
     logged=logged && boundary_checkpoint(line);
-    snprintf(line,sizeof(line),"[JC] traveler prepare=%ld controller-own-mesh-before/after=%ld/%ld",
+    snprintf(line,sizeof(line),"[JNET] traveler prepare=%ld controller-own-mesh-before/after=%ld/%ld",
         (long)JNETTraveler[29],(long)JNETTraveler[30],(long)JNETTraveler[31]);
     logged=logged && boundary_checkpoint(line);
-    snprintf(line,sizeof(line),"[JC] traveler gates=%ld/%ld/%ld blocked=%ld chapters=%ld/%ld present=%ld transport=%ld layout=%ld",
+    snprintf(line,sizeof(line),"[JNET] traveler gates=%ld/%ld/%ld blocked=%ld chapters=%ld/%ld present=%ld transport=%ld layout=%ld",
         (long)JNETTraveler[20],(long)JNETTraveler[21],(long)JNETTraveler[22],
         (long)JNETTraveler[23],(long)JNETTraveler[24],(long)JNETTraveler[25],
         (long)JNETTraveler[26],(long)JNETTraveler[27],(long)JNETTraveler[28]);
     logged=logged && boundary_checkpoint(line);
-    snprintf(line,sizeof(line),"[JC] traveler clone=%ld pose=%ld animation=%ld callbacks=%ld restored=%ld",
+    snprintf(line,sizeof(line),"[JNET] traveler clone=%ld pose=%ld animation=%ld callbacks=%ld restored=%ld",
         (long)JNETTraveler[10],(long)JNETTraveler[11],(long)JNETTraveler[12],
         (long)JNETTraveler[13],(long)JNETTraveler[14]);
     logged=logged && boundary_checkpoint(line);

@@ -362,6 +362,7 @@ static int traveler_peer_before_input(void) {return 1;}
 static void traveler_peer_after_input(void) {}
 static void traveler_peer_after_update(void) {}
 #define JC_SAND_ABI __attribute__((ms_abi))
+static unsigned jnet_diagnostic_logs;
 #include "traveler_sand_guard.h"
 #undef __declspec
 static struct jc_actor_runtime_ops trial_ops;

@@ -8,7 +8,7 @@
 #endif
 struct jc_scarf_growth {
     uint64_t image,game,actor,pool,sounds,binding,payload;
-    unsigned slot,active;
+    unsigned slot,active,deferred;
     _Alignas(16) unsigned char native[0x20];
 };
 static inline int jc_scarf_growth_check(jc_layout_reader read,void *ctx,const struct jc_scarf_growth *g) {
@@ -80,7 +80,10 @@ static inline int jc_scarf_growth_step(jc_layout_reader read,jc_actor_writer wri
     float vectors[8];uint64_t handle;memcpy(&handle,g->native+0x18,8);
     if((uint32_t)handle!=UINT32_MAX && (uint32_t)handle>=512)return 0;
     if(!read(ctx,g->actor+0x2290,vectors,16) || !read(ctx,g->actor+0x14270,vectors+4,16))return 0;
-    for(unsigned i=0;i<8;++i)if(!isfinite(vectors[i]))return 0;
+    for(unsigned i=0;i<8;++i)if(!isfinite(vectors[i])) {
+        if(!jc_scarf_growth_stop(read,write,ctx,g))return 0;
+        ++g->deferred;return 1;
+    }
     float glow=fminf(1.f,fmaxf(0,(delta-jc_actor_scalar(g->image,0x68afd8))*jc_actor_scalar(g->image,0x68b520)));
     if(!write(ctx,g->actor+0x143c,&glow,4))return 0;
     g->active=1;

@@ -4,7 +4,7 @@ static const char *const jnet_travel_levels[]={"Level_Graveyard","Level_Barrens"
     "Level_Cave","Level_Ruins","Level_Mountain","Level_Summit","Level_Credits","Level_Bryan","Level_Matt","Level_Chris"};
 static void (*jnet_queue_level_original)(uintptr_t,const char *,unsigned char,unsigned char);
 static struct {
-    uint64_t room,generation,deadline,serial;
+    uint64_t room,generation,deadline,serial,next_retry,resume_until;
     uint64_t members[3];unsigned count,loaded,level,freeplay,chapter_select,restart,paradise,queued,local_loaded,init_before,delete_before,had_object;
     uint32_t handles[7];
     unsigned lighting,cycle_ms;
@@ -47,7 +47,7 @@ static int jnet_mepal_prepare(unsigned level) {
     for(unsigned i=0;i<4;++i)if(!jnet_mepal_site(sites[i],normal[i],enabled[i],sizes[i],i<3?meet:play)){
         int restored=1;
         for(unsigned j=0;j<=i;++j)restored=jnet_mepal_site(sites[j],normal[j],enabled[j],sizes[j],old[j]) && restored;
-        if(!restored)message("[JC] MEPAL patch rollback failed; restart Journey before further travel");
+        if(!restored)message("[JNET] MEPAL patch rollback failed; restart Journey before further travel");
         return 0;
     }
     return 1;
@@ -56,13 +56,25 @@ static int jnet_mepal_prepare(unsigned level) {
 static void jnet_travel_reset(void) {
     memset(&jnet_travel,0,sizeof(jnet_travel));jnet_travel_epoch=0;jnet_travel_busy=0;jnet_daynight_sync=0;
 }
+static int jnet_travel_peer_loading(uint64_t identity,uint64_t now) {
+    if(!jnet_sl.room || jnet_travel.room!=jnet_sl.room || jnet_travel.generation!=jnet_sl.generation ||
+        now>=jnet_travel.deadline)return 0;
+    unsigned member=0;
+    if(jnet_sn_members.room==jnet_sl.room)for(unsigned i=0;i<jnet_sn_members.count && i<3;++i)
+        member|=jnet_sn_members.ids[i]==identity;
+    if(!member)return 0;
+    for(unsigned i=0;i<jnet_travel.count;++i)
+        if(jnet_travel.members[i]==identity)return jnet_travel_busy || now<jnet_travel.resume_until ||
+            (jnet_sl.host==jnet_sl.identity && !(jnet_travel.loaded&(1u<<i)));
+    return 0;
+}
 static void jnet_travel_leave_for_title(void) {
     memset(&jnet_sl.deferred,0,sizeof(jnet_sl.deferred));
     ++jnet_sl.generation;
     jnet_sl_leave();
     jnet_sl.cancelled=!!jnet_sl.call;
     jnet_travel_reset();
-    jnet_sl_status("Left Steam lobby - returning to title");
+    jnet_sl_status("Returning to title");
 }
 #ifndef JNET_TRAVEL_FIXTURE
 static void jnet_travel_quit_to_title(void) {
@@ -98,7 +110,7 @@ static int jnet_travel_send(unsigned type,uint64_t only) {
     return ok;
 }
 static void jnet_travel_cancel(const char *reason) {
-    jnet_travel_busy=0;jnet_travel.queued=0;jnet_sg_reset();
+    jnet_travel_busy=0;jnet_travel.queued=0;jnet_travel.deadline=0;jnet_sg_reset();
     jnet_sl_status(reason);
 }
 static void jnet_travel_pause(void) {
@@ -106,7 +118,7 @@ static void jnet_travel_pause(void) {
     AcquireSRWLockExclusive(&jnet_sg_lock);
     jnet_sg_mail.event_count=jnet_sg_mail.outgoing_count=0;
     memset(&jnet_sg_mail.outgoing.chirp,0,sizeof(jnet_sg_mail.outgoing.chirp));
-    if(jnet_travel.level!=jnet_current_level){
+    if(jnet_travel.restart || jnet_travel.chapter_select || jnet_travel.level!=jnet_current_level){
         memset(jnet_sg_mail.records,0,sizeof(jnet_sg_mail.records));
         memset(&jnet_sg_mail.outgoing,0,sizeof(jnet_sg_mail.outgoing));
     }
@@ -115,15 +127,15 @@ static void jnet_travel_pause(void) {
 }
 static int jnet_travel_begin_mode(unsigned level,unsigned freeplay,unsigned chapter_select,unsigned restart) {
     if(level>=12){jnet_sl_status("Unknown destination");return 0;}
-    if(jnet_travel_busy){jnet_sl_status("Previous destination is still loading");return 0;}
-    if(!jnet_queue_level_original){jnet_sl_status("Native level travel is unavailable");return 0;}
-    if(JNETSteamLobby[10]){jnet_sl_status("Native companion ownership is present or unreadable");return 0;}
-    if(jnet_sl.room && jnet_sl.host!=jnet_sl.identity){jnet_sl_status("Only the current host can choose a destination");return 0;}
+    if(jnet_travel_busy){jnet_sl_status("Loading");return 0;}
+    if(!jnet_queue_level_original){jnet_sl_status("Travel unavailable");return 0;}
+    if(JNETSteamLobby[10]){jnet_sl_status("Companion unavailable");return 0;}
+    if(jnet_sl.room && jnet_sl.host!=jnet_sl.identity){jnet_sl_status("Only the host can choose a level");return 0;}
     if(jnet_sl.room && (!jnet_sn_member(jnet_sl.identity) || jnet_sn_members.count>3))return 0;
     if(jnet_sl.room){
         unsigned admitted=1;
         for(unsigned i=0;i<7;++i)admitted+=!!(jnet_sn.peers[i].admitted && jnet_sn.peers[i].connected);
-        if(admitted!=jnet_sn_members.count){jnet_sl_status("Waiting for guest connections before travel");return 0;}
+        if(admitted!=jnet_sn_members.count){jnet_sl_status("Waiting for connections");return 0;}
     }
     for(unsigned i=0;i<7;++i)jnet_travel.handles[i]=jnet_sn.peers[i].admitted?jnet_sn.peers[i].handle:0;
     jnet_travel.count=jnet_sl.room?jnet_sn_members.count:0;
@@ -136,10 +148,11 @@ static int jnet_travel_begin_mode(unsigned level,unsigned freeplay,unsigned chap
     if(jnet_travel.lighting==3 && level!=2 && level!=3)jnet_travel.lighting=0;
     jnet_travel.cycle_ms=jnet_travel.lighting==2?jnet_daynight_elapsed:0;
     jnet_travel.deadline=GetTickCount64()+90000;jnet_travel.loaded=0;jnet_travel.local_loaded=0;
-    jnet_travel.queued=0;jnet_travel_pause();
-    if(jnet_sl.room && !jnet_travel_send(1,0)){jnet_travel_cancel("Travel could not reach every guest");return 0;}
+    jnet_travel.resume_until=0;
+    jnet_travel.queued=0;jnet_travel.next_retry=GetTickCount64()+1000;jnet_travel_pause();
+    if(jnet_sl.room)jnet_travel_send(1,0);
     jnet_daynight_sync=(uint64_t)jnet_travel.cycle_ms+1;
-    jnet_sl_status("Traveling together");return 1;
+    jnet_sl_status("Loading");return 1;
 }
 static int jnet_travel_begin(unsigned level) {
     return jnet_travel_begin_mode(level,level==8 || level==10 || level==11,level==0,1);
@@ -170,18 +183,24 @@ static int jnet_travel_message(unsigned slot,const unsigned char *p,size_t bytes
         jnet_daynight_mode=lighting;jnet_daynight_host=lighting;
         jnet_daynight_sync=(uint64_t)cycle_ms+1;
         jnet_travel.deadline=GetTickCount64()+90000;jnet_travel.loaded=0;
+        jnet_travel.resume_until=0;
         if(!continuing)jnet_travel.queued=jnet_travel.local_loaded=0;
         jnet_travel_pause();
     } else if(epoch==jnet_travel_epoch && level==jnet_travel.level && count==jnet_travel.count &&
+        freeplay==jnet_travel.freeplay && chapter_select==jnet_travel.chapter_select && restart==jnet_travel.restart &&
+        paradise==jnet_travel.paradise && lighting==jnet_travel.lighting && cycle_ms==jnet_travel.cycle_ms &&
         !memcmp(members,jnet_travel.members,count*sizeof(uint64_t))) {
+        if(kind==1 && source==jnet_sl.host && source!=jnet_sl.identity && jnet_travel.local_loaded)
+            jnet_travel_send(2,jnet_sl.host);
         if(kind==2 && jnet_sl.host==jnet_sl.identity)
             for(unsigned i=0;i<count;++i)if(members[i]==source)jnet_travel.loaded|=1u<<i;
     }
     return 1;
 }
 static void jnet_travel_complete(void) {
+    jnet_travel.resume_until=GetTickCount64()+2000;
     jnet_travel.local_loaded=1;jnet_travel_busy=0;jnet_save_requested=1;
-    jnet_sl_status(jnet_sl.room?"Steam connected - gameplay active":"Destination loaded - ready to travel");
+    jnet_sl_status(jnet_sl.room?"Connected":"Level loaded");
     JNETSteamGame[90]=0;JNETSteamGame[95]=1;
 }
 static int jnet_travel_playable_menu(void);
@@ -190,12 +209,24 @@ static void jnet_travel_poll_live(void) {
     JNETSteamGame[92]=(LONG)jnet_current_level;JNETSteamGame[93]=(LONG)jnet_travel_epoch;
     JNETSteamGame[94]=(LONG)jnet_travel.queued;JNETSteamGame[95]=(LONG)jnet_travel.local_loaded;
     JNETSteamGame[96]=(LONG)jnet_travel.loaded;JNETSteamGame[97]=(LONG)jnet_travel.count;
-    if(jnet_travel_busy) {
-        if(jnet_travel.room!=jnet_sl.room || jnet_travel.generation!=jnet_sl.generation || GetTickCount64()>=jnet_travel.deadline) {
-            jnet_travel_cancel("Travel cancelled: session changed or loading timed out");return;
+    if(jnet_sl.room && jnet_sl.host==jnet_sl.identity && jnet_travel.room==jnet_sl.room &&
+        jnet_travel.generation==jnet_sl.generation && GetTickCount64()<jnet_travel.deadline) {
+        unsigned waiting=0;
+        for(unsigned i=0;i<jnet_travel.count;++i)if(jnet_travel.members[i]!=jnet_sl.identity &&
+            !(jnet_travel.loaded&(1u<<i)) && jnet_sn_member(jnet_travel.members[i])) {
+            ++waiting;
+            if(GetTickCount64()>=jnet_travel.next_retry)jnet_travel_send(1,jnet_travel.members[i]);
         }
+        if(GetTickCount64()>=jnet_travel.next_retry)jnet_travel.next_retry=GetTickCount64()+1000;
+        if(waiting)jnet_sl_status("Waiting for players");
+    }
+    if(jnet_travel_busy) {
+        if(jnet_travel.room!=jnet_sl.room || jnet_travel.generation!=jnet_sl.generation) {
+            jnet_travel_cancel("Travel cancelled");return;
+        }
+        if(GetTickCount64()>=jnet_travel.deadline){jnet_travel_cancel("Loading timed out");return;}
         if(jnet_travel.local_loaded)jnet_travel_complete();
-        else {jnet_sl_status("Loading destination - other players can continue");return;}
+        else {jnet_sl_status("Loading");return;}
     }
     if(jnet_sl.room && jnet_sl.host==jnet_sl.identity && JNETSteamLobby[9] && jnet_travel_playable_menu()) {
         for(unsigned i=0;i<7;++i)if(jnet_sn.peers[i].admitted && jnet_sn.peers[i].connected &&
@@ -220,6 +251,19 @@ static int jnet_travel_native_loaded(unsigned current,unsigned target,unsigned p
 }
 #ifndef JNET_TRAVEL_FIXTURE
 static uintptr_t jnet_chapter_menu,jnet_chapter_game;
+static uintptr_t jnet_chapter_entry_game;
+static void (*jnet_menu_initialize_original)(uintptr_t,uintptr_t);
+static void jnet_menu_initialize(uintptr_t menu,uintptr_t game) {
+    jnet_menu_initialize_original(menu,game);
+    if(game!=jnet_chapter_entry_game)return;
+    uintptr_t type=0;uint64_t entry=1;unsigned char playable[2]={0,1};
+    if(own_read(NULL,menu,&type,8) && type==fault_image+0x679c18 &&
+       jc_local_windows_write(menu+0xe8,&entry,8) &&
+       jc_local_windows_write(menu+0x20,playable,sizeof(playable)))
+        message("[JNET] Chapter Select hub entry restored after native menu initialization");
+    else message("[JNET] Chapter Select hub entry could not be restored");
+    jnet_chapter_entry_game=0;
+}
 static void (*jnet_menu_frame_original)(uintptr_t,uintptr_t);
 static void jnet_menu_frame(uintptr_t menu,uintptr_t game) {
     jnet_chapter_menu=menu;jnet_chapter_game=game;
@@ -232,15 +276,21 @@ static int jnet_travel_playable_menu(void) {
         own_read(NULL,jnet_chapter_menu+0x20,flags,sizeof(flags)) && !flags[0] && flags[1]==1;
 }
 static int jnet_travel_entry_chapter(unsigned level,unsigned restart,unsigned chapter_select,int playable) {
-    return chapter_select || (!level && !restart && !playable);
+    if(chapter_select || (!level && !restart && !playable))return 1;
+    return !level && restart?2:0;
 }
 static int jnet_travel_menu_prepare(uintptr_t game,unsigned chapter_select) {
     uintptr_t save=0,type=0,menu=jnet_chapter_menu;
     unsigned char snapshot[0x1ba8],menu_state[0xf0],spawn[12];
-    uint64_t zero=0;unsigned char enabled=1;float fade;
+    uint64_t zero=0,boot=1;unsigned char enabled=1;float fade;
     if(game!=jnet_chapter_game || !menu ||
        !own_read(NULL,menu,menu_state,sizeof(menu_state)))return 0;
     memcpy(&type,menu_state,8);if(type!=fault_image+0x679c18)return 0;
+    if(chapter_select==2)return jc_local_windows_write(menu+0xe8,&zero,4) &&
+        jc_local_windows_write(game+0x1c0374,&zero,8) &&
+        jc_local_windows_write(game+0x1c037c,&zero,4) &&
+        jc_local_windows_write(menu+0x20,&zero,1) &&
+        jc_local_windows_write(menu+0x21,&enabled,1);
     if(!chapter_select)return jc_local_windows_write(menu+0x20,&zero,1) &&
         jc_local_windows_write(menu+0x21,&enabled,1);
     if(!own_read(NULL,game+0x170,&save,8) || !save ||
@@ -255,8 +305,8 @@ static int jnet_travel_menu_prepare(uintptr_t game,unsigned chapter_select) {
     return jc_local_windows_write(save+0x1590,&zero,4) &&
         jc_local_windows_write(save+0x50,&enabled,1) &&
         jc_local_windows_write(menu+0x20,&zero,1) &&
-        jc_local_windows_write(menu+0x21,&enabled,1) &&
-        jc_local_windows_write(menu+0xe8,&zero,4) &&
+        jc_local_windows_write(menu+0x21,&zero,1) &&
+        jc_local_windows_write(menu+0xe8,&boot,8) &&
         jc_local_windows_write(menu+0xe0,&black,8) &&
         jc_local_windows_write(game+0x1c0374,&zero,8) &&
         jc_local_windows_write(game+0x1c037c,&zero,4) &&
@@ -289,32 +339,56 @@ static int jnet_traveler_rearm(void) {
     traveler_peer_depart_requested=traveler_peer_restart_requested=0;JNETActorTrial[0]=0;
     allocation_attempted=0;JNETTraveler[0]=0;JNETTraveler[19]=1;return 1;
 }
+static int jnet_travel_fade(uintptr_t game) {
+    lua_State *state=NULL;float duration=0;
+    if(!own_read(NULL,game+0x20,&state,8) || !state ||
+       !own_read(NULL,fault_image+0xd7fc34,&duration,4) ||
+       !isfinite(duration) || duration<=0 || duration>10)return 0;
+    char source[1024];
+    snprintf(source,sizeof(source),
+        "local e=HudAddElement.cast(game:eventBarn():MetaAddEvent('HudAddElement')) "
+        "e:elementName('JNETTravelFade') e:texName('Black') "
+        "e:alpha(1) e:dimx(3.556) e:dimy(2) e:posx(-1.778) e:posy(-1) "
+        "e:depth(0) e:isPauseElem(true) e:fadeIn(%.9g) e:fadeOut(0) e:duration(%.9g) e:Start()",
+        (double)duration,(double)duration+1);
+    int top=gettop(state);
+    int ok=original_loadbuffer(state,source,strlen(source),"JNET-travel-fade","t")==0 &&
+        pcallfn(state,0,0,0,0,NULL)==0;
+    settop(state,top);
+    if(!ok)message("[JNET] native travel fade unavailable; load cancelled");
+    return ok;
+}
 static void jnet_travel_game(uintptr_t game) {
     int level=-1;if(!jc_render_level(own_read,NULL,game,&level) && level>=0 && level<12)jnet_current_level=(unsigned)level;
     if(!jnet_travel_busy)return;
     jnet_realtime_enter();
     if(!jnet_travel.queued) {
+        unsigned char pending=1;
+        if(!own_read(NULL,game+0x1c0330,&pending,1) || pending)goto done;
         int playable=game==jnet_chapter_game && jnet_travel_playable_menu();
         if(playable && !jnet_travel.restart && !jnet_travel.chapter_select && jnet_travel_level_ready(game) && jnet_mepal_play==jnet_travel.freeplay)jnet_travel.queued=2;
         else {
             jnet_mepal_play=jnet_travel.freeplay;
             uintptr_t match=0;unsigned char connected=1;
             if(!own_read(NULL,game+0x180,&match,8) || !match || !own_read(NULL,match+0x11db4,&connected,1) || connected ||
-                !jnet_mepal_prepare(jnet_travel.level)){jnet_travel_cancel("Travel refused: native ownership or MEPAL validation failed");goto done;}
+                !jnet_mepal_prepare(jnet_travel.level)){jnet_travel_cancel("Travel unavailable");goto done;}
             jnet_travel.init_before=(unsigned)JNETTraveler[4];jnet_travel.delete_before=(unsigned)JNETTraveler[6];jnet_travel.had_object=traveler_object!=0;
             if(!jnet_travel_menu_prepare(game,jnet_travel_entry_chapter(jnet_travel.level,jnet_travel.restart,jnet_travel.chapter_select,playable))){
-                jnet_travel_cancel("Native travel menu state is unavailable");goto done;
+                jnet_travel_cancel("Travel unavailable");goto done;
             }
+            if(!jnet_travel_fade(game)){jnet_travel_cancel("Travel fade unavailable");goto done;}
+            jnet_chapter_entry_game=jnet_travel_entry_chapter(jnet_travel.level,jnet_travel.restart,jnet_travel.chapter_select,playable)==1?game:0;
             traveler_local_interrupt();jnet_travel.queued=1;
             unsigned char debug=jnet_travel.level!=0;
             jnet_paradise_cutscene=jnet_travel.paradise;
-            jnet_queue_level_original(game,jnet_travel_levels[jnet_travel.level],debug,debug);
+            jnet_queue_level_original(game,jnet_travel_levels[jnet_travel.level],0,debug);
         }
     }
     if(jnet_travel.queued && jnet_travel_level_ready(game) && !jnet_travel.local_loaded) {
+        jnet_chapter_entry_game=0;
         jnet_travel_complete();
         if(jnet_sl.identity==jnet_sl.host){for(unsigned i=0;i<jnet_travel.count;++i)if(jnet_travel.members[i]==jnet_sl.identity)jnet_travel.loaded|=1u<<i;}
-        else if(jnet_sl.room && !jnet_travel_send(2,jnet_sl.host))jnet_travel_cancel("Travel acknowledgement failed");
+        else if(jnet_sl.room)jnet_travel_send(2,jnet_sl.host);
     }
 done:
     jnet_realtime_leave();
@@ -327,7 +401,7 @@ static void jnet_queue_level(uintptr_t game,const char *target,unsigned char imm
     unsigned chapter_select=level==0 && caller==fault_image+0x21b1a4;
     if(jnet_travel_native_request(level,chapter_select))return;
     if(level>=0){jnet_mepal_play=0;jnet_paradise_cutscene=0;if(jnet_daynight_mode==3)jnet_daynight_mode=0;}
-    if(level>=0 && !jnet_mepal_prepare((unsigned)level)){jnet_sl_status("MEPAL code validation failed");return;}
+    if(level>=0 && !jnet_mepal_prepare((unsigned)level)){jnet_sl_status("Travel unavailable");return;}
     jnet_queue_level_original(game,target,immediate,reset);
 }
 #endif

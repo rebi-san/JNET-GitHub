@@ -1,0 +1,4 @@
+JNET menu model: private discovery, host permissions, confirmed switching, departure/load order, stale responses, mode reload and transactional Apply passed.
+Connection: HMAC corruption/truncation, challenge proof, pinned identities, derived keys, state fidelity, replay, restart and independent third peer passed.
+Peer config: JNN1 and legacy files, all participant/order combinations, unchanged input, truncation, invalid identities/ports/keys and duplicate peers passed.
+Production UDP adapter: two then three endpoints, actual sample fidelity, chirp deduplication, first-admission chirp retention, four immediate post-reconnect chirps, pause/timeout, independent reconnect and process epoch replacement passed. Native game capture and actor rendering remain separate runtime checks.

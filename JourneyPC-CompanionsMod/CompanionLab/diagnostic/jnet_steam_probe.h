@@ -1,6 +1,7 @@
 #ifndef JNET_STEAM_PROBE_H
 #define JNET_STEAM_PROBE_H
 __declspec(dllexport) volatile LONG JNETSteam[24];
+static _Atomic uint64_t jnet_steam_account_identity;
 __declspec(dllexport) char JNETSteamServiceText[2][256];
 struct jnet_steam_relay_status { int32_t availability,pinging,configuration,any_relay;char text[256]; };
 struct jnet_steam_auth_status { int32_t availability;char text[256]; };
@@ -109,6 +110,8 @@ static void jnet_steam_probe(void) {
     LONG sample[12]={0};
     sample[1]=JNETSteam[1];sample[2]=JNETSteam[2];
     jnet_steam_probe_sample(sample);
+    jnet_steam_account_identity=sample[5]==638230 && sample[0]>=3?
+        ((uint64_t)(uint32_t)sample[8]<<32)|(uint32_t)sample[7]:0;
     for(unsigned i=3;i<=11;++i)JNETSteam[i]=sample[i];
     JNETSteam[0]=sample[0];
 }

@@ -82,7 +82,7 @@ static int traveler_udp_poll(unsigned slot,struct jc_actor_stream *stream,uint64
             if(error==WSAEMSGSIZE){++u->rejected;continue;}return 112;
         }
         ++u->received;
-        int code=bytes>=4 && !memcmp(packet,"JCC1",4)?
+        int code=bytes>=4 && !memcmp(packet,"JNC1",4)?
             jc_chirp_packet_receive(&u->chirps,stream,jc_game_hash,packet,(size_t)bytes,now,traveler_udp_mac,u):
             jc_actor_packet_receive(stream,jc_game_hash,packet,(size_t)bytes,now,traveler_udp_mac,u);
         if(code)++u->rejected;

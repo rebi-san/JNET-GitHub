@@ -18,6 +18,15 @@ def main():
     sections = pe_sections(data)
     work = HERE.parent / "work/native-actor"
     work.mkdir(exist_ok=True)
+    probe = (HERE / "probe_dll.c").read_text()
+    start = probe.index("static int traveler_frame_wait(void) {")
+    end = probe.index("static void traveler_frame_complete(", start)
+    (work / "traveler_frame_wait_fixture.h").write_text(probe[start:end])
+    wait_binary = work / "test_traveler_frame_wait"
+    subprocess.run(["clang", "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
+                    "-fsanitize=address,undefined", "-I", str(work),
+                    str(HERE / "test_traveler_frame_wait.c"), "-o", str(wait_binary)], check=True)
+    subprocess.run([str(wait_binary)], check=True, timeout=30)
     ranges = ((0x117790, 0x1179df), (0x1183f4, 0x11865a), (0x117fd0, 0x11802a),
               (0x7a1b0, 0x7a2dd), (0x5c1e60, 0x5c1f40), (0x68ae80, 0x68c020),
               (0x118730, 0x118de8), (0xb1730, 0xb18f4), (0xa9d20, 0xaa481),
@@ -27,7 +36,7 @@ def main():
               (0x217a70,0x217c2d),(0x10f0a0,0x10f1b0),(0x13e6b0,0x13f354),(0x9eed0,0x9f036),
               (0x5cf750,0x5cf780),(0x5cec28,0x5cec48),
               (0xae650,0xaeb44),(0xaedd0,0xaefe3),(0x146870,0x1468d1),
-              (0x245e10,0x246125),(0x10e43b,0x10e5a8),(0x5defa8,0x5df030),(0x8ab10,0x8ad97),(0x117770,0x117785),
+              (0x2445f6,0x244630),(0x245e10,0x246125),(0x10e43b,0x10e5a8),(0x5defa8,0x5df030),(0x8ab10,0x8ad97),(0x117770,0x117785),
               (0x21d980,0x21d9ab),(0x24fa70,0x24fd1c),(0x140790,0x140a0d),(0x5cfa90,0x5cfaa0),
               (0xab830,0xab920),(0xc4d10,0xc4dc5),(0x24bdf0,0x24c002),(0x24c010,0x24c49b),(0x118e57,0x118e7c),(0x677870,0x677880))
     runtime = (HERE / "traveler_actor_runtime.h").read_text()

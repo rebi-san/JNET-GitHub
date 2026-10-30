@@ -1,2 +1,0 @@
-Pinned sound-bank initialized table including relocated self-pointers, occupied/corrupt table refusal, registration/lookup/release: stock fifth-slot limit, expanded sixth through eighth slots, capacity detection (overflow branch intercepted), all-bank lookup, repeated release/reuse and boundary canaries passed. Audio playback not exercised.
-Production sound-bank prepare: original PE slot data accepted, eight self-pointers initialized, idempotence, occupied/corrupt/changed/read-failure refusal and protection/cache rollback passed with mocked Windows APIs.

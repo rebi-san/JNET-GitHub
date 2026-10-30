@@ -15,8 +15,31 @@ static int own_read(void *ctx,uint64_t address,void *out,size_t n) {
 static int jc_local_windows_write(uint64_t at,const void *value,size_t n) {
     memcpy((void *)(uintptr_t)at,value,n);return 1;
 }
+static unsigned jnet_diagnostic_logs;
 static void message(const char *line) {assert(line && *line);}
 #include "traveler_sand_guard.h"
+extern void reference_effect_append(void *,void *);
+__asm__(".text\n.globl _reference_effect_append\n_reference_effect_append:\n"
+    "subq $8,%rsp\nmovq %rsi,%r9\nxorq %r10,%r10\n"
+    "pxor %xmm2,%xmm2\npxor %xmm8,%xmm8\npxor %xmm9,%xmm9\n"
+    "callq *%rdi\naddq $8,%rsp\nretq\n");
+static void effect_capacity_test(void) {
+    unsigned char buffer[0x1000];
+    assert(!mprotect(image,0x700000,PROT_READ|PROT_WRITE));
+    image[0x244630]=0xc3;
+    assert(!mprotect(image,0x700000,PROT_READ|PROT_EXEC));
+    original_effect_append=image+0x2445f6;
+    effect_append_resume=image+0x244630;
+    const unsigned starts[]={0,78,79,80,81,0xffffffff};
+    for(unsigned i=0;i<sizeof(starts)/sizeof(*starts);++i) {
+        memset(buffer,0xa5,sizeof(buffer));memcpy(buffer+0xf10,starts+i,4);
+        reference_effect_append((void *)traveler_effect_append,buffer);
+        unsigned count;memcpy(&count,buffer+0xf10,4);
+        assert(count==(starts[i]<80?starts[i]+1:starts[i]));
+        for(unsigned j=0xf14;j<sizeof(buffer);++j)assert(buffer[j]==0xa5);
+    }
+    assert(atomic_load(&traveler_effect_dropped)==3);
+}
 static uintptr_t JC_SAND_ABI vector_set(uintptr_t material,uintptr_t name,uintptr_t value) {
     assert(material && value);++calls;
     const unsigned offsets[]={0x5defa8,0x5defb8,0x5df000,0x5df010,0x5defe0,0x5deff0};
@@ -108,6 +131,7 @@ int main(void) {
         }
     }
     assert(traveler_sand_inline_dropped>0);
+    effect_capacity_test();
     free(renderer);assert(!munmap(image,0x700000));
     puts("Native inline writer reproduced the reported 0x400000003e000000 overwrite; production pre-write guard preserved the buffer boundary for both kinds and starting counts 0-12. Native sand consumer: seven entries reproduce the reported position-valued shader-name pointer; append and consumer guards submit six valid names each, including writers bypassing the append hook. Native consumer and append code executed; material writes intercepted, no Journey runtime.");
 }

@@ -4,12 +4,14 @@
 static void jnet_sg_game_phase(uintptr_t game,int playback) {
     static uint64_t room,generation,epoch,sequence,next_capture,last_update;
     static struct {uint64_t id,lease,generation,sequence,updated;} timing[2];
+    static struct {uint64_t wire,generation,sequence;struct jc_actor_sender sample;} delivered[2];
+    static struct {uint64_t id,lease;unsigned capacity;} scarf_seen[2];
     static struct {uint64_t id;} memory[2];static struct jc_chirp_capture capture;
     uint64_t now=GetTickCount64(),active_room,identity,active_generation,received;
     struct jnet_game_record records[JNET_STEAM_CAPACITY];
     AcquireSRWLockExclusive(&jnet_sg_lock);
     active_room=jnet_sg_mail.room;identity=jnet_sg_mail.identity;active_generation=jnet_sg_mail.generation;received=jnet_sg_mail.received;
-    memcpy(records,jnet_sg_mail.records,sizeof(records));ReleaseSRWLockExclusive(&jnet_sg_lock);
+    if(playback)memcpy(records,jnet_sg_mail.records,sizeof(records));ReleaseSRWLockExclusive(&jnet_sg_lock);
     if(!active_room && !traveler_network_external)return;
     if(room!=active_room || generation!=active_generation)memset(memory,0,sizeof(memory));
     if(room!=active_room || generation!=active_generation || epoch!=jnet_travel_epoch) {
@@ -27,7 +29,7 @@ static void jnet_sg_game_phase(uintptr_t game,int playback) {
     ++JNETSteamGame[55];
     traveler_network_external=1;traveler_network_active=1;traveler_stream_enabled=1;
     traveler_network.identity=identity;traveler_network.chapter=jnet_current_level;
-    traveler_network.paused=(jnet_travel_busy && jnet_travel_target!=jnet_current_level) || !active_room || !JNETSteamLobby[9] || JNETSteamLobby[10] || JNETNetwork[23];
+    traveler_network.paused=jnet_travel_busy || !active_room || !JNETSteamLobby[9] || JNETSteamLobby[10] || JNETNetwork[23];
     JNETNetwork[0]=traveler_network.paused?2:1;
     JNETSteamGame[26]=JNETSteamGame[34]=0;
     struct jnet_lobby_view lobby;jnet_lobby_snapshot(&lobby);
@@ -83,7 +85,21 @@ static void jnet_sg_game_phase(uintptr_t game,int playback) {
         JNETSteamGame[14]=(LONG)(now-r->seen);if(JNETSteamGame[14]>JNETSteamGame[15])JNETSteamGame[15]=JNETSteamGame[14];
         memory[slot].id=r->id;
         p->connection.local=identity;p->connection.peer=r->id;p->connection.remote_epoch=r->lease;p->connection.admitted=1;
-        p->connection.sequence=jnet_motion_apply(slot,r,generation,now,&p->sample);p->connection.last_seen=r->seen;traveler_udp[slot].ready=1;
+        jnet_motion_apply(slot,r,generation,now,&p->sample);
+        unsigned capacity=0;memcpy(&capacity,p->sample.state.bytes+0x5c,4);
+        if(scarf_seen[slot].id!=r->id || scarf_seen[slot].lease!=r->lease || scarf_seen[slot].capacity!=capacity){
+            char line[160];snprintf(line,sizeof(line),"[JNET] received scarf peer=%llu slot=%u capacity=%u sequence=%llu",
+                (unsigned long long)r->id,slot,capacity,(unsigned long long)r->sequence);message(line);
+            scarf_seen[slot].id=r->id;scarf_seen[slot].lease=r->lease;scarf_seen[slot].capacity=capacity;
+        }
+        float ride_position[3];
+        if(jnet_character_resolve_ride && jnet_character_resolve_ride(r,ride_position))
+            memcpy(p->sample.state.bytes,ride_position,sizeof(ride_position));
+        if(delivered[slot].wire!=r->sequence || delivered[slot].generation!=generation ||
+           memcmp(&delivered[slot].sample,&p->sample,sizeof(p->sample)))++delivered[slot].sequence;
+        delivered[slot].wire=r->sequence;delivered[slot].generation=generation;delivered[slot].sample=p->sample;
+        p->connection.sequence=delivered[slot].sequence;
+        p->connection.last_seen=r->seen;traveler_udp[slot].ready=1;
         traveler_network_chirp_take(slot,now);
     }
     AcquireSRWLockExclusive(&jnet_sg_lock);
@@ -113,7 +129,9 @@ static void jnet_sg_game_phase(uintptr_t game,int playback) {
     }
     if(jnet_travel_busy || !active_room || traveler_network.paused)return;
     struct jc_chirp_batch batch;int chirp=jc_chirp_capture_local(own_read,NULL,game,(uint32_t)JNETFrames,identity,1,&capture,&batch);
-    if(now<next_capture && (chirp || !batch.count))return;next_capture=now+33;
+    if(now<next_capture && (chirp || !batch.count))return;
+    if(!next_capture || now>=next_capture+33)next_capture=now+33;
+    else if(now>=next_capture)next_capture+=33;
     struct jnet_game_record outgoing={.id=identity,.lease=1,.sequence=++sequence,.seen=now};
     int code=jc_actor_capture_sender(own_read,NULL,(uintptr_t)GetModuleHandleW(NULL),game,&outgoing.sample);JNETSteamGame[5]=code;
     static uint64_t next_capture_error;
@@ -132,6 +150,8 @@ static void jnet_sg_game_phase(uintptr_t game,int playback) {
     outgoing.variant=jnet_menu_edit.applied.variant;
     outgoing.rotation_known=jnet_character_capture_rotation && jnet_character_capture_rotation(outgoing.rotation);
     outgoing.character_known=outgoing.character<JNET_CHARACTER_COUNT;
+    if(valid && jnet_character_capture_ride)jnet_character_capture_ride(&outgoing);
+    if(valid && jnet_character_capture_war)jnet_character_capture_war(&outgoing);
     AcquireSRWLockExclusive(&jnet_sg_lock);
     if(jnet_sg_mail.room==active_room && jnet_sg_mail.generation==active_generation) {
         outgoing.chirp=jnet_sg_mail.outgoing.chirp;outgoing.chirp_seen=jnet_sg_mail.outgoing.chirp_seen;

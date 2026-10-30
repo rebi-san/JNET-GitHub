@@ -1,6 +1,19 @@
 #ifndef JC_TRAVELER_NETWORK_H
 #define JC_TRAVELER_NETWORK_H
 #include "companion_connection.h"
+static int traveler_network_config_valid(const unsigned char *config,size_t bytes) {
+    static const unsigned char legacy_config_magic[4]={'J','C','N','1'};
+    if(!config || bytes!=112 || (memcmp(config,"JNN1",4) && memcmp(config,legacy_config_magic,4)))return 0;
+    uint64_t id=jc_packet_get(config+8,8);unsigned port=(unsigned)jc_packet_get(config+4,4);
+    if(id<1 || id>3 || port!=43840+id)return 0;
+    for(unsigned i=0;i<2;++i) {
+        const unsigned char *p=config+16+i*48;uint64_t peer=jc_packet_get(p,8);unsigned any=0;
+        for(unsigned n=16;n<48;++n)any|=p[n];
+        if(peer<1 || peer>3 || peer==id || jc_packet_get(p+8,8)!=43840+peer || !any ||
+            (i && peer==jc_packet_get(config+16,8)))return 0;
+    }
+    return 1;
+}
 struct jc_network_peer {
     struct jc_connection connection;
     struct jc_stream_udp authentication;
@@ -51,14 +64,8 @@ static int traveler_network_start(void) {
     if(file==INVALID_HANDLE_VALUE)return 120;
     int ok=GetFileSize(file,NULL)==sizeof(config) && ReadFile(file,config,sizeof(config),&count,NULL) && count==sizeof(config);
     CloseHandle(file);
+    if(!ok || !traveler_network_config_valid(config,sizeof(config))) {SecureZeroMemory(config,sizeof(config));return 120;}
     uint64_t id=jc_packet_get(config+8,8);unsigned port=(unsigned)jc_packet_get(config+4,4);
-    if(!ok || memcmp(config,"JCN1",4) || id<1 || id>3 || port!=43840+id) {SecureZeroMemory(config,sizeof(config));return 120;}
-    for(unsigned i=0;i<2;++i) {
-        const unsigned char *p=config+16+i*48;uint64_t peer=jc_packet_get(p,8);unsigned any=0;
-        for(unsigned n=16;n<48;++n)any|=p[n];
-        if(peer<1 || peer>3 || peer==id || jc_packet_get(p+8,8)!=43840+peer || !any ||
-            (i && peer==jc_packet_get(config+16,8))) {SecureZeroMemory(config,sizeof(config));return 120;}
-    }
     WSADATA ws;if(WSAStartup(MAKEWORD(2,2),&ws)){SecureZeroMemory(config,sizeof(config));return 121;}
     traveler_network.ws=1;traveler_network.identity=id;
     FILETIME ft;GetSystemTimeAsFileTime(&ft);memcpy(&traveler_network.epoch,&ft,8);
@@ -85,7 +92,7 @@ fail:
 }
 static void traveler_network_send(unsigned slot,const unsigned char *data,unsigned bytes) {
 #ifdef JNET_LOBBY_ENABLED
-    if(bytes>=4 && memcmp(data,"JCH1",4) && !jnet_lobby_allows(traveler_network.peers[slot].connection.peer))return;
+    if(bytes>=4 && memcmp(data,"JNH1",4) && !jnet_lobby_allows(traveler_network.peers[slot].connection.peer))return;
 #endif
     struct sockaddr_in address={0};address.sin_family=AF_INET;address.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
     address.sin_port=htons(traveler_network.peers[slot].port);
@@ -134,10 +141,10 @@ static void traveler_network_tick(uintptr_t game,uint64_t frame) {
             ntohs(address.sin_port)==traveler_network.peers[slot].port)break;
         if(slot==2){++JNETNetwork[5];continue;}
 #ifdef JNET_LOBBY_ENABLED
-        if(bytes<4 || (memcmp(packet,"JCH1",4) && !jnet_lobby_allows(traveler_network.peers[slot].connection.peer)))continue;
+        if(bytes<4 || (memcmp(packet,"JNH1",4) && !jnet_lobby_allows(traveler_network.peers[slot].connection.peer)))continue;
 #endif
         struct jc_network_peer *p=&traveler_network.peers[slot];int code=JC_STREAM_ARGUMENT;
-        if(bytes>=4 && !memcmp(packet,"JCH1",4)) {
+        if(bytes>=4 && !memcmp(packet,"JNH1",4)) {
             uint64_t previous=p->connection.remote_epoch,candidate=p->connection.candidate_epoch;
             code=jc_connection_receive(&p->connection,jc_game_hash,packet,(size_t)bytes,traveler_udp_mac,&p->authentication);
             if(!code && previous!=p->connection.remote_epoch) {
@@ -150,10 +157,10 @@ static void traveler_network_tick(uintptr_t game,uint64_t frame) {
                 if(jc_connection_hello(&p->connection,jc_game_hash,traveler_udp_mac,&p->authentication,reply))
                     traveler_network_send(slot,reply,sizeof(reply));
             }
-        } else if(bytes>=4 && !memcmp(packet,"JCA1",4)) {
+        } else if(bytes>=4 && !memcmp(packet,"JNA1",4)) {
             code=jc_connection_state(&p->connection,jc_game_hash,packet,(size_t)bytes,now,
                 traveler_udp_mac,&traveler_udp[slot],&p->sample);
-        } else if(bytes>=4 && !memcmp(packet,"JCC1",4) && p->connection.admitted && p->connection.sequence) {
+        } else if(bytes>=4 && !memcmp(packet,"JNC1",4) && p->connection.admitted && p->connection.sequence) {
             struct jc_actor_stream wire={.peer=p->connection.peer,.generation=p->connection.remote_epoch,
                 .last_seen=p->connection.last_seen,.clock=p->connection.last_seen,.sample=p->sample};
             code=jc_chirp_packet_receive(&p->wire_chirps,&wire,jc_game_hash,packet,(size_t)bytes,now,traveler_udp_mac,&traveler_udp[slot]);
@@ -210,6 +217,11 @@ static int traveler_network_sample(unsigned slot,int first,struct jc_actor_sende
     struct jc_network_peer *p=&traveler_network.peers[slot];struct jc_actor_stream *s=&traveler_streams[slot].stream;
     uint64_t now=GetTickCount64();
 #ifdef JNET_LOBBY_ENABLED
+    if(traveler_network_external && !JNETNetwork[23] && jnet_travel_peer_wait &&
+        jnet_travel_peer_wait(p->connection.peer,now) &&
+        (traveler_network.paused || !p->connection.admitted || !p->connection.sequence ||
+         now<p->connection.last_seen || now-p->connection.last_seen>=2000 ||
+         p->sample.chapter!=traveler_network.chapter))return JC_STREAM_HELD;
     if(!jnet_lobby_allows(p->connection.peer))return first?JC_STREAM_HELD:JC_STREAM_TIMEOUT;
 #endif
     if(traveler_network.paused || !p->connection.sequence || now<p->connection.last_seen ||

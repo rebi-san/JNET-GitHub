@@ -1,1 +1,0 @@
-Pinned sound-bank registration/lookup/release: stock fifth-slot limit, expanded sixth through eighth slots, capacity detection (overflow branch intercepted), all-bank lookup, repeated release/reuse and boundary canaries passed. Audio playback not exercised.

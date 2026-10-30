@@ -1,5 +1,0 @@
-Idle chirp capture: 6 protected reads, down from 13; no sound table scan.
-Shared companion events: source-independent delivery, native ownership, identity and duplicate guards passed.
-Actor chirp relay: head position, sound selection, duplicate suppression, feedback exclusion, full pool and irreversible enqueue checks passed.
-All seven characters: four charge levels and four variants captured and delivered with preserved origin; native audio playback is stubbed.
-Companion chirp: stable capture, priming, serial wrap/order, same-frame binding, two independent environmental pulses, no local/remote replay, exact enqueue postcheck, native fingerprint/sound/capacity guards; no Journey calls.

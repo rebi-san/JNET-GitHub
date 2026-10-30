@@ -11,7 +11,7 @@
 typedef int32_t LONG;
 typedef size_t SIZE_T;
 #define JC_RVA_MenuAppend 0x1024a0
-#define JC_IMAGE_SIZE 0x3770000
+#define JC_IMAGE_SIZE 0x4100000
 static uintptr_t fault_image;
 static LONG JNETFrames;
 static unsigned char menu[0xe00],nodes[96][0x48],storage[2048*112];
@@ -24,7 +24,7 @@ static void *GetCurrentProcess(void){return NULL;}
 static int ReadProcessMemory(void *process,const void *source,void *out,size_t bytes,SIZE_T *got) {
     (void)process;uintptr_t address=(uintptr_t)source;
     if(!inside(address,bytes,menu,sizeof(menu)) && !inside(address,bytes,nodes,sizeof(nodes)) &&
-       !inside(address,bytes,(void *)fault_image,0x3770000))return 0;
+       !inside(address,bytes,(void *)fault_image,0x4100000))return 0;
     memcpy(out,source,bytes);*got=bytes;return 1;
 }
 static LONG InterlockedExchange(volatile LONG *p,LONG value){LONG old=*p;*p=value;return old;}
@@ -126,14 +126,61 @@ static void navigation(unsigned char *image) {
     }
     string(path+0x30,"Menu");string(path+0x60,"Controls");string(path+0x90,"Longtail");
     pointer(menu+0xc18,path+0xc0);float speed=2;memcpy(menu+0xd74,&speed,4);
-    jnet_menu_pop_original=native_pop_probe;menu[0xd28]=1;jnet_menu_page=1;
+    jnet_menu_pop_original=native_pop_probe;menu[0xc98]=1;menu[0xc99]=0;jnet_menu_page=1;
+    uintptr_t escape=1;memcpy((void *)(fault_image+0x3c47b60+27*8),&escape,8);
+    float opacity=.75f;memcpy(menu+0xd6c,&opacity,4);
     jnet_menu_input((uintptr_t)menu,(uintptr_t)vector);
     uintptr_t end=0;memcpy(&end,menu+0xc18,8);memcpy(&speed,menu+0xd70,4);
-    assert(native_pop_calls==1 && end==(uintptr_t)path+0x60 && speed==-2);
-    assert(jnet_menu_closing && !jnet_menu_page && jnet_menu_input_blocked);
-    menu[0xd28]=0;jnet_menu_closing=0;jnet_menu_input_blocked=0;
+    assert(native_pop_calls==0 && end==(uintptr_t)path+0xc0 && speed==-2);
+    assert(jnet_menu_closing && jnet_menu_page==1 && jnet_menu_input_blocked);
+    jnet_menu_input((uintptr_t)menu,(uintptr_t)vector);
+    jnet_menu_finish_close((uintptr_t)menu);
+    assert(jnet_menu_closing && native_pop_calls==0);
+    menu[0xd68]=0;opacity=0;memcpy(menu+0xd6c,&opacity,4);
+    jnet_menu_finish_close((uintptr_t)menu);
+    memcpy(&end,menu+0xc18,8);
+    assert(!jnet_menu_closing && !jnet_menu_page && native_pop_calls==1 && end==(uintptr_t)path+0x60);
+    speed=2;memcpy(menu+0xd70,&speed,4);
+    menu[0xd68]=1;opacity=.1f;memcpy(menu+0xd6c,&opacity,4);
+    jnet_menu_input((uintptr_t)menu,(uintptr_t)vector);
+    assert(!jnet_menu_closing && !jnet_menu_page);
+    menu[0xc98]=0;menu[0xc99]=0;jnet_menu_input_blocked=0;
+    escape=0;memcpy((void *)(fault_image+0x3c47b60+27*8),&escape,8);
     pointer(menu+0xc10,menu+0xd00);pointer(menu+0xc18,menu+0xd60);
     string(menu+0xd00,"Root");string(menu+0xd30,"Menu");
+}
+static void mouse_input(unsigned char *image) {
+    unsigned char saved_menu[sizeof(menu)],saved_dimensions[8];
+    memcpy(saved_menu,menu,sizeof(menu));memcpy(saved_dimensions,image+0x3763e74,8);
+    float x,y;const unsigned dimensions[][2]={{1080,1920},{1440,3440},{1200,1600}};
+    memset(menu+0xc98,0,0xc0);
+    pointer(menu+0xc10,image+0x2000000);pointer(menu+0xc18,image+0x2000060);
+    string(image+0x2000000,"Root");string(image+0x2000030,"Menu");menu[0xd68]=1;
+    jnet_menu_input_blocked=0;jnet_menu_closing=0;
+    for(unsigned page=1;page<=2;++page)for(unsigned i=0;i<3;++i){
+        jnet_menu_page=page;
+        number(image+0x3763e74,dimensions[i][0]);number(image+0x3763e78,dimensions[i][1]);
+        float point[2]={.87f*dimensions[i][1]/dimensions[i][0],.48f};
+        memcpy(menu+0xc78,point,sizeof(point));
+        menu[0xd40]=menu[0xd41]=0;jnet_menu_input((uintptr_t)menu,0);
+        assert(jnet_menu_pointer((uintptr_t)menu,&x,&y) && fabsf(x-.87f)<.00001f && y==.48f);
+        menu[0xd40]=1;jnet_menu_input((uintptr_t)menu,0);
+        assert(jnet_menu_take_click((uintptr_t)menu,&x,&y) && fabsf(x-.87f)<.00001f && y==.48f);
+        assert(!jnet_menu_take_click((uintptr_t)menu,&x,&y));
+        jnet_menu_input((uintptr_t)menu,0);assert(!jnet_menu_take_click((uintptr_t)menu,&x,&y));
+        menu[0xd41]=1;jnet_menu_input((uintptr_t)menu,0);assert(!jnet_menu_click.pending);
+        menu[0xd40]=menu[0xd41]=0;jnet_menu_input((uintptr_t)menu,0);
+        menu[0xd40]=1;jnet_menu_input((uintptr_t)menu,0);
+        jnet_menu_reset_page();assert(!jnet_menu_take_click((uintptr_t)menu,&x,&y));
+    }
+    float invalid[2]={NAN,0};memcpy(menu+0xc78,invalid,sizeof(invalid));
+    assert(!jnet_menu_pointer((uintptr_t)menu,&x,&y));
+    invalid[0]=INFINITY;memcpy(menu+0xc78,invalid,sizeof(invalid));assert(!jnet_menu_pointer((uintptr_t)menu,&x,&y));
+    invalid[0]=0;invalid[1]=2;memcpy(menu+0xc78,invalid,sizeof(invalid));assert(!jnet_menu_pointer((uintptr_t)menu,&x,&y));
+    number(image+0x3763e74,0);assert(!jnet_menu_pointer((uintptr_t)menu,&x,&y));
+    memset(menu+0xc78,0,8);menu[0xd40]=menu[0xd41]=0;
+    memcpy(menu,saved_menu,sizeof(menu));memcpy(image+0x3763e74,saved_dimensions,8);
+    puts("Native custom-menu mouse: both pages, aspect ratios, press/release, held-button suppression, one-shot consumption and stale/invalid input passed.");
 }
 int main(void) {
     jnet_menu_page=1;jnet_menu_create=1;jnet_menu_password_focus=1;
@@ -144,7 +191,7 @@ int main(void) {
     assert(jnet_menu_level_step(11,1)==9 && jnet_menu_level_step(9,1)==0);
     assert(jnet_menu_level_step(9,-1)==11 && jnet_menu_level_step(10,-1)==8);
     assert(jnet_menu_level_step(0,-1)==9);
-    unsigned char *image=mmap(NULL,0x3770000,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANON,-1,0);
+    unsigned char *image=mmap(NULL,0x4100000,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANON,-1,0);
     assert(image!=MAP_FAILED);fault_image=(uintptr_t)image;load_menu_code(image);
     const char *long_names[]={"%JNET_CONTROL_CHARACTER%","%JNET_CREATURE_3_2_6%"};
     for(unsigned i=0;i<2;++i){
@@ -165,6 +212,7 @@ int main(void) {
     pointer(menu+0xc10,menu+0xd00);pointer(menu+0xc18,menu+0xd60);
     string(menu+0xd00,"Root");string(menu+0xd30,"Menu");menu[0xd68]=1;
     navigation(image);
+    mouse_input(image);
     number(menu+0xb0,2048);pointer(menu+0xb8,storage);
     pointer(menu+0x50,storage);pointer(menu+0x90,menu+0x200);
     pointer(menu+0x208,menu+0x220);pointer(menu+0x248,menu+0x280);
@@ -225,7 +273,7 @@ int main(void) {
         jnet_menu_restore_layout((uintptr_t)menu);
         jnet_menu_native_height=.35f;jnet_menu_layout_owner=(uintptr_t)menu;
         assert(jnet_menu_corner((uintptr_t)menu,fault_image+0x105ca3,&x,&y));
-        assert(fabsf(y-.35f+.88f)<.00001f);
+        assert(fabsf(y-(i==3?.31f:(.35f-.88f)))<.00001f);
         jnet_menu_restore_layout((uintptr_t)menu);
     }
     memset(menu+0xd30,0,32);string(menu+0xd30,"Audio");
@@ -270,6 +318,9 @@ int main(void) {
         }
     }
     puts("JNET readability: white foreground, native opaque black shadow offsets, and complete two-pass capacity reservation passed.");
+    jnet_lobby_view.count=0;jnet_lobby_view.searching=1;
+    number(menu+0xb4,0);assert(jnet_menu_draw_live((uintptr_t)menu)==0);
+    jnet_lobby_view.searching=0;
     jnet_lobby_view.count=3;
     for(unsigned i=0;i<3;++i)jnet_lobby_view.rows[i]=(struct jnet_lobby_row){10+i,i+1,3,0};
     memset(jnet_menu_password,'a',32);jnet_menu_password[32]=0;
@@ -288,9 +339,13 @@ int main(void) {
     jnet_menu_create=0;
     for(unsigned i=0;i<3;++i)strcpy(jnet_lobby_view.member_names[i],"Companion");
     jnet_lobby_view.cmatw=0;number(menu+0xb4,0);assert(jnet_menu_draw_live((uintptr_t)menu)==0);
-    unsigned hidden_names=number_at(menu+0xb4);
+    unsigned companion_names=number_at(menu+0xb4);
     jnet_lobby_view.cmatw=1;number(menu+0xb4,0);assert(jnet_menu_draw_live((uintptr_t)menu)==0);
-    assert(number_at(menu+0xb4)>hidden_names);
+    assert(number_at(menu+0xb4)==companion_names);
+    jnet_lobby_view.cmatw=0;
+    for(unsigned i=0;i<3;++i)strcpy(jnet_lobby_view.member_names[i],"76561198627333172");
+    number(menu+0xb4,0);assert(jnet_menu_draw_live((uintptr_t)menu)==0);
+    assert(number_at(menu+0xb4)==companion_names);
     memset(&jnet_lobby_view,0,sizeof(jnet_lobby_view));memset(jnet_menu_password,0,sizeof(jnet_menu_password));
     jnet_menu_create=jnet_menu_private=0;
     jnet_menu_page=2;number(menu+0xb4,0);jnet_menu_font.present['P'-32]=0;
@@ -319,6 +374,6 @@ int main(void) {
         memcpy(before,rows,256);jnet_menu_align_title((uintptr_t)menu,(uintptr_t)vector,NULL);
         assert(!memcmp(before,rows,256));
     }
-    assert(!munmap(image,0x3770000));
+    assert(!munmap(image,0x4100000));
     puts("JNET live menu adapter: title and pause drawing, submenu/hidden gates, glyph refusal, mapping and capacity checks, and wrong-caller reporting passed.");
 }

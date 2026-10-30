@@ -1,9 +1,0 @@
-Controls: queue bounds, missing actions, key edges, sticky crouch, movement cancel, second-press cancel, pause, focus, creature gating, mouse and trigger bindings passed.
-.....Setting lookup: all bindings resolve with at most two protected reads; native/invalid/read-failure fallback and value bounds passed.
-.JNET settings: clean Back, dirty prompt, isolated Apply, Revert, failed atomic save and original-action passthrough passed.
-.......................
-----------------------------------------------------------------------
-Ran 29 tests in 58.576s
-
-OK
-Lua 5.3 setup 8192-byte bucket peak: repeated compilation 100, cached 0

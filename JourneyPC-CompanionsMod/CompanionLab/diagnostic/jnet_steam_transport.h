@@ -246,18 +246,18 @@ static void jnet_sn_event(const struct jnet_sn_event *event) {
         if(jnet_sl.host!=jnet_sl.identity)jnet_sn_send(slot,1,0);
     } else if(event->info.state>=4) {
         JNETSteamLobby[15]=event->info.reason;jnet_sn_drop(slot);
-        if(jnet_sl.room && jnet_sl.host!=jnet_sl.identity){jnet_sl_leave();jnet_sl_status("Host connection ended; left Steam lobby");}
+        if(jnet_sl.room && jnet_sl.host!=jnet_sl.identity){jnet_sl_leave();jnet_sl_status("Host disconnected");}
     }
 }
-static void jnet_sn_receive_inner(unsigned slot) {
+static int jnet_sn_receive_inner(unsigned slot) {
     struct jnet_sn_message *messages[16];int count=jnet_sn_api.receive(jnet_sn_api.self,jnet_sn.peers[slot].handle,messages,16);
-    if(count<0){JNETSteamLobby[15]=-101;jnet_sn_drop(slot);return;}
+    if(count<0){JNETSteamLobby[15]=-101;jnet_sn_drop(slot);return 0;}
     if(count==16)++JNETSteamP2P[109+slot*8+7];
     for(int i=0;i<count;++i) {
         struct jnet_sn_message *m=messages[i];
         if(m && m->connection==jnet_sn.peers[slot].handle && jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity)jnet_sn_arrival(slot,m);
         if(m && m->bytes>0 && m->data && m->connection==jnet_sn.peers[slot].handle &&
-            jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity && ( (jnet_rocket_receive && jnet_rocket_receive(slot,m->data,(size_t)m->bytes)) || (jnet_flower_receive && jnet_flower_receive(slot,m->data,(size_t)m->bytes)) || (jnet_chat_receive && jnet_chat_receive(slot,m->data,(size_t)m->bytes)) || (jnet_travel_receive && jnet_travel_receive(slot,m->data,(size_t)m->bytes)) || jnet_sg_receive(slot,m->data,(size_t)m->bytes))){m->release(m);continue;}
+            jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity && ( (jnet_rocket_receive && jnet_rocket_receive(slot,m->data,(size_t)m->bytes)) || (jnet_chat_receive && jnet_chat_receive(slot,m->data,(size_t)m->bytes)) || (jnet_travel_receive && jnet_travel_receive(slot,m->data,(size_t)m->bytes)) || jnet_sg_receive(slot,m->data,(size_t)m->bytes))){m->release(m);continue;}
         unsigned char p[72];int valid=m && m->bytes==72 && m->data &&
             m->connection==jnet_sn.peers[slot].handle && jnet_sn_id(&m->peer)==jnet_sn.peers[slot].identity;
         if(valid)memcpy(p,m->data,sizeof(p));if(m)m->release(m);
@@ -272,27 +272,34 @@ static void jnet_sn_receive_inner(unsigned slot) {
         } else {JNETSteamLobby[15]=-104;continue;}
         InterlockedIncrement(&JNETSteamLobby[14]);if(jnet_sn.peers[slot].admitted)jnet_sn.peers[slot].deadline=GetTickCount64()+30000;
     }
+    return count;
 }
 static void jnet_sn_receive(unsigned slot) {
-    uint64_t started=GetTickCount64();jnet_sn_receive_inner(slot);jnet_sn_cost(19,started);
+    uint64_t started=GetTickCount64();
+    uint32_t handle=jnet_sn.peers[slot].handle;
+    for(unsigned batch=0;batch<4;++batch){
+        if(jnet_sn_receive_inner(slot)!=16 || jnet_sn.peers[slot].handle!=handle ||
+           GetTickCount64()-started>=2)break;
+    }
+    jnet_sn_cost(19,started);
 }
 static void jnet_sn_tick_inner(void) {
     if(!jnet_sl.room){if(jnet_sn.room)jnet_sn_reset();return;}
     if(jnet_sl.kind==6)return;
     if(jnet_sn.room!=jnet_sl.room || jnet_sn.generation!=jnet_sl.generation) {
         jnet_sn_reset();jnet_sn_members.active=1;jnet_sn.room=jnet_sl.room;jnet_sn.generation=jnet_sl.generation;jnet_sn.failed=0;
-        if(!jnet_sn_bind()){jnet_sn.failed=1;JNETSteamLobby[11]=-1;jnet_sl_status("Steam P2P bindings unavailable");return;}
-        if(!jnet_sn_register()){jnet_sn.failed=1;JNETSteamLobby[11]=-4;jnet_sl_status("Steam P2P callback registration failed");return;}
+        if(!jnet_sn_bind()){jnet_sn.failed=1;JNETSteamLobby[11]=-1;jnet_sl_status("Connection unavailable");return;}
+        if(!jnet_sn_register()){jnet_sn.failed=1;JNETSteamLobby[11]=-4;jnet_sl_status("Connection setup failed");return;}
         if(jnet_sl.host==jnet_sl.identity) {
             jnet_sn.listener=jnet_sn_api.listen(jnet_sn_api.self,21746,0,NULL);
-            if(!jnet_sn.listener){jnet_sn.failed=1;JNETSteamLobby[11]=-2;jnet_sl_status("Steam P2P listen failed; leave and retry");return;}
+            if(!jnet_sn.listener){jnet_sn.failed=1;JNETSteamLobby[11]=-2;jnet_sl_status("Could not host connection");return;}
         } else {
             struct jnet_sn_identity id={.type=16,.size=8};memcpy(id.value,&jnet_sl.host,8);
             uint32_t handle=jnet_sn_api.connect(jnet_sn_api.self,&id,21746,0,NULL);
-            if(!handle){jnet_sn.failed=1;JNETSteamLobby[11]=-3;jnet_sl_status("Steam P2P connect failed; leave and retry");return;}
+            if(!handle){jnet_sn.failed=1;JNETSteamLobby[11]=-3;jnet_sl_status("Could not connect");return;}
             jnet_sn.peers[0].handle=handle;jnet_sn.peers[0].identity=jnet_sl.host;jnet_sn.peers[0].generation=jnet_sl.generation;
             jnet_sn.peers[0].deadline=GetTickCount64()+30000;
-            if(!jnet_sn_api.userdata(jnet_sn_api.self,handle,(int64_t)jnet_sl.generation)){jnet_sn_drop(0);jnet_sn.failed=1;JNETSteamLobby[11]=-3;jnet_sl_status("Steam P2P generation binding failed");return;}
+            if(!jnet_sn_api.userdata(jnet_sn_api.self,handle,(int64_t)jnet_sl.generation)){jnet_sn_drop(0);jnet_sn.failed=1;JNETSteamLobby[11]=-3;jnet_sl_status("Connection setup failed");return;}
         }
         JNETSteamLobby[11]=1;
     }
@@ -300,7 +307,7 @@ static void jnet_sn_tick_inner(void) {
     struct jnet_sn_event events[32];unsigned count,overflow;
     AcquireSRWLockExclusive(&jnet_sn_lock);count=jnet_sn_queue.count;overflow=jnet_sn_queue.overflow;
     memcpy(events,jnet_sn_queue.events,count*sizeof(events[0]));jnet_sn_queue.count=jnet_sn_queue.overflow=0;ReleaseSRWLockExclusive(&jnet_sn_lock);
-    if(overflow){jnet_sn_reset();jnet_sl_leave();jnet_sl_status("P2P callback overflow; left lobby");return;}
+    if(overflow){jnet_sn_reset();jnet_sl_leave();jnet_sl_status("Connection error");return;}
     for(unsigned i=0;i<count && jnet_sl.room;++i)jnet_sn_event(&events[i]);
     if(!jnet_sl.room)return;
     unsigned admitted=0;uint64_t now=GetTickCount64();
@@ -316,9 +323,9 @@ static void jnet_sn_tick_inner(void) {
         }
         if(jnet_sn.peers[i].connected)jnet_sn_receive(i);
         if(!jnet_sn.peers[i].handle)continue;
-        if((now>=jnet_sn.peers[i].deadline && !jnet_travel_busy) || (jnet_sn.peers[i].admitted && !jnet_sn_member(jnet_sn.peers[i].identity))) {
+        if((now>=jnet_sn.peers[i].deadline && !(jnet_sn.peers[i].admitted && jnet_travel_peer_wait && jnet_travel_peer_wait(jnet_sn.peers[i].identity,now))) || (jnet_sn.peers[i].admitted && !jnet_sn_member(jnet_sn.peers[i].identity))) {
             jnet_sn_drop(i);JNETSteamLobby[15]=-105;
-            if(jnet_sl.host!=jnet_sl.identity){jnet_sl_leave();jnet_sl_status("P2P admission or heartbeat timed out");return;}continue;
+            if(jnet_sl.host!=jnet_sl.identity){jnet_sl_leave();jnet_sl_status("Connection timed out");return;}continue;
         }
         if(jnet_sn.peers[i].hello && !jnet_sn.peers[i].admitted && jnet_sn_member(jnet_sn.peers[i].identity) && jnet_sl_valid_session(jnet_sl.room,jnet_sl.host,jnet_sl.nonce)) {jnet_sn.peers[i].admitted=1;jnet_sn.peers[i].deadline=now+30000;jnet_sn_send(i,2,0);}
         if(jnet_sn.peers[i].admitted){++admitted;
@@ -326,12 +333,15 @@ static void jnet_sn_tick_inner(void) {
     }
     jnet_sg_tick();
     if(jnet_rocket_poll)jnet_rocket_poll();
-    if(jnet_flower_poll)jnet_flower_poll();
     JNETSteamLobby[12]=(LONG)admitted;
-    if(admitted){JNETSteamLobby[11]=3;jnet_sl_status("Steam connected - gameplay active");}
-    else if(jnet_sl.host==jnet_sl.identity){JNETSteamLobby[11]=1;jnet_sl_status("Hosting Steam lobby - waiting for P2P guests");}
+    if(admitted){JNETSteamLobby[11]=3;jnet_sl_status("Connected");}
+    else if(jnet_sl.host==jnet_sl.identity){
+        JNETSteamLobby[11]=1;
+        if(!strcmp(jnet_sl.status,"Connected"))jnet_sl_status("Waiting for players");
+        else if(!jnet_sl.status[0])jnet_sl_status("Lobby created");
+    }
     else {unsigned handles=0;for(unsigned i=0;i<7;++i)handles+=!!jnet_sn.peers[i].handle;
-        if(!handles){jnet_sl_leave();jnet_sl_status("Host connection failed; left Steam lobby");}}
+        if(!handles){jnet_sl_leave();jnet_sl_status("Could not connect to host");}}
 }
 static int jnet_sn_roster(uint64_t identity,unsigned *population) {
     unsigned active=jnet_sn_members.active;

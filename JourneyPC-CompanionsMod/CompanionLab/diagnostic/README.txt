@@ -1,11 +1,10 @@
 JNET @VERSION@
 
-On Windows, place this entire JNET folder inside your Steam Journey game folder,
-next to Journey.exe. Keep all included files together.
+For 64-bit Windows.
 
-Start Steam, open JNET.exe, then click Launch Journet.
-If prompted, use Select .exe to choose Journey.exe.
-All friends playing together should use the same JNET version.
+Extract the JNET folder to Steam > steamapps > common > Journey.
+Keep the folder named JNET.
+Create a shortcut of JNET.exe if you'd like for convenience.
+While Steam is open, open JNET.exe and click Launch to start the game.
 
-If there is a bug, use Save Session Report before closing JNET.
-No diagnostic log files are created automatically.
+If you experience a bug or your game crashes, you can click Copy Log before closing JNET and paste the report in a message or use Save Log if you want to save the report to a file. Find me in the Journey discord to send the report if you'd like to help with improving the mod.

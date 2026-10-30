@@ -36,6 +36,13 @@ static int traveler_udp_mac(void *p,const unsigned char *data,size_t size,unsign
 static int fixture_receive(int s,char *p,int cap,int flags,struct sockaddr *address,int *size) {
     socklen_t length=(socklen_t)*size;int result=(int)recvfrom(s,p,(size_t)cap,flags,address,&length);*size=(int)length;return result;
 }
+static unsigned sent_kinds[3];
+static ssize_t fixture_sendto(int socket,const void *packet,size_t bytes,int flags,const struct sockaddr *address,socklen_t length) {
+    unsigned kind=bytes==112?0:bytes==256?1:2;
+    assert(bytes==112 || bytes==256 || bytes==120);
+    assert(!memcmp(packet,kind==0?"JNH1":kind==1?"JNA1":"JNC1",4));++sent_kinds[kind];
+    return sendto(socket,packet,bytes,flags,address,length);
+}
 static int capture(void *read,void *ctx,uintptr_t image,uintptr_t game,struct jc_actor_sender *sample) {
     (void)read;(void)ctx;(void)image;assert(game==current+1);*sample=sources[current];return 0;
 }
@@ -50,12 +57,16 @@ static int capture_chirp(void *read,void *ctx,uintptr_t game,uint64_t frame,uint
     return 0;
 }
 #define recvfrom fixture_receive
+#define sendto fixture_sendto
 #define own_read NULL
 #define jc_actor_capture_sender capture
 #define jc_chirp_capture_local capture_chirp
 #define JNET_LOBBY_ENABLED 1
 static unsigned membership[3]={14,14,14};
 static int jnet_lobby_allows(uint64_t peer){return (membership[current]&(1u<<peer))!=0;}
+static int (*jnet_travel_peer_wait)(uint64_t,uint64_t);
+static uint64_t travel_hold_until;
+static int travel_hold(uint64_t peer,uint64_t now){return peer==2 && now<travel_hold_until;}
 #include "network_fixture.h"
 static __typeof__(traveler_network) clients[3];
 static struct jc_stream_udp cryptos[3][2];
@@ -83,7 +94,42 @@ static unsigned slot_for(unsigned client,unsigned peer) {
 static int sample(unsigned client,unsigned peer,int first,struct jc_actor_sender *out) {
     enter(client);int code=traveler_network_sample(slot_for(client,peer),first,out);leave();return code;
 }
-int main(void) {
+static void configurations(void) {
+    unsigned char config[113],before[112],bad[112];
+    for(unsigned id=1;id<=3;++id)for(unsigned swap=0;swap<2;++swap)for(unsigned legacy=0;legacy<2;++legacy) {
+        memset(config,0,sizeof(config));memcpy(config,legacy?"JCN1":"JNN1",4);
+        jc_packet_put(config+4,43840+id,4);jc_packet_put(config+8,id,8);
+        for(unsigned peer=1,slot=0;peer<=3;++peer)if(peer!=id) {
+            unsigned char *record=config+16+(slot++^swap)*48;
+            jc_packet_put(record,peer,8);jc_packet_put(record+8,43840+peer,8);record[16]=(unsigned char)(id+peer);
+        }
+        memcpy(before,config,112);assert(traveler_network_config_valid(config,112));
+        assert(!memcmp(config,before,112));
+        assert(!traveler_network_config_valid(NULL,112));
+        for(size_t bytes=0;bytes<112;++bytes)assert(!traveler_network_config_valid(config,bytes));
+        assert(!traveler_network_config_valid(config,113));
+        for(unsigned i=0;i<4;++i) {
+            memcpy(bad,config,112);bad[i]='X';assert(!traveler_network_config_valid(bad,112));
+        }
+        memcpy(bad,config,112);jc_packet_put(bad+4,43840+id+1,4);assert(!traveler_network_config_valid(bad,112));
+        memcpy(bad,config,112);jc_packet_put(bad+8,0,8);assert(!traveler_network_config_valid(bad,112));
+        memcpy(bad,config,112);jc_packet_put(bad+8,4,8);assert(!traveler_network_config_valid(bad,112));
+        for(unsigned slot=0;slot<2;++slot) {
+            unsigned at=16+slot*48;
+            memcpy(bad,config,112);jc_packet_put(bad+at,id,8);assert(!traveler_network_config_valid(bad,112));
+            memcpy(bad,config,112);jc_packet_put(bad+at,0,8);assert(!traveler_network_config_valid(bad,112));
+            memcpy(bad,config,112);jc_packet_put(bad+at,4,8);assert(!traveler_network_config_valid(bad,112));
+            memcpy(bad,config,112);jc_packet_put(bad+at+8,0,8);assert(!traveler_network_config_valid(bad,112));
+            memcpy(bad,config,112);memset(bad+at+16,0,32);assert(!traveler_network_config_valid(bad,112));
+        }
+        memcpy(bad,config,112);memcpy(bad+64,bad+16,48);assert(!traveler_network_config_valid(bad,112));
+    }
+    puts("Peer config: JNN1 and legacy files, all participant/order combinations, unchanged input, truncation, invalid identities/ports/keys and duplicate peers passed.");
+}
+int main(int argc,char **argv) {
+    configurations();
+    if(argc==2 && !strcmp(argv[1],"--config-only"))return 0;
+    assert(argc==1);
     uint16_t ports[3];
     for(unsigned i=0;i<3;++i) {
         clients[i].socket=socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);assert(clients[i].socket>=0);
@@ -134,6 +180,11 @@ int main(void) {
     }
     clients[1].paused=1;rounds(45,3);
     assert(sample(0,1,0,&out)==JC_STREAM_TIMEOUT);
+    traveler_network_external=1;jnet_travel_peer_wait=travel_hold;travel_hold_until=ticks+100;
+    assert(sample(0,1,0,&out)==JC_STREAM_HELD);
+    JNETNetwork[23]=1;assert(sample(0,1,0,&out)==JC_STREAM_TIMEOUT);JNETNetwork[23]=0;
+    ticks=travel_hold_until;assert(sample(0,1,0,&out)==JC_STREAM_TIMEOUT);
+    traveler_network_external=0;jnet_travel_peer_wait=NULL;
     assert(!sample(0,2,0,&out));assert(!sample(2,0,0,&out));
     uint64_t generation=streams[0][slot].stream.generation;
     clients[1].paused=0;rounds(3,3);
@@ -180,6 +231,7 @@ int main(void) {
     membership[0]|=4u;rounds(4,3);
     assert(clients[0].peers[slot_for(0,1)].connection.sequence>rejected_sequence);
     for(unsigned i=0;i<3;++i)close(clients[i].socket);
+    assert(sent_kinds[0] && sent_kinds[1] && sent_kinds[2]);
     puts("Production UDP adapter: two then three endpoints, actual sample fidelity, chirp deduplication, first-admission chirp retention, four immediate post-reconnect chirps, pause/timeout, independent reconnect and process epoch replacement passed. Native game capture and actor rendering remain separate runtime checks.");
     return 0;
 }

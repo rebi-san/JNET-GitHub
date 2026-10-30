@@ -2,8 +2,27 @@
 #include <stdio.h>
 #include "jnet_character.h"
 #include "jnet_character_audio.h"
+#include "jnet_remote_pose.h"
 static int near(float a,float b){return fabsf(a-b)<0.0001f;}
 int main(void) {
+    struct jnet_remote_pose remote[2]={0};
+    for(unsigned slot=0;slot<2;++slot){
+        float p[3]={0,0,0},q[4]={0,0,0,1};
+        assert(jnet_remote_pose_update(remote+slot,1,1000,1000,p,q));
+        p[0]=10;q[3]=-1;
+        assert(jnet_remote_pose_update(remote+slot,2,1100,1100,p,q) && near(p[0],0));
+        p[0]=10;
+        assert(jnet_remote_pose_update(remote+slot,2,1100,1150,p,q) && p[0]>3 && p[0]<5 && near(fabsf(q[3]),1));
+        p[0]=10;
+        assert(jnet_remote_pose_update(remote+slot,2,1100,1400,p,q) && p[0]>9.9f && p[0]<10);
+        assert(remote[slot].count==2);
+        p[0]=100;
+        assert(jnet_remote_pose_update(remote+slot,3,1400,1400,p,q) && near(p[0],100) && remote[slot].count==1);
+        p[0]=101;
+        assert(jnet_remote_pose_update(remote+slot,4,2001,2001,p,q) && near(p[0],101) && remote[slot].count==1);
+        p[0]=NAN;assert(!jnet_remote_pose_update(remote+slot,5,2002,2002,p,q));
+        assert(remote[slot].sequence==4);
+    }
     assert(JNET_CHARACTER_ROCKET==4 && JNET_CHARACTER_WAR_MACHINE==2 && JNET_CHARACTER_WHALE==3);
     assert(!strcmp(jnet_character_name(JNET_CHARACTER_FLOW_1),"fl0w 1"));
     assert(!strcmp(jnet_character_name(JNET_CHARACTER_FLOW_2),"fl0w 2"));
@@ -79,6 +98,8 @@ int main(void) {
     assert(jnet_character_control_step(&control,&in,&out) && out.spotlight && out.spotlight_changed);
     assert(jnet_character_control_step(&control,&in,&out) && out.spotlight && !out.spotlight_changed);
     in.interact=0;assert(jnet_character_control_step(&control,&in,&out));
+    in.interact=1;assert(jnet_character_control_step(&control,&in,&out) && out.spotlight==2 && out.spotlight_changed);
+    in.interact=0;assert(jnet_character_control_step(&control,&in,&out));
     in.interact=1;assert(jnet_character_control_step(&control,&in,&out) && !out.spotlight && out.spotlight_changed);
     in.enabled=0;in.interact=0;assert(jnet_character_control_step(&control,&in,&out) && !out.strength);
     in.interact=1;assert(jnet_character_control_step(&control,&in,&out) && !out.spotlight_changed);
@@ -135,16 +156,6 @@ int main(void) {
     assert(jnet_character_control_step(&flight,&flight_input,&flight_intent));
     assert(jnet_character_smooth(down_motion,&flight_intent,.016f,1));
     assert(near(up_motion[1],-down_motion[1]));
-    struct jnet_character_pose banked={.rotation={0,0,0,1}};
-    flight_intent=(struct jnet_character_intent){.roll=1.57079632679f};
-    for(unsigned i=0;i<240;++i){
-        assert(jnet_character_motion_step(&banked,&flight_intent,10,.016f,&next));banked=next;
-    }
-    assert(near(banked.position[0],0) && near(banked.position[1],0));
-    assert(fabsf(banked.rotation[2]-.70710678f)<.001f);
-    flight_intent.roll=0;
-    for(unsigned i=0;i<240;++i){assert(jnet_character_motion_step(&banked,&flight_intent,10,.016f,&next));banked=next;}
-    assert(fabsf(banked.rotation[2])<.001f);
     char path[256];
     assert(jnet_character_bank_path("C:/Journey/Data/Sounds/JNTBioSummit-SFX.bnk",path,sizeof(path)));
     assert(!strcmp(path,"C:/Journey/Data/Sounds/LvlSfxSummit-SFX.bnk"));

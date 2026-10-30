@@ -11,7 +11,8 @@ static size_t packet(unsigned char *wire,unsigned type,uint64_t id,uint64_t leas
                       uint64_t seq,uint64_t epoch,uint32_t chapter,float x) {
     struct jc_session_packet p={.type=type,.id=id,.lease=lease,.sequence=seq,
         .chapter_epoch=epoch,.chapter=chapter,.motion={{x,2,3},{4,5,6},1}};
-    size_t size; assert(!jc_session_encode(room,&p,wire,JC_SESSION_STATE_BYTES,&size)); return size;
+    size_t size; assert(!jc_session_encode(room,&p,wire,JC_SESSION_STATE_BYTES,&size));
+    assert(!memcmp(wire,"JNS1",4) && size==(type==JC_SESSION_STATE?92:64));return size;
 }
 static void same_game_state(const struct jc_member *a,const struct jc_member *b) {
     struct jc_member x=*a,y=*b; x.rate_start=y.rate_start=0; x.attempts=y.attempts=0;
@@ -57,6 +58,8 @@ int main(void) {
     n=packet(wire,JC_SESSION_STATE,20,a,1,1,2,5);
     rejection(&s,20,a,wire,n,0,JC_SESSION_CHAPTER);
     n=packet(wire,JC_SESSION_TRANSITION,20,a,1,1,2,0);
+    memcpy(wire,"JCS1",4);rejection(&s,20,a,wire,n,0,JC_SESSION_FORMAT);memcpy(wire,"JNS1",4);
+    rejection(&s,20,a,wire,72,0,JC_SESSION_FORMAT);
     assert(!jc_session_receive(&s,20,a,wire,n,0));
     n=packet(wire,JC_SESSION_STATE,20,a,3,1,2,9);
     assert(!jc_session_receive(&s,20,a,wire,n,0));

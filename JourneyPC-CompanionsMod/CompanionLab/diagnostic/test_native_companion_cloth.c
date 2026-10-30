@@ -91,6 +91,26 @@ static int step(int phase,int want) {
 }
 static void no_native(void) {for (unsigned i=1;i<=10;++i) assert(!calls[i]);}
 int main(void) {
+    for(unsigned capacity=0;capacity<=40;++capacity) {
+        unsigned expected=(unsigned)((float)capacity/40.f*73.f+1.5f);
+        if(expected<2)expected=2;
+        if(expected>73)expected=73;
+        put32(dude,0x6c,capacity);put32(dude,0x1460,expected);
+        dude[0x9ba0]=0;unsigned before=writes;
+        assert(!jc_cloth_scarf_resize(read_memory,write_memory,NULL,IMAGE,DUDE));
+        assert(!dude[0x9ba0] && writes==before);
+        put32(dude,0x1460,expected==2?73:2);
+        assert(!jc_cloth_scarf_resize(read_memory,write_memory,NULL,IMAGE,DUDE));
+        assert(dude[0x9ba0]==1 && writes==before+1);
+        assert(!jc_cloth_scarf_resize(read_memory,write_memory,NULL,IMAGE,DUDE));
+        assert(writes==before+1);
+    }
+    failed_write=DUDE+0x9ba0;dude[0x9ba0]=0;
+    assert(jc_cloth_scarf_resize(read_memory,write_memory,NULL,IMAGE,DUDE)==JC_CLOTH_CALL);
+    failed_write=0;failed_read=DUDE+0x6c;
+    assert(jc_cloth_scarf_resize(read_memory,write_memory,NULL,IMAGE,DUDE)==JC_CLOTH_READ);
+    failed_read=0;
+
     reset();assert(step(0,1)==JC_CLOTH_PHASE);no_native();assert(!writes);
     reset();barn[0x6bcf84]=1;assert(step(1,1)==JC_CLOTH_BUSY);no_native();assert(!writes);
     reset();job[0x58]=1;assert(step(1,1)==JC_CLOTH_BUSY);no_native();assert(!writes);

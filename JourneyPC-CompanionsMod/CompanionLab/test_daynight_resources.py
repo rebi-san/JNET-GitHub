@@ -80,6 +80,35 @@ class DayNightTests(unittest.TestCase):
         lua.execute('__JNETDayNight.ready=true')
         lua.globals().updating=True
 
+    def test_native_day_keeps_ending_stars(self):
+        level=next(i for i,mapping in enumerate(MAPPINGS) if mapping[0]=='Graveyard')
+        lua=self.scene(level)
+        update=lua.globals()['__JNETDayNightUpdate']
+        effects=lua.globals()['__JNETDayNight'].effects
+        for emitter in lua.globals().emitters.values():
+            if effects[emitter.name]:
+                emitter.intensity(emitter,.75)
+                effect=lua.globals().Names[effects[emitter.name].name]
+                effect.SetEnabled(effect,True)
+        for time in (0,1,10):
+            update(time,level,0)
+        for emitter in lua.globals().emitters.values():
+            if effects[emitter.name]:
+                self.assertEqual(emitter.intensityValue[1],.75)
+                self.assertTrue(lua.globals().Names[effects[emitter.name].name].SetEnabledValue[1])
+        update(0,level,1)
+        update(0,level,0)
+        for emitter in lua.globals().emitters.values():
+            row=effects[emitter.name]
+            if row:
+                self.assertEqual(emitter.intensityValue[1],lua.globals().emitterData[emitter.name].intensity)
+                effect=lua.globals().Names[row.name]
+                self.assertEqual(effect.SetEnabledValue[1],row.enabled)
+                effect.SetEnabled(effect,True)
+        update(1,level,0)
+        for row in effects.values():
+            self.assertTrue(lua.globals().Names[row.name].SetEnabledValue[1])
+
     def test_update_before_particle_initialization(self):
         lua=self.scene(0)
         lua.execute('__JNETDayNight.effects=nil')
@@ -253,7 +282,7 @@ class DayNightTests(unittest.TestCase):
                 for e in lua.globals().emitters.values():
                     value=lua.eval('rawget')(e,'intensityValue')
                     if value is not None:
-                        self.assertAlmostEqual(value[1],0)
+                        self.assertAlmostEqual(value[1],lua.globals().emitterData[e.name].intensity)
 
     def test_partial_data_is_not_applied(self):
         lua=self.scene(2)
@@ -292,6 +321,25 @@ class DayNightTests(unittest.TestCase):
                 self.assertAlmostEqual(mesh.shaderValues.alpha,values['day']['alpha']*factor)
                 self.assertIsNone(lua.eval('rawget')(mesh,'SetShaderTextureParamValue'))
         self.assertEqual(lua.globals().allocations,0)
+
+    def test_summit_selected_shadow_planes(self):
+        selected = {'c8a3854cb941f5b7bd82df63e0142f5a',
+                    'f281fa80e26c5507b8be57bb6c447200',
+                    '5fd6b7b0c8eef88daaeda898ce399893',
+                    '570c221cd2f9048548590784dd5b92ff',
+                    'd0bcda556118028a6ff1dd52de6ea5b1',
+                    '34b9219071a7c1eaa85c2bae204f2e98',
+                    '9467edcaf435a69e22e2d37d2a189076'}
+        profile = profiles()[7]
+        shadows = {key for key, row in decorations('Level_Summit').items()
+                   if row['Mesh'] == 'P_ShadowPlane'}
+        self.assertEqual(shadows.intersection(profile['suns']), selected)
+        lua = self.scene(7)
+        for mode, factor in ((1, 0), (0, 1)):
+            lua.globals()['__JNETDayNightUpdate'](0, 7, mode)
+            for key in selected:
+                self.assertAlmostEqual(lua.globals().Names[key].shaderValues.alpha,
+                                       profile['suns'][key]['day']['alpha'] * factor)
 
     def test_unsupported_level_does_not_allocate(self):
         lua=self.scene(0)

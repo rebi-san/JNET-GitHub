@@ -133,6 +133,7 @@ static void (*original_chapter_switch)(uintptr_t,const char *);
 #define JC_D3D_CONTEXT_SLOT_RVA 0x40408b8u
 static _Alignas(16) unsigned char cloth_progress_command[128];
 static volatile LONG cloth_progress_pending;
+static HANDLE cloth_progress_event;
 static void cloth_progress_request(void);
 static WNDPROC original_game_window;
 static HWND cloth_exit_window;
@@ -258,7 +259,7 @@ static unsigned jnet_diagnostic_scans=0,jnet_diagnostic_logs=0;
 static volatile LONG jnet_diagnostic_suppressed;
 static LONG jnet_diagnostic_scan_last,jnet_diagnostic_scan_peak,jnet_diagnostic_scan_count;
 static int jnet_observation_line(const char *line,size_t length) {
-    static const char *prefixes[]={"[JC] visibility ","[JC] appearance actor=","[JC] glyph ","[JC] floating glyph "};
+    static const char *prefixes[]={"[JNET] visibility ","[JNET] appearance actor=","[JNET] glyph ","[JNET] floating glyph "};
     for(unsigned i=0;i<sizeof(prefixes)/sizeof(prefixes[0]);++i)
         if(length>=strlen(prefixes[i]) && !memcmp(line,prefixes[i],strlen(prefixes[i])))return 1;
     return 0;
@@ -269,15 +270,12 @@ static volatile LONG initialization_started;
 
 static void log_line(const char *line, size_t length) {
     if(!jnet_diagnostic_logs && jnet_observation_line(line,length)){InterlockedIncrement(&jnet_diagnostic_suppressed);return;}
-    if (length > 480 || length < 4 ||
-        (memcmp(line, "[JC]", 4) && (length < 6 || memcmp(line, "[JNET]", 6)))) return;
+    if (length > 480 || length < 6 || memcmp(line, "[JNET]", 6)) return;
     for (size_t i = 0; i < length; ++i) {
         if ((unsigned char)line[i] < 32 || (unsigned char)line[i] > 126) return;
     }
-    AcquireSRWLockExclusive(&loglock);
     char record[482];memcpy(record,line,length);memcpy(record+length,"\r\n",2);
     jnet_log_append(&session_logs->runtime,record,length+2);
-    ReleaseSRWLockExclusive(&loglock);
 }
 
 static void message(const char *line) { log_line(line, strlen(line)); }
@@ -287,11 +285,11 @@ static int lua_log(lua_State *state) {
     size_t length = 0;
     const char *line = tolstring(state, 1, &length);
     if (line) {
-        static const char prefix[] = "[JC] observation_state=";
+        static const char prefix[] = "[JNET] observation_state=";
         if (length == sizeof(prefix) && !memcmp(line, prefix, sizeof(prefix) - 1) &&
             line[length - 1] >= '0' && line[length - 1] <= '8')
             InterlockedExchange(&JNETObservation, line[length - 1] - '0');
-        static const char stage_prefix[] = "[JC] sample_stage=";
+        static const char stage_prefix[] = "[JNET] sample_stage=";
         if (length == sizeof(stage_prefix) + 1 && !memcmp(line, stage_prefix, sizeof(stage_prefix) - 1) &&
             line[length - 2] == '1' && line[length - 1] >= '0' && line[length - 1] <= '8')
             InterlockedExchange(&JNETPhase, 10 + line[length - 1] - '0');
@@ -302,7 +300,7 @@ static int lua_log(lua_State *state) {
 
 static int execute(lua_State *state, const char *code, size_t size, int with_sink) {
     int top = gettop(state);
-    int ok = loadbuffer(state, code, size, "JC-diagnostic", "t") == 0;
+    int ok = loadbuffer(state, code, size, "JNET-diagnostic", "t") == 0;
     if (ok) {
         if (with_sink) pushclosure(state, lua_log, 0);
         ok = pcallfn(state, with_sink ? 1 : 0, 0, 0, 0, NULL) == 0;
@@ -310,7 +308,7 @@ static int execute(lua_State *state, const char *code, size_t size, int with_sin
     settop(state, top);
     if (!ok) {
         InterlockedExchange(&JNETStatus, -5);
-        message("[JC] Lua diagnostic failed; observation disabled; error text omitted");
+        message("[JNET] Lua diagnostic failed; observation disabled; error text omitted");
     }
     return ok;
 }
@@ -365,10 +363,10 @@ static int startup_load_observer(lua_State *state, const char *buffer, size_t si
             if (copy) HeapFree(GetProcessHeap(),0,copy);
             copy=NULL;
             InterlockedExchange(&JNETStartup[4],-1);
-            message("[JC] startup resource candidate declined; original buffer forwarded");
+            message("[JNET] startup resource candidate declined; original buffer forwarded");
         } else {
             InterlockedExchange(&JNETStartup[4],1);
-            message("[JC] startup resource candidate validated; private characters with animation stage checkpoints");
+            message("[JNET] startup resource candidate validated; private characters with animation stage checkpoints");
         }
     } else if (attempt>1) {
         InterlockedExchange(&JNETStartup[4],-2);
@@ -379,7 +377,7 @@ static int startup_load_observer(lua_State *state, const char *buffer, size_t si
     if (attempt==1) {
         InterlockedExchange(&JNETStartup[3],result);
         InterlockedExchange(&JNETStartup[2],1);
-        message("[JC] startup compiler returned; original executable and assets unchanged");
+        message("[JNET] startup compiler returned; original executable and assets unchanged");
     }
     return result;
 }
@@ -668,9 +666,9 @@ static uintptr_t geometry_build_observer(uintptr_t object) {
     uintptr_t image=(uintptr_t)GetModuleHandleW(NULL);
     int code=jc_geometry_build_read(own_read,NULL,image,object,&before);
     char line[160];
-    if (!code) snprintf(line,sizeof(line),"[JC] geometry build enter limit=%u slots=%u occupied=%u; observation only",
+    if (!code) snprintf(line,sizeof(line),"[JNET] geometry build enter limit=%u slots=%u occupied=%u; observation only",
         (unsigned)before.limit,(unsigned)before.slots,(unsigned)before.occupied);
-    else snprintf(line,sizeof(line),"[JC] geometry build enter snapshot declined code=%d; original forwarded",code);
+    else snprintf(line,sizeof(line),"[JNET] geometry build enter snapshot declined code=%d; original forwarded",code);
     boundary_record(line);
     uintptr_t result=original_geometry_build(object);
     int after_code=jc_geometry_build_read(own_read,NULL,image,object,&after);
@@ -684,7 +682,7 @@ static uintptr_t geometry_build_observer(uintptr_t object) {
         InterlockedExchange(&JNETBuilder[4],after.slots);
         InterlockedExchange(&JNETBuilder[5],after.occupied);
     }
-    boundary_record("[JC] geometry build original returned; observation only");
+    boundary_record("[JNET] geometry build original returned; observation only");
     return result;
 }
 static void *volatile guarded_mesh;
@@ -935,7 +933,7 @@ static uint32_t base_handoff_observer(uintptr_t executor,uintptr_t begin,uintptr
         if (b->begin && begin<b->end && b->begin<end) {
             active_cloth_backend->failed=1;
             active_cloth_backend->frames.frames[i].phase=JC_FRAME_UNKNOWN;
-            message("[JC] cloth batch reached an unsupported base handoff; retained");
+            message("[JNET] cloth batch reached an unsupported base handoff; retained");
             return 5;
         }
     }
@@ -972,8 +970,13 @@ static uint32_t command_execute_observer(uintptr_t executor,uintptr_t begin,uint
         }
     }
     if (matched) draw_input_snapshot(127,execution_first);
+    int retirement_work=cloth_mask || actor_mask ||
+        jc_live_retirement_needs_poll(&cloth_retirement) ||
+        jc_live_retirement_needs_poll(&actor_frame.retirement);
     uint32_t result=original_command_execute(executor,begin,end);
-    if (active_cloth_backend) {
+    if (active_cloth_backend && (cloth_mask || actor_mask ||
+        jc_live_retirement_needs_poll(&cloth_retirement) ||
+        jc_live_retirement_needs_poll(&actor_frame.retirement))) {
         uint64_t image=(uintptr_t)GetModuleHandleW(NULL);
         struct jc_cloth_graphics_ops graphics=jc_cloth_graphics_native_ops(image);
         struct jc_cloth_graphics_token token={0};
@@ -990,6 +993,11 @@ static uint32_t command_execute_observer(uintptr_t executor,uintptr_t begin,uint
     }
     if (begin==(uintptr_t)cloth_progress_command && end==begin+sizeof(cloth_progress_command))
         InterlockedExchange(&cloth_progress_pending,result ? -1 : 0);
+    if (active_cloth_backend && retirement_work && cloth_progress_event &&
+        (active_cloth_backend->failed ||
+         (!jc_live_retirement_needs_poll(&cloth_retirement) &&
+          !jc_live_retirement_needs_poll(&actor_frame.retirement))))
+        SetEvent(cloth_progress_event);
     if (matched) {
         InterlockedExchange(&JNETMeshLife[91],(LONG)result);
         InterlockedExchange(&JNETMeshLife[92],GetCurrentThreadId()==execution_submit_thread);
@@ -1186,7 +1194,7 @@ static int appearance_check(struct callback_read_budget *budget) {
     if (!code) InterlockedIncrement(&JNETAppearance[10]);
     else if (code!=9) {
         char line[128];
-        snprintf(line,sizeof(line),"[JC] borrow stopped rc=%d stage=%d param=%d role=%d ms=%ld",code,
+        snprintf(line,sizeof(line),"[JNET] borrow stopped rc=%d stage=%d param=%d role=%d ms=%ld",code,
             detail.stage,detail.parameter,detail.role,(long)JNETPerformance[10]);
         boundary_checkpoint(line);
     }
@@ -1234,7 +1242,7 @@ static int trial_shader_prepare(uint64_t model,uint64_t root,int updating,const 
     InterlockedExchange(&JNETAppearance[38],result.trial_only);
     InterlockedExchange(&JNETAppearance[39],(LONG)(GetTickCount64()-started));
     char line[160];
-    snprintf(line,sizeof(line),"[JC] trial shader result=%d step=%d stage=%d originals=%d trial_only=%d",code,step,result.stage,result.originals_unchanged,result.trial_only);
+    snprintf(line,sizeof(line),"[JNET] trial shader result=%d step=%d stage=%d originals=%d trial_only=%d",code,step,result.stage,result.originals_unchanged,result.trial_only);
     if ((!updating || code) && !boundary_checkpoint(line)) return 15;
     if (!code) {
         memcpy(preview_shader_world,world,sizeof(world));
@@ -1255,7 +1263,7 @@ static int trial_shader_prepare(uint64_t model,uint64_t root,int updating,const 
 static void preview_fail(int code) {
     InterlockedCompareExchange(&JNETMeshLife[27],code,0);
     char line[JC_CHECKPOINT_LENGTH+1];
-    snprintf(line,sizeof(line),"[JC] preview stop=%d first=%ld stage=%ld draws=%ld cp=%ld os=%lu",code,
+    snprintf(line,sizeof(line),"[JNET] preview stop=%d first=%ld stage=%ld draws=%ld cp=%ld os=%lu",code,
              (long)JNETMeshLife[27],(long)JNETMeshLife[28],(long)JNETMeshLife[26],
              (long)JNETMeshLife[116],(unsigned long)JNETMeshLife[117]);
     boundary_checkpoint(line);
@@ -1291,7 +1299,7 @@ static void preview_check_failed(int failure,int code,struct callback_read_budge
     InterlockedExchange(&JNETPerformance[14],(LONG)preview_retry.consecutive);
     if (defer) { InterlockedExchange(&JNETMeshLife[25],1); return; }
     char line[JC_CHECKPOINT_LENGTH+1];
-    snprintf(line,sizeof(line),"[JC] check=%d rc=%d owner=%ld field=%ld ms=%ld reads=%ld",failure,code,
+    snprintf(line,sizeof(line),"[JNET] check=%d rc=%d owner=%ld field=%ld ms=%ld reads=%ld",failure,code,
         (long)JNETPerformance[18],(long)JNETPerformance[19],
         (long)JNETPerformance[20],(long)JNETPerformance[22]);
     boundary_checkpoint(line);
@@ -1414,7 +1422,7 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
     if (!jc_render_trial_same_level(prepared_level,level)) { preview_fail(19); goto done; }
     if (!preview_source_queue) {
         if (budget.expired || GetTickCount64()>=budget.deadline) { preview_fail(10); goto done; }
-        if (!boundary_checkpoint("[JC] preview matching consumer returned; beginning trial validation")) { preview_fail(15); goto done; }
+        if (!boundary_checkpoint("[JNET] preview matching consumer returned; beginning trial validation")) { preview_fail(15); goto done; }
         /* First preflight includes the same full pose scan as preparation (250 ms).
            Start after the durable checkpoint so disk latency does not spend its read budget. */
         budget.deadline=GetTickCount64()+250;
@@ -1437,7 +1445,7 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
         preview_check_failed(5,JC_LAYOUT_READ,&budget,pose_written); goto done;
     }
     if (!preview_queue) {
-        if (!boundary_checkpoint("[JC] preview appearance preparation enter; trial material only")) { preview_fail(15); goto done; }
+        if (!boundary_checkpoint("[JNET] preview appearance preparation enter; trial material only")) { preview_fail(15); goto done; }
         preview_started=1; /* Borrowed material resources require restart even after a partial setter failure. */
         int appearance_code=appearance_prepare();
         if (appearance_code) { preview_fail(appearance_code); goto done; }
@@ -1469,7 +1477,7 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
         InterlockedExchange(&JNETMeshLife[114],input_elapsed>0x7fffffff ? 0x7fffffff : (LONG)input_elapsed);
         if (code) {
             char why[160];
-            snprintf(why,sizeof(why),"[JC] preview input rejected code=%d field=%d index=%d step=%d elapsed_ms=%ld",
+            snprintf(why,sizeof(why),"[JNET] preview input rejected code=%d field=%d index=%d step=%d elapsed_ms=%ld",
                 code,detail.field,detail.index,step,(long)JNETMeshLife[114]);
             boundary_checkpoint(why);
             preview_fail(6); goto done;
@@ -1482,7 +1490,7 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
         }
         preview_source_queue=queue;
         if (preview_linked && preview_deadline>GetTickCount64()+180000) preview_deadline=GetTickCount64()+180000;
-        if (!boundary_checkpoint("[JC] preview inputs accepted; transform write and private CPU update next")) { preview_fail(15); goto done; }
+        if (!boundary_checkpoint("[JNET] preview inputs accepted; transform write and private CPU update next")) { preview_fail(15); goto done; }
         preview_started=1;
         memcpy(preview_origin,origin,sizeof(preview_origin));
         if (!sibling_object || jc_dual_pose_snapshot_read(own_read,NULL,image,sibling_object,&sibling_before)) { preview_fail(24); goto done; }
@@ -1490,11 +1498,11 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
         memcpy((void *)(mesh+0x530),transform,sizeof(transform));
         InterlockedExchange(&JNETMeshLife[28],1);
         void (*mesh_update)(uintptr_t,void *)=(void *)(image+JC_RVA_MeshUpdate);
-        if (!boundary_checkpoint("[JC] preview private CPU update enter")) { preview_fail(15); goto done; }
+        if (!boundary_checkpoint("[JNET] preview private CPU update enter")) { preview_fail(15); goto done; }
         flight_mark(10,(LONG)body_context->index+1);
         mesh_update(mesh,preview_queue);
         flight_mark(11,(LONG)body_context->index+1);
-        if (!boundary_checkpoint("[JC] preview private CPU update returned")) { preview_fail(15); goto done; }
+        if (!boundary_checkpoint("[JNET] preview private CPU update returned")) { preview_fail(15); goto done; }
         InterlockedExchange(&JNETMeshLife[28],2);
         uint32_t count=0,refs=0; memcpy(&count,preview_queue+0x10080,4);
         if (count!=1 || !jc_idle_context_valid(preview_queue,&inputs) ||
@@ -1509,7 +1517,7 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
             !memcmp(root_transform,transform,sizeof(transform));
         InterlockedExchange(&JNETMeshLife[40],root_matches);
         if (!root_matches) { preview_fail(16); goto done; }
-        if (!boundary_checkpoint("[JC] trial spine shader preparation enter")) { preview_fail(15); goto done; }
+        if (!boundary_checkpoint("[JNET] trial spine shader preparation enter")) { preview_fail(15); goto done; }
         flight_mark(12,(LONG)body_context->index+1);
         int shader_code=trial_shader_prepare(inputs.model,inputs.root,0,transform);
         flight_mark(13,(LONG)body_context->index+1);
@@ -1671,14 +1679,14 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
     memcpy(preview_queue+0x10080,&count,4);
     InterlockedExchange(&JNETMeshLife[25],2);
     InterlockedExchange(&JNETMeshLife[28],3);
-    if (!JNETMeshLife[26] && !boundary_checkpoint("[JC] preview private draw enter; reference acquisition validated")) { preview_fail(15); goto done; }
+    if (!JNETMeshLife[26] && !boundary_checkpoint("[JNET] preview private draw enter; reference acquisition validated")) { preview_fail(15); goto done; }
     InterlockedExchange(&preview_observer_thread,(LONG)GetCurrentThreadId());
     flight_mark(20,(LONG)body_context->index+1);
     original_consume((uintptr_t)preview_queue,device,flags);
     flight_mark(21,(LONG)body_context->index+1);
     InterlockedExchange(&preview_observer_thread,0);
     InterlockedExchange(&JNETMeshLife[28],4);
-    if (!JNETMeshLife[26] && !boundary_checkpoint("[JC] preview private draw returned")) { preview_fail(15); goto done; }
+    if (!JNETMeshLife[26] && !boundary_checkpoint("[JNET] preview private draw returned")) { preview_fail(15); goto done; }
     memcpy(&count,preview_queue+0x10080,4);
     InterlockedExchange(&JNETMeshLife[31],(LONG)count);
     if (count || !jc_render_preview_queue(preview_queue,expected.model,expected.control) ||
@@ -1686,7 +1694,7 @@ static void preview_draw(uintptr_t queue,uintptr_t device,uint32_t flags,int all
         !own_read(NULL,queue+0x10080,&after_count,4) || after_count!=original_count) {
         preview_fail(12); goto done;
     }
-    if (!JNETMeshLife[26] && !boundary_checkpoint("[JC] preview first draw postchecks passed")) { preview_fail(15); goto done; }
+    if (!JNETMeshLife[26] && !boundary_checkpoint("[JNET] preview first draw postchecks passed")) { preview_fail(15); goto done; }
     if (!JNETMeshLife[26]) shader_inputs_snapshot();
     jc_render_budget_drawn(&preview_retry);
     InterlockedExchange(&JNETPerformance[14],0);
@@ -1819,28 +1827,28 @@ static uintptr_t mesh_register_observer(uintptr_t mesh, uintptr_t context) {
                               entries,count,JNETMesh[1],JNETMesh[2],&failure);
     if (decision==1) {
         InterlockedExchange(&JNETMesh[1],1);
-        if (!boundary_checkpoint("[JC] mesh early growth callback deferred")) InterlockedExchange(&mesh_fault,1);
+        if (!boundary_checkpoint("[JNET] mesh early growth callback deferred")) InterlockedExchange(&mesh_fault,1);
         return 0;
     }
     if (decision==2) {
         InterlockedExchange(&JNETMesh[2],1); /* Consume before calling: rejects reentry. */
-        if (!boundary_checkpoint("[JC] mesh initialized callback enter")) { InterlockedExchange(&mesh_fault,1); return 0; }
+        if (!boundary_checkpoint("[JNET] mesh initialized callback enter")) { InterlockedExchange(&mesh_fault,1); return 0; }
         uintptr_t result=original_mesh_register(mesh,context);
-        if (!boundary_checkpoint("[JC] mesh initialized callback returned")) InterlockedExchange(&mesh_fault,1);
+        if (!boundary_checkpoint("[JNET] mesh initialized callback returned")) InterlockedExchange(&mesh_fault,1);
         return result;
     }
     InterlockedExchange(&mesh_fault,1);
     if (!body_context->mesh_guard_failure) body_context->mesh_guard_failure=failure;
     char line[160];
-    snprintf(line,sizeof(line),"[JC] body=%u callback rejected reason=%d early=%ld ready=%ld; cleanup required",
+    snprintf(line,sizeof(line),"[JNET] body=%u callback rejected reason=%d early=%ld ready=%ld; cleanup required",
         body_context->index+1,failure,(long)JNETMesh[1],(long)JNETMesh[2]);
     boundary_checkpoint(line);
     return 0;
 }
 static uint64_t mesh_create(void *image) {
-    if (!boundary_checkpoint("[JC] mesh factory enter")) { InterlockedExchange(&mesh_fault,1); return 0; }
+    if (!boundary_checkpoint("[JNET] mesh factory enter")) { InterlockedExchange(&mesh_fault,1); return 0; }
     uint64_t object=trial_create(image);
-    if (!boundary_checkpoint("[JC] mesh factory returned")) InterlockedExchange(&mesh_fault,1);
+    if (!boundary_checkpoint("[JNET] mesh factory returned")) InterlockedExchange(&mesh_fault,1);
     return object;
 }
 static int material_mark(LONG phase,const char *text) {
@@ -1861,21 +1869,21 @@ static void idle_pose_trial(void *image,uintptr_t mesh) {
     /* Native caller's temporary reference context; direct update only reads its queue. */
     uint64_t type=(uintptr_t)image+0x6896e8;
     memcpy(context,&type,8);
-    if (!material_mark(38,"[JC] inactive-weight mesh update enter; one call; no explicit draw")) {
+    if (!material_mark(38,"[JNET] inactive-weight mesh update enter; one call; no explicit draw")) {
         HeapFree(GetProcessHeap(),0,context); return;
     }
     InterlockedExchange(&JNETIdle[1],1);
     void (*mesh_update)(uintptr_t,void *)=(void *)((unsigned char *)image+JC_RVA_MeshUpdate);
     mesh_update(mesh,context);
     InterlockedExchange(&JNETIdle[1],2);
-    boundary_record("[JC] inactive-weight mesh update returned; checking temporary references");
+    boundary_record("[JNET] inactive-weight mesh update returned; checking temporary references");
     uint32_t queued; memcpy(&queued,context+0x10080,4);
     InterlockedExchange(&JNETIdle[2],(LONG)queued);
     int valid=jc_idle_context_valid(context,&inputs);
     if (!valid) {
         /* Quarantine unknown references: never invoke a destructor through them. */
         InterlockedExchange(&JNETIdle[0],11); InterlockedExchange(&mesh_fault,1);
-        boundary_record("[JC] unexpected temporary reference context quarantined; restart required"); return;
+        boundary_record("[JNET] unexpected temporary reference context quarantined; restart required"); return;
     }
     void (*release)(void *)=(void *)((unsigned char *)image+JC_RVA_ReferenceRelease);
     memset(context+0x10080,0,4);
@@ -1888,7 +1896,7 @@ static void idle_pose_trial(void *image,uintptr_t mesh) {
     InterlockedExchange(&JNETIdle[3],restored ? 1 : 0);
     InterlockedExchange(&JNETIdle[4],matched ? 1 : 0);
     if (!restored || !matched) { InterlockedExchange(&JNETIdle[0],12); InterlockedExchange(&mesh_fault,1); }
-    boundary_record("[JC] idle pose reference and root checks recorded; native mesh cleanup follows");
+    boundary_record("[JNET] idle pose reference and root checks recorded; native mesh cleanup follows");
 }
 
 static int body_pair_storage(void *image,uint64_t mesh) {
@@ -1944,45 +1952,45 @@ static void material_prepare(void *image,uintptr_t mesh) {
     InterlockedExchange(&JNETGeometry[0],geometry_code);
     if (geometry_code) {
         InterlockedExchange(&mesh_fault,1);
-        boundary_checkpoint("[JC] original remote geometry-pool snapshot declined; preparation not attempted");
+        boundary_checkpoint("[JNET] original remote geometry-pool snapshot declined; preparation not attempted");
         return;
     }
     if (geometry.slots!=JC_BODY_CAPACITY || geometry.occupied!=2+body_context->index || geometry.free_slots!=JC_BODY_COUNT-body_context->index || geometry.source!=geometry_source_before) {
         InterlockedExchange(&mesh_fault,1);
-        boundary_checkpoint("[JC] free geometry slot changed; binding declined");
+        boundary_checkpoint("[JNET] free geometry slot changed; binding declined");
         return;
     }
     InterlockedExchange(&JNETGeometry[1],(LONG)geometry.slots);
     InterlockedExchange(&JNETGeometry[2],(LONG)geometry.occupied);
     InterlockedExchange(&JNETGeometry[3],(LONG)geometry.free_slots);
     char geometry_line[160];
-    snprintf(geometry_line,sizeof(geometry_line),"[JC] geometry pool before binding slots=%u occupied=%u free=%u",
+    snprintf(geometry_line,sizeof(geometry_line),"[JNET] geometry pool before binding slots=%u occupied=%u free=%u",
         (unsigned)geometry.slots,(unsigned)geometry.occupied,(unsigned)geometry.free_slots);
     if (!material_mark(36,geometry_line)) return;
-    if (!material_mark(30,"[JC] material property clear enter")) return;
+    if (!material_mark(30,"[JNET] material property clear enter")) return;
     clear(mesh+0x80);
-    if (!material_mark(30,"[JC] material property clear returned")) return;
-    if (!material_mark(31,"[JC] material clone reference enter")) return;
+    if (!material_mark(30,"[JNET] material property clear returned")) return;
+    if (!material_mark(31,"[JNET] material clone reference enter")) return;
     uintptr_t returned=get(mesh,reference);
     if (returned!=(uintptr_t)reference) {
         InterlockedExchange(&mesh_fault,1);
-        boundary_checkpoint("[JC] material reference result unexpected; temporary reference quarantined");
+        boundary_checkpoint("[JNET] material reference result unexpected; temporary reference quarantined");
         return;
     }
-    int proceed=material_mark(31,"[JC] material clone reference returned");
-    if (proceed) proceed=material_mark(32,"[JC] material property assign enter");
+    int proceed=material_mark(31,"[JNET] material clone reference returned");
+    if (proceed) proceed=material_mark(32,"[JNET] material property assign enter");
     if (proceed) {
         assign(mesh+0x80,reference);
-        proceed=material_mark(32,"[JC] material property assign returned");
+        proceed=material_mark(32,"[JNET] material property assign returned");
     }
     /* The getter's known output owns one temporary reference. Release even if logging failed. */
-    if (!material_mark(33,"[JC] material temporary release enter")) proceed=0;
+    if (!material_mark(33,"[JNET] material temporary release enter")) proceed=0;
     release(reference);
-    if (!material_mark(33,"[JC] material temporary release returned")) proceed=0;
+    if (!material_mark(33,"[JNET] material temporary release returned")) proceed=0;
     if (!proceed) return;
-    if (!material_mark(34,"[JC] material geometry binding enter")) return;
+    if (!material_mark(34,"[JNET] material geometry binding enter")) return;
     bind(material_manager,material_name,mesh+0x88);
-    if (!material_mark(34,"[JC] material geometry binding returned")) return;
+    if (!material_mark(34,"[JNET] material geometry binding returned")) return;
     uint64_t bound_source, bound_slot;
     int source_state=3,slot_state=-1;
     if (jc_layout_field(own_read,NULL,mesh+0x80,0x10,&bound_source,8))
@@ -1990,7 +1998,7 @@ static void material_prepare(void *image,uintptr_t mesh) {
     if (jc_layout_field(own_read,NULL,mesh+0x80,0x30,&bound_slot,8)) slot_state=bound_slot ? 1 : 0;
     InterlockedExchange(&JNETGeometry[4],source_state);
     InterlockedExchange(&JNETGeometry[5],slot_state);
-    snprintf(geometry_line,sizeof(geometry_line),"[JC] trial geometry source comparison=%d slot_present=%d; no render commit",source_state,slot_state);
+    snprintf(geometry_line,sizeof(geometry_line),"[JNET] trial geometry source comparison=%d slot_present=%d; no render commit",source_state,slot_state);
     if (!material_mark(36,geometry_line)) return;
     struct jc_geometry_pool trial_pool;
     uint64_t remote_slot=0,local_slot=0;
@@ -2002,7 +2010,7 @@ static void material_prepare(void *image,uintptr_t mesh) {
         remote_slot==geometry_slot_before && bound_slot!=remote_slot && bound_slot!=local_slot;
     InterlockedExchange(&JNETGeometry[6],owned ? 1 : 0);
     if (!owned) InterlockedExchange(&mesh_fault,1);
-    boundary_record(owned ? "[JC] trial owns a distinct geometry slot in four-slot pool" : "[JC] trial geometry ownership not established; cleanup required");
+    boundary_record(owned ? "[JNET] trial owns a distinct geometry slot in four-slot pool" : "[JNET] trial geometry ownership not established; cleanup required");
     uint64_t slot, resource, payload, end;
     int present=jc_layout_field(own_read,NULL,mesh+0x80,0x30,&slot,8) &&
         jc_layout_field(own_read,NULL,slot,0x10,&resource,8) &&
@@ -2013,13 +2021,13 @@ static void material_prepare(void *image,uintptr_t mesh) {
     uint64_t ready_payload=0,cached=0;
     int ready=jc_material_ready(own_read,NULL,mesh+0x80,&ready_payload);
     InterlockedExchange(&JNETCommit[0],ready);
-    if (ready) { InterlockedExchange(&mesh_fault,1); boundary_record("[JC] material commit input declined; cleanup required"); return; }
-    if (!material_mark(37,"[JC] material commit enter; one call before cleanup")) return;
+    if (ready) { InterlockedExchange(&mesh_fault,1); boundary_record("[JNET] material commit input declined; cleanup required"); return; }
+    if (!material_mark(37,"[JNET] material commit enter; one call before cleanup")) return;
     InterlockedExchange(&JNETCommit[1],1);
     void (*commit)(uintptr_t)=(void *)((unsigned char *)image+JC_RVA_MaterialCommit);
     commit(mesh+0x80);
     InterlockedExchange(&JNETCommit[1],2);
-    if (!material_mark(37,"[JC] material commit returned")) return;
+    if (!material_mark(37,"[JNET] material commit returned")) return;
     if (jc_layout_field(own_read,NULL,mesh+0x80,0x468,&cached,8) && cached==ready_payload)
         InterlockedExchange(&JNETCommit[1],3);
     else InterlockedExchange(&mesh_fault,1);
@@ -2029,7 +2037,7 @@ static void material_prepare(void *image,uintptr_t mesh) {
     InterlockedExchange(&JNETPose[1],pose_models);
     InterlockedExchange(&JNETPose[2],pose_roots);
     InterlockedExchange(&JNETPose[0],pose_code);
-    boundary_record("[JC] pose storage observation complete; no animation update or draw invoked");
+    boundary_record("[JNET] pose storage observation complete; no animation update or draw invoked");
     struct jc_pose_write_workspace *pose_work=HeapAlloc(GetProcessHeap(),0,sizeof(*pose_work));
     struct callback_read_budget pose_budget={.deadline=GetTickCount64()+250};
     struct jc_pose_write_result pose_writes;
@@ -2042,7 +2050,7 @@ static void material_prepare(void *image,uintptr_t mesh) {
         InterlockedExchange(&JNETPoseWrites[1],pose_writes.disjoint);
     }
     InterlockedExchange(&JNETPoseWrites[0],write_code);
-    boundary_record("[JC] nested matrix destination inspection returned; cleanup follows; no animation calls");
+    boundary_record("[JNET] nested matrix destination inspection returned; cleanup follows; no animation calls");
     struct jc_animation_workspace *animation_work=HeapAlloc(GetProcessHeap(),0,sizeof(*animation_work));
     struct callback_read_budget animation_budget={.deadline=GetTickCount64()+250};
     struct jc_animation_result animation;
@@ -2055,7 +2063,7 @@ static void material_prepare(void *image,uintptr_t mesh) {
         InterlockedExchange(&JNETAnimation[1],animation.disjoint);
     }
     InterlockedExchange(&JNETAnimation[0],animation_code);
-    boundary_record("[JC] animation storage inspection returned; no animation functions invoked");
+    boundary_record("[JNET] animation storage inspection returned; no animation functions invoked");
     struct jc_callback_snapshot callbacks;
     int code=callback_snapshot_read(&callbacks);
     InterlockedExchange(&JNETCallbacks[3],code);
@@ -2068,7 +2076,7 @@ static void material_prepare(void *image,uintptr_t mesh) {
             !jc_callback_equal(&callbacks.owners[1],&callback_baseline.owners[1])) InterlockedExchange(&mesh_fault,1);
     } else InterlockedExchange(&mesh_fault,1);
     if (!code) body_context->prepared_callbacks=callbacks;
-    boundary_record("[JC] bounded callback registration snapshot complete; no callbacks invoked by probe");
+    boundary_record("[JNET] bounded callback registration snapshot complete; no callbacks invoked by probe");
     if (!mesh_fault) {
         int pair_code=body_pair_storage(image,mesh);
         InterlockedExchange(&JNETDual[2],pair_code);
@@ -2083,19 +2091,19 @@ static void mesh_initialize(void *image,uint64_t object) {
     callback_meshes[2]=object+0x160;
     if (mesh_fault) return;
     void (*attach)(uintptr_t,uintptr_t,uintptr_t)=(void *)((unsigned char *)image+JC_RVA_ResourceAttach);
-    if (!boundary_checkpoint("[JC] mesh attachment enter")) { InterlockedExchange(&mesh_fault,1); return; }
+    if (!boundary_checkpoint("[JNET] mesh attachment enter")) { InterlockedExchange(&mesh_fault,1); return; }
     InterlockedExchangePointer(&guarded_mesh,(void *)(uintptr_t)(object+0x160));
     InterlockedExchange(&JNETPhase,22);
     attach(mesh_source,mesh_context,(uintptr_t)object+0x160);
     InterlockedExchangePointer(&guarded_mesh,NULL);
-    if (!boundary_checkpoint("[JC] mesh attachment returned")) InterlockedExchange(&mesh_fault,1);
+    if (!boundary_checkpoint("[JNET] mesh attachment returned")) InterlockedExchange(&mesh_fault,1);
     if (!jc_mesh_guard_complete(JNETMesh[1],JNETMesh[2])) InterlockedExchange(&mesh_fault,1);
     if (mesh_fault) return;
     material_prepare(image,(uintptr_t)object+0x160);
 }
 static void mesh_cleanup(void *image,uint64_t object) {
     void (*cleanup)(uintptr_t)=(void *)((unsigned char *)image+JC_RVA_MeshCleanup);
-    if (!boundary_checkpoint("[JC] mesh cleanup enter")) InterlockedExchange(&mesh_fault,1);
+    if (!boundary_checkpoint("[JNET] mesh cleanup enter")) InterlockedExchange(&mesh_fault,1);
     InterlockedExchange(&JNETPhase,24);
     if (initialized_life.state==3) InterlockedExchange(&JNETMeshLife[5],4);
     cleanup((uintptr_t)object+0x160);
@@ -2104,14 +2112,14 @@ static void mesh_cleanup(void *image,uint64_t object) {
     int cleared=jc_layout_field(own_read,NULL,object+0x160+0x80,0x468,&cached,8) && !cached;
     InterlockedExchange(&JNETCommit[2],cleared ? 1 : -1);
     if (!cleared) InterlockedExchange(&mesh_fault,1);
-    if (!boundary_checkpoint("[JC] mesh cleanup returned")) InterlockedExchange(&mesh_fault,1);
+    if (!boundary_checkpoint("[JNET] mesh cleanup returned")) InterlockedExchange(&mesh_fault,1);
 }
 static void mesh_destroy(void *image,uint64_t object) {
-    if (!boundary_checkpoint("[JC] mesh deleting destructor enter")) InterlockedExchange(&mesh_fault,1);
+    if (!boundary_checkpoint("[JNET] mesh deleting destructor enter")) InterlockedExchange(&mesh_fault,1);
     if (initialized_life.state==3) InterlockedExchange(&JNETMeshLife[5],6);
     trial_destroy(image,object);
     if (initialized_life.state==3) InterlockedExchange(&JNETMeshLife[5],7);
-    if (!boundary_checkpoint("[JC] mesh deleting destructor returned")) InterlockedExchange(&mesh_fault,1);
+    if (!boundary_checkpoint("[JNET] mesh deleting destructor returned")) InterlockedExchange(&mesh_fault,1);
 }
 static void initialized_publish(const struct jc_initialized_detail *detail) {
     InterlockedExchange(&JNETMeshLife[4],detail->field);
@@ -2163,7 +2171,7 @@ static int mesh_retain(void *image,uint64_t object) {
     }
     if (budget.expired) code=jc_initialized_error(&candidate.detail,JC_IF_BUDGET,9);
     initialized_publish(&candidate.detail);
-    if (code || !boundary_checkpoint("[JC] initialized undrawn mesh retained until next local cleanup")) {
+    if (code || !boundary_checkpoint("[JNET] initialized undrawn mesh retained until next local cleanup")) {
         InterlockedExchange(&mesh_fault,1);
         if (!code) initialized_fault_field(JC_IF_CHECKPOINT,1);
         InterlockedExchange(&JNETMeshLife[2],code ? code : 10); return 0;
@@ -2184,7 +2192,7 @@ static void mesh_restoration(uintptr_t dude,int mesh_result) {
     }
     InterlockedExchange(&JNETGeometry[7],restored ? 1 : 0);
     if (restored) InterlockedExchange(&JNETGeometry[8],(LONG)released_pool.free_slots);
-    boundary_record(restored ? "[JC] geometry slot returned; original remote ownership preserved" : "[JC] geometry pool restoration not established; restart required");
+    boundary_record(restored ? "[JNET] geometry slot returned; original remote ownership preserved" : "[JNET] geometry pool restoration not established; restart required");
     struct jc_callback_snapshot callback_after;
     int callback_after_code=callback_snapshot_read(&callback_after);
     InterlockedExchange(&JNETCallbacks[6],callback_after_code);
@@ -2193,18 +2201,18 @@ static void mesh_restoration(uintptr_t dude,int mesh_result) {
         jc_callback_equal(&callback_after.owners[0],&callback_baseline.owners[0]) &&
         jc_callback_equal(&callback_after.owners[1],&callback_baseline.owners[1]);
     InterlockedExchange(&JNETCallbacks[7],callbacks_restored ? 1 : 0);
-    boundary_record(callbacks_restored ? "[JC] trial callback registrations absent after cleanup; originals match" : "[JC] callback registration restoration not established");
+    boundary_record(callbacks_restored ? "[JNET] trial callback registrations absent after cleanup; originals match" : "[JNET] callback registration restoration not established");
     int good=JNETIdle[0]==0 && JNETIdle[1]==3 && callbacks_restored && JNETCallbacks[3]==0 && JNETCommit[1]==3 && JNETCommit[2]==1 && restored && JNETGeometry[6]==1 && !mesh_fault && !lifetime_conflict && JNETMaterial==1 && mesh_result==2 && jc_mesh_guard_complete(JNETMesh[1],JNETMesh[2]);
     InterlockedExchange(&JNETResource,good ? 4 : -1);
-    boundary_record(good ? "[JC] material commit returned; trial resources inspected and released" :
-        "[JC] guarded mesh rehearsal incomplete or declined; restart required");
+    boundary_record(good ? "[JNET] material commit returned; trial resources inspected and released" :
+        "[JNET] guarded mesh rehearsal incomplete or declined; restart required");
 }
 static uintptr_t resource_observer(uintptr_t dude, uintptr_t manager, uintptr_t effects,
                                    uintptr_t unused, uintptr_t lua, uintptr_t name) {
     int observing=JNETResource==1 || JNETResource==2;
-    if (observing) boundary_record("[JC] boundary resource original enter");
+    if (observing) boundary_record("[JNET] boundary resource original enter");
     uintptr_t result=original_resource_init(dude,manager,effects,unused,lua,name);
-    if (observing && JNETResource>=0) boundary_record("[JC] boundary resource original returned");
+    if (observing && JNETResource>=0) boundary_record("[JNET] boundary resource original returned");
     if (JNETResource!=2) return result;
     if (!TryAcquireSRWLockExclusive(&lifetime_lock)) {
         InterlockedExchange(&lifetime_conflict,1);
@@ -2233,7 +2241,7 @@ static uintptr_t resource_observer(uintptr_t dude, uintptr_t manager, uintptr_t 
         !jc_layout_field(own_read,NULL,head,0x10,&payload,8) || !payload ||
         !jc_layout_field(own_read,NULL,manager,8,&value,8) || !value) {
         InterlockedExchange(&JNETResource,-1);
-        boundary_record("[JC] boundary remote context declined; no trial object allocated");
+        boundary_record("[JNET] boundary remote context declined; no trial object allocated");
         goto finished;
     }
     if (JNETStartup[0]) {
@@ -2245,19 +2253,19 @@ static uintptr_t resource_observer(uintptr_t dude, uintptr_t manager, uintptr_t 
         if (reason) {
             InterlockedExchange(&JNETMeshLife[107],reason);
             InterlockedExchange(&JNETResource,-1);
-            boundary_checkpoint("[JC] preparation declined: unknown/non-target level or timeout; no trial allocated");
+            boundary_checkpoint("[JNET] preparation declined: unknown/non-target level or timeout; no trial allocated");
             goto finished;
         }
         if (level==0) {
             LONG skipped=InterlockedIncrement(&JNETMeshLife[95]);
             if (skipped>2) InterlockedExchange(&JNETMeshLife[107],4);
             InterlockedExchange(&JNETResource,skipped<=2 ? 1 : -1);
-            boundary_checkpoint("[JC] chapter-select initialization skipped; enter an eligible ordinary chapter");
+            boundary_checkpoint("[JNET] chapter-select initialization skipped; enter an eligible ordinary chapter");
             goto finished;
         }
         prepared_level=level;
         InterlockedExchange(&JNETMeshLife[108],level);
-        if (!boundary_checkpoint("[JC] ordinary chapter selected; validating native trial resources")) {
+        if (!boundary_checkpoint("[JNET] ordinary chapter selected; validating native trial resources")) {
             InterlockedExchange(&JNETResource,-1); goto finished;
         }
     }
@@ -2271,7 +2279,7 @@ static uintptr_t resource_observer(uintptr_t dude, uintptr_t manager, uintptr_t 
         else InterlockedExchange(&JNETBuilder[6],code);
         InterlockedExchangePointer(&builder_target,NULL);
         InterlockedExchange(&JNETResource,code || JNETBuilder[6] ? -1 : 4);
-        boundary_record("[JC] geometry build observation ended at remote initialization; no trial allocated");
+        boundary_record("[JNET] geometry build observation ended at remote initialization; no trial allocated");
         goto finished;
     }
     const uint64_t meshes[2]={barn+0xb0+0x160,dude+0x160};
@@ -2290,14 +2298,14 @@ static uintptr_t resource_observer(uintptr_t dude, uintptr_t manager, uintptr_t 
     InterlockedExchange(&JNETPool[0],pool_status);
     char pool_line[160];
     if (!pool_status) snprintf(pool_line,sizeof(pool_line),
-        "[JC] pool slots=%u capacity=%u occupied=%u free=%u; no trial object allocated",
+        "[JNET] pool slots=%u capacity=%u occupied=%u free=%u; no trial object allocated",
         (unsigned)pool.slots,(unsigned)pool.capacity,(unsigned)pool.occupied,(unsigned)pool.free_slots);
-    else snprintf(pool_line,sizeof(pool_line),"[JC] pool snapshot declined code=%d; no trial object allocated",pool_status);
+    else snprintf(pool_line,sizeof(pool_line),"[JNET] pool snapshot declined code=%d; no trial object allocated",pool_status);
     boundary_record(pool_line);
     if (JNETResource<0) goto finished;
     if (pool_status || pool.slots!=2 || pool.capacity!=2 || pool.occupied!=2 || pool.free_slots) {
         InterlockedExchange(&JNETResource,-1);
-        boundary_checkpoint("[JC] guarded mesh declined: requires matched exhausted two-slot pool");
+        boundary_checkpoint("[JNET] guarded mesh declined: requires matched exhausted two-slot pool");
         goto finished;
     }
     struct jc_geometry_pool before_geometry;
@@ -2310,7 +2318,7 @@ static uintptr_t resource_observer(uintptr_t dude, uintptr_t manager, uintptr_t 
         jc_geometry_build_read(own_read,NULL,expected_image,geometry_object,&before_build) || before_build.limit!=JC_BODY_CAPACITY ||
         !jc_layout_field(own_read,NULL,dude+0x160+0x80,0x30,&geometry_slot_before,8)) {
         InterlockedExchange(&JNETResource,-1);
-        boundary_checkpoint("[JC] slot trial declined: validated startup and two free four-slot geometry slots required");
+        boundary_checkpoint("[JNET] slot trial declined: validated startup and two free four-slot geometry slots required");
         goto finished;
     }
     uint64_t saved_slot=geometry_slot_before;
@@ -2434,7 +2442,7 @@ static int cloth_actor_appearance_status(int code,unsigned stage,unsigned detail
     static unsigned previous_stage,previous_detail;
     if (code!=previous_code || stage!=previous_stage || detail!=previous_detail) {
         char line[192];
-        snprintf(line,sizeof(line),"[JC] actor appearance code/stage/detail=%d/%u/%u frame=%ld",
+        snprintf(line,sizeof(line),"[JNET] actor appearance code/stage/detail=%d/%u/%u frame=%ld",
             code,stage,detail,(long)JNETFrames);
         message(line);previous_code=code;previous_stage=stage;previous_detail=detail;
     }
@@ -2502,6 +2510,14 @@ static int cloth_actor_numeric_appearance(uint64_t peer,uint64_t generation,uint
     if(!own_read(NULL,traveler_object+0x68,scarf,sizeof(scarf)) ||
         !own_read(NULL,image+0x731fb0,&maximum,4) || !maximum || maximum>4096 ||
         scarf[0]>scarf[1] || scarf[1]>4096)return cloth_actor_appearance_status(JC_FRAME_MATERIAL,8,0);
+    static uint64_t scarf_report_peer,scarf_report_generation;
+    static unsigned scarf_report_capacity=UINT32_MAX;
+    if(scarf_report_peer!=peer || scarf_report_generation!=generation || scarf_report_capacity!=scarf[1]){
+        char line[192];snprintf(line,sizeof(line),"[JNET] extra scarf peer=%llu capacity=%u maximum=%u visible=%.4f descriptor=%llx",
+            (unsigned long long)peer,scarf[1],maximum,cloth_actor_scarf.scarf_length,
+            (unsigned long long)cloth_actor_scarf.descriptor[0]);message(line);
+        scarf_report_peer=peer;scarf_report_generation=generation;scarf_report_capacity=scarf[1];
+    }
     float growth=fminf(1.f,(float)scarf[1]/maximum)-cloth_actor_scarf.scarf_length;
     int step=jc_cloth_scarf_step(own_read,cloth_actor_descriptor_write,&cloth_actor_scarf,
             &cloth_actor_scarf,timer);
@@ -2509,19 +2525,22 @@ static int cloth_actor_numeric_appearance(uint64_t peer,uint64_t generation,uint
     if(traveler_growth_active()) {
         if(!jc_scarf_growth_prepare(own_read,NULL,image,traveler_game,traveler_object,&cloth_actor_growth))
             return cloth_actor_appearance_status(JC_FRAME_MATERIAL,10,2);
+        unsigned deferred=cloth_actor_growth.deferred;
         if(!jc_scarf_growth_step(own_read,cloth_actor_growth_write,NULL,&cloth_actor_growth,growth)) {
             uint64_t handle=0;float vectors[8]={0};
             memcpy(&handle,cloth_actor_growth.native+0x18,8);
             int position=own_read(NULL,traveler_object+0x2290,vectors,16);
             int direction=own_read(NULL,traveler_object+0x14270,vectors+4,16);
             char line[512];
-            snprintf(line,sizeof(line),"[JC] scarf growth failed delta=%g owner=%d handle=%llu read=%d/%d vectors=%g,%g,%g,%g/%g,%g,%g,%g",
+            snprintf(line,sizeof(line),"[JNET] scarf growth failed delta=%g owner=%d handle=%llu read=%d/%d vectors=%g,%g,%g,%g/%g,%g,%g,%g",
                 growth,jc_scarf_growth_check(own_read,NULL,&cloth_actor_growth),
                 (unsigned long long)handle,position,direction,
                 vectors[0],vectors[1],vectors[2],vectors[3],vectors[4],vectors[5],vectors[6],vectors[7]);
             message(line);
             return cloth_actor_appearance_status(JC_FRAME_MATERIAL,10,3);
         }
+        if(cloth_actor_growth.deferred!=deferred && (deferred<4 || cloth_actor_growth.deferred%128==0))
+            message("[JNET] scarf growth effect deferred: nonfinite emitter vector; traveler retained");
     } else if(!cloth_actor_growth_stop())return cloth_actor_appearance_status(JC_FRAME_MATERIAL,10,1);
     ((void (*)(uintptr_t,uintptr_t,float,float,float))(image+0x217a70))
         (0,traveler_object,hsv[0],hsv[1],hsv[2]);
@@ -2546,6 +2565,8 @@ static int cloth_actor_scope_begin(uint64_t peer,uint64_t generation) {
             jc_cloth_storage_read(own_read,NULL,target[i],owned+i)) return JC_FRAME_MATERIAL;
     }
     if (jc_cloth_appearance_route_make(source,target,stock,owned,&route)) return JC_FRAME_MATERIAL;
+    if(jc_cloth_scarf_resize(own_read,cloth_actor_growth_write,NULL,
+        (uintptr_t)GetModuleHandleW(NULL),traveler_object))return JC_FRAME_MATERIAL;
     AcquireSRWLockExclusive(&cloth_appearance_lock);
     if (cloth_appearance_thread) { ReleaseSRWLockExclusive(&cloth_appearance_lock); return JC_FRAME_BUSY; }
     cloth_appearance_scope=route;cloth_appearance_thread=GetCurrentThreadId();
@@ -2729,7 +2750,7 @@ static int cloth_stage_stock_batch(unsigned index,
             !own_read(NULL,cloth_maps.barn+0x669970+r*8,&vertices,8) || vertices ||
             !own_read(NULL,cloth_maps.barn+0x6699a8+r*8,&indices,8) || indices) {
             s->failed=1; s->frames.frames[index].phase=JC_FRAME_UNKNOWN;
-            message("[JC] native cloth finalizer did not retire its mapped rings; frame retained");
+            message("[JNET] native cloth finalizer did not retire its mapped rings; frame retained");
             return JC_FRAME_QUARANTINED;
         }
     }
@@ -2814,7 +2835,7 @@ __declspec(dllexport) int JNETClothAdoptMappedPass(unsigned index,uint64_t gener
     if (applied) {
         if (applied==JC_PRELAUNCH_QUARANTINED) {
             s->failed=1;f->phase=JC_FRAME_UNKNOWN;code=JC_FRAME_QUARANTINED;
-            message("[JC] native prelaunch mapping restoration failed; retained private buffers");
+            message("[JNET] native prelaunch mapping restoration failed; retained private buffers");
         } else { memset(&cloth_maps,0,sizeof(cloth_maps));code=JC_FRAME_OWNERSHIP; }
         goto done;
     }
@@ -2862,7 +2883,7 @@ static uint32_t cloth_map_observer(uintptr_t object,uintptr_t output,unsigned ki
         memcmp(check,mapped,sizeof(check))) {
         if (!jc_local_windows_write(output,original_output,sizeof(original_output)) || !own_read(NULL,output,check,sizeof(check)) ||
             memcmp(check,original_output,sizeof(check)))
-            message("[JC] cloth map output restoration failed; native caller does not check map status");
+            message("[JNET] cloth map output restoration failed; native caller does not check map status");
         goto failed;
     }
     cloth_maps.seen[kind]|=1u<<role;
@@ -2870,7 +2891,7 @@ static uint32_t cloth_map_observer(uintptr_t object,uintptr_t output,unsigned ki
 failed:
     if (s) s->failed=1;
     if (f) f->phase=JC_FRAME_UNKNOWN;
-    message("[JC] cloth mapping ownership changed; retained frame quarantined");
+    message("[JNET] cloth mapping ownership changed; retained frame quarantined");
     return 5;
 }
 static uint32_t cloth_dependency_observer(uintptr_t dependency) {
@@ -2915,7 +2936,7 @@ static uint32_t cloth_dependency_observer(uintptr_t dependency) {
     else {
         atomic_store_explicit(&f->route.failed,JC_PARTITION_ARGUMENT,memory_order_release);
         s->failed=1; f->phase=JC_FRAME_UNKNOWN;
-        message("[JC] native cloth launch refused: current jobs differ from owned frame; resources retained");
+        message("[JNET] native cloth launch refused: current jobs differ from owned frame; resources retained");
     }
     ReleaseSRWLockExclusive(&cloth_map_lock);
     return valid ? original_cloth_dependency(dependency) : 0;
@@ -2963,16 +2984,16 @@ failed:
     cloth_participant_ready=0;
     if (!quarantined) {
         LONG declines=InterlockedIncrement(&JNETCompanionFeatures[30]);
-        if (declines==1 || (declines&63)==0) {
+        if (declines==1 || (declines&(code==JC_FRAME_BUSY?2047:63))==0) {
             char line[192];
-            snprintf(line,sizeof(line),"[JC] private cloth declined code=%d stage=%u detail=%u jobs=%u roles=%u declines=%ld",
+            snprintf(line,sizeof(line),"[JNET] private cloth declined code=%d stage=%u detail=%u jobs=%u roles=%u declines=%ld",
                 code,stage,cloth_producer.detail,cloth_producer.jobs.count,cloth_producer.roles,(long)declines);
             message(line);
         }
         return 0;
     }
     s->failed=1;
-    message("[JC] automatic cloth preparation failed before worker release; retained for inspection");
+    message("[JNET] automatic cloth preparation failed before worker release; retained for inspection");
     return -1;
 }
 static void cloth_render_model_report(unsigned role,unsigned participant,uintptr_t model) {
@@ -2990,7 +3011,7 @@ static void cloth_render_model_report(unsigned role,unsigned participant,uintptr
         readable=readable && binding && own_read(NULL,binding,&shader,8);
     }
     char line[384];
-    snprintf(line,sizeof(line),"[JC] cloth render model role=%u owner=%u readable=%d model=%llx span=%llx/%llx item=%llx geometry=%llx batches=%u table=%llx collection=%llx count=%u selector=%u binding=%llx shader=%llx",
+    snprintf(line,sizeof(line),"[JNET] cloth render model role=%u owner=%u readable=%d model=%llx span=%llx/%llx item=%llx geometry=%llx batches=%u table=%llx collection=%llx count=%u selector=%u binding=%llx shader=%llx",
         role,participant,readable,(unsigned long long)model,(unsigned long long)span[0],(unsigned long long)span[1],
         (unsigned long long)item,(unsigned long long)geometry,batches,(unsigned long long)table,
         (unsigned long long)collection,count,selector,(unsigned long long)binding,(unsigned long long)shader);
@@ -3010,7 +3031,7 @@ static void cloth_publish_at_render(uintptr_t barn,unsigned pass,uintptr_t conte
         InterlockedExchange(&JNETCompanionFeatures[33],105);
         InterlockedExchange(&JNETCompanionFeatures[34],(LONG)detail);
         char line[256];
-        snprintf(line,sizeof(line),"[JC] cloth render registration failed code=%d detail=%u frame=%u phase=%u committed=%u draws=%u refs=%u thread=%lu/%lu context=%llx",
+        snprintf(line,sizeof(line),"[JNET] cloth render registration failed code=%d detail=%u frame=%u phase=%u committed=%u draws=%u refs=%u thread=%lu/%lu context=%llx",
             code,detail,index,s->frames.frames[index].phase,s->frames.frames[index].stock_committed,
             s->frames.frames[index].draw_count,s->frames.frames[index].ref_count,
             (unsigned long)GetCurrentThreadId(),(unsigned long)s->thread,(unsigned long long)context);
@@ -3018,7 +3039,7 @@ static void cloth_publish_at_render(uintptr_t barn,unsigned pass,uintptr_t conte
         struct jc_cloth_frame *f=s->frames.frames+index;
         for (unsigned n=0;n<f->ref_count;++n) if (f->refs[n].kind==JC_FRAME_VERTEX || f->refs[n].kind==JC_FRAME_INDEX) {
             struct jc_cloth_live_buffer *buffer=jc_cloth_live_buffer_find(s,f->refs[n].object);
-            snprintf(line,sizeof(line),"[JC] cloth render buffer ref=%u kind=%u object=%llx found=%u mapped=%u pins=%u",
+            snprintf(line,sizeof(line),"[JNET] cloth render buffer ref=%u kind=%u object=%llx found=%u mapped=%u pins=%u",
                 n,f->refs[n].kind,(unsigned long long)f->refs[n].object,buffer!=NULL,
                 buffer && buffer->mapped,buffer ? buffer->pins : 0);
             message(line);
@@ -3031,7 +3052,7 @@ static void cloth_publish_at_render(uintptr_t barn,unsigned pass,uintptr_t conte
             const struct jc_cloth_material *d=&f->draws[n].material;
             struct jc_cloth_live_material *m=jc_cloth_live_material_find(s,d->material);
             cloth_render_model_report(d->role,d->participant,m ? (uintptr_t)m->model : 0);
-            snprintf(line,sizeof(line),"[JC] cloth render material draw=%u role=%u owner=%u found=%u pins=%u ready=%u quarantined=%u bindings=%d",
+            snprintf(line,sizeof(line),"[JNET] cloth render material draw=%u role=%u owner=%u found=%u pins=%u ready=%u quarantined=%u bindings=%d",
                 n,d->role,d->participant,m!=NULL,m ? m->pins : 0,m ? m->ready : 0,m ? m->quarantined : 0,
                 m ? jc_cloth_live_bindings_match(s,d) : 0);
             message(line);
@@ -3127,7 +3148,7 @@ static uintptr_t cloth_finish_observer(uintptr_t barn,void *result,unsigned pass
         InterlockedExchange(&JNETCompanionFeatures[33],(LONG)stage);
         InterlockedExchange(&JNETCompanionFeatures[34],(LONG)detail);
         char line[384];
-        snprintf(line,sizeof(line),"[JC] cloth finish failure code=%d stage=%u detail=%u pass=%u phase=%u pending=%u done=%u busy=%u route=%u completed=%u jobs=%u sealed=%u committed=%u finalized=%u native-called=%u",
+        snprintf(line,sizeof(line),"[JNET] cloth finish failure code=%d stage=%u detail=%u pass=%u phase=%u pending=%u done=%u busy=%u route=%u completed=%u jobs=%u sealed=%u committed=%u finalized=%u native-called=%u",
             code,stage,detail,pass,phase,pending,done,busy,route,
             atomic_load_explicit(&f->route.completed,memory_order_acquire),(unsigned)f->route.jobs,
             f->pass_sealed,f->pass_committed,f->pass_finalized,call.called);
@@ -3136,7 +3157,7 @@ static uintptr_t cloth_finish_observer(uintptr_t barn,void *result,unsigned pass
             for (unsigned role=0;role<7;++role) if (f->pass_roles[pass]&(1u<<role)) {
                 const struct jc_cloth_partition_range *range=&f->route.plan.ranges[owner][role];
                 if (!range->jobs) continue;
-                snprintf(line,sizeof(line),"[JC] cloth finish counters owner=%u role=%u vertices=%u/%u indices=%u/%u jobs=%u",
+                snprintf(line,sizeof(line),"[JNET] cloth finish counters owner=%u role=%u vertices=%u/%u indices=%u/%u jobs=%u",
                     owner,role,jc_cloth_u32(f->route.args[owner].bytes+0x210+4*role),
                     range->vertex_begin+range->vertices,jc_cloth_u32(f->route.args[owner].bytes+0x22c+4*role),
                     range->index_begin+range->indices,range->jobs);
@@ -3171,7 +3192,7 @@ static void cloth_worker_observer(unsigned kind,void *worker,const void *entry,v
         if (!own_read(NULL,(uintptr_t)entry,captured,sizeof(captured))) {
             if (!InterlockedCompareExchange(&cloth_maps.worker_reported,1,0)) {
                 char line[128];
-                snprintf(line,sizeof(line),"[JC] cloth worker entry unreadable kind=%u entry=%llx",
+                snprintf(line,sizeof(line),"[JNET] cloth worker entry unreadable kind=%u entry=%llx",
                     kind,(unsigned long long)(uintptr_t)entry);
                 message(line);
             }
@@ -3187,6 +3208,32 @@ static void cloth_worker_observer(unsigned kind,void *worker,const void *entry,v
             } else handled=jc_cloth_frame_dispatch(f,cloth_maps.generation,cloth_maps.roles,
                 (void *)(cloth_maps.barn+0x669960),&original_cloth_worker[kind],cloth_worker_call,
                 worker,captured,args,streams,descriptor,state);
+            if(handled==1 && role==5 && slot<JC_CLOTH_PARTITION_SLOTS &&
+               f->route.present[slot] && f->route.slots[slot].participant==1) {
+                static volatile LONG scarf_sample=-1;
+                static volatile LONG64 scarf_sample_at;
+                for(unsigned n=0;n<f->draw_count;++n)if(f->draws[n].material.role==5) {
+                    unsigned capacity=f->draws[n].material.scarf_capacity,maximum=0;
+                    LONG previous=InterlockedCompareExchange(&scarf_sample,0,0);
+                    ULONGLONG now=GetTickCount64();
+                    if(previous>=0 && (unsigned)previous/2==capacity &&
+                       ((previous&1) || now-(ULONGLONG)InterlockedCompareExchange64(&scarf_sample_at,0,0)<1000))break;
+                    InterlockedExchange64(&scarf_sample_at,(LONG64)now);
+                    float cutoff=0;
+                    const struct jc_cloth_partition_range *range=&f->route.plan.ranges[1][5];
+                    int readable=own_read(NULL,(uintptr_t)descriptor+0xc90,&cutoff,4) &&
+                        own_read(NULL,(uintptr_t)GetModuleHandleW(NULL)+0x731fb0,&maximum,4) && maximum &&
+                        range->vertices;
+                    LONG sample=(LONG)(capacity*2+(readable && fabsf(cutoff-(1.f-fminf(1.f,(float)capacity/maximum)))<.001f));
+                    if(InterlockedExchange(&scarf_sample,sample)!=sample) {
+                        char line[224];snprintf(line,sizeof(line),
+                            "[JNET] scarf render peer=%llu capacity=%u maximum=%u readable=%d descriptor_cutoff=%.5f vertices=%u",
+                            (unsigned long long)f->draws[n].material.peer,capacity,maximum,readable,
+                            cutoff,range->vertices);message(line);
+                    }
+                    break;
+                }
+            }
             if (handled<0 && !InterlockedCompareExchange(&cloth_maps.worker_reported,1,0)) {
                 uintptr_t vertex=0,index=0;
                 if (role<7) {
@@ -3194,7 +3241,7 @@ static void cloth_worker_observer(unsigned kind,void *worker,const void *entry,v
                     own_read(NULL,(uintptr_t)streams+0x48+role*8,&index,8);
                 }
                 char line[512];
-                snprintf(line,sizeof(line),"[JC] cloth worker rejected kind=%u slot=%u role=%u route=%u rejection=%u phase=%u args=%llx/%llx vertex=%llx/%llx index=%llx/%llx visible=%u subdivided=%u",
+                snprintf(line,sizeof(line),"[JNET] cloth worker rejected kind=%u slot=%u role=%u route=%u rejection=%u phase=%u args=%llx/%llx vertex=%llx/%llx index=%llx/%llx visible=%u subdivided=%u",
                     kind,slot,role,atomic_load(&f->route.failed),atomic_load(&f->route.rejection),f->phase,
                     (unsigned long long)(uintptr_t)args,(unsigned long long)(uintptr_t)f->source_args,
                     (unsigned long long)vertex,(unsigned long long)(uintptr_t)(role<7 ? f->streams[role].mapped_vertices : NULL),
@@ -3256,10 +3303,9 @@ static int traveler_peer_replace(uint64_t peer,uint64_t generation);
 #include "jnet_options_live.h"
 #include "jnet_appearance_live.h"
 #include "jnet_character_live.h"
-#include "jnet_flower_net.h"
-#include "jnet_flower_live.h"
 #include "jnet_rocket_live.h"
 #include "jnet_intro_live.h"
+#include "jnet_canyon_live.h"
 static void (*jnet_character_skeleton_build_original)(uintptr_t,uintptr_t);
 static void jnet_character_skeleton_build(uintptr_t output,uintptr_t model) {
     char name[64]={0},line[200];
@@ -3296,7 +3342,7 @@ static void jnet_character_animation_stage(uintptr_t resource,int finish) {
     private_resource=private_resource && own_read(NULL,address,name,(size_t)length+1) &&
         !name[length];
     int spin_resource=private_resource && !strcmp(name,"JNETSpin3");
-    private_resource=private_resource && !strncmp(name,"JC_",3);
+    private_resource=private_resource && !strncmp(name,"JNET_",5);
     if(spin_resource){
         snprintf(line,sizeof(line),"[JNET-mesh] Spin3 %s begin\r\n",finish?"finalize":"initialize");
         jnet_log_append(&session_logs->fault,line,strlen(line));
@@ -3345,7 +3391,7 @@ static int jnet_character_asset_load(const char *path,void *result,unsigned char
             break;
         }
     }
-    int trace=(key && (strstr(key,"JNETCharacter_") || !strncmp(key,"JC_",3))) || (path && strstr(path,"JNETCharacter_"));
+    int trace=(key && (strstr(key,"JNETCharacter_") || !strncmp(key,"JNET_",5))) || (path && strstr(path,"JNETCharacter_"));
     if(trace){
         DWORD attributes=GetFileAttributesA(resolved);
         DWORD error=attributes==INVALID_FILE_ATTRIBUTES?GetLastError():0;
@@ -3377,9 +3423,10 @@ static void jnet_online_game_tick(uintptr_t game) {
     if(JC_NATIVE_CHARACTERS_ENABLED)jnet_character_tick_native(game);
     jnet_appearance_game(game);
     jnet_daynight_game(game);
-    jnet_flower_tick(game);
     jnet_rocket_game(game);
-    if(JC_NATIVE_CHARACTERS_ENABLED)jnet_character_remote_tick(game);
+    if(JC_NATIVE_CHARACTERS_ENABLED){
+        jnet_character_remote_tick(game);
+    }
     JNETSteamGame[76]=jnet_diagnostic_scan_last;JNETSteamGame[77]=jnet_diagnostic_scan_peak;
     JNETSteamGame[78]=jnet_diagnostic_scan_count;JNETSteamGame[79]=jnet_diagnostic_suppressed;
     if(jnet_online_input_frame!=JNETFrames){if(JNETSteamGame[0] || traveler_network_external)++JNETSteamGame[56];jnet_online_before_input(game);}
@@ -3396,22 +3443,29 @@ static void jnet_online_game_tick(uintptr_t game) {
 static int64_t traveler_last_update;
 static int traveler_frame_wait(void) {
     if (!traveler_actor || !active_cloth_backend) return 1;
+    if (!cloth_progress_event) cloth_progress_event=CreateEventW(NULL,FALSE,FALSE,NULL);
     ULONGLONG deadline=GetTickCount64()+500;
+    int result=0;
+    unsigned timer_active=0;
     for (;;) {
         int ready=traveler_frame_retired();
-        if (ready<0 || active_cloth_backend->failed) return 0;
+        if (ready<0 || active_cloth_backend->failed) break;
         int all_free=1;
-        if (jc_cloth_frames_poll(&active_cloth_backend->frames)) return 0;
+        if (jc_cloth_frames_poll(&active_cloth_backend->frames)) break;
         for (unsigned i=0;i<JC_CLOTH_FRAMES;++i)
             if (active_cloth_backend->frames.frames[i].phase!=JC_FRAME_FREE) all_free=0;
-        if (ready && all_free && !InterlockedCompareExchange(&cloth_progress_pending,0,0)) return 1;
+        if (ready && all_free && !InterlockedCompareExchange(&cloth_progress_pending,0,0)) {result=1;break;}
+        if (!timer_active) timer_active=timeBeginPeriod(1)==TIMERR_NOERROR;
         cloth_progress_request();
         if (GetTickCount64()>=deadline) {
-            message("[JC] prior actor frame still pending; preserving leases before another game update");
-            return 0;
+            message("[JNET] prior actor frame still pending; preserving leases before another game update");
+            break;
         }
-        Sleep(1);
+        if (cloth_progress_event) WaitForSingleObject(cloth_progress_event,1);
+        else Sleep(1);
     }
+    if (timer_active) timeEndPeriod(1);
+    return result;
 }
 static void traveler_frame_complete(uintptr_t game) {
     if (!active_cloth_backend ||
@@ -3424,7 +3478,7 @@ static void traveler_frame_complete(uintptr_t game) {
         active_cloth_backend->failed=1;
         if (traveler_actor)
             traveler_actor_report(jc_actor_runtime_quarantine(traveler_actor,JC_ACTOR_RUNTIME_SCOPE));
-        message("[JC] actor frame closure could not be proven; resources retained");
+        message("[JNET] actor frame closure could not be proven; resources retained");
     }
 }
 static void chapter_switch_observer(uintptr_t game,const char *target) {
@@ -3447,7 +3501,7 @@ static void chapter_switch_observer(uintptr_t game,const char *target) {
     }
     if (!readable || game!=traveler_game || !jc_chapter_defer(&cloth_chapter,game,GetCurrentThreadId(),name)) {
         cloth_chapter.failed=1;
-        message("[JC] cloth chapter request quarantined; native teardown withheld"); return;
+        message("[JNET] cloth chapter request quarantined; native teardown withheld"); return;
     }
     /* GameUpdate clears its pending name after this hook returns. The private
        copy is replayed at the next update boundary after the drain completes. */
@@ -3455,7 +3509,7 @@ static void chapter_switch_observer(uintptr_t game,const char *target) {
 static void cloth_chapter_tick(uintptr_t game) {
     if (!active_cloth_backend || cloth_exit_window || !cloth_chapter.pending || cloth_chapter.failed) return;
     if (game!=cloth_chapter.game || GetCurrentThreadId()!=cloth_chapter.thread) {
-        cloth_chapter.failed=1; message("[JC] cloth chapter owner changed; native teardown withheld"); return;
+        cloth_chapter.failed=1; message("[JNET] cloth chapter owner changed; native teardown withheld"); return;
     }
     cloth_progress_request();
     traveler_repeat_cancel();
@@ -3475,12 +3529,14 @@ static void cloth_chapter_tick(uintptr_t game) {
         ReleaseSRWLockExclusive(&cloth_map_lock);
         active_cloth_backend=NULL;
         original_chapter_switch(game,target);
-    } else if (cloth_chapter.failed) message("[JC] cloth chapter drain quarantined; native teardown withheld");
+    } else if (cloth_chapter.failed) message("[JNET] cloth chapter drain quarantined; native teardown withheld");
 }
+static int cloth_quarantined_close(UINT msg);
 static void CALLBACK cloth_exit_timer(HWND window,UINT message_id,UINT_PTR timer,DWORD elapsed) {
     (void)window; (void)message_id; (void)elapsed;
     if (!cloth_exit_window || timer!=cloth_exit_timer_id || !active_cloth_backend) return;
     if (active_cloth_backend->thread!=GetCurrentThreadId()) return;
+    if(cloth_quarantined_close(WM_CLOSE))return;
     cloth_progress_request();
     traveler_repeat_cancel();
     if (JNETActorStop()) return;
@@ -3490,7 +3546,7 @@ static void CALLBACK cloth_exit_timer(HWND window,UINT message_id,UINT_PTR timer
     if ((code && code!=JC_FRAME_BUSY) || progress<0) {
         if (!cloth_exit_reported) {
             cloth_exit_reported=1;
-            message("[JC] cloth exit drain quarantined; native destruction withheld");
+            message("[JNET] cloth exit drain quarantined; native destruction withheld");
         }
         return;
     }
@@ -3506,10 +3562,11 @@ static void CALLBACK cloth_exit_timer(HWND window,UINT message_id,UINT_PTR timer
     original_game_window(target,WM_CLOSE,wp,lp);
 }
 static int cloth_quarantined_close(UINT msg) {
-    if (msg!=WM_CLOSE || !active_cloth_backend || !active_cloth_backend->failed) return 0;
-    message("[JC] user requested close after cloth quarantine; terminating this Journey process, exit e04a4301");
+    if (msg!=WM_CLOSE || !active_cloth_backend ||
+        (!active_cloth_backend->failed && (!traveler_actor || traveler_actor->state!=JC_ACTOR_RUNTIME_QUARANTINED))) return 0;
+    message("[JNET] user requested close after cloth quarantine; terminating this Journey process, exit e04a4301");
     if (!TerminateProcess(GetCurrentProcess(),0xe04a4301u))
-        message("[JC] quarantined Journey process termination failed");
+        message("[JNET] quarantined Journey process termination failed");
     return 1;
 }
 static LRESULT CALLBACK cloth_window_observer(HWND window,UINT msg,WPARAM wp,LPARAM lp) {
@@ -3532,14 +3589,14 @@ static LRESULT CALLBACK cloth_window_observer(HWND window,UINT msg,WPARAM wp,LPA
        (msg==WM_CHAR && wp==8)))return 0;
     if (msg!=WM_CLOSE || !active_cloth_backend) return original_game_window(window,msg,wp,lp);
     if (active_cloth_backend->thread!=GetCurrentThreadId()) {
-        message("[JC] cloth close deferred: window/producer thread mismatch"); return 0;
+        message("[JNET] cloth close deferred: window/producer thread mismatch"); return 0;
     }
     if (cloth_exit_window) return 0;
     HMODULE user=GetModuleHandleW(L"user32.dll");
     cloth_set_timer=(void *)GetProcAddress(user,"SetTimer");
     cloth_kill_timer=(void *)GetProcAddress(user,"KillTimer");
     if (!cloth_set_timer || !cloth_kill_timer) {
-        message("[JC] cloth close deferred: timer services unavailable"); return 0;
+        message("[JNET] cloth close deferred: timer services unavailable"); return 0;
     }
     cloth_exit_window=window; cloth_exit_wparam=wp; cloth_exit_lparam=lp;
     cloth_exit_reported=0;
@@ -3547,13 +3604,13 @@ static LRESULT CALLBACK cloth_window_observer(HWND window,UINT msg,WPARAM wp,LPA
     cloth_exit_timer_id=cloth_set_timer(NULL,0,16,cloth_exit_timer);
     if (!cloth_exit_timer_id) {
         cloth_exit_window=NULL;
-        message("[JC] cloth close deferred: timer allocation failed");
+        message("[JNET] cloth close deferred: timer allocation failed");
     }
     return 0;
 }
 static uintptr_t cleanup_observer(uintptr_t dude, uintptr_t handles) {
     if(dude==traveler_barn+0xb0 || dude==traveler_object) {
-        if(!cloth_actor_growth_stop())message("[JC] scarf growth cleanup ownership changed");
+        if(!cloth_actor_growth_stop())message("[JNET] scarf growth cleanup ownership changed");
         memset(&cloth_actor_growth,0,sizeof(cloth_actor_growth));
     }
     traveler_charge_cleanup(dude);
@@ -3565,7 +3622,7 @@ static uintptr_t cleanup_observer(uintptr_t dude, uintptr_t handles) {
         render_cleanup=render_snapshot(14);
     }
     int observing=JNETResource==1 || JNETResource==2;
-    if (observing) boundary_record("[JC] boundary cleanup hook enter");
+    if (observing) boundary_record("[JNET] boundary cleanup hook enter");
     if (!TryAcquireSRWLockExclusive(&lifetime_lock)) {
         InterlockedExchange(&lifetime_conflict,1);
         InterlockedExchange(&JNETLifetime,-1);
@@ -3589,7 +3646,7 @@ static uintptr_t cleanup_observer(uintptr_t dude, uintptr_t handles) {
         int valid=!lifetime_conflict && GetCurrentThreadId()==resource_thread &&
             (uintptr_t)JNETGame==resource_game && own_read(NULL,resource_game+0x1e0,&barn,8) && barn==resource_barn;
         InterlockedExchange(&JNETResource,valid ? 2 : -1);
-        boundary_record(valid ? "[JC] boundary local cleanup matched" : "[JC] boundary local cleanup context declined");
+        boundary_record(valid ? "[JNET] boundary local cleanup matched" : "[JNET] boundary local cleanup context declined");
     }
     if (lifetime_conflict && lifetime.state==1) jc_lifetime_quarantine(&lifetime);
     if (lifetime.state==1) {
@@ -3604,14 +3661,14 @@ static uintptr_t cleanup_observer(uintptr_t dude, uintptr_t handles) {
         }
         else if (state<0) InterlockedExchange(&JNETLifetime,-1);
         if (state!=previous) message(state==2 ?
-            "[JC] retained unregistered Dude released at native local traveler cleanup; original cleanup continues" :
-            "[JC] lifetime validation failed; allocation quarantined until process exit; restart required");
+            "[JNET] retained unregistered Dude released at native local traveler cleanup; original cleanup continues" :
+            "[JNET] lifetime validation failed; allocation quarantined until process exit; restart required");
     }
     ReleaseSRWLockExclusive(&lifetime_lock);
-    if (observing && JNETResource>=0) boundary_record("[JC] boundary cleanup original enter");
+    if (observing && JNETResource>=0) boundary_record("[JNET] boundary cleanup original enter");
     uintptr_t result=original_cleanup(dude,handles);
     if (render_cleanup && JNETRender[0]==7 && render_snapshot(17)) InterlockedExchange(&JNETRender[0],8);
-    if (observing && JNETResource>=0) boundary_record("[JC] boundary cleanup original returned");
+    if (observing && JNETResource>=0) boundary_record("[JNET] boundary cleanup original returned");
     return result;
 }
 static void allocation_trial(uintptr_t game, int retain) {
@@ -3630,16 +3687,17 @@ static void allocation_trial(uintptr_t game, int retain) {
         !jc_layout_field(own_read,NULL,game,0x180,&match,8) ||
         !jc_layout_field(own_read,NULL,match,0x11db4,&connected,1) || connected) {
         InterlockedExchange(&JNETTrial,-1);
-        message("[JC] allocation rehearsal declined: requires fresh native-only solo gameplay and valid resources");
+        message("[JNET] allocation rehearsal declined: requires fresh native-only solo gameplay and valid resources");
         return;
     }
     for (size_t i=0;i<sizeof(jc_targets)/sizeof(jc_targets[0]);++i) {
         const struct jc_target *t=jc_targets+i;
-        if (t->rva==JC_RVA_EnvironmentCopy || t->rva==JC_RVA_EnvironmentUpdate || t->rva==JC_RVA_TextureNullGuard || t->rva==JC_RVA_IntroUpdate || t->rva==JC_RVA_CharacterBank || t->rva==JC_RVA_CharacterMeshUpdate || t->rva==JC_RVA_CharacterShoutInit || t->rva==JC_RVA_CharacterDecorationUpdate || t->rva==JC_RVA_CharacterDecorationDraw || t->rva==JC_RVA_CharacterDecorationCleanup || t->rva==JC_RVA_CharacterInteract || t->rva==JC_RVA_CharacterBodyInput || t->rva==JC_RVA_ChestSymbol || t->rva==JC_RVA_DudeClothAppearance || t->rva==JC_RVA_NativeShout || t->rva==JC_RVA_CharacterEye || t->rva==JC_RVA_CharacterAttack || t->rva==JC_RVA_CharacterAttackHandler || t->rva==JC_RVA_CharacterJump || t->rva==JC_RVA_CharacterCamera || t->rva==JC_RVA_CreatureReset || t->rva==JC_RVA_SavePoll || t->rva==JC_RVA_SaveLoad || t->rva==JC_RVA_MenuInput || t->rva==JC_RVA_MenuPop || t->rva==JC_RVA_MenuFrame || t->rva==JC_RVA_ScriptExecute || t->rva==JC_RVA_MenuPresent || t->rva==JC_RVA_MenuNodes || t->rva==JC_RVA_MenuBuild || t->rva==JC_RVA_SandInline || t->rva==JC_RVA_SandAppend || t->rva==JC_RVA_SandConsume || t->rva==JC_RVA_DudeFullInit || t->rva==JC_RVA_luaL_loadbufferx || t->rva==JC_RVA_GameUpdate || t->rva==JC_RVA_DudeCleanup || t->rva==JC_RVA_DudeResourceInit || t->rva==JC_RVA_MeshRegister || t->rva==JC_RVA_GeometryBuild || t->rva==JC_RVA_TravelerSubmit || t->rva==JC_RVA_RenderConsume || t->rva==JC_RVA_GeometryDispatch || t->rva==JC_RVA_CommandBuild || t->rva==JC_RVA_RenderFlush || t->rva==JC_RVA_RenderHandoff || t->rva==JC_RVA_BaseFlush || t->rva==JC_RVA_BaseHandoff || t->rva==JC_RVA_CommandExecute || t->rva==JC_RVA_ClothUpdate || t->rva==JC_RVA_ClothFinish || t->rva==JC_RVA_PlayerUpdate || t->rva==JC_RVA_ActorInput || t->rva==JC_RVA_ActorFinish || t->rva==JC_RVA_ClothRender || t->rva==JC_RVA_AsyncGeometryDispatch || t->rva==JC_RVA_ClothDependency || t->rva==JC_RVA_MaterialCommit || t->rva==JC_RVA_MaterialSamplerInit) continue; /* Our own detour is expected. */
+        if (t->rva==JC_RVA_CanyonHullQuery) continue;
+        if (t->rva==JC_RVA_EnvironmentCopy || t->rva==JC_RVA_EnvironmentUpdate || t->rva==JC_RVA_TextureNullGuard || t->rva==JC_RVA_IntroUpdate || t->rva==JC_RVA_CharacterBank || t->rva==JC_RVA_CharacterMeshUpdate || t->rva==JC_RVA_CharacterShoutInit || t->rva==JC_RVA_CharacterDecorationUpdate || t->rva==JC_RVA_CharacterDecorationDraw || t->rva==JC_RVA_CharacterDecorationCleanup || t->rva==JC_RVA_CharacterInteract || t->rva==JC_RVA_CharacterBodyInput || t->rva==JC_RVA_ChestSymbol || t->rva==JC_RVA_DudeClothAppearance || t->rva==JC_RVA_NativeShout || t->rva==JC_RVA_CharacterGrab || t->rva==JC_RVA_CharacterEye || t->rva==JC_RVA_CharacterHit || t->rva==JC_RVA_CharacterCollision || t->rva==JC_RVA_CharacterAttack || t->rva==JC_RVA_CharacterAttackHandler || t->rva==JC_RVA_CharacterAuthority || t->rva==JC_RVA_CharacterJump || t->rva==JC_RVA_CharacterCamera || t->rva==JC_RVA_CreatureReset || t->rva==JC_RVA_SavePoll || t->rva==JC_RVA_SaveLoad || t->rva==JC_RVA_MenuInput || t->rva==JC_RVA_MenuPop || t->rva==JC_RVA_MenuFrame || t->rva==JC_RVA_ScriptExecute || t->rva==JC_RVA_MenuPresent || t->rva==JC_RVA_MenuNodes || t->rva==JC_RVA_MenuBuild || t->rva==JC_RVA_SandInline || t->rva==JC_RVA_SandAppend || t->rva==JC_RVA_SandConsume || t->rva==JC_RVA_DudeFullInit || t->rva==JC_RVA_luaL_loadbufferx || t->rva==JC_RVA_GameUpdate || t->rva==JC_RVA_DudeCleanup || t->rva==JC_RVA_DudeResourceInit || t->rva==JC_RVA_MeshRegister || t->rva==JC_RVA_GeometryBuild || t->rva==JC_RVA_TravelerSubmit || t->rva==JC_RVA_RenderConsume || t->rva==JC_RVA_GeometryDispatch || t->rva==JC_RVA_CommandBuild || t->rva==JC_RVA_RenderFlush || t->rva==JC_RVA_RenderHandoff || t->rva==JC_RVA_BaseFlush || t->rva==JC_RVA_BaseHandoff || t->rva==JC_RVA_CommandExecute || t->rva==JC_RVA_ClothUpdate || t->rva==JC_RVA_ClothFinish || t->rva==JC_RVA_PlayerUpdate || t->rva==JC_RVA_ActorInput || t->rva==JC_RVA_ActorFinish || t->rva==JC_RVA_ClothRender || t->rva==JC_RVA_AsyncGeometryDispatch || t->rva==JC_RVA_ClothDependency || t->rva==JC_RVA_MaterialCommit || t->rva==JC_RVA_MaterialSamplerInit) continue; /* Our own detour is expected. */
         unsigned char bytes[16];
         if (!own_read(NULL,(uint64_t)(uintptr_t)(image+t->rva),bytes,16) || memcmp(bytes,t->prologue,16)) {
             InterlockedExchange(&JNETTrial,-1);
-            message("[JC] allocation rehearsal declined: loaded entry points changed");
+            message("[JNET] allocation rehearsal declined: loaded entry points changed");
             return;
         }
     }
@@ -3670,12 +3728,12 @@ static void allocation_trial(uintptr_t game, int retain) {
         }
         resource_game=game; resource_barn=barn; resource_thread=GetCurrentThreadId();
         InterlockedExchange(&JNETResource,lifetime_conflict ? -1 : 1);
-        boundary_record(retain==3 ? "[JC] geometry build observation armed; no allocations or pool edits" : "[JC] guarded mesh armed; one attempt at next matched resource boundary");
+        boundary_record(retain==3 ? "[JNET] geometry build observation armed; no allocations or pool edits" : "[JNET] guarded mesh armed; one attempt at next matched resource boundary");
         ReleaseSRWLockExclusive(&lifetime_lock);
         return;
     }
     InterlockedExchange(&JNETTrial,1);
-    message("[JC] one-shot native allocation rehearsal starting; no registration or gameplay update");
+    message("[JNET] one-shot native allocation rehearsal starting; no registration or gameplay update");
     const struct jc_allocation_ops ops={own_read,trial_create,trial_destroy,image};
     uint64_t object=0;
     int result=retain ? jc_allocation_create_checked(&ops,(uint64_t)(uintptr_t)image,barn,&object) :
@@ -3694,15 +3752,15 @@ static void allocation_trial(uintptr_t game, int retain) {
         if (state<0) InterlockedExchange(&JNETLifetime,-1);
         InterlockedExchange(&JNETTrial,state==1 ? 4 : -3);
         ReleaseSRWLockExclusive(&lifetime_lock);
-        message(state==1 ? "[JC] unregistered Dude retained; waiting for native local traveler cleanup; no graphics or networking" :
-                "[JC] lifetime ownership could not be established; restart required");
+        message(state==1 ? "[JNET] unregistered Dude retained; waiting for native local traveler cleanup; no graphics or networking" :
+                "[JNET] lifetime ownership could not be established; restart required");
         return;
     }
     if (retain) InterlockedExchange(&JNETLifetime,-1);
     if (result==JC_ALLOC_OK && (!jc_layout_field(own_read,NULL,game,0x1e0,&after,8) || after!=barn)) result=-4;
     InterlockedExchange(&JNETTrial,result);
-    message(result==JC_ALLOC_OK ? "[JC] native Dude constructor and deleting destructor returned; no visible traveler or networking added" :
-            "[JC] native allocation rehearsal did not complete validation; restart Journey before further diagnostics");
+    message(result==JC_ALLOC_OK ? "[JNET] native Dude constructor and deleting destructor returned; no visible traveler or networking added" :
+            "[JNET] native allocation rehearsal did not complete validation; restart Journey before further diagnostics");
 }
 
 static void evaluation_inspect(uintptr_t game) {
@@ -3751,8 +3809,8 @@ done:
         for (unsigned j=0;j<8;++j) InterlockedExchange(&JNETEvaluation[8+i*8+j],row[j]);
     }
     InterlockedExchange(&JNETEvaluation[0],code ? -1 : 1);
-    message(code ? "[JC] evaluator storage observation declined; no scheduler or game-memory writes" :
-        "[JC] selected evaluator storage observed; scheduler disabled, graph/phase ownership still unverified");
+    message(code ? "[JNET] evaluator storage observation declined; no scheduler or game-memory writes" :
+        "[JNET] evaluator storage captured; scheduler disabled");
 }
 static int evaluation_writable(void *opaque,uint64_t address,size_t bytes) {
     struct callback_read_budget *budget=opaque;
@@ -3802,7 +3860,7 @@ static void native_scarf_update(uintptr_t actor,float dt,uintptr_t state,uintptr
     if(a->actor==actor && a->generation!=a->applied && traveler_context()) {
         int ok=jc_scarf_arrival_apply(own_read,cloth_actor_growth_write,NULL,
             (uintptr_t)GetModuleHandleW(NULL),traveler_game,actor,state,a);
-        message(ok?"[JC] companion scarf arrival reset": "[JC] companion scarf arrival reset declined");
+        message(ok?"[JNET] companion scarf arrival reset": "[JNET] companion scarf arrival reset declined");
     }
     original_native_scarf_update(actor,dt,state,fourth,fifth,sounds);
 }
@@ -3850,13 +3908,13 @@ static void traveler_native_chirp_tick(void) {
         &budget,(uintptr_t)GetModuleHandleW(NULL),traveler_game,(uint32_t)JNETFrames,
         UINT64_C(0x4c4f43414c4e4154),generation,position,relay,1);
     if(code || relay->emitted!=emitted || relay->dropped!=dropped) {
-        char line[160];snprintf(line,sizeof(line),"[JC] native companion chirp code=%d emitted=%u dropped=%u stopped=%u symbol=%u",
+        char line[160];snprintf(line,sizeof(line),"[JNET] native companion chirp code=%d emitted=%u dropped=%u stopped=%u symbol=%u",
             code,relay->emitted,relay->dropped,relay->stopped,traveler_local_symbol);message(line);
     }
 }
 static void traveler_actor_chirp_report(void) {
     char line[192];
-    snprintf(line,sizeof(line),"[JC] actor chirp code=%d emitted=%u dropped=%u stopped=%u frame=%ld",
+    snprintf(line,sizeof(line),"[JNET] actor chirp code=%d emitted=%u dropped=%u stopped=%u frame=%ld",
         traveler_chirp_code,traveler_chirp_relay.emitted,traveler_chirp_relay.dropped,
         traveler_chirp_relay.stopped,(long)JNETFrames);
     message(line);
@@ -4115,12 +4173,12 @@ static void native_playback_end(int state,int code) {
         if (JNETMeshLife[25]>0) InterlockedExchange(&JNETMeshLife[25],3);
         body_publish();
         char line[480];
-        snprintf(line,sizeof(line),"[JC] native body=%u state=%ld result=%ld stage=%ld detail=%ld accepted=%ld changed=%ld submissions=%ld elapsed=%ld reads=%ld",
+        snprintf(line,sizeof(line),"[JNET] native body=%u state=%ld result=%ld stage=%ld detail=%ld accepted=%ld changed=%ld submissions=%ld elapsed=%ld reads=%ld",
             i+1,(long)native_report[0],(long)native_report[1],(long)native_report[2],(long)native_report[3],
             (long)native_report[4],(long)native_report[5],(long)native_report[16],(long)native_report[6],(long)native_report[9]);
         message(line);
         volatile LONG *o=JNETNativeOutputs+i*8;
-        snprintf(line,sizeof(line),"[JC] native output body=%u items=%lu bindings=%lu index=%lu binding=%lu kind=%lu type_rva=%08lx bytes=%lu owners=%lu",
+        snprintf(line,sizeof(line),"[JNET] native output body=%u items=%lu bindings=%lu index=%lu binding=%lu kind=%lu type_rva=%08lx bytes=%lu owners=%lu",
             i+1,(unsigned long)(uint32_t)o[0],(unsigned long)(uint32_t)o[1],(unsigned long)(uint32_t)o[2],
             (unsigned long)(uint32_t)o[3],(unsigned long)(uint32_t)o[4],(unsigned long)(uint32_t)o[5],
             (unsigned long)(uint32_t)o[6],(unsigned long)(uint32_t)o[7]);
@@ -4552,7 +4610,7 @@ static int64_t update(uintptr_t game, float dt) {
     if (JNETRender[0]>0 && JNETRender[0]<9 &&
         (game!=render_game || GetCurrentThreadId()!=render_thread)) render_fail(3);
     if (JNETCommand==10 && !JNETMeshLife[106]) {
-        if (boundary_checkpoint("[JC] Show Trial pending before original game update"))
+        if (boundary_checkpoint("[JNET] Show Trial pending before original game update"))
             InterlockedExchange(&JNETMeshLife[106],1);
         else { InterlockedCompareExchange(&JNETCommand,0,10); preview_fail(15); }
     }
@@ -4565,6 +4623,7 @@ static int64_t update(uintptr_t game, float dt) {
     traveler_frame_complete(game);
     jnet_update_cost(45,section_started);section_started=GetTickCount64();
     if(jnet_online_enabled)jnet_online_game_tick(game);else jnet_lobby_tick(game);
+    if(jnet_online_enabled)jnet_realtime_after_capture();
     jnet_update_cost(47,section_started);
     if (JNETActorTrial[0]==1) {
         LONG cost=(LONG)(GetTickCount64()-update_started);
@@ -4586,7 +4645,7 @@ static int64_t update(uintptr_t game, float dt) {
         body_context=&body_contexts[0];
     }
     if (JNETMeshLife[106]==1) {
-        if (boundary_checkpoint("[JC] original game update returned with Show Trial pending"))
+        if (boundary_checkpoint("[JNET] original game update returned with Show Trial pending"))
             InterlockedExchange(&JNETMeshLife[106],2);
         else { InterlockedCompareExchange(&JNETCommand,0,10); preview_fail(15); }
     }
@@ -4594,7 +4653,7 @@ static int64_t update(uintptr_t game, float dt) {
         preparation_deadline && GetTickCount64()>=preparation_deadline) {
         InterlockedExchange(&JNETResource,-1);
         InterlockedExchange(&JNETMeshLife[107],2);
-        boundary_checkpoint("[JC] preparation expired; no trial allocated");
+        boundary_checkpoint("[JNET] preparation expired; no trial allocated");
     }
     if (JNETRender[0]==5 && render_snapshot(11)) InterlockedExchange(&JNETRender[0],6);
     if (JNETRender[0]>0 && JNETRender[0]<6 && (uint32_t)(JNETFrames-render_frame)>=120) render_fail(10);
@@ -4637,7 +4696,7 @@ static int64_t update(uintptr_t game, float dt) {
             !own_read(NULL,game+0x1e0,&barn,8) || barn!=lifetime.barn) {
             jc_lifetime_quarantine(&lifetime);
             InterlockedExchange(&JNETLifetime,-1);
-            message("[JC] retained object's game/barn/thread changed without matched cleanup; restart required");
+            message("[JNET] retained object's game/barn/thread changed without matched cleanup; restart required");
         }
       }
       ReleaseSRWLockExclusive(&lifetime_lock);
@@ -4646,7 +4705,7 @@ static int64_t update(uintptr_t game, float dt) {
     if (JNETStatus < 0 || InterlockedCompareExchange(&in_callback, 1, 0)) return result;
     if (JNETStatus == 2) {
         InterlockedExchange(&JNETStatus, 1);
-        message("[JC] native capture ready; Lua observation remains disabled until requested");
+        message("[JNET] native capture ready; Lua observation remains disabled until requested");
     }
     LONG command = InterlockedExchange(&JNETCommand, 0);
     if (JNETTraveler[0]==1 && GetTickCount64()>=traveler_deadline) traveler_result(-1,2,9);
@@ -4688,7 +4747,7 @@ static int64_t update(uintptr_t game, float dt) {
         traveler_repeat_cancel();traveler_actor_trial_stop(0);traveler_peer_depart_requested=2;goto done;
     }
     if (JNETTraveler[0] || JNETTraveler[19]) {
-        if (command) message("[JC] full traveler lifecycle selected; restart before another mode");
+        if (command) message("[JNET] full traveler lifecycle selected; restart before another mode");
         goto done;
     }
     if (!command) goto done;
@@ -4719,8 +4778,8 @@ static int64_t update(uintptr_t game, float dt) {
         goto done;
     }
     if (command==19) { evaluation_inspect(game); goto done; }
-    if (native_playback_mode) { message("[JC] native playback selected; restart before another mode"); goto done; }
-    if (mirror_mode) { message("[JC] local skeleton test selected; restart before another mode"); goto done; }
+    if (native_playback_mode) { message("[JNET] native playback selected; restart before another mode"); goto done; }
+    if (mirror_mode) { message("[JNET] local skeleton test selected; restart before another mode"); goto done; }
     if (command==20) {
         int level=-1;
         native_playback_mode=2;
@@ -4730,7 +4789,7 @@ static int64_t update(uintptr_t game, float dt) {
             InterlockedExchange(&JNETNativePlayback[0],-1); InterlockedExchange(&JNETNativePlayback[1],20); goto done;
         }
         if (!native_playback_start(0)) goto done;
-        message("[JC] two-body native playback selected; guarded clip evaluation after original GameUpdate");
+        message("[JNET] two-body native playback selected; guarded clip evaluation after original GameUpdate");
         goto done;
     }
     if (command==18) {
@@ -4792,14 +4851,14 @@ static int64_t update(uintptr_t game, float dt) {
         }
         goto done;
     }
-    if (pose_link.started) { message("[JC] pose link selected; other experiments refused until restart"); goto done; }
+    if (pose_link.started) { message("[JNET] pose link selected; other experiments refused until restart"); goto done; }
     if (command==10) {
         int level=-1; int code=jc_render_level(own_read,NULL,game,&level);
         InterlockedExchange(&JNETMeshLife[96],level);
         InterlockedExchange(&JNETMeshLife[97],code);
         if (code || !jc_render_trial_same_level(prepared_level,level)) { preview_fail(19); goto done; }
         if (!JNETMeshLife[25] && initialized_life.state==1 && JNETStartup[0] && JNETResource==5) {
-            if (!boundary_checkpoint("[JC] Show Trial command accepted; waiting for matching consumer")) { preview_fail(15); goto done; }
+            if (!boundary_checkpoint("[JNET] Show Trial command accepted; waiting for matching consumer")) { preview_fail(15); goto done; }
             preview_not_before=GetTickCount64()+5000;
             preview_deadline=preview_not_before+60000;
             InterlockedExchange(&JNETMeshLife[109],5);
@@ -4812,23 +4871,23 @@ static int64_t update(uintptr_t game, float dt) {
         else render_arm(game);
         goto done;
     }
-    if (JNETRender[0]) { message("[JC] render observation selected; restart before other experiments"); goto done; }
-    if (JNETStartup[0] && command!=7) { message("[JC] slot trial: other experimental commands refused; restart first"); goto done; }
-    if (command==7 && (!JNETStartup[0] || JNETStartup[1]!=1 || JNETStartup[2]!=1 || JNETStartup[3]!=0 || JNETStartup[4]!=1)) { InterlockedExchange(&JNETResource,-1); message("[JC] slot trial refused: successful capacity startup required"); goto done; }
+    if (JNETRender[0]) { message("[JNET] render observation selected; restart before other experiments"); goto done; }
+    if (JNETStartup[0] && command!=7) { message("[JNET] slot trial: other experimental commands refused; restart first"); goto done; }
+    if (command==7 && (!JNETStartup[0] || JNETStartup[1]!=1 || JNETStartup[2]!=1 || JNETStartup[3]!=0 || JNETStartup[4]!=1)) { InterlockedExchange(&JNETResource,-1); message("[JNET] slot trial refused: successful capacity startup required"); goto done; }
     if (allocation_attempted && (JNETTrial < 0 || JNETLifetime < 0 || JNETResource < 0)) {
-        message("[JC] allocation failure: restart required; further commands refused");
+        message("[JNET] allocation failure: restart required; further commands refused");
         goto done;
     }
     if (command>=5 && command<=8) { allocation_trial(game,(int)command-5); goto done; }
-    if (JNETResource) { message("[JC] resource test selected; Lua observation refused; restart for other diagnostics"); goto done; }
-    if (JNETLifetime==1) { message("[JC] lifetime test active; Lua observation refused; change chapters to test cleanup"); goto done; }
+    if (JNETResource) { message("[JNET] resource test selected; Lua observation refused; restart for other diagnostics"); goto done; }
+    if (JNETLifetime==1) { message("[JNET] lifetime test active; Lua observation refused; change chapters to test cleanup"); goto done; }
     if (command < 1 || command > 4) {
-        message("[JC] unknown control value ignored");
+        message("[JNET] unknown control value ignored");
         goto done;
     }
     if (command == 3 && !bound_state) {
         InterlockedExchange(&JNETObservation, 3);
-        message("[JC] no Lua observer active; observation remains paused");
+        message("[JNET] no Lua observer active; observation remains paused");
         goto done;
     }
     InterlockedExchange(&JNETPhase, 3);
@@ -4836,21 +4895,21 @@ static int64_t update(uintptr_t game, float dt) {
     lua_State *state = *(lua_State **)(game + 32);
     if (!jc_readable(state, 64)) goto invalid_state;
     if (bound_state && state != bound_state) {
-        message("[JC] Lua state changed; restart Journey before another diagnostic session");
+        message("[JNET] Lua state changed; restart Journey before another diagnostic session");
         goto invalid_state;
     }
     if (!bound_state) {
         bound_state = state;
         if (!execute(state, jc_embedded_probe, sizeof(jc_embedded_probe) - 1, 1)) goto done;
         InterlockedExchange(&JNETStatus, 1);
-        message("[JC] ready; observation is manual; native matchmaking unchanged");
+        message("[JNET] ready; observation is manual; native matchmaking unchanged");
     }
     const char *action = NULL;
-    if (command == 1) action = "JourneyCompanionProbe.request()";
-    else if (command == 2) action = "JourneyCompanionProbe.start()";
-    else if (command == 3) action = "JourneyCompanionProbe.stop()";
-    else if (command == 4) action = "JourneyCompanionProbe.bindings()";
-    else if (command != 0) message("[JC] unknown control value ignored");
+    if (command == 1) action = "scarfhelper.request()";
+    else if (command == 2) action = "scarfhelper.start()";
+    else if (command == 3) action = "scarfhelper.stop()";
+    else if (command == 4) action = "scarfhelper.bindings()";
+    else if (command != 0) message("[JNET] unknown control value ignored");
     if (action) {
         InterlockedExchange(&JNETPhase, 4);
         execute(state, action, strlen(action), 0);
@@ -4858,7 +4917,7 @@ static int64_t update(uintptr_t game, float dt) {
     goto done;
 invalid_state:
     InterlockedExchange(&JNETStatus, -6);
-    message("[JC] unexpected Lua context; observation disabled");
+    message("[JNET] unexpected Lua context; observation disabled");
 done:
     InterlockedExchange(&JNETPhase, 0);
     InterlockedExchange(&in_callback, 0);
@@ -4896,25 +4955,25 @@ static DWORD WINAPI initialize(void *unused) {
     if(shared)session_logs=shared;
     atomic_store(&session_logs->ready,1);
     message("[JNET] native session diagnostics initialized; memory-only recording");
-    message("[JC] validating executable identity");
+    message("[JNET] validating executable identity");
     DWORD length = GetModuleFileNameW(NULL, actual, JC_PATH_CAP);
     if (!length || length >= JC_PATH_CAP || !jc_same_file(actual, game) ||
         !jc_hash(actual, hash) || !jc_executable_size(hash)) {
-        message("[JC] executable path or hash mismatch; no hook installed");
+        message("[JNET] executable path or hash mismatch; no hook installed");
         JNETStatus = -1;
         return 0;
     }
-    message("[JC] executable identity passed; validating loaded entry points");
+    message("[JNET] executable identity passed; validating loaded entry points");
     unsigned char *image = (unsigned char *)GetModuleHandleW(NULL);
     if (!check_code(image)) {
-        message("[JC] loaded code differs from expected entry points; no hook installed");
+        message("[JNET] loaded code differs from expected entry points; no hook installed");
         JNETStatus = -2;
         return 0;
     }
     /* Fault-injection self-tests must not gate initialization inside Journey. */
     InterlockedExchange(&JNETCompanionFeatures[8],0);
     InterlockedExchange(&JNETCompanionFeatures[9],-1);
-    message("[JC] native playback reader: ReadProcessMemory; in-game fault self-test disabled");
+    message("[JNET] native playback reader: ReadProcessMemory; in-game fault self-test disabled");
     fault_image=(uintptr_t)image; fault_self=(uintptr_t)self;
     IMAGE_DOS_HEADER *self_dos=(IMAGE_DOS_HEADER *)self;
     IMAGE_NT_HEADERS64 *self_nt=(IMAGE_NT_HEADERS64 *)(fault_self+self_dos->e_lfanew);
@@ -4925,7 +4984,7 @@ static DWORD WINAPI initialize(void *unused) {
         InterlockedExchange(&JNETFlight[8],-1);
         InterlockedExchange(&JNETFlight[9],(LONG)GetLastError());
     }
-    message("[JC] passive fault observer configured; exceptions remain unhandled by this diagnostic");
+    message("[JNET] passive fault observer configured; exceptions remain unhandled by this diagnostic");
     gettop = (void *)(image + JC_RVA_lua_gettop);
     settop = (void *)(image + JC_RVA_lua_settop);
     loadbuffer = (void *)(image + JC_RVA_luaL_loadbufferx);
@@ -4934,7 +4993,7 @@ static DWORD WINAPI initialize(void *unused) {
     pushclosure = (void *)(image + JC_RVA_lua_pushcclosure);
     InterlockedExchange(&JNETPerformance[0],0);
     InterlockedExchange(&JNETPerformance[1],-1);
-    message("[JC] compatibility reader: ReadProcessMemory; fault self-test disabled");
+    message("[JNET] compatibility reader: ReadProcessMemory; fault self-test disabled");
     if (MH_Initialize() != MH_OK) goto hook_failed;
     if (MH_CreateHook(image + JC_RVA_GameUpdate, (void *)update, (void **)&original_update) != MH_OK) {
         MH_Uninitialize();
@@ -4949,9 +5008,14 @@ static DWORD WINAPI initialize(void *unused) {
         if (MH_EnableHook(lifecycle_only ? MH_ALL_HOOKS : image+JC_RVA_GameUpdate)!=MH_OK) {
             MH_RemoveHook(MH_ALL_HOOKS); MH_Uninitialize(); goto hook_failed;
         }
-        message(lifecycle_only ? "[JC] lifecycle trace: twenty native entry observers; no trial objects or gameplay mutations" : "[JC] connection scan: only GameUpdate capture installed; no startup, render, resource or matchmaking hooks");
+        message(lifecycle_only ? "[JNET] lifecycle trace: twenty native entry observers; no trial objects or gameplay mutations" : "[JNET] connection scan: only GameUpdate capture installed; no startup, render, resource or matchmaking hooks");
         return 0;
     }
+    if(jnet_canyon_prepare((uintptr_t)image)){
+        if(MH_CreateHook(image+JC_RVA_CanyonHullQuery,(void *)jnet_canyon_query_live,(void **)&jnet_canyon_query_original)!=MH_OK){
+            MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
+        }
+    }else message("[JNET] Surface collision packages unavailable or invalid; original collision retained");
     if (MH_CreateHook(image + JC_RVA_DudeFullInit,(void *)full_init_observer,(void **)&original_full_init)!=MH_OK) {
         MH_RemoveHook(MH_ALL_HOOKS); MH_Uninitialize(); goto hook_failed;
     }
@@ -4975,6 +5039,9 @@ static DWORD WINAPI initialize(void *unused) {
     jnet_controls_initialize();
     static const unsigned char controls_xml_entry[]={0x48,0x89,0x5c,0x24,0x18,0x56,0x48,0x81,0xec,0x30,0x01,0x00,0x00,0x48,0x8b,0xd9};
     static const unsigned char controls_setting_entry[]={0x48,0x89,0x5c,0x24,0x08,0x48,0x89,0x6c,0x24,0x10,0x48,0x89,0x74,0x24,0x18,0x57};
+    static const unsigned char controls_passive_entry[]={0x40,0x55,0x48,0x8d,0x6c,0x24,0xa9,0x48,0x81,0xec,0xf0,0x00,0x00,0x00};
+    static const unsigned char controls_current_entry[]={0xf3,0x0f,0x10,0x05,0xcc,0xc9,0x5d,0x00,0x33,0xc0};
+    jnet_controls_current_action=(void *)(image+0xaedd0);
     static const unsigned char controls_action_entry[]={0x48,0x89,0x5c,0x24,0x08,0x48,0x89,0x74,0x24,0x10,0x57,0x48,0x83,0xec,0x20,0x8b};
     static const unsigned char controls_dispatch_entry[]={0x48,0x89,0x5c,0x24,0x18,0x55,0x57,0x41,0x57,0x48,0x8d,0x6c,0x24,0xb9};
     static const unsigned char controls_push_entry[]={0x48,0x89,0x5c,0x24,0x08,0x48,0x89,0x6c,0x24,0x10,0x48,0x89,0x74,0x24,0x18,0x57};
@@ -4983,6 +5050,11 @@ static DWORD WINAPI initialize(void *unused) {
        !jc_readable(image+0x2ecf60,16) || memcmp(image+0x2ecf60,controls_xml_entry,16) ||
        !jc_readable(image+0x1084f0,16) || memcmp(image+0x1084f0,controls_setting_entry,16) ||
        !jc_readable(image+0xaea60,16) || memcmp(image+0xaea60,controls_action_entry,16) ||
+       !jc_readable(image+0xa5240,sizeof(controls_passive_entry)) ||
+       memcmp(image+0xa5240,controls_passive_entry,sizeof(controls_passive_entry)) ||
+       !jc_readable(image+0xaedd0,sizeof(controls_current_entry)) ||
+       memcmp(image+0xaedd0,controls_current_entry,sizeof(controls_current_entry)) ||
+       MH_CreateHook(image+0xa5240,(void *)jnet_controls_passive,(void **)&jnet_controls_passive_original)!=MH_OK ||
        MH_CreateHook(image+0xaea60,(void *)jnet_controls_queue,(void **)&jnet_controls_queue_original)!=MH_OK ||
        MH_CreateHook(image+0x2ecf60,(void *)jnet_menu_xml,(void **)&jnet_menu_xml_original)!=MH_OK ||
        MH_CreateHook(image+0x1084f0,(void *)jnet_setting,(void **)&jnet_setting_original)!=MH_OK ||
@@ -5029,8 +5101,15 @@ static DWORD WINAPI initialize(void *unused) {
             MH_RemoveHook(MH_ALL_HOOKS); MH_Uninitialize(); goto hook_failed;
         }
     }
+    traveler_chirp_play=(jc_chirp_play_fn)(image+0x146520);
     if (MH_CreateHook(image+JC_RVA_ShoutUpdate,(void *)traveler_glyph_update,(void **)&original_glyph_update)!=MH_OK) {
         MH_RemoveHook(MH_ALL_HOOKS); MH_Uninitialize(); goto hook_failed;
+    }
+    static const unsigned char effect_entry[]={0x41,0x8b,0x81,0x10,0x0f,0,0,0x48,0x8d,0x0c,0x40,0x48,0x03,0xc9};
+    if(memcmp(image+0x2445f6,effect_entry,sizeof(effect_entry))) {JNETStatus=-2;return 0;}
+    effect_append_resume=image+0x244630;
+    if(MH_CreateHook(image+0x2445f6,(void *)traveler_effect_append,&original_effect_append)!=MH_OK) {
+        message("[JNET] effect capacity hook failed");JNETStatus=-4;return 0;
     }
     sand_inline_resume=image+JC_RVA_SandInlineResume;
     if (MH_CreateHook(image+JC_RVA_SandInline,(void *)traveler_sand_inline,&original_sand_inline)!=MH_OK) {
@@ -5045,7 +5124,7 @@ static DWORD WINAPI initialize(void *unused) {
     static const unsigned char scarf_entry[]={0x4c,0x8b,0xdc,0x56,0x57,0x41,0x54,0x48,0x81,0xec,0xb0,0,0,0};
     if(memcmp(image+0x24c010,scarf_entry,sizeof(scarf_entry))) {JNETStatus=-2;return 0;}
     if (MH_CreateHook(image+0x24c010,(void *)native_scarf_update,(void **)&original_native_scarf_update)!=MH_OK) {
-        message("[JC] scarf arrival hook failed");JNETStatus=-4;return 0;
+        message("[JNET] scarf arrival hook failed");JNETStatus=-4;return 0;
     }
     if (MH_CreateHook(image+0x273200,(void *)cloth_vector_setter,(void **)&original_cloth_setter[0])!=MH_OK ||
         MH_CreateHook(image+0x273400,(void *)cloth_matrix_setter,(void **)&original_cloth_setter[1])!=MH_OK ||
@@ -5081,6 +5160,7 @@ static DWORD WINAPI initialize(void *unused) {
     jnet_texture_missing=image+0x9e3de;
     if (JC_NATIVE_CHARACTERS_ENABLED &&
         (MH_CreateHook(image+JC_RVA_ResourceView,(void *)jnet_resource_view_guard,&jnet_resource_view_original)!=MH_OK ||
+         MH_CreateHook(image+JC_RVA_ResourceBuffer,(void *)jnet_resource_buffer_guard,(void **)&jnet_resource_buffer_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_TextureNullGuard,(void *)jnet_texture_guard,&jnet_texture_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterMeshUpdate,(void *)jnet_character_mesh_update,(void **)&jnet_character_mesh_update_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterShoutInit,(void *)jnet_character_shout_init,(void **)&jnet_character_shout_init_original)!=MH_OK ||
@@ -5093,6 +5173,7 @@ static DWORD WINAPI initialize(void *unused) {
          MH_CreateHook(image+JC_RVA_CharacterBank,(void *)jnet_character_bank,(void **)&jnet_character_bank_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterBodyInput,(void *)jnet_character_body_input,(void **)&jnet_character_body_input_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_DudeClothAppearance,(void *)jnet_character_appearance,(void **)&jnet_character_appearance_original)!=MH_OK ||
+         MH_CreateHook(image+JC_RVA_CharacterGrab,(void *)jnet_character_grab,(void **)&jnet_character_grab_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterClothRide,(void *)jnet_character_ride,(void **)&jnet_character_cloth_ride_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterClothTouch,(void *)jnet_character_touch,(void **)&jnet_character_touch_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterWhaleRide,(void *)jnet_character_ride,(void **)&jnet_character_ride_original)!=MH_OK ||
@@ -5106,13 +5187,22 @@ static DWORD WINAPI initialize(void *unused) {
         MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
     }
     if (JC_NATIVE_CHARACTERS_ENABLED &&
-        (MH_CreateHook(image+JC_RVA_CharacterAttack,(void *)jnet_character_attack,(void **)&jnet_character_attack_original)!=MH_OK ||
+        (MH_CreateHook(image+JC_RVA_CharacterAuthority,(void *)jnet_character_authority,(void **)&jnet_character_authority_original)!=MH_OK ||
+         MH_CreateHook(image+JC_RVA_CharacterHit,(void *)jnet_character_hit,(void **)&jnet_character_hit_original)!=MH_OK ||
+         MH_CreateHook(image+JC_RVA_CharacterCollision,(void *)jnet_character_collision,(void **)&jnet_character_collision_original)!=MH_OK ||
+         MH_CreateHook(image+JC_RVA_CharacterAttack,(void *)jnet_character_attack,(void **)&jnet_character_attack_original)!=MH_OK ||
          MH_CreateHook(image+JC_RVA_CharacterAttackHandler,(void *)jnet_character_attack_handler,(void **)&jnet_character_attack_handler_original)!=MH_OK)) {
         MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
     }
     if (JC_NATIVE_CHARACTERS_ENABLED && MH_CreateHook(image+JC_RVA_CharacterJump,
         (void *)jnet_character_jump,(void **)&jnet_character_jump_original)!=MH_OK) {
         message("[JNET] native creature jump hook unavailable");
+        MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
+    }
+    static const unsigned char save_serialize_entry[]={0x40,0x53,0x48,0x83,0xec,0x30,0x48,0x8b,0xda,0x48,0x8d,0x51,0x08};
+    if(!jc_readable(image+0x1386c0,sizeof(save_serialize_entry)) ||
+       memcmp(image+0x1386c0,save_serialize_entry,sizeof(save_serialize_entry)) ||
+       MH_CreateHook(image+0x1386c0,(void *)jnet_save_serialize,(void **)&jnet_save_serialize_original)!=MH_OK){
         MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
     }
     if (JC_NATIVE_CHARACTERS_ENABLED && MH_CreateHook(image+JC_RVA_CharacterCamera,
@@ -5159,6 +5249,11 @@ static DWORD WINAPI initialize(void *unused) {
         MH_CreateHook(image + JC_RVA_MenuNodes, (void *)jnet_menu_nodes, (void **)&jnet_original_menu_nodes) != MH_OK) {
         MH_RemoveHook(MH_ALL_HOOKS); MH_Uninitialize(); goto hook_failed;
     }
+    static const unsigned char menu_initialize_entry[]={0x48,0x89,0x5c,0x24,0x08,0x57,0x48,0x83,0xec,0x20};
+    if(memcmp(image+0x21a9b0,menu_initialize_entry,sizeof(menu_initialize_entry)) ||
+       MH_CreateHook(image+0x21a9b0,(void *)jnet_menu_initialize,(void **)&jnet_menu_initialize_original)!=MH_OK){
+        MH_RemoveHook(MH_ALL_HOOKS);MH_Uninitialize();goto hook_failed;
+    }
     static const unsigned char queue_entry[]={0x40,0x57,0x48,0x83,0xec,0x40,0x4c,0x8b,0xd1};
     if(memcmp(image+0xda6c0,queue_entry,sizeof(queue_entry))){
         message("[JNET] QueueLevel startup signature mismatch at RVA 000da6c0");
@@ -5170,7 +5265,7 @@ static DWORD WINAPI initialize(void *unused) {
     }
     traveler_level_rearm=jnet_traveler_rearm;
     traveler_native_initialized=traveler_local_level_initialized;
-    jnet_travel_request=jnet_travel_begin;jnet_travel_receive=jnet_travel_message;jnet_travel_poll=jnet_travel_poll_live;
+    jnet_travel_request=jnet_travel_begin;jnet_travel_receive=jnet_travel_message;jnet_travel_poll=jnet_travel_poll_live;jnet_travel_peer_wait=jnet_travel_peer_loading;
     {
         const unsigned char signature[]={0x4c,0x8b,0xdc,0x49,0x89,0x5b,0x10};
         unsigned char actual[sizeof(signature)];
@@ -5181,7 +5276,6 @@ static DWORD WINAPI initialize(void *unused) {
         }
     }
     jnet_rocket_receive=jnet_rocket_message;jnet_rocket_poll=jnet_rocket_poll_live;
-    jnet_flower_receive=jnet_flower_message;jnet_flower_poll=jnet_flower_poll_live;
     jnet_chat_receive=jnet_chat_message;jnet_chat_poll=jnet_chat_lobby;
     jnet_member_view=jnet_travel_members_view;jnet_travel_session_reset=jnet_travel_reset;
     jnet_quit_to_title=jnet_travel_quit_to_title;
@@ -5189,6 +5283,9 @@ static DWORD WINAPI initialize(void *unused) {
     traveler_online_before_input=jnet_online_before_input;
     if(JC_NATIVE_CHARACTERS_ENABLED){
         jnet_character_capture_rotation=jnet_character_rotation;
+        jnet_character_capture_ride=jnet_character_ride_capture;
+        jnet_character_capture_war=jnet_character_war_capture;
+        jnet_character_resolve_ride=jnet_character_ride_resolve;
         traveler_character_input=jnet_character_input_native;
         traveler_character_updated=jnet_character_after_player;
         jnet_character_apply_native=jnet_character_apply;
@@ -5231,11 +5328,11 @@ static DWORD WINAPI initialize(void *unused) {
     traveler_glyph_sampler_hook_ready=1;
     InterlockedExchange(&JNETMenu[6],1);
     message("[JNET] title/pause menu hook enabled; waiting for native menu draw");
-    message("[JC] game update hook installed; waiting for a game frame");
+    message("[JNET] game update hook installed; waiting for a game frame");
     return 0;
 hook_failed:
     JNETStatus = -4;
-    message("[JC] hook installation failed; do not retry without restarting Journey");
+    message("[JNET] hook installation failed; do not retry without restarting Journey");
     return 0;
 }
 

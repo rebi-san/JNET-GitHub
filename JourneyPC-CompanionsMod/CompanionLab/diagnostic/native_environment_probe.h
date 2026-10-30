@@ -128,7 +128,7 @@ static inline int jc_environment_probe_create(jc_layout_reader read,void *ctx,ui
         if (jc_environment_texture_read(read,ctx,stock[i*2],stock_texture+i) ||
             !jc_environment_texture_ready(stock_texture+i)) return 1;
     char name[96];unsigned char native_name[32]={0};uint64_t capacity=15;
-    int length=snprintf(name,sizeof(name),"JCEnv_%016llx_%016llx_%016llx",
+    int length=snprintf(name,sizeof(name),"JNETEnv_%016llx_%016llx_%016llx",
         (unsigned long long)peer,(unsigned long long)generation,(unsigned long long)serial);
     if (length<0 || (size_t)length>=sizeof(name)) return 1;
     memcpy(native_name+24,&capacity,8);

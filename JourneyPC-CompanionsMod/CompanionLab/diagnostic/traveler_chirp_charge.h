@@ -103,8 +103,8 @@ static void traveler_charge_before_update(uintptr_t barn,uintptr_t game) {
             }
         }
     }
-    if((uint32_t)JNETFrames%300==0) {
-        char line[192];snprintf(line,sizeof(line),"[JC] extra chirp charging hits local/native/extra=%u/%u/%u timers=%.3f/%.3f/%.3f",
+    if(jnet_diagnostic_logs && (uint32_t)JNETFrames%300==0) {
+        char line[192];snprintf(line,sizeof(line),"[JNET] extra chirp charging hits local/native/extra=%u/%u/%u timers=%.3f/%.3f/%.3f",
             traveler_charge.hits[0],traveler_charge.hits[1],traveler_charge.hits[2],
             traveler_charge.remaining[0],traveler_charge.remaining[1],traveler_charge.remaining[2]);message(line);
     }

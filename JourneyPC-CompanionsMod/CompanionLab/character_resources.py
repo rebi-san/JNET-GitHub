@@ -389,8 +389,12 @@ def lua_literal(value):
     raise ValueError('Unsupported native character literal')
 
 
+CHARACTER_ANIMATION_SHORT_NAMES = {"FlatFishFlip": "FishFlip", "FlatFishSwim": "FishSwim"}
+
+
 def character_resource_name(kind, name):
-    alias = ('JC_' if kind == 'MeshAnimation' else 'JNETCharacter_') + name
+    alias = ('JNET_' + CHARACTER_ANIMATION_SHORT_NAMES.get(name, name) if kind == 'MeshAnimation'
+             else 'JNETCharacter_' + name)
     if kind == 'MeshAnimation' and (not alias.isascii() or len(alias) >= 16):
         raise ValueError('Private animation name exceeds native 16-byte slot')
     return alias
@@ -507,6 +511,8 @@ def character_animation_bundle_header(image):
 
 def character_animation_files(image):
     files = {}
+    full_names = {character_resource_name('MeshAnimation', name): 'JNET_' + name
+                  for name in CHARACTER_ANIMATION_SHORT_NAMES}
     for name, clip in WAYFARER_ACTION_CLIPS.items():
         source = 'C_ClothNinja_A_' + clip
         data = (ROOT / 'JourneyPC/Data/Meshes' / (source + '.D3D11x64')).read_bytes()
@@ -515,7 +521,7 @@ def character_animation_files(image):
         key = name.removesuffix('.Phyre.D3D11x64.gz')
         with tarfile.open(fileobj=io.BytesIO(data)) as archive:
             listing = archive.extractfile(archive.getmembers()[0]).read().decode('ascii').splitlines()
-            files['JNET_' + key.removeprefix('JC_') + '.D3D11x64'] = archive.extractfile(listing[1]).read()
+            files[full_names.get(key, key) + '.D3D11x64'] = archive.extractfile(listing[1]).read()
     return files
 
 
@@ -531,7 +537,8 @@ def character_mesh_files(image):
 
 def character_animation_file_header(files):
     return ('static const struct { const char *key, *file; } jnet_character_animation_files[] = {\n' +
-            ''.join('{' + json.dumps(('JC_' + name[5:] if name.startswith('JNET_') else name).removesuffix('.D3D11x64')) + ',' +
+            ''.join('{' + json.dumps(character_resource_name('MeshAnimation', name[5:].removesuffix('.D3D11x64'))
+                                     if name.startswith('JNET_') else name.removesuffix('.D3D11x64')) + ',' +
                     json.dumps(name) + '},\n' for name in files) + '};\n')
 
 

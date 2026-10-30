@@ -1,31 +1,12 @@
 #ifndef JNET_INTRO_LIVE_H
 #define JNET_INTRO_LIVE_H
 #if defined(_WIN32)
-#include <xinput.h>
 static int jnet_intro_input_down(void) {
     DWORD pid=0;GetWindowThreadProcessId(GetForegroundWindow(),&pid);
     if(pid!=GetCurrentProcessId())return -1;
     for(int key=1;key<256;++key)if(GetAsyncKeyState(key)&0x8000)return 1;
-    static DWORD (WINAPI *read_pad)(DWORD,XINPUT_STATE *);
-    static unsigned loaded;
-    if(!loaded){
-        loaded=1;
-        const wchar_t *names[]={L"xinput1_4.dll",L"xinput1_3.dll",L"xinput9_1_0.dll"};
-        for(unsigned i=0;i<3 && !read_pad;++i){
-            HMODULE module=GetModuleHandleW(names[i]);
-            if(!module)module=LoadLibraryW(names[i]);
-            if(module)read_pad=(void *)GetProcAddress(module,"XInputGetState");
-        }
-    }
-    if(read_pad)for(DWORD i=0;i<4;++i){
-        XINPUT_STATE state={0};
-        if(read_pad(i,&state)!=ERROR_SUCCESS)continue;
-        XINPUT_GAMEPAD *p=&state.Gamepad;
-        if(p->wButtons || p->bLeftTrigger>30 || p->bRightTrigger>30 ||
-           p->sThumbLX>16000 || p->sThumbLX<-16000 || p->sThumbLY>16000 || p->sThumbLY<-16000 ||
-           p->sThumbRX>16000 || p->sThumbRX<-16000 || p->sThumbRY>16000 || p->sThumbRY<-16000)return 1;
-    }
-    return 0;
+    struct jnet_controls_pad_state pad=jnet_controls_pad();
+    return pad.buttons || pad.motion;
 }
 #endif
 static void (*jnet_intro_update_original)(uintptr_t,float,uintptr_t);

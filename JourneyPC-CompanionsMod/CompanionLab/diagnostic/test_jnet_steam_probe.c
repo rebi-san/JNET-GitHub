@@ -74,6 +74,7 @@ int main(void) {
     assert(strlen(JNETSteamServiceText[0])==255 && JNETSteamServiceText[0][0]==' ');
     unsigned before=queries;jnet_steam_callbacks();assert(original_calls==2 && queries==before);
     online=0;clock_ms+=2000;jnet_steam_callbacks();assert(JNETSteam[0]==3);
+    assert(jnet_steam_account_identity==UINT64_C(76561198000000000));
     app=480;clock_ms+=2000;jnet_steam_callbacks();assert(JNETSteam[0]==-5 && !JNETSteam[10]);
     handles=0;clock_ms+=2000;jnet_steam_callbacks();assert(JNETSteam[0]==2 && !JNETSteam[7]);
     handles=1;app=638230;online=1;interfaces=0;clock_ms+=2000;jnet_steam_callbacks();assert(JNETSteam[0]==-4);

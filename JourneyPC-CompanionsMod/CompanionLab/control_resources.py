@@ -21,7 +21,7 @@ def menu_bytes():
     at=list(menu).index(menu.find('Options'))
     for offset,label in enumerate(('Character','World')):
         menu.insert(at+offset,ET.Element('JNET'+label,Text=label,Action='%JNET_OPEN%'))
-    for branch,before,name,label,options in [('Audio','Back','JNETCredits','Credits','Off;On'),('Graphics','Default','JNETFPS','FPS','Default;30;60')]:
+    for branch,before,name,label,options in [('Audio','Back','JNETCredits','Credits','Off;On'),('Graphics','Default','JNETFPS','FPS','Default;30;55')]:
         parent=menu.find('Options/'+branch)
         parent.insert(list(parent).index(parent.find(before)),ET.Element(name,Text=label,Options=options,Setting='%'+name+'%'))
     controls=root.find('./Menu/Options/Controls')
@@ -47,21 +47,28 @@ def menu_bytes():
                 group.append(row)
             if kind==0:
                 group.append(copy.deepcopy(native['Fly']))
-                actions=((0,'Crouch'),(4,'Frontflip'),(1,'Backflip'),(5,'SideflipL'),(6,'SideflipR'),(2,'Spin'))
+                actions=((0,'Crouch'),(4,'Frontflip'),(1,'Backflip'),(2,'Spin'),(5,'SideflipL'),(6,'SideflipR'))
             else:
                 actions=[(0,'Fly Up'),(1,'Fly Down'),(2,'Level')]
-                if kind in (2,3):actions.extend(((3,'TiltL'),(4,'TiltR')))
+                actions.append((6,'Dash'))
                 if kind==2:actions.append((5,'Spotlight'))
                 if kind==1:actions.append((5,'Grab'))
-                actions.append((6,'Sprint'))
-                if kind==5:actions.append((7,'Flower Trail'))
+                if kind==2:actions.append((7,'Attack'))
             for action,label in actions:
                 setting=f'%JNET_BIND_{device}_{action}%' if kind==0 else f'%JNET_CREATURE_{kind}_{device}_{action}%'
                 choices=options[device]
                 if branch=='Pad/DualShock':choices=choices.replace('LB','L1').replace('RB','R1').replace(';A;B;X;Y;LT;RT',';Cross;Circle;Square;Triangle;L2;R2')
+                if device==2:
+                    face_names=('Cross','Circle','Square','Triangle') if branch=='Pad/DualShock' else ('A','B','X','Y')
+                    face_codes=(18,17,19,16) if branch=='Pad/DualShock' else (22,23,20,21)
+                    glyphs=dict(zip(face_names,face_codes))
+                    choices=';'.join(f'&#{glyphs[name]:04d};' if name in glyphs else name for name in choices.split(';'))
                 ET.SubElement(group,'JNETAction'+str(action),Text=label,Options=choices,Setting=setting)
     for name in ('Move','Look'):controls.find('Pad').remove(controls.find('Pad/'+name))
-    plain=ET.tostring(root,encoding='utf-8',xml_declaration=True)+b'\0'
+    plain=ET.tostring(root,encoding='utf-8',xml_declaration=True)
+    for code in range(16,24):
+        plain=plain.replace(f'&amp;#{code:04d};'.encode(),f'&#{code:04d};'.encode())
+    plain+=b'\0'
     plain+=b'\0'*(-len(plain)%4)
     key=0x6341f337
     encrypted=bytearray()

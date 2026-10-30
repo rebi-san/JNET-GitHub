@@ -1,4 +1,5 @@
 #include "companion_chirp_packet.h"
+#include "jnet_chat.h"
 #include <assert.h>
 #include <stdio.h>
 #include <sys/socket.h>
@@ -17,6 +18,18 @@ static void chirps(void) {
     struct jc_chirp_inbox inbox={0};
     struct jc_chirp_event e={.participant=42,.epoch=1,.sequence=1,.sound=3,.position={1,2,3},.velocity={.1f,.2f,.3f},.radius=3,.duration=.5f},out;
     assert(jc_chirp_packet_encode(build,2,&e,test_mac,&key,packet));
+    assert(!memcmp(packet,"JNC1",4) && sizeof(packet)==120);
+    memcpy(bad,packet,sizeof(packet));memcpy(bad,"JCC1",4);
+    assert(test_mac(&key,bad,JC_CHIRP_PACKET_BODY,bad+JC_CHIRP_PACKET_BODY));
+    assert(jc_chirp_packet_receive(&inbox,&stream,build,bad,sizeof(bad),101,test_mac,&key)==JC_STREAM_ARGUMENT);
+    assert(!inbox.pending && !inbox.sequence);
+    uint64_t source=0,sequence=0;char text[121],nonce[33]={0};
+    assert(!jnet_chat_unpack(packet,sizeof(packet),1,nonce,&source,&sequence,text));
+    unsigned char chat[JNET_CHAT_PACKET]={0};memcpy(chat,"JNC1",4);
+    jc_packet_put(chat+8,1,8);jc_packet_put(chat+16,42,8);jc_packet_put(chat+24,1,8);chat[64]='a';
+    assert(jnet_chat_unpack(chat,sizeof(chat),1,nonce,&source,&sequence,text));
+    assert(jc_chirp_packet_receive(&inbox,&stream,build,chat,sizeof(chat),101,test_mac,&key)==JC_STREAM_ARGUMENT);
+    assert(!inbox.pending && !inbox.sequence);
     for(unsigned i=0;i<sizeof(packet);++i) {
         memcpy(bad,packet,sizeof(packet));bad[i]^=1;
         assert(jc_chirp_packet_receive(&inbox,&stream,build,bad,sizeof(bad),101,test_mac,&key));
@@ -54,6 +67,7 @@ int main(void) {
     a.scalars[0]=.4f;a.scalars[1]=.7f;a.glow_targets[2]=.9f;
     struct jc_actor_stream stream={0};assert(!jc_actor_stream_open(&stream,42,1,&a,0));
     assert(jc_actor_packet_encode(build,42,1,1,&a,test_mac,&key,packet));
+    assert(!memcmp(packet,"JNA1",4) && sizeof(packet)==256);
     assert(!jc_actor_packet_receive(&stream,build,packet,sizeof(packet),50,test_mac,&key));
     assert(!memcmp(&stream.sample,&a,sizeof(a)));
     for(size_t n=0;n<sizeof(packet);++n)assert(jc_actor_packet_receive(&stream,build,packet,n,100,test_mac,&key));
