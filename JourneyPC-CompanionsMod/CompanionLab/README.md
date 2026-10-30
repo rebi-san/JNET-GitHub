@@ -1,6 +1,12 @@
 # JNET (Journet)
 
-Current release: **0.314**. Distribute `work/JNET-0.314.zip`; it extracts into `JNET/`.
+Current release: **0.357 alpha**. Distribute `work/JNET.zip` and extract it to a folder named `JNET`. All players must use the same build.
+
+Diagnostics stay in memory. Use Copy Log to copy the report or Save Log to write it to a file. The MinHook license is included in the packaged README.
+
+Build inputs include `WorldLevelPictures/` at the repository root, the five `work/*-collision-scene.json` and `work/*-collision-meshes.json.gz` pairs, and `work/menu-images/atlas.png` with its `manifest.json`. Keep these with the existing toolchain and original game references when rebuilding with `diagnostic/build_diagnostic.py`.
+
+## Release history
 
 0.314 routes Character and World mouse input through Journey's native cursor and button transitions, with one-shot click delivery and aspect-ratio conversion. This removes separate desktop mouse polling for these pages. Windows gameplay validation remains pending; all participants must use the same package.
 
@@ -115,7 +121,7 @@ Cycle lasts 30 minutes in Chapter Select, Broken Bridge, Pink Desert and Sunken 
 
 JNET co-op has no player-distance cutoff: a transport fixture admits peers at opposite coordinate bounds (two million units apart), with a third peer on another axis. Existing finite-coordinate validation, freshness timeouts, and level separation remain in place. This is transport evidence, not live rendering evidence.
 
-## Current validation limits
+## Earlier validation notes
 
 The user confirmed startup and lighting work after the 0.243 allocation correction. Later visual refinements and symbol updates remain live-unverified. The user reported the 0.247 startup blackout did not work; 0.250 removes it and ends the slideshow at the current logo. The replacement passes focused fixtures but remains visually unverified. Three-player transport and character handling pass offline fixtures; full online three-player gameplay remains unverified. War Machine autonomous attacks remain unavailable.
 
@@ -125,8 +131,8 @@ The audit found that host Day does not override a guest's non-Day mode and light
 
 `work/native/` contains disassembly and native maps; `work/pc_scripts/` contains extracted PC scripts. Keep these, toolchain dependencies, editor assets and test sources. `work/research-history/` preserves historical release notes and selected raw failure logs in structured form. Historical notes are evidence, not current setup instructions.
 
-`work/install-*.json` records bottle installations. Keep the latest rollback for each recorded bottle, including original filenames and hashes; rollback snapshots must not be renamed internally. `work/cleanup-0.248.json` records the removed paths and retained evidence. Original game files and reference projects are outside this cleanup.
+`work/install-*.json` records local bottle installations. The rollback copies were removed after verifying the 0.357 installations. `work/cleanup-0.357.json` records the cleanup; older diagnostic logs are preserved in `work/diagnostic-evidence-before-0.357.zip`. Original game files and reference projects are unchanged.
 
-After each successful, hash-verified installation, delete the preceding build's release ZIP, version-specific Python installer script, and routine build log, plus any older superseded copies. Keep the current release ZIP, installer and log, the reusable `install-jnet.py` entry point, current installation receipts, and the latest rollback for each bottle.
+After each successful, hash-verified installation, delete the preceding build's release ZIP, version-specific Python installer script, and routine build log, plus any older superseded copies. Keep the current release ZIP, installer and log, the reusable `install-jnet.py` entry point, and current installation receipts.
 
 Preserve important research and useful experiments, including their source, results, native maps, disassembly, fixtures, and any artifacts needed to reproduce or explain findings. Preserve logs that contain unique troubleshooting evidence in `work/research-history/` before deleting their old copies. Age alone does not make an experiment disposable. Do not remove active source tools or fixture scripts as installer cleanup; remove compiled experiment outputs only when they are reproducible and contain no unique evidence.
