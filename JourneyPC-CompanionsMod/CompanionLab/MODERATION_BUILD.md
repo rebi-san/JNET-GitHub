@@ -2,6 +2,8 @@
 
 The release ZIP is `JourneyPC-CompanionsMod/CompanionLab/work/JNET.zip`. The DLL entry point is `diagnostic/probe_dll.c`; the launcher source is `diagnostic/probe_helper.c`. Source headers under `diagnostic/` implement the mod. The release was cross-compiled on Apple Silicon macOS for Windows x64 using Zig 0.13.0 and MinHook 1.3.4.
 
+The current repository contains `JourneyPC-CompanionsMod` and only the external inputs needed for full package regeneration, plus Git metadata files. [MODERATION_BUILD_INPUTS.txt](MODERATION_BUILD_INPUTS.txt) lists the 114 retained external files relative to the repository root. The standalone DLL and EXE compilation commands below need only `JourneyPC-CompanionsMod`, Zig, and Git LFS payloads. Unrelated projects and game files have been removed from the current tree; older commits still contain the previous tree.
+
 ## Identify the submitted release
 
 SHA-256 values for the submitted 0.357 package:
@@ -87,7 +89,7 @@ python3 -B JourneyPC-CompanionsMod/CompanionLab/diagnostic/build_diagnostic.py -
 
 It requires Python 3.9 or newer, Zig at `work/deps/zig-macos-aarch64-0.13.0/zig`, MinHook at `work/deps/minhook-1.3.4`, and a Python environment with Pillow at `work/editor-assets-env/bin/python`. Paths here are relative to `JourneyPC-CompanionsMod/CompanionLab`. The builder does not install dependencies.
 
-Full regeneration also requires the repository's original Journey assets and reference executables, extracted scripts under `work/pc_scripts`, collision inputs, day/night inputs, `WorldLevelPictures`, and the existing menu atlas and manifest. Keep the workspace layout intact. `JourneyPC/Journey.exe` must have SHA-256 `16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f`; the optional sound-fix reference `Journey-sound-fix-0.3.1.exe` must have SHA-256 `0a73c2fb3a2e5b33f6c38082b966160cd54882fac9efbe09c3ea8dde6fc037ca`. The builder checks both before proceeding.
+Full regeneration uses the retained files listed in `MODERATION_BUILD_INPUTS.txt`: 81 files under `JourneyPC`, nine under `JourneyIOS`, 23 under `WorldLevelPictures`, and `Journey-sound-fix-0.3.1.exe`. These supply reference executables, mesh and animation data, fonts, menu definitions, environment definitions, collision source geometry, and chapter images. It also uses the extracted scripts under `work/pc_scripts`, collision inputs, day/night inputs, and the existing menu atlas and manifest inside `JourneyPC-CompanionsMod`. Preserve their relative paths; the retained Journey directories are build inputs, not complete playable game installations. `JourneyPC/Journey.exe` must have SHA-256 `16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f`; the optional sound-fix reference `Journey-sound-fix-0.3.1.exe` must have SHA-256 `0a73c2fb3a2e5b33f6c38082b966160cd54882fac9efbe09c3ea8dde6fc037ca`. The builder checks both before proceeding.
 
 The builder regenerates payload headers, compiles the DLL and matching launcher, validates imports, exports and hashes, and writes `work/JNET.zip` and `work/package-0.357/JNET/`. `--package-only` skips the ABI test fixture and collision audit reports. It does not install or launch the mod. The complete build succeeded for the hashes above; no gameplay validation is claimed.
 

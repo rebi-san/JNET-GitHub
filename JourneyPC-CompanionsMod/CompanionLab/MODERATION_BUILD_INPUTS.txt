@@ -1,0 +1,114 @@
+Journey-sound-fix-0.3.1.exe
+JourneyIOS/Data/Scripts/Level_Barrens/DecorationMeshInstances.lua
+JourneyIOS/Data/Scripts/Level_Barrens/HullInstances.lua
+JourneyIOS/Data/Scripts/Level_Canyon/DecorationMeshInstances.lua
+JourneyIOS/Data/Scripts/Level_Canyon/HullInstances.lua
+JourneyIOS/Data/Scripts/Level_Cave/DecorationMeshInstances.lua
+JourneyIOS/Data/Scripts/Level_Desert/DecorationMeshInstances.lua
+JourneyIOS/Data/Scripts/Level_Desert/HullInstances.lua
+JourneyIOS/Data/Scripts/Level_Mountain/DecorationMeshInstances.lua
+JourneyIOS/Data/Scripts/Level_Mountain/HullInstances.lua
+JourneyPC/Data/Meshes/C_ClothNinja_A_RollL.D3D11x64
+JourneyPC/Data/Meshes/C_ClothNinja_A_RollR.D3D11x64
+JourneyPC/Data/Meshes/C_ClothNinja_A_SlideJump3.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianHead.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianHead_A_BankL.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianHead_A_Spin.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianNeck.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianNeck_A_BankL.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianNeck_A_Spin.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianTail.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianTail_A_BankL.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianTail_A_Spin.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianWing.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianWing_A_BankL.D3D11x64
+JourneyPC/Data/Meshes/P_ClothGuardianWing_A_Spin.D3D11x64
+JourneyPC/Data/Meshes/P_FishFlat_A_Flip.D3D11x64
+JourneyPC/Data/Meshes/P_FishFlat_A_Swim.D3D11x64
+JourneyPC/Data/Meshes/P_FishFlat_A_Test.D3D11x64
+JourneyPC/Data/Meshes/P_FlowCreature_Body.D3D11x64
+JourneyPC/Data/Meshes/P_FlowCreature_Fins.D3D11x64
+JourneyPC/Data/Meshes/P_FlowCreature_Head.D3D11x64
+JourneyPC/Data/Meshes/P_FlowCreature_Tail.D3D11x64
+JourneyPC/Data/Meshes/P_FlowHunter_Body.D3D11x64
+JourneyPC/Data/Meshes/P_FlowHunter_Fins.D3D11x64
+JourneyPC/Data/Meshes/P_FlowHunter_FinsLarge.D3D11x64
+JourneyPC/Data/Meshes/P_FlowHunter_Head.D3D11x64
+JourneyPC/Data/Meshes/P_FlowHunter_Tail.D3D11x64
+JourneyPC/Data/Meshes/P_Guardian.D3D11x64
+JourneyPC/Data/Meshes/P_GuardianWingL.D3D11x64
+JourneyPC/Data/Meshes/P_GuardianWingR.D3D11x64
+JourneyPC/Data/Meshes/P_MechBodyCombined.D3D11x64
+JourneyPC/Data/Meshes/P_MechHead.D3D11x64
+JourneyPC/Data/Meshes/P_MechHeadEye.D3D11x64
+JourneyPC/Data/Meshes/P_MechHeadFlaps.D3D11x64
+JourneyPC/Data/Meshes/P_MechHeadGlowMask.D3D11x64
+JourneyPC/Data/Meshes/P_MechHeadGrate.D3D11x64
+JourneyPC/Data/Meshes/P_MechTail.D3D11x64
+JourneyPC/Data/Meshes/P_MechWing.D3D11x64
+JourneyPC/Data/Scripts/Level_Barrens/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Barrens/HullInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Barrens/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Barrens/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Canyon/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Canyon/HullInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Canyon/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Canyon/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Cave/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Cave/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Cave/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Desert/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Desert/HullInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Desert/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Desert/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Graveyard/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Graveyard/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Graveyard/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Mountain/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Mountain/HullInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Mountain/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Mountain/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Ruins/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Ruins/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Ruins/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Summit/DecorationMeshInstances.lua.bin
+JourneyPC/Data/Scripts/Level_Summit/__EnvNodeInstances.lua.gz
+JourneyPC/Data/Scripts/Level_Summit/__ParticleEmitterInstances.lua.gz
+JourneyPC/Data/Textures/Bin/BlankBlank.dds.D3D11x64
+JourneyPC/Data/Textures/Bin/ClothPlayerScarfFilledClothPlayerScarfFilled.dds
+JourneyPC/Data/Textures/Bin/ClothPlayerScarfGlowFilledClothPlayerScarfGlowFilled.dds
+JourneyPC/Data/Textures/Bin/DesertRampDesertRamp.dds.D3D11x64
+JourneyPC/Data/Textures/Bin/Font2Font2.dds
+JourneyPC/Data/Textures/Bin/GreyGrey.dds.D3D11x64
+JourneyPC/Data/Textures/Bin/GuardianMechGuardianMech.dds.D3D11x64
+JourneyPC/Data/Textures/Bin/GuardianWingGuardianWing.dds.D3D11x64
+JourneyPC/Data/Textures/Bin/SandMaskSandMask.dds.D3D11x64
+JourneyPC/Data/Textures/Bin/WhiteWhite.dds.D3D11x64
+JourneyPC/Data/Wads/ClothGuardian_39196.Phyre.D3D11x64.gz
+JourneyPC/Data/Wads/FlatFish_6348.Phyre.D3D11x64.gz
+JourneyPC/Journey.exe
+JourneyPC/MenuSystem.xme
+JourneyPC/font2.fnt
+WorldLevelPictures/1 Chapter Select Day.png
+WorldLevelPictures/10 Sunken City Dawn.png
+WorldLevelPictures/11 Underground Day.png
+WorldLevelPictures/12 Underground Night.png
+WorldLevelPictures/13 Tower Day.png
+WorldLevelPictures/14 Tower Night.png
+WorldLevelPictures/15 Snow Day.png
+WorldLevelPictures/16 Snow Night.png
+WorldLevelPictures/17 Paradise Day.png
+WorldLevelPictures/18 Paradise Night.png
+WorldLevelPictures/19 Paradise Cutscene.png
+WorldLevelPictures/2 Chapter Select Night.png
+WorldLevelPictures/20 Level Credits.png
+WorldLevelPictures/21 Level Matt.png
+WorldLevelPictures/22 Level Chris.png
+WorldLevelPictures/23 Level 09.png
+WorldLevelPictures/3 Broken Bridge Day.png
+WorldLevelPictures/4 Broken Bridge Night.png
+WorldLevelPictures/5 Pink Desert Day.png
+WorldLevelPictures/6 Pink Desert Night.png
+WorldLevelPictures/7 Pink Desert Dusk.png
+WorldLevelPictures/8 Sunken City Day.png
+WorldLevelPictures/9 Sunken City Night.png
