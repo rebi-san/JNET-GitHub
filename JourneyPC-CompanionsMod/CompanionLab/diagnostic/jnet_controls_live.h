@@ -193,33 +193,28 @@ static struct jnet_controls_pad_state jnet_controls_pad(void) {
     LONG frame=JNETFrames;
     if(sampled_valid && sampled_frame==frame)return sampled;
     sampled_valid=1;sampled_frame=frame;sampled=(struct jnet_controls_pad_state){0};
-    static DWORD (WINAPI *get_state)(DWORD,XINPUT_STATE *);
-    static unsigned checked;
-    if(!checked){
-        checked=1;
-        const wchar_t *libraries[]={L"xinput1_4.dll",L"xinput1_3.dll",L"xinput9_1_0.dll"};
-        for(unsigned i=0;i<3 && !get_state;++i){HMODULE module=GetModuleHandleW(libraries[i]);
-            if(!module)module=LoadLibraryW(libraries[i]);
-            if(module)get_state=(void *)GetProcAddress(module,"XInputGetState");}
-    }
-    static unsigned connected;static uint64_t scan_at;
-    uint64_t now=GetTickCount64();unsigned scan=now>=scan_at;
-    if(scan)scan_at=now+1000;
     sampled.buttons=jnet_controls_playstation_buttons();
-    if(get_state)for(unsigned i=0;i<4;++i){
-        if(!scan && !(connected&(1u<<i)))continue;
+    uintptr_t devices[4];
+    if(!jnet_menu_read(fault_image+0x403e420,devices,sizeof(devices)))return sampled;
+    for(unsigned i=0;i<4;++i){
+        uintptr_t device=devices[i],type=0,again=0;
+        unsigned index=4;unsigned char connected=0,still_connected=0;
         XINPUT_STATE state={0};
-        if(get_state(i,&state)==ERROR_SUCCESS){
-            connected|=1u<<i;
-            static const unsigned masks[]={1,2,4,8,16,32,64,128,256,512,4096,8192,16384,32768};
-            for(unsigned bit=0;bit<14;++bit)if(state.Gamepad.wButtons&masks[bit])sampled.buttons|=1u<<bit;
-            if(state.Gamepad.bLeftTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)sampled.buttons|=1u<<14;
-            if(state.Gamepad.bRightTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)sampled.buttons|=1u<<15;
-            sampled.motion|=state.Gamepad.sThumbLX>16000 || state.Gamepad.sThumbLX<-16000 ||
-                state.Gamepad.sThumbLY>16000 || state.Gamepad.sThumbLY<-16000 ||
-                state.Gamepad.sThumbRX>16000 || state.Gamepad.sThumbRX<-16000 ||
-                state.Gamepad.sThumbRY>16000 || state.Gamepad.sThumbRY<-16000;
-        } else connected&=~(1u<<i);
+        if(!device ||
+           !jnet_menu_read(device,&type,8) || type!=fault_image+0x682b10 ||
+           !jnet_menu_read(device+0xc5,&connected,1) || connected!=1 ||
+           !jnet_menu_read(device+0x468,&index,4) || index!=i ||
+           !jnet_menu_read(device+0x46c,&state,sizeof(state)) ||
+           !jnet_menu_read(fault_image+0x403e420+8*i,&again,8) || again!=device ||
+           !jnet_menu_read(device+0xc5,&still_connected,1) || still_connected!=1)continue;
+        static const unsigned masks[]={1,2,4,8,16,32,64,128,256,512,4096,8192,16384,32768};
+        for(unsigned bit=0;bit<14;++bit)if(state.Gamepad.wButtons&masks[bit])sampled.buttons|=1u<<bit;
+        if(state.Gamepad.bLeftTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)sampled.buttons|=1u<<14;
+        if(state.Gamepad.bRightTrigger>XINPUT_GAMEPAD_TRIGGER_THRESHOLD)sampled.buttons|=1u<<15;
+        sampled.motion|=state.Gamepad.sThumbLX>16000 || state.Gamepad.sThumbLX<-16000 ||
+            state.Gamepad.sThumbLY>16000 || state.Gamepad.sThumbLY<-16000 ||
+            state.Gamepad.sThumbRX>16000 || state.Gamepad.sThumbRX<-16000 ||
+            state.Gamepad.sThumbRY>16000 || state.Gamepad.sThumbRY<-16000;
     }
     return sampled;
 }

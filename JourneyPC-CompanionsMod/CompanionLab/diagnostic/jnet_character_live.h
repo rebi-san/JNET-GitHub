@@ -25,7 +25,8 @@ struct jnet_character_state {
     uint32_t teleport_identity;
     unsigned eye_ready,eye_warned,chirp_variant,variant,variant_applied;
     float saved_dissolve[2],motion[3],follow_position[3],sprint;
-    unsigned follow_position_valid;
+    unsigned follow_position_valid,steering_valid;
+    float steering[4];
     unsigned char saved_visibility[2];
 };
 static struct jnet_character_state jnet_character_instances[3];
@@ -373,7 +374,6 @@ static inline int jnet_character_prepare_native(uintptr_t game,uintptr_t barn,un
     jnet_character_instance.failed=1;return 0;
 }
 
-static float jnet_character_frame_dt;
 static int jnet_character_visibility(struct jnet_character_state *instance,int visible) {
     if(!jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation))return 0;
     const struct jnet_character_spec *spec=&jnet_character_specs[instance->kind];
@@ -439,6 +439,7 @@ static void jnet_character_reactivate_state(struct jnet_character_state *instanc
     instance->visual_samples=0;
     instance->input_frames=instance->follow_frames=0;
     instance->follow_position_valid=0;
+    instance->steering_valid=0;
     instance->sprint=0;
     instance->grab_blocked=0;
     instance->ride_peer=instance->ride_epoch=instance->ride_tick=instance->ride_active=0;
@@ -813,7 +814,7 @@ static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     if(!instance->initialized || instance->failed || instance->game!=game || instance->barn!=barn)return;
     int attacking=jnet_character_attack_locked(own_read,NULL,fault_image,instance->attack_event,instance->binding.creature);
     if(attacking<0){instance->failure_stage="attack state";jnet_character_fail(instance);return;}
-    if(attacking){memset(instance->motion,0,sizeof(instance->motion));instance->sprint=0;return;}
+    if(attacking){memset(instance->motion,0,sizeof(instance->motion));instance->sprint=0;instance->steering_valid=0;return;}
     ++instance->input_frames;
     unsigned char menu=0;
     if(jnet_menu_last && !own_read(NULL,jnet_menu_last+0xd68,&menu,1))return;
@@ -843,14 +844,29 @@ static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     if(intent.spotlight_changed){
         char line[96];snprintf(line,sizeof(line),"[JNET] war machine spotlight requested=%u native_ready=%u",intent.spotlight,instance->eye_ready);message(line);
     }
-    if(!jnet_character_smooth(instance->motion,&intent,jnet_character_frame_dt,!menu)){
+    uintptr_t clock=0;float dt=0;
+    instance->failure_stage="movement simulation clock";
+    if(!own_read(NULL,game+0x68,&clock,8) || !clock ||
+       !own_read(NULL,clock+0x10,&dt,4) || !isfinite(dt) || dt<0){
         jnet_character_fail(instance);return;
     }
-    float ramp=1-expf(-fminf(jnet_character_frame_dt,.05f)/.28f);
+    if(!dt)return;
+    if(!instance->steering_valid){
+        if(!jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation) ||
+           !own_read(NULL,instance->binding.target+0x20,instance->steering,sizeof(instance->steering))){
+            jnet_character_fail(instance);return;
+        }
+        instance->steering_valid=1;
+    }
+    if(!jnet_character_smooth(instance->motion,&intent,dt,!menu)){
+        jnet_character_fail(instance);return;
+    }
+    float ramp=1-expf(-fminf(dt,.05f)/.28f);
     instance->sprint+=ramp*((float)jnet_sprint_down-instance->sprint);
     instance->failure_stage="target binding/pose";
-    int result=jnet_character_target_step(own_read,jnet_character_write_memory,instance,&instance->binding,
-        jnet_character_generation,&intent,jnet_character_speed(instance->kind)*(1+instance->sprint),jnet_character_frame_dt,jnet_character_ground);
+    int result=jnet_character_target_step_from_position(own_read,jnet_character_write_memory,instance,&instance->binding,
+        jnet_character_generation,&intent,jnet_character_speed(instance->kind)*(1+instance->sprint),dt,jnet_character_ground,instance->steering,
+        instance->follow_position_valid?instance->follow_position:NULL);
     if(result){instance->failure_detail=result;jnet_character_fail(instance);return;}
 }
 static void jnet_character_after_player(uintptr_t barn,uintptr_t game) {

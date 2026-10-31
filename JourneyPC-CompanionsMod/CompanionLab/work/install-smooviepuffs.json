@@ -1,12 +1,12 @@
 {
-  "installed_utc": "2026-10-30T05:08:03.136692+00:00",
+  "installed_utc": "2026-10-31T15:04:10.046825+00:00",
   "bottle": "smooviepuffs",
   "directory": "/Users/rebisan/Library/Containers/com.isaacmarovitz.Whisky/Bottles/598C5EF7-1BBF-4C6F-815E-6068C5507D85/drive_c/Program Files (x86)/Steam/steamapps/common/Journey/Journet",
-  "package_sha256": "db80712ecaba1d2b384f7593b2231fe2148a6193dcdbe22b4211c9af3c36c220",
+  "package_sha256": "33d318fbe8526d730a5b82633f4e91290b394336cc72d798e4ae45bc2d10a3ef",
   "files": {
-    "JNET.dll": "6e28867858f79b1c7e68691520c745dfd6999581a8ed5218407b02b704465390",
-    "JNET.exe": "5b4cb3c5bdfab88de8c1e0d2acffcff500128d9d2942db11c17615915837009b",
-    "manifest.json": "d827b64a2abf01c852d2ad6a529918fb4cf5d82b2e3b80023a8cf8ed4e5a9279",
+    "JNET.dll": "f6a7f7753e7e25d4b1d51ab0084522f0a88da288b3607d0ce99b00114ca14a34",
+    "JNET.exe": "35fb8cf17422851bdc333f29c107e23ae5b149b021541b5f204264047b0cc99b",
+    "manifest.json": "dcae2cbfc7c4879ca51db9ff1b068c162185ab2109b3307b7463a1e0ecaae53e",
     "session-peers.bin": "1ab81da840c7f8ceaf3560b892bdb4154a1154b9f278b064e725af40b34f96f8",
     "JNETCharacter_P_FlowHunter_Tail.D3D11x64": "9f59990c8d6453ec969f88d6e431331189810cbec200dd9f3eb0b4d91a8d3b6e",
     "JNETCharacter_P_ClothGuardianNeck.D3D11x64": "e209981535a5a798a8372ac799eb6980108dbaf7c1c8e9d94b607d457e0b765a",
@@ -61,7 +61,7 @@
   "process_check": "closed before replacement",
   "helper_launched": false,
   "connection_scope": "smooviepuffs installation only",
-  "validation": "Windows build and eight package checks passed; package hashes verified. UI text update only.",
+  "validation": "Windows release build completed and package hashes verified. No tests created or run; live jitter improvement unverified.",
   "folder_renamed_utc": "2026-10-12T02:43:42.458408+00:00",
   "log_cleanup": {
     "utc": "2026-10-30T04:16:22.188569+00:00",
@@ -75,8 +75,8 @@
       "bytes_deleted": 221088
     }
   },
-  "source_commit": "Local workspace: JNET 0.357 alpha UI text update",
-  "build_id": "69eaf7f7904e46a1d838d0d677999bdfb57fe39f13496999efb7fe1bfcef493e",
+  "source_commit": "Local workspace: JNET 0.357 local creature position feedback fix",
+  "build_id": "3bbe9c8e1c1ef1861487824e4dcdf295019a3b6fd6aa89d1f85609b44c4466e3",
   "display_version": "0.357 alpha",
   "surface_collision_levels": {
     "Canyon": {

@@ -1,11 +1,11 @@
 {
-  "installed_utc": "2026-10-30T05:08:02.896407+00:00",
+  "installed_utc": "2026-10-31T15:04:09.800738+00:00",
   "version": "0.357",
-  "package_sha256": "db80712ecaba1d2b384f7593b2231fe2148a6193dcdbe22b4211c9af3c36c220",
+  "package_sha256": "33d318fbe8526d730a5b82633f4e91290b394336cc72d798e4ae45bc2d10a3ef",
   "directory": "/Users/rebisan/Library/Containers/com.isaacmarovitz.Whisky/Bottles/9FAD618B-4D76-4C96-B0AA-4A3A85EC24A0/drive_c/Program Files (x86)/Steam/steamapps/common/Journey/JNET",
   "files": {
-    "JNET.dll": "6e28867858f79b1c7e68691520c745dfd6999581a8ed5218407b02b704465390",
-    "JNET.exe": "5b4cb3c5bdfab88de8c1e0d2acffcff500128d9d2942db11c17615915837009b",
+    "JNET.dll": "f6a7f7753e7e25d4b1d51ab0084522f0a88da288b3607d0ce99b00114ca14a34",
+    "JNET.exe": "35fb8cf17422851bdc333f29c107e23ae5b149b021541b5f204264047b0cc99b",
     "README.txt": "d376ae60223d5f3c09651366e67991870c78cbf6e3876b0f16fa9f873f7e4d0b",
     "JNETMenu.xme": "545ef6dcbc89026bbe4914b8f8f206ea311ef38f5919c3bc12dca3be5dfa2a51",
     "JNETSpin3.D3D11x64": "5d4af83666f1377817948db9cc96c943b81182da043bf6e305bc5d2696d71b3f",
@@ -35,7 +35,7 @@
     "JNETCharacter_P_MechHeadGrate.D3D11x64": "029e7f94a724e1c1f796736a386f2a4f70d0b28fdd94dd7d58acba83afcd3efd",
     "JNETCharacter_P_MechTail.D3D11x64": "9517f08174cfd0e2537f501f29b6886cea11e15ba7099628c132f9419686fc13",
     "JNETCharacter_P_MechWing.D3D11x64": "d535037cba5521d8af7fc1712d0db1d8af09c22aa607ff95672208688f2c42fd",
-    "manifest.json": "d827b64a2abf01c852d2ad6a529918fb4cf5d82b2e3b80023a8cf8ed4e5a9279",
+    "manifest.json": "dcae2cbfc7c4879ca51db9ff1b068c162185ab2109b3307b7463a1e0ecaae53e",
     "JNETCharacter_P_FlowHunter_Fins.D3D11x64": "dbc264f736258ca6578f31f1f55ef280b44fb671d062005c39156bf5a9e191d6",
     "JNETCharacter_P_FlowCreature_Body.D3D11x64": "0e4f8e957bbd635e198fa08d5560ccbfd61f67f827942e4d0256cd62427277ab",
     "JNETCharacter_P_FlowHunter_FinsLarge.D3D11x64": "a8a544db34ac393a86f00644c599602addfc7744b3b3f7376f509c1b6d5f3b42",
@@ -61,7 +61,7 @@
   "runtime_verified": false,
   "helper_launched": false,
   "connection_scope": "rebishaz installation only",
-  "validation": "Windows build and eight package checks passed; package hashes verified. UI text update only.",
+  "validation": "Windows release build completed and package hashes verified. No tests created or run; live jitter improvement unverified.",
   "folder_renamed_utc": "2026-10-12T02:43:42.440093+00:00",
   "log_cleanup": {
     "utc": "2026-10-12T02:43:42.456081+00:00",
@@ -69,8 +69,8 @@
     "bytes_deleted": 226421
   },
   "bottle": "rebishaz",
-  "source_commit": "Local workspace: JNET 0.357 alpha UI text update",
-  "build_id": "69eaf7f7904e46a1d838d0d677999bdfb57fe39f13496999efb7fe1bfcef493e",
+  "source_commit": "Local workspace: JNET 0.357 local creature position feedback fix",
+  "build_id": "3bbe9c8e1c1ef1861487824e4dcdf295019a3b6fd6aa89d1f85609b44c4466e3",
   "display_version": "0.357 alpha",
   "surface_collision_levels": {
     "Canyon": {

@@ -1200,7 +1200,7 @@ static INT_PTR CALLBACK result_dialog(HWND window, UINT message, WPARAM wparam, 
             !result_theme.body || !result_theme.small) { EndDialog(window,-1); return TRUE; }
         if (!result_control(window,L"STATIC",L"",SS_OWNERDRAW,118,result_theme.small) ||
             !result_control(window,L"STATIC",L"",SS_OWNERDRAW,119,result_theme.small) ||
-            !result_control(window,L"STATIC",L"JNET | " JC_HELPER_VERSION,0,111,result_theme.small) ||
+            !result_control(window,L"STATIC",L"JNET | " JC_HELPER_HEADER_VERSION,0,111,result_theme.small) ||
             !result_control(window,L"STATIC",L"",SS_LEFT,117,result_theme.small)) {
             EndDialog(window,-1); return TRUE;
         }

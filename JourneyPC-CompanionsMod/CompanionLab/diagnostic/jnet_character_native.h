@@ -367,27 +367,36 @@ static inline int jnet_character_terrain_binding(jnet_character_read read,void *
        !read(ctx,terrain+0x38,&collision,8) || !collision)return 0;
     *out=terrain;return 1;
 }
-static inline int jnet_character_target_step(jnet_character_read read,jnet_character_write write,
+static inline int jnet_character_target_step_from_position(jnet_character_read read,jnet_character_write write,
         void *ctx,const struct jnet_character_binding *binding,uint64_t generation,
         const struct jnet_character_intent *intent,float speed,float dt,
-        int (*ground)(void *,const float[3],float *)) {
-    struct jnet_character_pose before,next,check;
+        int (*ground)(void *,const float[3],float *),float steering[4],const float position[3]) {
+    struct jnet_character_pose before,current,next,check;
     if(!write || !jnet_character_binding_valid(read,ctx,binding,generation) ||
        !read(ctx,binding->target+0x10,before.position,sizeof(before.position)) ||
-       !read(ctx,binding->target+0x20,before.rotation,sizeof(before.rotation)) ||
-       !jnet_character_motion_step(&before,intent,speed,dt,&next))return -1;
+       !read(ctx,binding->target+0x20,before.rotation,sizeof(before.rotation)))return -1;
+    current=before;
+    if(position)memcpy(current.position,position,sizeof(current.position));
+    if(steering)memcpy(current.rotation,steering,sizeof(current.rotation));
+    if(!jnet_character_motion_step(&current,intent,speed,dt,&next))return -1;
     if(ground){
         float height=0;
         if(!ground(ctx,next.position,&height) || !isfinite(height))return -1;
         if(next.position[1]<height)next.position[1]=height;
     }
-    if(!memcmp(&before,&next,sizeof(before)))return 0;
+    if(!memcmp(&before,&next,sizeof(before))){
+        if(steering)memcpy(steering,next.rotation,sizeof(next.rotation));
+        return 0;
+    }
     if(!jnet_character_binding_valid(read,ctx,binding,generation))return -1;
     if(write(ctx,binding->target+0x10,next.position,sizeof(next.position)) &&
        write(ctx,binding->target+0x20,next.rotation,sizeof(next.rotation)) &&
        read(ctx,binding->target+0x10,check.position,sizeof(check.position)) &&
        read(ctx,binding->target+0x20,check.rotation,sizeof(check.rotation)) &&
-       !memcmp(&check,&next,sizeof(next)))return 0;
+       !memcmp(&check,&next,sizeof(next))){
+        if(steering)memcpy(steering,next.rotation,sizeof(next.rotation));
+        return 0;
+    }
     if(!jnet_character_binding_valid(read,ctx,binding,generation) ||
        !write(ctx,binding->target+0x10,before.position,sizeof(before.position)) ||
        !write(ctx,binding->target+0x20,before.rotation,sizeof(before.rotation)) ||
@@ -395,6 +404,13 @@ static inline int jnet_character_target_step(jnet_character_read read,jnet_chara
        !read(ctx,binding->target+0x20,check.rotation,sizeof(check.rotation)) ||
        memcmp(&check,&before,sizeof(before)))return -3;
     return -2;
+}
+static inline int jnet_character_target_step(jnet_character_read read,jnet_character_write write,
+        void *ctx,const struct jnet_character_binding *binding,uint64_t generation,
+        const struct jnet_character_intent *intent,float speed,float dt,
+        int (*ground)(void *,const float[3],float *),float steering[4]) {
+    return jnet_character_target_step_from_position(read,write,ctx,binding,generation,
+        intent,speed,dt,ground,steering,NULL);
 }
 struct jnet_character_pools {
     uint64_t game,image,creatures,decorations,markers,clumps,events;

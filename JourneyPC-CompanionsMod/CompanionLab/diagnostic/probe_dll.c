@@ -4616,7 +4616,6 @@ static int64_t update(uintptr_t game, float dt) {
     }
     flight_mark(1,0);
     ULONGLONG section_started=GetTickCount64();
-    jnet_character_frame_dt=dt;
     int64_t result = original_update(game, dt);
     jnet_update_cost(43,section_started);section_started=GetTickCount64();
     traveler_last_update=result;

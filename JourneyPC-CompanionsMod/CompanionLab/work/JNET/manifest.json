@@ -10,7 +10,7 @@
   "optional_sound_fix_sha256": "0a73c2fb3a2e5b33f6c38082b966160cd54882fac9efbe09c3ea8dde6fc037ca",
   "sound_fix_version": "0.3.1",
   "optional_drop_in_executable": true,
-  "build_id": "69eaf7f7904e46a1d838d0d677999bdfb57fe39f13496999efb7fe1bfcef493e",
+  "build_id": "3bbe9c8e1c1ef1861487824e4dcdf295019a3b6fd6aa89d1f85609b44c4466e3",
   "runtime_verified": false,
   "three_player_supported": false,
   "local_diagnostic_only": false,
@@ -906,8 +906,8 @@
     }
   },
   "artifacts": {
-    "JNET.dll": "6e28867858f79b1c7e68691520c745dfd6999581a8ed5218407b02b704465390",
-    "JNET.exe": "5b4cb3c5bdfab88de8c1e0d2acffcff500128d9d2942db11c17615915837009b",
+    "JNET.dll": "f6a7f7753e7e25d4b1d51ab0084522f0a88da288b3607d0ce99b00114ca14a34",
+    "JNET.exe": "35fb8cf17422851bdc333f29c107e23ae5b149b021541b5f204264047b0cc99b",
     "README.txt": "d376ae60223d5f3c09651366e67991870c78cbf6e3876b0f16fa9f873f7e4d0b",
     "JNETMenu.xme": "545ef6dcbc89026bbe4914b8f8f206ea311ef38f5919c3bc12dca3be5dfa2a51",
     "JNET-canyon-collision.bin": "5ac624ee839e34a458eb8da737e12ca4797540f10e845621483777c80be25108",

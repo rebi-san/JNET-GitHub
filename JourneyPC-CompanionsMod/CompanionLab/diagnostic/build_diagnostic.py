@@ -164,7 +164,7 @@ def verify_reference(data):
     return pe_sections(data)
 
 
-def build(source_check=False):
+def build(source_check=False, package_only=False):
     work = LAB / "work/diagnostic-build"
     package = LAB / ("work/production-check" if source_check else f"work/package-{VERSION}/JNET")
     deps = LAB / "work/deps"
@@ -293,7 +293,8 @@ def build(source_check=False):
         filename=f"JNET-{level.lower()}-collision.bin"
         collision_payloads[level]=payload;collision_reports[level]=report;collision_files.append(filename)
         (package / filename).write_bytes(payload)
-        (LAB / f"work/{level.lower()}-collision-audit.json").write_text(json.dumps(report,indent=2)+"\n")
+        if not package_only:
+            (LAB / f"work/{level.lower()}-collision-audit.json").write_text(json.dumps(report,indent=2)+"\n")
     collision_header=canyon_runtime_header(collision_payloads)
     (work / "jnet_canyon_payload.h").write_text(collision_header)
     source_parts.extend((hull_runtime_header().encode(),collision_header.encode(),*collision_payloads.values(),(LAB / "canyon_collision.py").read_bytes()))
@@ -327,9 +328,10 @@ def build(source_check=False):
     subprocess.run(flags + ["-shared", str(HERE / "probe_dll.c"), *map(str, hook_sources), "-lwinmm", "-lbcrypt", "-lws2_32", "-lgdi32", "-o", str(package / "JNET.dll")],
                    env=env, check=True, cwd=work)
     # Compile the exact observer shims against a standalone canary target, never Journey.
-    fixture = LAB / "work/companion-components/test_native_lifecycle_abi.exe"
-    fixture.parent.mkdir(exist_ok=True)
-    subprocess.run(flags + [str(HERE / "test_native_lifecycle_abi.c"), "-o", str(fixture)], env=env, check=True, cwd=work)
+    if not package_only:
+        fixture = LAB / "work/companion-components/test_native_lifecycle_abi.exe"
+        fixture.parent.mkdir(exist_ok=True)
+        subprocess.run(flags + [str(HERE / "test_native_lifecycle_abi.c"), "-o", str(fixture)], env=env, check=True, cwd=work)
     dll = (package / "JNET.dll").read_bytes()
     exported = exports(dll)
     live_exports = {'JNETSteamGame', 'JNETSteamP2P', 'JNETSteamP2PText', 'JNETSteamLobby', 'JNETSteamLobbyText', 'JNETSteamServiceText', 'JNETSteam', 'JNETMenu', 'JNETNetwork', 'JNETPeerLifecycle', 'JNETActorTrial', 'JNETActorTrialStart', 'JNETActorTrialStop', 'JNETClothAdoptMappedPass', 'JNETClothBindNativeMaps', 'JNETClothPublish', 'JNETActorActivate', 'JNETClothInitialize', 'JNETActorStop', 'JNETClothApplyAnimatedAppearance', 'JNETActorPrepare', 'JNETActor', 'JNETActorReceive', 'JNETClothStageStockBatch'}
@@ -340,6 +342,7 @@ def build(source_check=False):
     if dll[id_offset:id_offset + 32] != build_id:
         raise ValueError("Exported build identifier mismatch")
     built_header = '#define JC_HELPER_VERSION L"' + ("development" if source_check else DISPLAY_VERSION) + '"\n'
+    built_header += '#define JC_HELPER_HEADER_VERSION L"' + ("development" if source_check else VERSION) + '"\n'
     built_header += f"static const unsigned char jc_dll_hash[32] = {array(bytes.fromhex(sha(dll)))};\n"
     for macro, symbol in (("STEAM_GAME", "JNETSteamGame"), ("STEAM_P2P", "JNETSteamP2P"), ("STEAM_P2P_TEXT", "JNETSteamP2PText"), ("STEAM_LOBBY", "JNETSteamLobby"), ("STEAM_LOBBY_TEXT", "JNETSteamLobbyText"), ("STEAM_TEXT", "JNETSteamServiceText"), ("STEAM", "JNETSteam"), ("MENU", "JNETMenu"), ("PEER_LIFECYCLE", "JNETPeerLifecycle"), ("CONTROL", "JNETControl"), ("ACTOR_TRIAL", "JNETActorTrial"), ("ACTOR", "JNETActor"), ("TRAVELER", "JNETTraveler"), ("LIFECYCLE", "JNETLifecycle"), ("STATUS", "JNETStatus"), ("COMMAND", "JNETCommand"), ("BUILD", "JNETBuildId"), ("INIT", "JNETInitialize"), ("OBSERVATION", "JNETObservation"), ("PHASE", "JNETPhase"), ("FRAMES", "JNETFrames"), ("GAME", "JNETGame"), ("TRIAL", "JNETTrial"), ("LIFETIME", "JNETLifetime"), ("RESOURCE", "JNETResource"), ("POOL", "JNETPool"), ("MESH", "JNETMesh"), ("MATERIAL", "JNETMaterial"), ("GEOMETRY", "JNETGeometry"), ("BUILDER", "JNETBuilder"), ("STARTUP", "JNETStartup"), ("COMMIT", "JNETCommit"), ("CALLBACKS", "JNETCallbacks"), ("POSE", "JNETPose"), ("POSE_WRITES", "JNETPoseWrites"), ("ANIMATION", "JNETAnimation"), ("IDLE", "JNETIdle"), ("RENDER", "JNETRender"), ("MESH_LIFE", "JNETMeshLife"), ("APPEARANCE", "JNETAppearance"), ("LINK", "JNETLink"), ("ROOM", "JNETRoom"), ("MOTION", "JNETMotion"), ("BODIES", "JNETBodies"), ("DUAL", "JNETDual"), ("SKELETON", "JNETSkeleton"), ("EVALUATION", "JNETEvaluation"), ("NATIVE_PLAYBACK", "JNETNativePlayback"), ("NATIVE_OUTPUTS", "JNETNativeOutputs"), ("COMPANION_FEATURES", "JNETCompanionFeatures"), ("FLIGHT", "JNETFlight"), ("LINK_CONFIG", "JNETLinkConfig"), ("NETWORK", "JNETNetwork"), ("PERFORMANCE", "JNETPerformance")):
         built_header += f"#define JC_{macro}_RVA {exported[symbol]}u\n"
@@ -407,4 +410,8 @@ def build(source_check=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--source-check", action="store_true", help="Build the live source DLL separately; no helper package or installation")
-    build(parser.parse_args().source_check)
+    parser.add_argument("--package-only", action="store_true", help="Build the release without test fixtures or collision audit reports")
+    args = parser.parse_args()
+    if args.source_check and args.package_only:
+        parser.error("--package-only cannot be combined with --source-check")
+    build(args.source_check, args.package_only)

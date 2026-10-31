@@ -100,6 +100,7 @@ static int jnet_menu_is_controls(uintptr_t menu) {
     uintptr_t begin=0,end=0;
     if(!jnet_menu_read(menu+0xc10,&begin,8) || !jnet_menu_read(menu+0xc18,&end,8) ||
        !begin || end<begin || end-begin>0x600 || (end-begin)%0x30)return 0;
+    if(end>begin && jnet_menu_string_is(end-0x30,"Back"))return 0;
     for(uintptr_t p=begin;p<end;p+=0x30)if(jnet_menu_string_is(p,"Controls"))return 1;
     return 0;
 }

@@ -274,14 +274,14 @@ static void test_grounded_motor(void) {
     float pos[3]={1,3,2},quat[4]={0,0,0,1};
     memcpy(f.bytes+144,pos,12);memcpy(f.bytes+160,quat,16);
     struct jnet_character_intent intent={.direction={.6f,-.8f,0},.strength=1};
-    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,ground_height));
+    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,ground_height,NULL));
     memcpy(pos,f.bytes+144,12);
     assert(pos[0]>1 && pos[1]==pos[0]+pos[2]);
     intent.direction[0]=0;intent.direction[1]=1;
-    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,ground_height));
+    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,ground_height,NULL));
     memcpy(pos,f.bytes+144,12);assert(pos[1]>pos[0]+pos[2]);
     unsigned char saved[256];memcpy(saved,f.bytes,256);unsigned writes=f.writes;
-    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,ground_unavailable)==-1);
+    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,ground_unavailable,NULL)==-1);
     assert(f.writes==writes && !memcmp(saved,f.bytes,256));
 }
 static void test_motor(void) {
@@ -292,20 +292,50 @@ static void test_motor(void) {
     float pos[3]={1,5000,2},quat[4]={0,0,0,1};
     memcpy(f.bytes+144,pos,12);memcpy(f.bytes+160,quat,16);
     struct jnet_character_intent intent={.direction={0,1,0},.strength=1};
-    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,8,&intent,10,.02f,NULL)==-1 && !f.writes);
+    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,8,&intent,10,.02f,NULL,NULL)==-1 && !f.writes);
     intent.strength=0;
-    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL) && !f.writes);
+    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL,NULL) && !f.writes);
     intent.strength=1;
     unsigned char original[256];memcpy(original,f.bytes,sizeof(original));
     f.fail_at=2;
-    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL)==-2);
+    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL,NULL)==-2);
     assert(!memcmp(original,f.bytes,sizeof(original)));
     f.writes=f.fail_at=0;
-    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL));
+    assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL,NULL));
     float moved[3];memcpy(moved,f.bytes+144,12);assert(moved[1]>5000);
     assert(!memcmp(f.bytes,original,144) && !memcmp(f.bytes+176,original+176,80));
     f.writes=0;f.fail_at=2;f.fail_rest=1;
-    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL)==-3);
+    assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL,NULL)==-3);
+}
+static void test_steering_frame_rates(void) {
+    const unsigned rates[]={30,55,60,120,144};
+    for(unsigned rate=0;rate<sizeof(rates)/sizeof(rates[0]);++rate){
+        for(unsigned uneven=0;uneven<2;++uneven){
+            struct motor_fixture f={0};
+            const struct jnet_character_binding binding={0x140000000ULL,16,128,9};
+            uint64_t type=binding.image+0x5ce668;
+            memcpy(f.bytes+16,&type,8);memcpy(f.bytes+32,&binding.target,8);
+            float steering[4]={0,0,0,1};
+            struct jnet_character_pose expected={.rotation={0,0,0,1}};
+            struct jnet_character_intent intent={.direction={1,0,0},.strength=1};
+            for(unsigned frame=0;frame<rates[rate]*2;++frame){
+                float dt=(uneven?(frame%2?.75f:1.25f):1.f)/rates[rate];
+                float native_rotation[4]={0,frame%2?-.70710678f:.70710678f,0,.70710678f};
+                memcpy(f.bytes+160,native_rotation,sizeof(native_rotation));
+                assert(jnet_character_motion_step(&expected,&intent,10,dt,&expected));
+                assert(!jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,dt,NULL,steering));
+                assert(!memcmp(steering,expected.rotation,sizeof(steering)));
+                assert(!memcmp(f.bytes+144,expected.position,sizeof(expected.position)));
+                assert(!memcmp(f.bytes+160,expected.rotation,sizeof(expected.rotation)));
+            }
+            assert(fabsf(expected.position[0]-20.f)<.001f);
+            assert(steering[1]>.69f && steering[3]>.70f);
+            float saved[4];memcpy(saved,steering,sizeof(saved));
+            f.writes=0;f.fail_at=2;
+            assert(jnet_character_target_step(motor_read,motor_write,&f,&binding,9,&intent,10,.02f,NULL,steering)==-2);
+            assert(!memcmp(saved,steering,sizeof(saved)));
+        }
+    }
 }
 static void test_chirp_head(void) {
     struct input_fixture f={0};
@@ -516,6 +546,7 @@ int main(void) {
     test_terrain_binding();
     test_input();
     test_motor();
+    test_steering_frame_rates();
     test_grounded_motor();
     struct fixture f;uint64_t object=99;uint32_t count;unsigned char flags[2];
     setup(&f);assert(reserve(&f,&object)==0 && object==creatures+0x10 && f.allocations==1);

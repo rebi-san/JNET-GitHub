@@ -181,7 +181,7 @@ class DiagnosticTests(unittest.TestCase):
             self.assertEqual(dll[offset:offset + 32].hex(), manifest["build_id"])
             self.assertEqual(imports(dll), manifest["dll_imports"])
             helper = archive.read("JNET.exe")
-            self.assertIn(("JNET | " + DISPLAY_VERSION).encode("utf-16le"), helper)
+            self.assertIn(("JNET | " + VERSION + "\0").encode("utf-16le"), helper)
             self.assertIn("Open Steam and click Launch to start Journey.".encode("utf-16le"), helper)
             self.assertIn(b"scarfhelper", dll)
             pe = struct.unpack_from("<I", helper, 60)[0]
