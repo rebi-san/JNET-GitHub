@@ -78,6 +78,23 @@ static inline int jnet_character_unit(float v[3]) {
     n=sqrtf(n);for(unsigned i=0;i<3;++i)v[i]/=n;
     return 1;
 }
+static inline int jnet_character_vertical_basis(const float previous_right[3],float basis[12]) {
+    float forward[3]={basis[0],basis[1],basis[2]},right[3],up[3];
+    if(!jnet_character_unit(forward) || fabsf(forward[1])<.95f)return 0;
+    float dot=0;
+    for(unsigned i=0;i<3;++i){
+        if(!isfinite(previous_right[i]))return 0;
+        dot+=previous_right[i]*forward[i];
+    }
+    for(unsigned i=0;i<3;++i)right[i]=previous_right[i]-dot*forward[i];
+    if(!jnet_character_unit(right))return 0;
+    up[0]=forward[1]*right[2]-forward[2]*right[1];
+    up[1]=forward[2]*right[0]-forward[0]*right[2];
+    up[2]=forward[0]*right[1]-forward[1]*right[0];
+    if(!jnet_character_unit(up))return 0;
+    for(unsigned i=0;i<3;++i){basis[i]=forward[i];basis[4+i]=up[i];basis[8+i]=right[i];}
+    return 1;
+}
 static inline int jnet_character_control_step(struct jnet_character_control *control,
         const struct jnet_character_input *input,struct jnet_character_intent *out) {
     if(!out)return 0;
@@ -168,8 +185,12 @@ static inline int jnet_character_motion_step(const struct jnet_character_pose *c
             result.position[i]+=direction[i]*distance;
             if(!isfinite(result.position[i]))return 0;
         }
-        float yaw=atan2f(direction[0],direction[2])*0.5f;
-        float pitch=-asinf(fmaxf(-1,fminf(1,direction[1])))*0.5f;
+        const float *q=current->rotation;
+        float horizontal=direction[0]*direction[0]+direction[2]*direction[2];
+        float yaw=horizontal<.0001f?
+            atan2f(2*(q[3]*q[1]-q[0]*q[2]),norm-2*(q[1]*q[1]+q[2]*q[2]))*.5f:
+            atan2f(direction[0],direction[2])*.5f;
+        float pitch=-asinf(fmaxf(-.99995f,fminf(.99995f,direction[1])))*.5f;
         float sy=sinf(yaw),cy=cosf(yaw),sp=sinf(pitch),cp=cosf(pitch);
         float target[4]={sp*cy,cp*sy,-sp*sy,cp*cy};
         float dot=0,blend=1-expf(-fminf(dt,.05f)/.4f),scale=1/sqrtf(norm);

@@ -25,8 +25,9 @@ struct jnet_character_state {
     uint32_t teleport_identity;
     unsigned eye_ready,eye_warned,chirp_variant,variant,variant_applied;
     float saved_dissolve[2],motion[3],follow_position[3],sprint;
-    unsigned follow_position_valid,steering_valid;
-    float steering[4];
+    unsigned follow_position_valid;
+    uint32_t motion_frame;
+    unsigned motion_frame_valid;
     unsigned char saved_visibility[2];
 };
 static struct jnet_character_state jnet_character_instances[3];
@@ -99,11 +100,14 @@ static void jnet_character_shout_init(uintptr_t shouts,uintptr_t resources,uintp
     jnet_character_shout_init_original(shouts,resources,pool);
 }
 static void (*jnet_character_decoration_update_original)(uintptr_t,unsigned,float,uintptr_t,uintptr_t,uintptr_t,uintptr_t,uintptr_t);
+static void jnet_character_before_cloth(float dt,uintptr_t cloth);
 static void jnet_character_decoration_update(uintptr_t pool,unsigned group,float dt,uintptr_t resources,
         uintptr_t lua,uintptr_t camera,uintptr_t world,uintptr_t sounds) {
     jnet_character_decoration_update_original(pool,group,dt,resources,lua,camera,world,sounds);
-    if(pool==jnet_character_level_decorations && jnet_character_decorations)
+    if(pool==jnet_character_level_decorations && jnet_character_decorations){
+        if(group==0)jnet_character_before_cloth(dt,world);
         jnet_character_decoration_update_original(jnet_character_decorations,group,dt,resources,lua,camera,world,sounds);
+    }
 }
 static void (*jnet_character_decoration_draw_original)(uintptr_t,uintptr_t);
 static void jnet_character_decoration_draw(uintptr_t pool,uintptr_t renderer) {
@@ -374,6 +378,7 @@ static inline int jnet_character_prepare_native(uintptr_t game,uintptr_t barn,un
     jnet_character_instance.failed=1;return 0;
 }
 
+static float jnet_character_frame_dt;
 static int jnet_character_visibility(struct jnet_character_state *instance,int visible) {
     if(!jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation))return 0;
     const struct jnet_character_spec *spec=&jnet_character_specs[instance->kind];
@@ -439,7 +444,7 @@ static void jnet_character_reactivate_state(struct jnet_character_state *instanc
     instance->visual_samples=0;
     instance->input_frames=instance->follow_frames=0;
     instance->follow_position_valid=0;
-    instance->steering_valid=0;
+    instance->motion_frame_valid=0;
     instance->sprint=0;
     instance->grab_blocked=0;
     instance->ride_peer=instance->ride_epoch=instance->ride_tick=instance->ride_active=0;
@@ -814,7 +819,7 @@ static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     if(!instance->initialized || instance->failed || instance->game!=game || instance->barn!=barn)return;
     int attacking=jnet_character_attack_locked(own_read,NULL,fault_image,instance->attack_event,instance->binding.creature);
     if(attacking<0){instance->failure_stage="attack state";jnet_character_fail(instance);return;}
-    if(attacking){memset(instance->motion,0,sizeof(instance->motion));instance->sprint=0;instance->steering_valid=0;return;}
+    if(attacking){memset(instance->motion,0,sizeof(instance->motion));instance->sprint=0;return;}
     ++instance->input_frames;
     unsigned char menu=0;
     if(jnet_menu_last && !own_read(NULL,jnet_menu_last+0xd68,&menu,1))return;
@@ -844,30 +849,117 @@ static void jnet_character_input_native(uintptr_t barn,uintptr_t game) {
     if(intent.spotlight_changed){
         char line[96];snprintf(line,sizeof(line),"[JNET] war machine spotlight requested=%u native_ready=%u",intent.spotlight,instance->eye_ready);message(line);
     }
-    uintptr_t clock=0;float dt=0;
-    instance->failure_stage="movement simulation clock";
-    if(!own_read(NULL,game+0x68,&clock,8) || !clock ||
-       !own_read(NULL,clock+0x10,&dt,4) || !isfinite(dt) || dt<0){
+    if(!jnet_character_smooth(instance->motion,&intent,jnet_character_frame_dt,!menu)){
         jnet_character_fail(instance);return;
     }
-    if(!dt)return;
-    if(!instance->steering_valid){
-        if(!jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation) ||
-           !own_read(NULL,instance->binding.target+0x20,instance->steering,sizeof(instance->steering))){
-            jnet_character_fail(instance);return;
-        }
-        instance->steering_valid=1;
-    }
-    if(!jnet_character_smooth(instance->motion,&intent,dt,!menu)){
-        jnet_character_fail(instance);return;
-    }
-    float ramp=1-expf(-fminf(dt,.05f)/.28f);
+    float ramp=1-expf(-fminf(jnet_character_frame_dt,.05f)/.28f);
     instance->sprint+=ramp*((float)jnet_sprint_down-instance->sprint);
     instance->failure_stage="target binding/pose";
-    int result=jnet_character_target_step_from_position(own_read,jnet_character_write_memory,instance,&instance->binding,
-        jnet_character_generation,&intent,jnet_character_speed(instance->kind)*(1+instance->sprint),dt,jnet_character_ground,instance->steering,
-        instance->follow_position_valid?instance->follow_position:NULL);
+    int result=jnet_character_target_step(own_read,jnet_character_write_memory,instance,&instance->binding,
+        jnet_character_generation,&intent,jnet_character_speed(instance->kind)*(1+instance->sprint),jnet_character_frame_dt,jnet_character_ground);
     if(result){instance->failure_detail=result;jnet_character_fail(instance);return;}
+    instance->motion_frame=(uint32_t)JNETFrames;instance->motion_frame_valid=1;
+}
+static void jnet_character_motion_report(struct jnet_character_state *instance,float dt,int early) {
+    static struct {
+        uint64_t creature,generation,at,last;
+        float target[3],head[3],gap_peak,root_error_peak,vertical_error_peak,step_peak,dt_peak;
+        unsigned samples,moving,vertical,held,early;
+    } trace;
+    float target[3],head[3];uint64_t now=GetTickCount64();
+    if(!own_read(NULL,instance->binding.target+0x10,target,sizeof(target)) ||
+       !own_read(NULL,instance->binding.creature+0x110,head,sizeof(head)))return;
+    for(unsigned i=0;i<3;++i)if(!isfinite(target[i]) || !isfinite(head[i]))return;
+    if(trace.creature!=instance->binding.creature || trace.generation!=jnet_character_generation ||
+       now<trace.last){
+        memset(&trace,0,sizeof(trace));trace.creature=instance->binding.creature;
+        trace.generation=jnet_character_generation;trace.at=trace.last=now;
+        memcpy(trace.target,target,sizeof(target));memcpy(trace.head,head,sizeof(head));return;
+    }
+    float target_step=0,head_step=0,error=0,vertical_error=0;
+    for(unsigned i=0;i<3;++i){
+        float t=target[i]-trace.target[i],h=head[i]-trace.head[i];
+        target_step+=t*t;head_step+=h*h;error+=(h-t)*(h-t);
+        if(i==1){vertical_error=fabsf(h-t);trace.vertical+=fabsf(t)>.001f;}
+    }
+    trace.gap_peak=fmaxf(trace.gap_peak,(float)(now-trace.last));
+    trace.dt_peak=fmaxf(trace.dt_peak,dt);
+    if(target_step<4 && head_step<4){
+        ++trace.samples;trace.moving+=target_step>.000001f;trace.early+=early!=0;
+        trace.held+=target_step>.0001f && head_step<target_step*.01f;
+        trace.root_error_peak=fmaxf(trace.root_error_peak,sqrtf(error));
+        trace.vertical_error_peak=fmaxf(trace.vertical_error_peak,vertical_error);
+        trace.step_peak=fmaxf(trace.step_peak,sqrtf(head_step));
+    }
+    memcpy(trace.target,target,sizeof(target));memcpy(trace.head,head,sizeof(head));trace.last=now;
+    if(now-trace.at>=2000){
+        if(trace.moving){
+            char line[320];snprintf(line,sizeof(line),
+                "[JNET] creature motion %s samples/moving/vertical/early=%u/%u/%u/%u head_held=%u gap_peak_ms=%.0f dt_peak_ms=%.1f head_step_peak=%.4f root_step_error_peak=%.4f vertical_step_error_peak=%.4f (native poses, not cloth/render)",
+                jnet_character_name(instance->kind),trace.samples,trace.moving,trace.vertical,trace.early,trace.held,
+                (double)trace.gap_peak,(double)trace.dt_peak*1000,(double)trace.step_peak,
+                (double)trace.root_error_peak,(double)trace.vertical_error_peak);message(line);
+        }
+        trace.at=now;trace.samples=trace.moving=trace.vertical=trace.held=trace.early=0;
+        trace.gap_peak=trace.root_error_peak=trace.vertical_error_peak=trace.step_peak=trace.dt_peak=0;
+    }
+}
+static __declspec(thread) uintptr_t jnet_character_pose_creature;
+static void (*jnet_character_segment_original)(uintptr_t,uintptr_t,float,float);
+static void jnet_character_segment(uintptr_t segment,uintptr_t target,float dt,float blend) {
+    uintptr_t creature=jnet_character_pose_creature;
+    float previous[3],basis[12];uint32_t count=0;
+    int controlled=creature && segment>=creature+0x110 &&
+        (segment-creature-0x110)%0xa0==0 &&
+        own_read(NULL,creature+0xb10,&count,4) && count<=16 &&
+        (segment-creature-0x110)/0xa0<count &&
+        own_read(NULL,segment+0x60,previous,sizeof(previous));
+    jnet_character_segment_original(segment,target,dt,blend);
+    if(controlled && own_read(NULL,segment+0x40,basis,sizeof(basis)) &&
+       jnet_character_vertical_basis(previous,basis))
+        jc_local_windows_write(segment+0x40,basis,sizeof(basis));
+}
+static void (*jnet_character_simulate_original)(float,uintptr_t,uintptr_t,uintptr_t);
+static void jnet_character_simulate_owned(float dt,uintptr_t creature,uintptr_t unused,uintptr_t cloth) {
+    struct jnet_character_state *instance=&jnet_character_instances[0];
+    uintptr_t previous=jnet_character_pose_creature;
+    jnet_character_pose_creature=instance->initialized && !instance->failed &&
+        jnet_character_is_creature(instance->kind) && instance->binding.creature==creature &&
+        jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation) &&
+        jnet_character_attack_locked(own_read,NULL,fault_image,instance->attack_event,creature)==0?creature:0;
+    jnet_character_simulate_original(dt,creature,unused,cloth);
+    jnet_character_pose_creature=previous;
+}
+static struct { uintptr_t creature;uint64_t generation;uint32_t frame;unsigned valid; } jnet_character_early_pose;
+static void jnet_character_simulate(float dt,uintptr_t creature,uintptr_t unused,uintptr_t cloth) {
+    if(jnet_character_early_pose.valid && jnet_character_early_pose.creature==creature &&
+       jnet_character_early_pose.generation==jnet_character_generation &&
+       jnet_character_early_pose.frame==(uint32_t)JNETFrames)return;
+    jnet_character_simulate_owned(dt,creature,unused,cloth);
+    struct jnet_character_state *instance=&jnet_character_instances[0];
+    if(instance->initialized && !instance->failed && instance->binding.creature==creature &&
+       jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation))
+        jnet_character_motion_report(instance,dt,0);
+}
+static void jnet_character_before_cloth(float dt,uintptr_t cloth) {
+    struct jnet_character_state *instance=&jnet_character_instances[0];
+    uintptr_t expected=0;unsigned char state[2]={0};
+    if(!instance->initialized || instance->failed || instance->kind!=JNET_CHARACTER_LONGTAIL ||
+       instance->game!=(uintptr_t)JNETGame || !instance->motion_frame_valid ||
+       instance->motion_frame!=(uint32_t)JNETFrames || !isfinite(dt) || dt<=0 ||
+       !jnet_character_simulate_original ||
+       !jnet_character_binding_valid(own_read,NULL,&instance->binding,jnet_character_generation) ||
+       !own_read(NULL,instance->game+0x108,&expected,8) || !expected || cloth!=expected ||
+       !own_read(NULL,instance->binding.creature+8,state,sizeof(state)) || state[0]!=1 || state[1] ||
+       jnet_character_attack_locked(own_read,NULL,fault_image,instance->attack_event,instance->binding.creature)!=0)return;
+    if(jnet_character_early_pose.valid && jnet_character_early_pose.creature==instance->binding.creature &&
+       jnet_character_early_pose.generation==jnet_character_generation &&
+       jnet_character_early_pose.frame==(uint32_t)JNETFrames)return;
+    jnet_character_simulate_owned(dt,instance->binding.creature,0,cloth);
+    jnet_character_early_pose.creature=instance->binding.creature;
+    jnet_character_early_pose.generation=jnet_character_generation;
+    jnet_character_early_pose.frame=(uint32_t)JNETFrames;jnet_character_early_pose.valid=1;
+    jnet_character_motion_report(instance,dt,1);
 }
 static void jnet_character_after_player(uintptr_t barn,uintptr_t game) {
     struct jnet_character_state *instance=&jnet_character_instance;

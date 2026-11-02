@@ -1,96 +1,59 @@
 # JNET 0.357 moderation build
 
-The release ZIP is `JourneyPC-CompanionsMod/CompanionLab/work/JNET.zip`. The DLL entry point is `diagnostic/probe_dll.c`; the launcher source is `diagnostic/probe_helper.c`. Source headers under `diagnostic/` implement the mod. The release was cross-compiled on Apple Silicon macOS for Windows x64 using Zig 0.13.0 and MinHook 1.3.4.
+This repository is the source-review snapshot for the JNET **0.357** Windows x64 DLL and launcher EXE. It contains only their transitive source/header inputs, generated payload headers, MinHook sources and license notices, this guide, the rebuild script, and Git metadata files. [MODERATION_BUILD_INPUTS.txt](MODERATION_BUILD_INPUTS.txt) is the complete repository-root-relative allowlist of 157 files, including itself.
 
-The current repository contains `JourneyPC-CompanionsMod` and only the external inputs needed for full package regeneration, plus Git metadata files. [MODERATION_BUILD_INPUTS.txt](MODERATION_BUILD_INPUTS.txt) lists the 114 retained external files relative to the repository root. The standalone DLL and EXE compilation commands below need only `JourneyPC-CompanionsMod`, Zig, and Git LFS payloads. Unrelated projects and game files have been removed from the current tree; older commits still contain the previous tree.
+## Submitted release
 
-## Identify the submitted release
-
-SHA-256 values for the submitted 0.357 package:
-
-| File | SHA-256 |
+| Artifact | SHA-256 |
 | --- | --- |
-| JNET.zip | `33d318fbe8526d730a5b82633f4e91290b394336cc72d798e4ae45bc2d10a3ef` |
-| JNET.dll | `f6a7f7753e7e25d4b1d51ab0084522f0a88da288b3607d0ce99b00114ca14a34` |
-| JNET.exe | `35fb8cf17422851bdc333f29c107e23ae5b149b021541b5f204264047b0cc99b` |
+| JNET.zip | `992d7beacbe686b22cd9c38b1f63390a3eed3509a6eb9a983913be089e07567d` |
+| JNET.dll | `f233ffb8490233c035a044ba27bbc7376663652368d16a428db4361c97496595` |
+| JNET.exe | `a81aea154ba9ea172424c7578a5a07dda6ad737a2fb622624c4c36ede408c5d8` |
 
-Embedded build identifier: `3bbe9c8e1c1ef1861487824e4dcdf295019a3b6fd6aa89d1f85609b44c4466e3`.
+Embedded build identifier: `7a13a4336b796a123790f058c11386139debe62c9beb869cbbcf4434827159c5`.
 
-The ZIP's `manifest.json` records hashes for every packaged artifact. These values identify the submitted binaries; byte-for-byte reproducibility across different host environments has not been established. The embedded build identifier is generated from build inputs, not a Git commit ID.
+The submitted ZIP is provided separately; it is not tracked in this source-only repository. Its `manifest.json` hashes every packaged artifact. The local release output is `JourneyPC-CompanionsMod/CompanionLab/work/JNET.zip`. No game executable, compiler distribution, environment, cache, installation receipt, runtime log, test binary, or unrelated research is required in this Git tree. Removing those files from Git tracking preserves the developer's local copies. Older commits still contain the previous tree.
 
-## Compile the DLL on Windows for source review
+## Creature movement change
 
-Obtain Zig **0.13.0** from <https://ziglang.org/download/0.13.0/> and put its directory on PATH. Use the MinHook **1.3.4** source already included under `work/deps/minhook-1.3.4`; its upstream is <https://github.com/TsudaKageyu/minhook/tree/v1.3.4>. No Visual Studio project or separate Windows SDK is needed for this Zig command.
+The shared movement path retains the correction that shifts native head history by the externally applied target displacement, avoiding counting that displacement twice. Controlled Longtail simulates before its private cloth preparation and skips its later duplicate simulation in the same frame.
 
-Clone the private repository with authorized access and fetch its Git LFS objects. A GitHub source ZIP does not necessarily contain the LFS payloads. Run the following in PowerShell from the repository root:
+This revision stabilizes vertical orientation for every playable creature. Straight ascent/descent preserves heading, while the orientation stays slightly short of the native world-up singularity; actual movement remains fully vertical. During native segment simulation, a guarded hook projects the previous right axis onto the new forward plane near vertical and reconstructs an orthonormal basis before the native marker/mesh publication. This prevents a collapsed or flipped sideways axis from feeding the visible pose and cloth. Level-flight bases, native NPCs, remote creatures, and attack-controlled simulation retain their native segment behavior.
+
+Review `diagnostic/jnet_character.h`, `jnet_character_native.h`, `jnet_character_live.h`, and the hook registration in `probe_dll.c`. The new segment hook is pinned to RVA `0x2380d0` in `target_build.h`; startup verifies native entry signatures. It does not patch original game files.
+
+Focused local checks passed at **30 and 55 FPS** for ascent/descent, Dash displacement, pole noise and orientation continuity, head-history rollback, and once-per-frame Longtail scheduling. Native scheduling/arithmetic fixtures are not rendered-game tests. The supplied pre-revision reports show zero sampled head holds and negligible target/head error; they do not prove the final rendered result. This release has not been installed or gameplay-validated. There is no claim of guaranteed elimination of every stutter.
+
+## Rebuild both binaries
+
+Prerequisites: Python **3.9+**, Zig **0.13.0** for the reviewer's host, and Git LFS payloads. MinHook **1.3.4** source and its bundled HDE license are included. Zig supplies the Windows cross-toolchain; no separate Windows SDK or Visual Studio project is required. No dependencies are downloaded or installed by the build script.
+
+After cloning the authorized repository, run from its root:
+
+```sh
+git lfs pull
+python3 JourneyPC-CompanionsMod/CompanionLab/build_moderation.py --zig /path/to/zig
+```
+
+On Windows PowerShell:
 
 ```powershell
 git lfs pull
-zig version  # Must print 0.13.0
-$lab = (Resolve-Path 'JourneyPC-CompanionsMod/CompanionLab').Path
-$generated = Join-Path $lab 'work/diagnostic-build'
-$minhook = Join-Path $lab 'work/deps/minhook-1.3.4'
-$output = Join-Path $lab 'work/moderation-build'
-New-Item -ItemType Directory -Force $output | Out-Null
-$env:ZIG_GLOBAL_CACHE_DIR = Join-Path $output 'zig-cache'
-$env:ZIG_LOCAL_CACHE_DIR = Join-Path $output 'zig-local-cache'
-
-$compileArgs = @(
-    'cc', '-target', 'x86_64-windows-gnu', '-O2', '-std=c11',
-    '-fms-extensions', '-DUNICODE', '-D_UNICODE',
-    '-Wall', '-Wextra', '-Werror', '-Wno-unused-const-variable',
-    "-I$generated", "-I$minhook/include", '-shared',
-    "$lab/diagnostic/probe_dll.c",
-    "$minhook/src/buffer.c", "$minhook/src/hook.c",
-    "$minhook/src/trampoline.c", "$minhook/src/hde/hde64.c",
-    '-lwinmm', '-lbcrypt', '-lws2_32', '-lgdi32',
-    '-o', "$output/JNET.dll"
-)
-& zig @compileArgs
-if ($LASTEXITCODE -ne 0) { throw 'DLL compilation failed' }
-Get-FileHash "$output/JNET.dll" -Algorithm SHA256
+py -3 JourneyPC-CompanionsMod/CompanionLab/build_moderation.py --zig C:/tools/zig/zig.exe
 ```
 
-This uses the same compiler flags and C translation units as the release builder. It compiles only the DLL; it does not launch Journey, install the mod, run tests, or redirect compiler output to a log. The PowerShell recipe has been checked against the release builder but has not been executed on Windows here.
+If Zig 0.13.0 is on PATH, omit `--zig`. Compiler downloads: <https://ziglang.org/download/0.13.0/>. MinHook upstream: <https://github.com/TsudaKageyu/minhook/tree/v1.3.4>.
 
-The generated headers from the submitted build are included in `work/diagnostic-build/`, along with `work/menu-images/jnet_menu_assets.h`. They contain native address signatures, Lua payloads, creature data, fonts, and menu assets and must be included in review. This DLL-only path does not regenerate those inputs or independently establish their provenance.
+Outputs are `JourneyPC-CompanionsMod/CompanionLab/work/moderation-build/JNET.dll` and `JNET.exe`. The command compiles only; it never installs or launches either binary. It uses the existing JNET release compiler flags and translation units: C11, `x86_64-windows-gnu`, `-O2`, Unicode, Microsoft extensions, warnings as errors, the native DLL source, and MinHook's buffer/hook/trampoline/HDE64 sources. The EXE is built as a Windows GUI executable.
 
-The released launcher verifies the DLL hash. A separately compiled DLL whose hash differs will not work with that launcher unchanged. Use a complete build to generate a matching launcher; do not disable its hash validation.
+The script first builds the DLL, reads its PE exports, hashes that exact DLL, then generates an output-local `built_dll.h` and compiles the EXE against it. This preserves the launcher's DLL hash and RVA checks. Do not replace only one member of the pair or disable validation. The checked-in `work/diagnostic-build/built_dll.h` identifies the submitted DLL for review; the rebuild's output-local copy takes precedence during launcher compilation.
 
-## Compile the EXE on Windows for source review
+Generated inputs in `work/diagnostic-build/` and `work/menu-images/jnet_menu_assets.h` are part of the reviewed source. They contain executable-address signatures, embedded Lua, creature resources, collision/environment payloads, fonts, and UI data. The source-only rebuild consumes these supplied headers and does not regenerate original game-derived assets or the distribution ZIP. The full asset-generation workspace is deliberately excluded. Neither a Journey installation nor private bottle paths are needed to compile these binaries.
 
-In the same PowerShell session, compile the launcher with the generated headers supplied for the submitted release:
+The complete release build passed, including artifact hashes, PE exports, embedded build identifier, GUI subsystem and system-library import checks. The source-only recipe also compiled both binaries successfully from an isolated copy of exactly the 157 allowlisted files. Its regenerated launcher header was checked against the rebuilt DLL hash and every required export RVA. Cross-host byte-for-byte reproducibility and Windows execution are not assumed. The identifier names the submitted generated-input snapshot, not a Git commit or a fresh hash of reviewer edits.
 
-```powershell
-$launcherArgs = @(
-    'cc', '-target', 'x86_64-windows-gnu', '-O2', '-std=c11',
-    '-fms-extensions', '-DUNICODE', '-D_UNICODE',
-    '-Wall', '-Wextra', '-Werror', '-Wno-unused-const-variable',
-    "-I$generated", "-I$minhook/include",
-    '-municode', '-Wl,--subsystem,windows',
-    "$lab/diagnostic/probe_helper.c",
-    '-lbcrypt', '-luser32', '-lgdi32', '-lcomdlg32',
-    '-o', "$output/JNET.exe"
-)
-& zig @launcherArgs
-if ($LASTEXITCODE -ne 0) { throw 'EXE compilation failed' }
-Get-FileHash "$output/JNET.exe" -Algorithm SHA256
-```
+## Review scope
 
-This compiles the EXE without executing it. Review `work/diagnostic-build/built_dll.h` and `scarf_banners.h` as well as `probe_helper.c` and its source includes. The supplied `built_dll.h` pins the submitted DLL's SHA-256 and export addresses. Therefore this standalone EXE build is paired with the submitted DLL, not automatically with the separately rebuilt DLL above. The full builder regenerates `built_dll.h` from the newly compiled DLL before compiling the EXE. Both PowerShell recipes reproduce the release compilation commands but have not been executed on Windows here.
+The DLL entry point is `diagnostic/probe_dll.c`; the launcher entry point is `diagnostic/probe_helper.c`. Review their included headers and generated payloads alongside them, especially launcher process access/DLL injection, native hooks, Steam networking, and save/configuration/report export writes. Notices are in `diagnostic/THIRD-PARTY.txt`, MinHook's `LICENSE.txt`/`AUTHORS.txt`, and `journey_detour-main/LICENSE.txt`.
 
-## Regenerate the complete package
-
-The existing release builder is `diagnostic/build_diagnostic.py`. On the recorded Apple Silicon macOS setup, from the repository root:
-
-```sh
-python3 -B JourneyPC-CompanionsMod/CompanionLab/diagnostic/build_diagnostic.py --package-only
-```
-
-It requires Python 3.9 or newer, Zig at `work/deps/zig-macos-aarch64-0.13.0/zig`, MinHook at `work/deps/minhook-1.3.4`, and a Python environment with Pillow at `work/editor-assets-env/bin/python`. Paths here are relative to `JourneyPC-CompanionsMod/CompanionLab`. The builder does not install dependencies.
-
-Full regeneration uses the retained files listed in `MODERATION_BUILD_INPUTS.txt`: 81 files under `JourneyPC`, nine under `JourneyIOS`, 23 under `WorldLevelPictures`, and `Journey-sound-fix-0.3.1.exe`. These supply reference executables, mesh and animation data, fonts, menu definitions, environment definitions, collision source geometry, and chapter images. It also uses the extracted scripts under `work/pc_scripts`, collision inputs, day/night inputs, and the existing menu atlas and manifest inside `JourneyPC-CompanionsMod`. Preserve their relative paths; the retained Journey directories are build inputs, not complete playable game installations. `JourneyPC/Journey.exe` must have SHA-256 `16a7c176b9cce893e0ca72c5d0e4b2e7377c4fabec179f95a5e1331b6c2a788f`; the optional sound-fix reference `Journey-sound-fix-0.3.1.exe` must have SHA-256 `0a73c2fb3a2e5b33f6c38082b966160cd54882fac9efbe09c3ea8dde6fc037ca`. The builder checks both before proceeding.
-
-The builder regenerates payload headers, compiles the DLL and matching launcher, validates imports, exports and hashes, and writes `work/JNET.zip` and `work/package-0.357/JNET/`. `--package-only` skips the ABI test fixture and collision audit reports. It does not install or launch the mod. The complete build succeeded for the hashes above; no gameplay validation is claimed.
-
-For moderation, provide the release ZIP, this guide, and access to the matching source commit including generated inputs and MinHook. Review the launcher's process access and DLL injection, the DLL's native hooks, Steam networking, and file-writing paths in the source. Repository access remains private unless the owner explicitly changes it.
+Provide this matching source commit and the separately submitted release ZIP to Nexus Mods support. Repository visibility is unchanged by this release.
